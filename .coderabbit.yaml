@@ -1,0 +1,43 @@
+language: "en-US"
+early_access: false
+reviews:
+  auto_review:
+    enabled: true
+    drafts: false
+  request_changes_workflow: false
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
+  path_filters:
+    - "!**/*.lock"
+    - "!**/*.md"
+    - "!**/node_modules/**"
+  auto_title_placeholder: "AI Review"
+  path_instructions:
+    - path: "apps/web/src/app/**"
+      instructions: |
+        Review for Next.js 15 App Router best practices.
+        Check for proper Server Component vs Client Component usage.
+        Verify async/await patterns in Server Components.
+    - path: "apps/web/src/components/**"
+      instructions: |
+        Review for React best practices.
+        Check for proper prop types and TypeScript usage.
+        Verify accessibility with jsx-a11y rules.
+    - path: "apps/web/e2e/**"
+      instructions: |
+        Review Playwright test quality.
+        Check for proper page object patterns.
+        Verify test coverage of critical flows.
+    - path: "supabase/migrations/**"
+      instructions: |
+        Review SQL migration safety.
+        Check for proper RLS policies.
+        Verify foreign key constraints and indexes.
+    - path: "packages/**"
+      instructions: |
+        Review shared package patterns.
+        Ensure proper exports and TypeScript types.
+chat:
+  auto_reply: true

@@ -1,0 +1,5 @@
+{
+  "root": true,
+  "extends": ["@uiforge/eslint-config"],
+  "ignorePatterns": ["node_modules/", ".next/", "out/", "dist/", "build/"]
+}
