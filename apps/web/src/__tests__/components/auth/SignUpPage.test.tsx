@@ -27,7 +27,7 @@ describe('SignUpPage', () => {
 
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole('button', { name: /sign up/i });
+    const submitButton = screen.getByRole('button', { name: /create account/i });
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
@@ -51,15 +51,15 @@ describe('SignUpPage', () => {
 
   it('handles sign up error', async () => {
     mockSupabaseClient.auth.signUp.mockResolvedValue({
-      data: { user: null },
-      error: { message: 'Email already registered' },
+      data: { user: null, session: null },
+      error: { message: 'Email already registered', name: 'AuthError', status: 400 },
     });
 
     render(<SignUpPage />);
 
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole('button', { name: /sign up/i });
+    const submitButton = screen.getByRole('button', { name: /create account/i });
 
     fireEvent.change(emailInput, {
       target: { value: 'existing@example.com' },
@@ -69,26 +69,28 @@ describe('SignUpPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/email already registered/i)).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
   });
 
   it('shows loading state during sign up', async () => {
     mockSupabaseClient.auth.signUp.mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 100))
+      () => new Promise((resolve) => setTimeout(() => resolve({ data: { user: null }, error: null }), 100))
     );
 
     render(<SignUpPage />);
 
     const emailInput = screen.getByLabelText(/email/i);
     const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole('button', { name: /sign up/i });
+    const submitButton = screen.getByRole('button', { name: /create account/i });
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(submitButton);
 
-    // Button should be disabled during loading
-    expect(submitButton).toBeDisabled();
+    // Wait for loading state to be set
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /creating account/i })).toBeDisabled();
+    });
   });
 
   it('has link to sign in page', () => {

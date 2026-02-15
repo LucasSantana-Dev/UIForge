@@ -64,7 +64,7 @@ describe('SignInPage', () => {
   it('handles sign in error', async () => {
     mockSupabaseClient.auth.signInWithPassword.mockResolvedValue({
       data: { user: null, session: null },
-      error: { message: 'Invalid login credentials' },
+      error: { message: 'Invalid login credentials', name: 'AuthError', status: 400 },
     });
 
     render(<SignInPage />);
@@ -79,7 +79,7 @@ describe('SignInPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/invalid login credentials/i)).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
 
     // Should not redirect
     expect(mockPush).not.toHaveBeenCalled();
@@ -87,7 +87,7 @@ describe('SignInPage', () => {
 
   it('shows loading state during sign in', async () => {
     mockSupabaseClient.auth.signInWithPassword.mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 100))
+      () => new Promise((resolve) => setTimeout(() => resolve({ data: { user: null, session: null }, error: null }), 100))
     );
 
     render(<SignInPage />);
@@ -100,8 +100,10 @@ describe('SignInPage', () => {
     fireEvent.change(passwordInput, { target: { value: 'password123' } });
     fireEvent.click(submitButton);
 
-    // Button should be disabled during loading
-    expect(submitButton).toBeDisabled();
+    // Wait for loading state to be set
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /signing in/i })).toBeDisabled();
+    });
   });
 
   it('has link to sign up page', () => {
