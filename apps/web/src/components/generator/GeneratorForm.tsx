@@ -1,16 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SparklesIcon, WandIcon } from 'lucide-react';
+import { useGeneration } from '@/hooks/use-generation';
+import GenerationProgress from './GenerationProgress';
 
 const generatorSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters').max(1000),
   componentName: z.string().min(1, 'Component name is required').max(50),
-  includeStyles: z.boolean(),
-  includeTests: z.boolean(),
+  componentLibrary: z.enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none']).optional(),
+  style: z.enum(['modern', 'minimal', 'colorful']).optional(),
+  typescript: z.boolean(),
 });
 
 type GeneratorFormData = z.infer<typeof generatorSchema>;
@@ -18,7 +21,7 @@ type GeneratorFormData = z.infer<typeof generatorSchema>;
 interface GeneratorFormProps {
   projectId: string;
   framework: string;
-  onGenerate: (code: string) => void;
+  onGenerate: (code: string, settings: any) => void;
   onGenerating: () => void;
   isGenerating: boolean;
 }
@@ -30,7 +33,13 @@ export default function GeneratorForm({
   onGenerating,
   isGenerating,
 }: GeneratorFormProps) {
-  const [error, setError] = useState<string | null>(null);
+  const generation = useGeneration();
+  const [currentSettings, setCurrentSettings] = useState({
+    componentName: '',
+    componentLibrary: '',
+    style: '',
+    typescript: false,
+  });
 
   const {
     register,
@@ -39,37 +48,64 @@ export default function GeneratorForm({
   } = useForm<GeneratorFormData>({
     resolver: zodResolver(generatorSchema),
     defaultValues: {
-      includeStyles: true,
-      includeTests: false,
+      componentName: '',
+      prompt: '',
+      componentLibrary: framework === 'react' ? 'shadcn' : 'tailwind',
+      style: 'modern',
+      typescript: true,
     },
   });
 
   const onSubmit = async (data: GeneratorFormData) => {
     try {
-      setError(null);
       onGenerating();
 
-      // TODO: Implement MCP client call
-      // For now, generate a placeholder component
-      const placeholderCode = generatePlaceholder(data.componentName, framework);
+      // Update current settings
+      setCurrentSettings({
+        componentName: data.componentName,
+        componentLibrary: data.componentLibrary || 'none',
+        style: data.style || 'modern',
+        typescript: data.typescript,
+      });
 
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Start streaming generation
+      await generation.startGeneration({
+        framework: framework as 'react' | 'vue' | 'angular' | 'svelte',
+        componentLibrary: data.componentLibrary || 'none',
+        description: data.prompt,
+        style: data.style,
+        typescript: data.typescript,
+        componentName: data.componentName,
+        prompt: data.prompt,
+      });
 
-      onGenerate(placeholderCode);
+      // The hook will handle the streaming and update state
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate component');
-      onGenerate('');
+      console.error('Generation failed:', err);
     }
   };
+
+  // Notify parent when generation completes
+  useEffect(() => {
+    if (generation.code && !generation.isGenerating && !generation.error) {
+      onGenerate(generation.code, currentSettings);
+    }
+  }, [generation.code, generation.isGenerating, generation.error, onGenerate, currentSettings]);
+
+  // Notify parent when generation starts
+  useEffect(() => {
+    if (generation.isGenerating && !isGenerating) {
+      onGenerating();
+    }
+  }, [generation.isGenerating, isGenerating, onGenerating]);
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {error && (
+          {generation.error && (
             <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-              {error}
+              {generation.error}
             </div>
           )}
 
@@ -105,32 +141,55 @@ export default function GeneratorForm({
             )}
           </div>
 
-          <div className="space-y-3">
-            <label className="flex items-center">
-              <input
-                {...register('includeStyles')}
-                type="checkbox"
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              <span className="ml-2 text-sm text-gray-700">Include Tailwind styles</span>
-            </label>
+          <div className="space-y-4">
+            <div>
+              <label htmlFor="componentLibrary" className="block text-sm font-medium text-gray-700 mb-2">
+                Component Library
+              </label>
+              <select
+                {...register('componentLibrary')}
+                id="componentLibrary"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="tailwind">Tailwind CSS</option>
+                <option value="shadcn">shadcn/ui</option>
+                <option value="mui">Material-UI</option>
+                <option value="chakra">Chakra UI</option>
+                <option value="none">None</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="style" className="block text-sm font-medium text-gray-700 mb-2">
+                Design Style
+              </label>
+              <select
+                {...register('style')}
+                id="style"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="modern">Modern</option>
+                <option value="minimal">Minimal</option>
+                <option value="colorful">Colorful</option>
+              </select>
+            </div>
 
             <label className="flex items-center">
               <input
-                {...register('includeTests')}
+                {...register('typescript')}
                 type="checkbox"
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="ml-2 text-sm text-gray-700">Generate tests</span>
+              <span className="ml-2 text-sm text-gray-700">Use TypeScript</span>
             </label>
           </div>
 
           <button
             type="submit"
-            disabled={isGenerating}
+            disabled={generation.isGenerating}
             className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isGenerating ? (
+            {generation.isGenerating ? (
               <>
                 <WandIcon className="animate-spin h-5 w-5 mr-2" />
                 Generating...
@@ -145,6 +204,18 @@ export default function GeneratorForm({
         </form>
       </div>
 
+      {/* Generation Progress */}
+      {(generation.isGenerating || generation.progress > 0 || generation.error) && (
+        <div className="border-t border-gray-200">
+          <GenerationProgress
+            isGenerating={generation.isGenerating}
+            progress={generation.progress}
+            events={generation.events}
+            error={generation.error}
+          />
+        </div>
+      )}
+
       <div className="border-t border-gray-200 p-4 bg-gray-50">
         <div className="text-xs text-gray-600">
           <p className="font-medium mb-1">Tips:</p>
@@ -152,30 +223,10 @@ export default function GeneratorForm({
             <li>Be specific about styling and behavior</li>
             <li>Mention any props or state needed</li>
             <li>Describe responsive behavior if needed</li>
+            <li>Choose component library for better results</li>
           </ul>
         </div>
       </div>
     </div>
   );
-}
-
-function generatePlaceholder(componentName: string, framework: string): string {
-  if (framework === 'react') {
-    return `import React from 'react';
-
-interface ${componentName}Props {
-  children?: React.ReactNode;
-  className?: string;
-}
-
-export default function ${componentName}({ children, className = '' }: ${componentName}Props) {
-  return (
-    <div className={\`\${className}\`}>
-      {children || '${componentName} Component'}
-    </div>
-  );
-}`;
-  }
-
-  return `// ${componentName} component for ${framework}`;
 }

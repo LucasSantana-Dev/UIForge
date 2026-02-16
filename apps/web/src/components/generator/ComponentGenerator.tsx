@@ -2,9 +2,12 @@
 
 import { useState } from 'react';
 import { useProject } from '@/hooks/use-projects';
+import { useGeneration } from '@/hooks/use-generation';
 import GeneratorForm from './GeneratorForm';
 import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
+import GenerationHistory from './GenerationHistory';
+import SaveToProject from './SaveToProject';
 import { SparklesIcon } from 'lucide-react';
 
 interface ComponentGeneratorProps {
@@ -13,8 +16,17 @@ interface ComponentGeneratorProps {
 
 export default function ComponentGenerator({ projectId }: ComponentGeneratorProps) {
   const { data: project, isLoading } = useProject(projectId);
-  const [generatedCode, setGeneratedCode] = useState<string>('');
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [currentComponentName, setCurrentComponentName] = useState('');
+  const [currentSettings, setCurrentSettings] = useState({
+    componentLibrary: '',
+    style: '',
+    typescript: false,
+  });
+  const [editedCode, setEditedCode] = useState('');
+  const [isEdited, setIsEdited] = useState(false);
+
+  // Initialize generation hook with projectId
+  const generation = useGeneration(projectId);
 
   if (isLoading) {
     return (
@@ -54,12 +66,19 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
           <GeneratorForm
             projectId={projectId}
             framework={project.framework}
-            onGenerate={(code: string) => {
-              setGeneratedCode(code);
-              setIsGenerating(false);
+            onGenerate={(code: string, settings: any) => {
+              // Update current settings for save functionality
+              setCurrentComponentName(settings.componentName);
+              setCurrentSettings({
+                componentLibrary: settings.componentLibrary,
+                style: settings.style,
+                typescript: settings.typescript,
+              });
             }}
-            onGenerating={() => setIsGenerating(true)}
-            isGenerating={isGenerating}
+            onGenerating={() => {
+              // Generation state is handled by the hook
+            }}
+            isGenerating={generation.isGenerating}
           />
         </div>
 
@@ -68,19 +87,46 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
           {/* Code Editor */}
           <div className="flex-1 border-b border-gray-200">
             <CodeEditor
-              code={generatedCode}
-              onChange={setGeneratedCode}
+              code={isEdited ? editedCode : generation.code}
+              onChange={(code) => {
+                setEditedCode(code);
+                setIsEdited(true);
+              }}
               language={project.framework === 'vue' ? 'vue' : 'typescript'}
             />
           </div>
 
           {/* Live Preview */}
-          <div className="flex-1">
+          <div className="flex-1 border-b border-gray-200">
             <LivePreview
-              code={generatedCode}
+              code={isEdited ? editedCode : generation.code}
               framework={project.framework}
             />
           </div>
+
+          {/* Generation History */}
+          <div className="h-48">
+            <GenerationHistory
+              projectId={projectId}
+              onSelectGeneration={(code) => {
+                setEditedCode(code);
+                setIsEdited(true);
+              }}
+            />
+          </div>
+
+          {/* Save to Project */}
+          {generation.code && (
+            <SaveToProject
+              projectId={projectId}
+              code={isEdited ? editedCode : generation.code}
+              componentName={currentComponentName || 'GeneratedComponent'}
+              framework={project.framework}
+              componentLibrary={currentSettings.componentLibrary}
+              style={currentSettings.style}
+              typescript={currentSettings.typescript}
+            />
+          )}
         </div>
       </div>
     </div>

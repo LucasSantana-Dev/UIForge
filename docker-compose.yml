@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  # UIForge API Service
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: uiforge-api
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - FRONTEND_URL_PROD=${FRONTEND_URL_PROD}
+      - RATE_LIMIT_GENERATION=${RATE_LIMIT_GENERATION:-10}
+      - RATE_LIMIT_WINDOW_HOURS=${RATE_LIMIT_WINDOW_HOURS:-1}
+      - RATE_LIMIT_WEBSOCKET_MESSAGES=${RATE_LIMIT_WEBSOCKET_MESSAGES:-100}
+      - WS_HEARTBEAT_INTERVAL=${WS_HEARTBEAT_INTERVAL:-30000}
+      - WS_MAX_CONNECTIONS=${WS_MAX_CONNECTIONS:-1000}
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1); })"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - uiforge-network
+
+  # Next.js Web App (optional - can run separately)
+  # web:
+  #   build:
+  #     context: ./apps/web
+  #     dockerfile: Dockerfile
+  #   container_name: uiforge-web
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}
+  #     - NEXT_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+  #     - NEXT_PUBLIC_API_URL=http://api:3001
+  #   depends_on:
+  #     - api
+  #   restart: unless-stopped
+  #   networks:
+  #     - uiforge-network
+
+networks:
+  uiforge-network:
+    driver: bridge
