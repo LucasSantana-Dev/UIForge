@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FolderIcon, FileTextIcon, SettingsIcon, PlusIcon } from 'lucide-react';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
 const navigation = [
   { name: 'Projects', href: '/projects', icon: FolderIcon },
@@ -15,38 +17,36 @@ export default function Sidebar() {
 
   return (
     <div className="hidden md:flex md:w-64 md:flex-col">
-      <div className="flex flex-col flex-grow pt-5 bg-white border-r border-gray-200 overflow-y-auto">
-        <div className="flex items-center flex-shrink-0 px-4">
-          <h1 className="text-2xl font-bold text-blue-600">UIForge</h1>
-        </div>
+      <div className="flex flex-col flex-grow pt-5 bg-card border-r overflow-y-auto">
+        <Link href="/dashboard" className="flex items-center flex-shrink-0 px-4 gap-3 hover:opacity-80 transition-opacity">
+          <Image src="/anvil-logo.svg" alt="UIForge" width={32} height={32} className="flex-shrink-0" />
+          <h1 className="text-2xl font-bold">
+            <span className="text-muted-foreground">UI</span>
+            <span className="text-primary">Forge</span>
+          </h1>
+        </Link>
         <div className="mt-8 flex-grow flex flex-col">
           <nav className="flex-1 px-2 space-y-1">
-            <Link
-              href="/generate"
-              className="group flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 mb-4"
-            >
-              <PlusIcon className="mr-3 h-5 w-5" />
-              Generate Component
-            </Link>
+            <Button asChild className="w-full justify-start mb-4">
+              <Link href="/generate">
+                <PlusIcon className="mr-2 h-4 w-4" />
+                Generate Component
+              </Link>
+            </Button>
             {navigation.map((item) => {
               const isActive = pathname.startsWith(item.href);
               return (
-                <Link
+                <Button
                   key={item.name}
-                  href={item.href}
-                  className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md ${
-                    isActive
-                      ? 'bg-gray-100 text-gray-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                  asChild
+                  variant={isActive ? 'secondary' : 'ghost'}
+                  className="w-full justify-start"
                 >
-                  <item.icon
-                    className={`mr-3 h-5 w-5 ${
-                      isActive ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-500'
-                    }`}
-                  />
-                  {item.name}
-                </Link>
+                  <Link href={item.href}>
+                    <item.icon className="mr-2 h-4 w-4" />
+                    {item.name}
+                  </Link>
+                </Button>
               );
             })}
           </nav>
