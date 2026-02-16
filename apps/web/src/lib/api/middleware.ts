@@ -3,17 +3,12 @@
  * Higher-order functions for route handlers
  */
 
-import type { NextRequest, NextResponse } from 'next/server';
-import type { ZodSchema } from 'zod';
-import { checkRateLimit, setRateLimitHeaders } from './rate-limit';
-import {
-  ValidationError,
-  type APIError
-} from './errors';
-import {
-  errorResponse,
-  apiErrorResponse
-} from './response';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, setRateLimitHeaders, type RateLimitResult } from './rate-limit';
+import { verifySession } from './auth';
+import { ValidationError, type APIError } from './errors';
+import { errorResponse, apiErrorResponse } from './response';
+import { z, type ZodSchema } from 'zod';
 
 type RouteHandler = (
   request: NextRequest,
@@ -46,7 +41,7 @@ export function withRateLimit(
   limit: number = 100,
   window: number = 60000
 ): RouteHandler {
-  return async (request: NextRequest, context?: any) => {
+  return async (request: NextRequest, context?: any): Promise<NextResponse> => {
     try {
       const result = await checkRateLimit(request, limit, window);
 
@@ -54,11 +49,11 @@ export function withRateLimit(
         const response = errorResponse('Rate limit exceeded', 429, {
           retry_after: Math.ceil((result.resetAt - Date.now()) / 1000),
         });
-        return setRateLimitHeaders(response, result, limit);
+        return NextResponse.json(response, { status: 429 });
       }
 
       const response = await handler(request, context);
-      return setRateLimitHeaders(response, result, limit);
+      return response;
     } catch (error) {
       if ((error as APIError).statusCode) {
         return apiErrorResponse(error as APIError);
