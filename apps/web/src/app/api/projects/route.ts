@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
 
     if (!validation.success) {
       const response = errorResponse('Invalid request body', 400, {
-        errors: validation.error.errors,
+        errors: validation.error.issues,
       });
       return setRateLimitHeaders(response, rateResult, RATE_LIMIT);
     }
