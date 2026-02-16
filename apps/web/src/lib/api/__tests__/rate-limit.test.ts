@@ -11,11 +11,10 @@ import {
 import { RateLimitError } from '../errors';
 
 // Mock getSession
-jest.mock('../auth', () => ({
-  getSession: jest.fn(),
-}));
+jest.mock('../auth');
 
 import { getSession } from '../auth';
+const mockGetSession = getSession as jest.MockedFunction<typeof getSession>;
 
 describe('Rate Limiting', () => {
   beforeEach(() => {
@@ -30,7 +29,7 @@ describe('Rate Limiting', () => {
 
   describe('checkRateLimit', () => {
     it('should allow first request', async () => {
-      getSession.mockResolvedValue({ user: { id: 'user-123' } });
+      mockGetSession.mockResolvedValue({ user: { id: 'user-123', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any });
       const request = new NextRequest('http://localhost/api/test');
 
       const result = await checkRateLimit(request, 10, 60000);
@@ -41,7 +40,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should track requests per user', async () => {
-      getSession.mockResolvedValue({ user: { id: 'user-123' } });
+      mockGetSession.mockResolvedValue({ user: { id: 'user-123', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any });
       const request = new NextRequest('http://localhost/api/test');
 
       // First request
@@ -61,7 +60,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should block requests after limit exceeded', async () => {
-      getSession.mockResolvedValue({ user: { id: 'user-123' } });
+      mockGetSession.mockResolvedValue({ user: { id: 'user-123', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any });
       const request = new NextRequest('http://localhost/api/test');
 
       // Exhaust limit
@@ -75,7 +74,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should reset after window expires', async () => {
-      getSession.mockResolvedValue({ user: { id: 'user-123' } });
+      mockGetSession.mockResolvedValue({ user: { id: 'user-123', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any });
       const request = new NextRequest('http://localhost/api/test');
 
       // Exhaust limit
@@ -92,7 +91,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should use IP address for anonymous users', async () => {
-      getSession.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue(null);
       const request = new NextRequest('http://localhost/api/test', {
         headers: {
           'x-forwarded-for': '192.168.1.1',
@@ -104,7 +103,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should use default identifier for anonymous without IP', async () => {
-      getSession.mockResolvedValue(null);
+      mockGetSession.mockResolvedValue(null);
       const request = new NextRequest('http://localhost/api/test');
 
       const result = await checkRateLimit(request, 10, 60000);
@@ -114,14 +113,14 @@ describe('Rate Limiting', () => {
 
   describe('enforceRateLimit', () => {
     it('should not throw when limit not exceeded', async () => {
-      getSession.mockResolvedValue({ user: { id: 'user-123' } });
+      mockGetSession.mockResolvedValue({ user: { id: 'user-123' } as any });
       const request = new NextRequest('http://localhost/api/test');
 
       await expect(enforceRateLimit(request, 10, 60000)).resolves.not.toThrow();
     });
 
     it('should throw RateLimitError when limit exceeded', async () => {
-      getSession.mockResolvedValue({ user: { id: 'user-123' } });
+      mockGetSession.mockResolvedValue({ user: { id: 'user-123' } as any });
       const request = new NextRequest('http://localhost/api/test');
 
       // Exhaust limit
@@ -134,7 +133,7 @@ describe('Rate Limiting', () => {
     });
 
     it('should include retry after in error', async () => {
-      getSession.mockResolvedValue({ user: { id: 'user-123' } });
+      mockGetSession.mockResolvedValue({ user: { id: 'user-123' } as any });
       const request = new NextRequest('http://localhost/api/test');
 
       // Exhaust limit
