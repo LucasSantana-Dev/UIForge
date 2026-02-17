@@ -8,7 +8,8 @@ export async function GET(request: NextRequest) {
   try {
     // Rate limiting
     const rateLimitResult = await checkRateLimit(request, 100, 60000);
-    setRateLimitHeaders(NextResponse, rateLimitResult, 100);
+    const response = new NextResponse();
+    setRateLimitHeaders(response, rateLimitResult, 100);
 
     if (!rateLimitResult.allowed) {
       return errorResponse('Too many requests', 429);
@@ -66,7 +67,8 @@ export async function POST(request: NextRequest) {
   try {
     // Rate limiting
     const rateLimitResult = await checkRateLimit(request, 20, 60000);
-    setRateLimitHeaders(NextResponse, rateLimitResult, 20);
+    const response = new NextResponse();
+    setRateLimitHeaders(response, rateLimitResult, 20);
 
     if (!rateLimitResult.allowed) {
       return errorResponse('Too many requests', 429);
@@ -91,7 +93,7 @@ export async function POST(request: NextRequest) {
     const { data: project, error: projectError } = await supabase
       .from('projects')
       .select('id, user_id')
-      .eq('id', body.project_id)
+      .eq('id', body.project_id.toString())
       .single();
 
     if (projectError || !project) {
@@ -106,7 +108,7 @@ export async function POST(request: NextRequest) {
     const { data: generation, error } = await supabase
       .from('generations')
       .insert({
-        project_id: body.project_id,
+        project_id: body.project_id.toString(),
         user_id: user.id,
         prompt: body.prompt,
         component_name: body.component_name,
@@ -116,7 +118,7 @@ export async function POST(request: NextRequest) {
         style: body.style || null,
         typescript: body.typescript || false,
         status: 'completed',
-        tokens_used: body.tokens_used || null,
+        tokens_used: body.tokens_used?.toString() || null,
       })
       .select()
       .single();
@@ -126,7 +128,13 @@ export async function POST(request: NextRequest) {
       return errorResponse('Failed to create generation', 500);
     }
 
-    return successResponse({ generation }, 201);
+    return successResponse({
+      generation: {
+        ...generation,
+        project_id: generation.project_id?.toString() || '',
+        tokens_used: generation.tokens_used || null,
+      }
+    }, 201);
 
   } catch (error) {
     console.error('Generations POST error:', error);

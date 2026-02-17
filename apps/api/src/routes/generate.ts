@@ -68,27 +68,27 @@ router.post('/', async (req, res) => {
     // Start streaming generation
     try {
       let fullCode = '';
-      
+
       for await (const chunk of streamComponentGeneration(options)) {
         fullCode += chunk;
-        
+
         // Send chunk to client
         res.write(`data: ${JSON.stringify({ type: 'chunk', content: chunk })}\n\n`);
       }
 
       // Validate generated code
       const isValidCode = await hasCodePatterns(fullCode, options.typescript ? 'typescript' : 'javascript');
-      
+
       if (!isValidCode) {
-        res.write(`data: ${JSON.stringify({ 
-          type: 'warning', 
-          message: 'Generated code may not be valid' 
+        res.write(`data: ${JSON.stringify({
+          type: 'warning',
+          message: 'Generated code may not be valid'
         })}\n\n`);
       }
 
       // Send completion event
-      res.write(`data: ${JSON.stringify({ 
-        type: 'complete', 
+      res.write(`data: ${JSON.stringify({
+        type: 'complete',
         code: fullCode,
         isValid: isValidCode
       })}\n\n`);
@@ -101,9 +101,9 @@ router.post('/', async (req, res) => {
 
     } catch (generationError) {
       logger.error('Generation failed', generationError);
-      
-      res.write(`data: ${JSON.stringify({ 
-        type: 'error', 
+
+      res.write(`data: ${JSON.stringify({
+        type: 'error',
         error: generationError instanceof Error ? generationError.message : 'Unknown error'
       })}\n\n`);
     }
@@ -112,15 +112,15 @@ router.post('/', async (req, res) => {
 
   } catch (error) {
     logger.error('Route error', error);
-    
+
     if (!res.headersSent) {
       res.status(500).json({
         error: 'Internal server error',
         message: error instanceof Error ? error.message : 'Unknown error',
       });
     } else {
-      res.write(`data: ${JSON.stringify({ 
-        type: 'error', 
+      res.write(`data: ${JSON.stringify({
+        type: 'error',
         error: 'Internal server error'
       })}\n\n`);
       res.end();

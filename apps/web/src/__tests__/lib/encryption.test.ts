@@ -89,30 +89,30 @@ describe('Encryption Utilities', () => {
       const validKey = 'sk-1234567890abcdef1234567890abcdef12345678';
       const invalidKey = 'invalid-key';
 
-      expect(validateApiKey('openai' as AIProvider, validKey)).toBe(true);
-      expect(validateApiKey('openai' as AIProvider, invalidKey)).toBe(false);
+      expect(validateApiKey(validKey, 'openai' as AIProvider)).toBe(true);
+      expect(validateApiKey(invalidKey, 'openai' as AIProvider)).toBe(false);
     });
 
     it('should validate Anthropic API keys', () => {
       const validKey = 'sk-ant-api03-1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
       const invalidKey = 'invalid-key';
 
-      expect(validateApiKey('anthropic' as AIProvider, validKey)).toBe(true);
-      expect(validateApiKey('anthropic' as AIProvider, invalidKey)).toBe(false);
+      expect(validateApiKey(validKey, 'anthropic' as AIProvider)).toBe(true);
+      expect(validateApiKey(invalidKey, 'anthropic' as AIProvider)).toBe(false);
     });
 
     it('should validate Google AI API keys', () => {
       const validKey = 'AIzaSy-1234567890abcdef-1234567890abcdef';
       const invalidKey = 'invalid-key';
 
-      expect(validateApiKey('google' as AIProvider, validKey)).toBe(true);
-      expect(validateApiKey('google' as AIProvider, invalidKey)).toBe(false);
+      expect(validateApiKey(validKey, 'google' as AIProvider)).toBe(true);
+      expect(validateApiKey(invalidKey, 'google' as AIProvider)).toBe(false);
     });
 
     it('should reject empty API keys', () => {
-      expect(validateApiKey('openai' as AIProvider, '')).toBe(false);
-      expect(validateApiKey('anthropic' as AIProvider, '')).toBe(false);
-      expect(validateApiKey('google' as AIProvider, '')).toBe(false);
+      expect(validateApiKey('', 'openai' as AIProvider)).toBe(false);
+      expect(validateApiKey('', 'anthropic' as AIProvider)).toBe(false);
+      expect(validateApiKey('', 'google' as AIProvider)).toBe(false);
     });
   });
 
@@ -157,7 +157,7 @@ describe('Encryption Utilities', () => {
 
   describe('Encryption Key Derivation', () => {
     it('should derive encryption keys from passwords', () => {
-      const password = TEST_CONFIG.PASSWORDS.USER;
+      const password = TEST_CONFIG.USER.PASSWORD;
       const salt = 'random-salt-456';
 
       const derivedKey = deriveEncryptionKey(password, salt);

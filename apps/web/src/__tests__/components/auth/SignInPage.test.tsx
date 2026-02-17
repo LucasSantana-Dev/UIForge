@@ -5,8 +5,8 @@
 
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { SignInPage } from '@/components/auth/SignInPage';
-import { TEST_CONFIG } from '../../../../../test-config';
+import SignInPage from '@/app/(auth)/signin/page';
+import { TEST_CONFIG } from '../../../../../../test-config';
 
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
