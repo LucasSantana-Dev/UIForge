@@ -77,7 +77,7 @@ async function handleHealth(env: Env): Promise<Response> {
       if (!response.ok) {
         health.status = 'degraded';
       }
-    } catch (error) {
+    } catch {
       health.services.supabase = 'disconnected';
       health.status = 'degraded';
     }
@@ -95,7 +95,7 @@ async function handleHealth(env: Env): Promise<Response> {
       status: statusCode,
       headers: { 'Content-Type': 'application/json' }
     });
-  } catch (error) {
+  } catch {
     return new Response(JSON.stringify({
       status: 'unhealthy',
       timestamp: new Date().toISOString(),

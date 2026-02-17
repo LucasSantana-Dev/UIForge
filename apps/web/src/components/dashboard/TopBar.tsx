@@ -17,7 +17,9 @@ export default function TopBar({ user }: TopBarProps) {
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
-    setMounted(true);
+    if (!mounted) {
+      setTimeout(() => setMounted(true), 0);
+    }
   }, []);
 
   return (

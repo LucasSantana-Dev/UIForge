@@ -100,13 +100,12 @@ class AIKeyManagerImpl implements AIKeyManager {
   /**
    * Get all API keys (decrypted)
    */
-  async getApiKeys(encryptionKey: string): Promise<DecryptedApiKey[]> {
+  async getApiKeys(_encryptionKey: string): Promise<DecryptedApiKey[]> {
     const encryptedKeys = await storage.getApiKeys();
     const decryptedKeys: DecryptedApiKey[] = [];
 
     for (const encryptedKey of encryptedKeys) {
       try {
-        const apiKey = getApiKey(encryptedKey, encryptionKey);
         const isDefault = await this.isDefaultKey(encryptedKey.keyId);
         
         decryptedKeys.push({
@@ -125,7 +124,7 @@ class AIKeyManagerImpl implements AIKeyManager {
   /**
    * Get default API key for a provider
    */
-  async getDefaultApiKey(provider: AIProvider, encryptionKey: string): Promise<DecryptedApiKey | null> {
+  async getDefaultApiKey(provider: AIProvider, _encryptionKey: string): Promise<DecryptedApiKey | null> {
     const encryptedKey = await storage.getDefaultApiKey(provider);
     
     if (!encryptedKey) {
@@ -133,7 +132,6 @@ class AIKeyManagerImpl implements AIKeyManager {
     }
 
     try {
-      const apiKey = getApiKey(encryptedKey, encryptionKey);
       return {
         ...encryptedKey,
         isDefault: true,
@@ -257,7 +255,6 @@ class AIKeyManagerImpl implements AIKeyManager {
    */
   private async callAIProvider(request: GenerationRequest, apiKey: string): Promise<GenerationResponse> {
     const { provider, model, prompt, options = {} } = request;
-    const config = AI_PROVIDERS[provider];
 
     switch (provider) {
       case 'openai':

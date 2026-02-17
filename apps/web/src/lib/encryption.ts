@@ -83,7 +83,7 @@ export function decryptApiKey(encryptedKey: string, encryptionKey: string): stri
   try {
     const bytes = CryptoJS.AES.decrypt(encryptedKey, encryptionKey);
     return bytes.toString(CryptoJS.enc.Utf8);
-  } catch (error) {
+  } catch {
     throw new Error('Failed to decrypt API key. Invalid encryption key.');
   }
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { verifySession } from '@/lib/api/auth';
-import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
+import { checkRateLimit } from '@/lib/api/rate-limit';
 import { successResponse, errorResponse } from '@/lib/api/response';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {

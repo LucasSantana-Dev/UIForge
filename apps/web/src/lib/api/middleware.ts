@@ -3,12 +3,10 @@
  * Higher-order functions for route handlers
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit, setRateLimitHeaders, type RateLimitResult } from './rate-limit';
+import { checkRateLimit } from './rate-limit';
 import { verifySession } from './auth';
 import { ValidationError, type APIError } from './errors';
 import { errorResponse, apiErrorResponse } from './response';
-import { z, type ZodSchema } from 'zod';
 
 type RouteHandler = (
   request: NextRequest,

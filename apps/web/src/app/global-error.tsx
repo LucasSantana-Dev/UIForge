@@ -3,14 +3,14 @@
 import NextError from 'next/error';
 
 export default function GlobalError({
-  error,
+  _error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
   return (
-    <html>
+    <html lang="en">
       <body>
         <NextError
           title="Something went wrong"

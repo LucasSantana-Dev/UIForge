@@ -4,14 +4,6 @@ import type { NextRequest } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const generateSchema = {
-  framework: ['react', 'vue', 'angular', 'svelte'],
-  componentLibrary: ['tailwind', 'mui', 'chakra', 'shadcn', 'none'],
-  style: ['modern', 'minimal', 'colorful'],
-  typescript: 'boolean',
-  description: 'string',
-};
-
 export async function POST(request: NextRequest) {
   try {
     // Parse request body

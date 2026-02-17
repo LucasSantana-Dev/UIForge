@@ -289,6 +289,5 @@ export const useProviderConfig = (provider: AIProvider) => {
 };
 
 export const useAvailableProviders = () => {
-  const apiKeys = useAIKeys();
   return Object.keys(AI_PROVIDERS) as AIProvider[];
 };

@@ -26,8 +26,6 @@ function GeneratePageClient() {
   // Handle template instantiation
   useEffect(() => {
     if (template && description) {
-      // This would typically fetch the template code from an API
-      // For now, we'll simulate it with a basic template structure
       const templateCode = `// Template: ${template}
 // Framework: ${framework}
 // Component Library: ${componentLibrary}
@@ -44,8 +42,10 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
   );
 }`;
 
-      setGeneratedCode(templateCode);
-      setIsTemplateMode(true);
+      setTimeout(() => {
+        setGeneratedCode(templateCode);
+        setIsTemplateMode(true);
+      }, 0);
     }
   }, [template, description, framework, componentLibrary]);
 

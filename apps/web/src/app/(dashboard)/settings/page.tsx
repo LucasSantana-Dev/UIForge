@@ -15,7 +15,6 @@ import {
   Key, 
   Shield, 
   CheckCircle, 
-  AlertCircle,
   Info,
   ExternalLink
 } from 'lucide-react';
@@ -95,7 +94,6 @@ export default function SettingsPage() {
     );
   }
 
-  const hasApiKeys = apiKeys.length > 0;
   const providerStats = Object.entries(AI_PROVIDERS).map(([provider, config]) => {
     const keysForProvider = apiKeys.filter(key => key.provider === provider);
     return {
