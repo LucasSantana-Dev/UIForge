@@ -5,6 +5,7 @@
 
 import request from 'supertest';
 import app from '../../app';
+import { TEST_CONFIG } from '../../../../test-config';
 
 describe('/api/generate', () => {
   const validRequestData = {
@@ -110,7 +111,7 @@ describe('/api/generate', () => {
       const userKeyRequest = {
         ...validRequestData,
         useUserKey: true,
-        apiKey: 'sk-user-key-123',
+        apiKey: TEST_CONFIG.API_KEYS.OPENAI,
       };
 
       const response = await request(app)

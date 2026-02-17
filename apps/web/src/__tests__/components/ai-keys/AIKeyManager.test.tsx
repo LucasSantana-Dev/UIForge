@@ -3,7 +3,7 @@
  * Tests for AI key management UI component
  */
 
-import { render, screen } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AIKeyManager } from '@/components/ai-keys/AIKeyManager';
 import { useAIKeyStore } from '@/stores/ai-keys';
@@ -33,7 +33,7 @@ describe('AIKeyManager', () => {
         createdAt: new Date().toISOString(),
       },
     ],
-    isLoading: false,
+    loading: false,
     error: null,
     addApiKey: jest.fn(),
     removeApiKey: jest.fn(),
@@ -47,22 +47,22 @@ describe('AIKeyManager', () => {
   });
 
   it('should render AI key manager', () => {
-    render(<AIKeyManager />);
+    const { getByText } = render(<AIKeyManager />);
 
-    expect(screen.getByText('AI API Keys')).toBeInTheDocument();
-    expect(screen.getByText('OpenAI Key')).toBeInTheDocument();
-    expect(screen.getByText('Anthropic Key')).toBeInTheDocument();
+    expect(getByText('AI API Keys')).toBeInTheDocument();
+    expect(getByText('OpenAI Key')).toBeInTheDocument();
+    expect(getByText('Anthropic Key')).toBeInTheDocument();
   });
 
   it('should show loading state', () => {
     mockUseAIKeyStore.mockReturnValue({
       ...mockStore,
-      isLoading: true,
+      loading: true,
     });
 
-    render(<AIKeyManager />);
+    const { getByText } = render(<AIKeyManager />);
 
-    expect(screen.getByText('Loading API keys...')).toBeInTheDocument();
+    expect(getByText('Loading API keys...')).toBeInTheDocument();
   });
 
   it('should show error state', () => {
@@ -71,29 +71,29 @@ describe('AIKeyManager', () => {
       error: 'Failed to load API keys',
     });
 
-    render(<AIKeyManager />);
+    const { getByText } = render(<AIKeyManager />);
 
-    expect(screen.getByText('Failed to load API keys')).toBeInTheDocument();
+    expect(getByText('Failed to load API keys')).toBeInTheDocument();
   });
 
   it('should add new API key', async () => {
-    render(<AIKeyManager />);
+    const { getByText, getByLabelText, getByRole } = render(<AIKeyManager />);
 
     // Click add button
-    const addButton = screen.getByText('Add API Key');
+    const addButton = getByText('Add API Key');
     await userEvent.click(addButton);
 
     // Fill form
-    const providerSelect = screen.getByLabelText(/provider/i);
-    const keyNameInput = screen.getByLabelText(/key name/i);
-    const apiKeyInput = screen.getByLabelText(/api key/i);
+    const providerSelect = getByLabelText(/provider/i);
+    const keyNameInput = getByLabelText(/key name/i);
+    const apiKeyInput = getByLabelText(/api key/i);
 
     await userEvent.selectOptions(providerSelect, 'openai');
     await userEvent.type(keyNameInput, 'Test Key');
     await userEvent.type(apiKeyInput, TEST_CONFIG.API_KEYS.OPENAI);
 
     // Submit form
-    const submitButton = screen.getByRole('button', { name: /add key/i });
+    const submitButton = getByRole('button', { name: /add key/i });
     await userEvent.click(submitButton);
 
     expect(mockStore.addApiKey).toHaveBeenCalledWith({
@@ -104,51 +104,51 @@ describe('AIKeyManager', () => {
   });
 
   it('should toggle API key active status', async () => {
-    render(<AIKeyManager />);
+    const { getByLabelText } = render(<AIKeyManager />);
 
     // Find toggle for OpenAI key
-    const openaiToggle = screen.getByLabelText(/toggle openai key/i);
+    const openaiToggle = getByLabelText(/toggle openai key/i);
     await userEvent.click(openaiToggle);
 
     expect(mockStore.toggleApiKey).toHaveBeenCalledWith('openai');
   });
 
   it('should remove API key', async () => {
-    render(<AIKeyManager />);
+    const { getByLabelText, getByRole } = render(<AIKeyManager />);
 
     // Find delete button for OpenAI key
-    const deleteButton = screen.getByLabelText(/delete openai key/i);
+    const deleteButton = getByLabelText(/delete openai key/i);
     await userEvent.click(deleteButton);
 
     // Confirm deletion
-    const confirmButton = screen.getByRole('button', { name: /delete/i });
+    const confirmButton = getByRole('button', { name: /delete/i });
     await userEvent.click(confirmButton);
 
     expect(mockStore.removeApiKey).toHaveBeenCalledWith('openai');
   });
 
   it('should validate API key format', async () => {
-    render(<AIKeyManager />);
+    const { getByText, getByLabelText, getByRole } = render(<AIKeyManager />);
 
     // Click add button
-    const addButton = screen.getByText('Add API Key');
+    const addButton = getByText('Add API Key');
     await userEvent.click(addButton);
 
     // Fill form with invalid key
-    const providerSelect = screen.getByLabelText(/provider/i);
-    const keyNameInput = screen.getByLabelText(/key name/i);
-    const apiKeyInput = screen.getByLabelText(/api key/i);
+    const providerSelect = getByLabelText(/provider/i);
+    const keyNameInput = getByLabelText(/key name/i);
+    const apiKeyInput = getByLabelText(/api key/i);
 
     await userEvent.selectOptions(providerSelect, 'openai');
     await userEvent.type(keyNameInput, 'Test Key');
     await userEvent.type(apiKeyInput, 'invalid-key');
 
     // Submit form
-    const submitButton = screen.getByRole('button', { name: /add key/i });
+    const submitButton = getByRole('button', { name: /add key/i });
     await userEvent.click(submitButton);
 
     // Should show validation error
-    expect(screen.getByText(/invalid api key format/i)).toBeInTheDocument();
+    expect(getByText(/invalid api key format/i)).toBeInTheDocument();
   });
 
   it('should handle empty API keys list', () => {
@@ -157,16 +157,16 @@ describe('AIKeyManager', () => {
       apiKeys: [],
     });
 
-    render(<AIKeyManager />);
+    const { getByText } = render(<AIKeyManager />);
 
-    expect(screen.getByText('No API keys configured')).toBeInTheDocument();
-    expect(screen.getByText('Add your first API key to get started')).toBeInTheDocument();
+    expect(getByText('No API keys configured')).toBeInTheDocument();
+    expect(getByText('Add your first API key to get started')).toBeInTheDocument();
   });
 
   it('should sort API keys by provider', () => {
-    render(<AIKeyManager />);
+    const { getAllByTestId } = render(<AIKeyManager />);
 
-    const keys = screen.getAllByTestId(/api-key-/);
+    const keys = getAllByTestId(/api-key-/);
     expect(keys).toHaveLength(2);
 
     // Should be sorted by provider name
@@ -175,14 +175,14 @@ describe('AIKeyManager', () => {
   });
 
   it('should show API key status indicators', () => {
-    render(<AIKeyManager />);
+    const { getByTestId } = render(<AIKeyManager />);
 
     // Active key should show green indicator
-    const activeIndicator = screen.getByTestId(/openai-active-indicator/);
+    const activeIndicator = getByTestId(/openai-active-indicator/);
     expect(activeIndicator).toHaveClass('bg-green-500');
 
     // Inactive key should show gray indicator
-    const inactiveIndicator = screen.getByTestId(/anthropic-active-indicator/);
+    const inactiveIndicator = getByTestId(/anthropic-active-indicator/);
     expect(inactiveIndicator).toHaveClass('bg-gray-500');
   });
 });

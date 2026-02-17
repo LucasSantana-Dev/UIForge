@@ -7,6 +7,7 @@ import { generateComponent as generateWithOpenAI } from '../../services/openai';
 import { generateComponent as generateWithAnthropic } from '../../services/anthropic';
 import { generateComponent as generateWithGemini } from '../../services/gemini';
 import { ComponentGenerationRequest, ComponentGenerationResult } from '../../types/ai';
+import { TEST_CONFIG } from '../../../../test-config';
 
 // Mock the individual AI services
 jest.mock('../../services/openai');
@@ -31,7 +32,7 @@ describe('AI Generation Service Integration', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Reset all mocks
     mockOpenAIGenerate.mockClear();
     mockAnthropicGenerate.mockClear();
@@ -222,7 +223,7 @@ describe('AI Generation Service Integration', () => {
       const userKeyRequest = {
         ...validRequest,
         useUserKey: true,
-        apiKey: 'sk-user-key-123',
+        apiKey: TEST_CONFIG.API_KEYS.OPENAI,
       };
 
       const mockResult: ComponentGenerationResult = {

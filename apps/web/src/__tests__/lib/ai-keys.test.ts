@@ -7,6 +7,7 @@ import { aiKeyManager } from '@/lib/ai-keys';
 import { storage } from '@/lib/storage';
 import { encryptApiKey, decryptApiKey, validateApiKey as validateKeyFormat, AIProvider } from '@/lib/encryption';
 import { EncryptedApiKey } from '@/lib/encryption';
+import { TEST_CONFIG } from '../../../../test-config';
 
 // Mock storage
 jest.mock('@/lib/storage');
@@ -18,9 +19,9 @@ const mockDecryptApiKey = decryptApiKey as jest.MockedFunction<typeof decryptApi
 const mockValidateKeyFormat = validateKeyFormat as jest.MockedFunction<typeof validateKeyFormat>;
 
 describe('AI Keys Service', () => {
-  const testApiKey = 'sk-test123456789';
+  const testApiKey = TEST_CONFIG.API_KEYS.OPENAI;
   const testProvider: AIProvider = 'openai';
-  const testEncryptionKey = 'test-encryption-key';
+  const testEncryptionKey = TEST_CONFIG.ENCRYPTION.TEST_KEY;
   const testEncryptedKey: EncryptedApiKey = {
     provider: testProvider,
     encryptedKey: 'encrypted_test_key',
