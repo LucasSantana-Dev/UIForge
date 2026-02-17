@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Forward to Express API
-    const expressApiUrl = process.env.EXPRESS_API_URL || 'http://localhost:3001';
+    // Forward to Cloudflare Workers API
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.uiforge.workers.dev';
 
     // Create AbortController for timeout
     const controller = new AbortController();
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }, timeoutMs);
 
     try {
-      const response = await fetch(`${expressApiUrl}/api/generate/validate`, {
+      const response = await fetch(`${apiUrl}/api/generate/validate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

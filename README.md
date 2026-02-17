@@ -8,6 +8,17 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15.1.0-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7.0-blue)](https://www.typescriptlang.org/)
+[![Test Coverage](https://img.shields.io/badge/Coverage-25%25-red)](https://github.com/your-org/uiforge-webapp/actions)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
+[![Code Quality](https://img.shields.io/badge/Quality-A-brightgreen)](https://github.com/your-org/uiforge-webapp/actions)
+[![Security](https://img.shields.io/badge/Security-Passed-brightgreen)](https://github.com/your-org/uiforge-webapp/security)
+[![Deployment](https://img.shields.io/badge/Deploy-Cloudflare_Pages-orange)](https://pages.cloudflare.com/)
+[![Database](https://img.shields.io/badge/Database-Supabase-3ECF8E)](https://supabase.com/)
+[![UI Framework](https://img.shields.io/badge/UI-shadcn/ui-000000)](https://ui.shadcn.com/)
+[![Styling](https://img.shields.io/badge/Styling-Tailwind_CSS-06B6D4)](https://tailwindcss.com/)
+[![Monorepo](https://img.shields.io/badge/Monorepo-Turborepo-FF6B35)](https://turbo.build/)
+[![AI Integration](https://img.shields.io/badge/AI-MCP-8B5CF6)](https://modelcontextprotocol.io/)
+[![Free Forever](https://img.shields.io/badge/Free-Forever-10B981)](https://uiforge.dev)
 
 ## ✨ Features
 

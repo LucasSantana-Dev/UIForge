@@ -25,10 +25,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Forward to Express API with SSE
-    const expressApiUrl = process.env.EXPRESS_API_URL || 'http://localhost:3001';
+    // Forward to Cloudflare Workers API with SSE
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.uiforge.workers.dev';
 
-    const response = await fetch(`${expressApiUrl}/api/generate`, {
+    const response = await fetch(`${apiUrl}/api/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,0 +1,89 @@
+# Snyk Security Policy for UIForge
+# This file defines the security policy and vulnerability rules
+
+# Ignore rules for specific vulnerabilities (add as needed)
+# Format: ignore: <vulnerability-id> <reason>
+# Example: ignore: SNYK-JS-LODASH-567890 This vulnerability is not exploitable in our context
+
+# License policy
+# Define which licenses are allowed or blocked
+licensePolicy:
+  allowed:
+    - MIT
+    - Apache-2.0
+    - BSD-2-Clause
+    - BSD-3-Clause
+    - ISC
+    - CC0-1.0
+    - Unlicense
+  blocked:
+    - GPL-2.0
+    - GPL-3.0
+    - AGPL-3.0
+
+# Severity thresholds
+severityThresholds:
+  low: ignore
+  medium: warn
+  high: fail
+  critical: fail
+
+# Patch rules
+patchRules:
+  # Auto-patch vulnerabilities when possible
+  autoPatch: true
+  
+  # Require patches for critical vulnerabilities
+  requirePatches:
+    - critical
+    - high
+
+# Exclusions
+exclude:
+  # Exclude development dependencies from critical security checks
+  devDependencies:
+    severity: low
+    paths:
+      - "**/test/**"
+      - "**/tests/**"
+      - "**/spec/**"
+      - "**/__tests__/**"
+      
+  # Exclude certain packages that are not security-sensitive
+  packages:
+    - name: "eslint"
+      reason: "Development tool only"
+    - name: "jest"
+      reason: "Testing framework only"
+    - name: "@types/*"
+      reason: "Type definitions only"
+
+# Monitoring settings
+monitoring:
+  # Enable continuous monitoring
+  enabled: true
+  
+  # Notification settings
+  notifications:
+    # Notify on new vulnerabilities
+    newVulnerabilities: true
+    
+    # Notify on license issues
+    licenseIssues: true
+    
+    # Notify on dependency updates
+    dependencyUpdates: true
+
+# Reporting
+reporting:
+  # Generate detailed reports
+  detailed: true
+  
+  # Include remediation advice
+  remediation: true
+  
+  # Format options
+  formats:
+    - json
+    - html
+    - pdf

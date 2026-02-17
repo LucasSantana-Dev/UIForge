@@ -69,9 +69,10 @@ export function createRateLimiter(options: RateLimitOptions) {
         (requestId ? `req-${requestId}` : null);
 
       if (!identifier) {
-        return res.status(400).json({
+        res.status(400).json({
           error: 'Unable to identify client for rate limiting',
         });
+        return;
       }
 
       const key = `${keyPrefix}:${identifier}`;

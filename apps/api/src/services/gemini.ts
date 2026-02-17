@@ -6,6 +6,7 @@
 import { GoogleGenerativeAI, GenerativeModel } from '@google/generative-ai';
 import { env } from '../config/env';
 import { logger } from '../utils/logger';
+import type { GenerateComponentOptions, ComponentGenerationResult } from '../types/ai';
 
 // Model configuration for Gemini 1.5 Flash (free tier)
 const MODEL_NAME = 'gemini-1.5-flash';
@@ -13,37 +14,31 @@ const MODEL_NAME = 'gemini-1.5-flash';
 // Lazy initialization of Gemini client
 let genAI: GoogleGenerativeAI | null = null;
 
-function getGenAI(): GoogleGenerativeAI {
-  if (!env.GEMINI_API_KEY) {
-    throw new Error('GEMINI_API_KEY is not configured');
+function getGenAI(apiKey?: string, useUserKey = false): GoogleGenerativeAI {
+  let key: string;
+
+  if (useUserKey && apiKey) {
+    key = apiKey;
+  } else {
+    // Use environment key (fallback)
+    key = env.GEMINI_API_KEY || '';
   }
-  if (!genAI) {
-    genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+
+  if (!key) {
+    throw new Error('Gemini API key is required');
+  }
+
+  if (!genAI || genAI.apiKey !== key) {
+    genAI = new GoogleGenerativeAI(key);
   }
   return genAI;
-}
-
-export interface GenerateComponentOptions {
-  framework: 'react' | 'vue' | 'angular' | 'svelte';
-  componentLibrary?: 'tailwind' | 'mui' | 'chakra' | 'shadcn' | 'none';
-  description: string;
-  style?: 'modern' | 'minimal' | 'colorful';
-  typescript?: boolean;
-  signal?: AbortSignal;
-}
-
-export interface ComponentGenerationResult {
-  code: string;
-  language: string;
-  framework: string;
-  tokensUsed?: number;
 }
 
 /**
  * Get Gemini model instance
  */
-function getModel(): GenerativeModel {
-  return getGenAI().getGenerativeModel({ model: MODEL_NAME });
+function getModel(apiKey?: string, useUserKey = false): GenerativeModel {
+  return getGenAI(apiKey, useUserKey).getGenerativeModel({ model: MODEL_NAME });
 }
 
 /**
@@ -101,9 +96,10 @@ export async function generateComponent(
     logger.info('Generating component with Gemini', {
       framework: options.framework,
       library: options.componentLibrary,
+      useUserKey: options.useUserKey,
     });
 
-    const model = getModel();
+    const model = getModel(options.apiKey, options.useUserKey);
     const prompt = buildPrompt(options);
 
     // Generate content
@@ -127,6 +123,8 @@ export async function generateComponent(
       language: options.typescript ? 'typescript' : 'javascript',
       framework: options.framework,
       tokensUsed: response.usageMetadata?.totalTokenCount,
+      provider: 'google',
+      model: MODEL_NAME,
     };
   } catch (error) {
     logger.error('Gemini generation failed', error);
@@ -152,9 +150,10 @@ export async function* streamComponentGeneration(
 
     logger.info('Starting streaming generation with Gemini', {
       framework: options.framework,
+      useUserKey: options.useUserKey,
     });
 
-    const model = getModel();
+    const model = getModel(options.apiKey, options.useUserKey);
     const prompt = buildPrompt(options);
 
     // Stream generation
@@ -216,9 +215,9 @@ export async function validateCode(code: string, language: string): Promise<bool
 /**
  * Format code with Gemini (experimental)
  */
-export async function formatCode(code: string, _language: string): Promise<string> {
+export async function formatCode(code: string, _language: string, apiKey?: string, useUserKey = false): Promise<string> {
   try {
-    const model = getModel();
+    const model = getModel(apiKey, useUserKey);
     const prompt = `Format this ${_language} code following best practices and proper indentation. Return ONLY the formatted code without explanations:
 
 \`\`\`${_language}

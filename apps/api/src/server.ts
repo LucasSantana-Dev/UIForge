@@ -15,6 +15,9 @@ import generateRouter from './routes/generate';
 
 const app = express();
 
+// Disable X-Powered-By header for security
+app.disable('x-powered-by');
+
 // Middleware
 app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));

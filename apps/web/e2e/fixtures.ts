@@ -10,9 +10,11 @@ type TestFixtures = {
 export const test = base.extend<TestFixtures>({
   testUser: async ({}, use) => {
     const uniqueId = crypto.randomUUID();
+    // Generate a random test password instead of hardcoded one
+    const testPassword = crypto.randomBytes(16).toString('hex');
     const testUser = {
       email: `test-${uniqueId}@example.com`,
-      password: 'TestPassword123!',
+      password: testPassword,
       id: uniqueId,
     };
     await use(testUser);

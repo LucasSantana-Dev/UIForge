@@ -5,7 +5,8 @@
 
 import { Router } from 'express';
 import { z } from 'zod';
-import { streamComponentGeneration, hasCodePatterns, formatCode } from '../services/gemini';
+import { streamComponentGeneration } from '../services/ai-generation';
+import { hasCodePatterns, formatCode } from '../services/gemini';
 import { logger } from '../utils/logger';
 import { authMiddleware } from '../middleware/auth';
 import { createRateLimiter } from '../middleware/rateLimit';
@@ -18,236 +19,191 @@ const router = Router();
 const generateSchema = z.object({
   framework: z.enum(['react', 'vue', 'angular', 'svelte']),
   componentLibrary: z.enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none']).optional(),
-  description: z.string().min(10).max(1000),
+  description: z.string().min(1).max(1000),
   style: z.enum(['modern', 'minimal', 'colorful']).optional(),
   typescript: z.boolean().optional(),
+  aiProvider: z.enum(['openai', 'anthropic', 'google', 'auto']).optional(),
+  useUserKey: z.boolean().optional(),
+  userApiKey: z.string().optional(),
 });
 
-// Create rate limiters
-const generateLimiter = createRateLimiter({ limit: 10, window: 60000 }); // 10 requests per minute
-const validateLimiter = createRateLimiter({ limit: 50, window: 60000 }); // 50 requests per minute
-const formatLimiter = createRateLimiter({ limit: 50, window: 60000 }); // 50 requests per minute
+// Apply middleware
+router.use(authMiddleware);
+router.use(createRateLimiter({ limit: 10, window: 60 * 60 * 1000 })); // 10 requests per hour
 
 /**
  * POST /api/generate
- * Stream component generation with Server-Sent Events (SSE)
+ * Stream component generation
  */
-router.post(
-  '/generate',
-  authMiddleware,
-  generateLimiter,
-  async (req, res) => {
-    try {
-      // Validate request body
-      const validationResult = generateSchema.safeParse(req.body);
+router.post('/', async (req, res) => {
+  try {
+    // Validate request body
+    const validation = generateSchema.safeParse(req.body);
+    if (!validation.success) {
+      res.status(400).json({
+        error: 'Invalid request body',
+        details: validation.error.issues,
+      });
+      return;
+    }
 
-      if (!validationResult.success) {
-        res.status(400).json({
-          error: {
-            message: 'Invalid request body',
-            code: 'VALIDATION_ERROR',
-            details: validationResult.error.issues,
-          },
-        });
-        return;
+    const options = validation.data;
+
+    logger.info('Starting component generation', {
+      framework: options.framework,
+      library: options.componentLibrary,
+      aiProvider: options.aiProvider,
+      useUserKey: options.useUserKey,
+    });
+
+    // Set headers for Server-Sent Events
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'Cache-Control',
+    });
+
+    // Start streaming generation
+    try {
+      let fullCode = '';
+      
+      for await (const chunk of streamComponentGeneration(options)) {
+        fullCode += chunk;
+        
+        // Send chunk to client
+        res.write(`data: ${JSON.stringify({ type: 'chunk', content: chunk })}\n\n`);
       }
 
-      const options = validationResult.data;
+      // Validate generated code
+      const isValidCode = await hasCodePatterns(fullCode, options.typescript ? 'typescript' : 'javascript');
+      
+      if (!isValidCode) {
+        res.write(`data: ${JSON.stringify({ 
+          type: 'warning', 
+          message: 'Generated code may not be valid' 
+        })}\n\n`);
+      }
 
-      logger.info('Starting component generation', {
-        userId: req.user?.id,
+      // Send completion event
+      res.write(`data: ${JSON.stringify({ 
+        type: 'complete', 
+        code: fullCode,
+        isValid: isValidCode
+      })}\n\n`);
+
+      logger.info('Component generation completed', {
         framework: options.framework,
-        description: options.description.substring(0, 50),
+        codeLength: fullCode.length,
+        isValid: isValidCode,
       });
 
-      // Set SSE headers
-      res.setHeader('Content-Type', 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache');
-      res.setHeader('Connection', 'keep-alive');
-      res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+    } catch (generationError) {
+      logger.error('Generation failed', generationError);
+      
+      res.write(`data: ${JSON.stringify({ 
+        type: 'error', 
+        error: generationError instanceof Error ? generationError.message : 'Unknown error'
+      })}\n\n`);
+    }
 
-      // Send initial event
-      res.write(`data: ${JSON.stringify({ type: 'start', timestamp: Date.now() })}\n\n`);
+    res.end();
 
-      let generatedCode = '';
-      const controller = new AbortController();
-      let clientDisconnected = false;
-
-      // Handle client disconnect
-      const onClose = () => {
-        clientDisconnected = true;
-        controller.abort();
-        logger.info('Client disconnected during generation', { userId: req.user?.id });
-      };
-      res.on('close', onClose);
-
-      // Stream generation
-      try {
-        for await (const chunk of streamComponentGeneration({ ...options, signal: controller.signal })) {
-          if (clientDisconnected) break;
-
-          generatedCode += chunk;
-
-          // Send chunk as SSE event
-          if (!clientDisconnected) {
-            res.write(`data: ${JSON.stringify({
-              type: 'chunk',
-              content: chunk,
-              timestamp: Date.now()
-            })}\n\n`);
-          }
-        }
-
-        if (!clientDisconnected) {
-          // Send completion event
-          res.write(`data: ${JSON.stringify({
-            type: 'complete',
-            totalLength: generatedCode.length,
-            timestamp: Date.now()
-          })}\n\n`);
-
-          logger.info('Component generation completed', {
-            userId: req.user?.id,
-            codeLength: generatedCode.length,
-          });
-
-          res.end();
-        }
-      } catch (streamError: any) {
-        // Don't treat abort as error
-        if (streamError?.name === 'AbortError' || clientDisconnected) {
-          logger.info('Generation aborted due to client disconnect');
-          return;
-        }
-
-        logger.error('Streaming generation failed', streamError);
-
-        // Send error event
-        if (!clientDisconnected) {
-          res.write(`data: ${JSON.stringify({
-            type: 'error',
-            message: 'Generation failed',
-            timestamp: Date.now()
-          })}\n\n`);
-
-          res.end();
-        }
-      } finally {
-        res.off('close', onClose);
-      }
-    } catch (error) {
-      logger.error('Generation request failed', error);
-
-      if (!res.headersSent) {
-        res.status(500).json({
-          error: {
-            message: 'Internal server error',
-            code: 'GENERATION_ERROR',
-          },
-        });
-      }
+  } catch (error) {
+    logger.error('Route error', error);
+    
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: 'Internal server error',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      });
+    } else {
+      res.write(`data: ${JSON.stringify({ 
+        type: 'error', 
+        error: 'Internal server error'
+      })}\n\n`);
+      res.end();
     }
   }
-);
+});
 
 /**
- * POST /api/validate - Validate code patterns
+ * POST /api/validate
+ * Validate generated code
  */
-router.post(
-  '/validate',
-  validateLimiter,
-  async (req, res) => {
-    try {
-      const { code, language } = req.body;
+router.post('/validate', async (req, res) => {
+  try {
+    const { code, language = 'typescript' } = req.body;
 
-      if (!code || !language) {
-        res.status(400).json({
-          error: {
-            message: 'Missing required fields: code, language',
-            code: 'VALIDATION_ERROR',
-          },
-        });
-        return;
-      }
-
-      if (code.length > MAX_CODE_LENGTH) {
-        res.status(413).json({
-          error: {
-            message: `Code exceeds maximum length of ${MAX_CODE_LENGTH} characters`,
-            code: 'PAYLOAD_TOO_LARGE',
-          },
-        });
-        return;
-      }
-
-      // Validate code patterns
-      const isValid = await hasCodePatterns(code, language);
-
-      res.json({
-        valid: isValid,
-        language,
-        timestamp: Date.now(),
+    if (!code || typeof code !== 'string') {
+      res.status(400).json({
+        error: 'Code is required and must be a string',
       });
-    } catch (error) {
-      logger.error('Code validation failed', error);
-      res.status(500).json({
-        error: {
-          message: 'Validation failed',
-          code: 'VALIDATION_ERROR',
-        },
-      });
+      return;
     }
+
+    if (code.length > MAX_CODE_LENGTH) {
+      res.status(400).json({
+        error: `Code exceeds maximum length of ${MAX_CODE_LENGTH} characters`,
+      });
+      return;
+    }
+
+    const isValid = await hasCodePatterns(code, language);
+
+    res.json({
+      isValid,
+      language,
+      length: code.length,
+    });
+
+  } catch (error) {
+    logger.error('Validation error', error);
+    res.status(500).json({
+      error: 'Validation failed',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
-);
+});
 
 /**
- * POST /api/format - Format generated code
+ * POST /api/format
+ * Format code using AI
  */
-router.post(
-  '/format',
-  formatLimiter,
-  async (req, res) => {
-    try {
-      const { code, language } = req.body;
+router.post('/format', async (req, res) => {
+  try {
+    const { code, language = 'typescript', apiKey, useUserKey = false } = req.body;
 
-      if (!code || !language) {
-        res.status(400).json({
-          error: {
-            message: 'Missing required fields: code, language',
-            code: 'VALIDATION_ERROR',
-          },
-        });
-        return;
-      }
-
-      if (code.length > MAX_CODE_LENGTH) {
-        res.status(413).json({
-          error: {
-            message: `Code exceeds maximum length of ${MAX_CODE_LENGTH} characters`,
-            code: 'PAYLOAD_TOO_LARGE',
-          },
-        });
-        return;
-      }
-
-      // Format code
-      const formatted = await formatCode(code, language);
-
-      res.json({
-        code: formatted,
-        language,
-        timestamp: Date.now(),
+    if (!code || typeof code !== 'string') {
+      res.status(400).json({
+        error: 'Code is required and must be a string',
       });
-    } catch (error) {
-      logger.error('Code formatting failed', error);
-      res.status(500).json({
-        error: {
-          message: 'Formatting failed',
-          code: 'FORMATTING_ERROR',
-        },
-      });
+      return;
     }
+
+    if (code.length > MAX_CODE_LENGTH) {
+      res.status(400).json({
+        error: `Code exceeds maximum length of ${MAX_CODE_LENGTH} characters`,
+      });
+      return;
+    }
+
+    const formattedCode = await formatCode(code, language, apiKey, useUserKey);
+
+    res.json({
+      originalCode: code,
+      formattedCode,
+      language,
+    });
+
+  } catch (error) {
+    logger.error('Formatting error', error);
+    res.status(500).json({
+      error: 'Formatting failed',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
-);
+});
 
 export default router;
