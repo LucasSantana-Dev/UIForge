@@ -1,0 +1,39 @@
+# Branch Protection Rules for UIForge
+
+## Main Branch Protection
+- Required reviewers: 2
+- Require up-to-date branches
+- Require status checks to pass
+- Require linear history
+- Restrict force pushes
+
+## Dev Branch Protection  
+- Required reviewers: 1
+- Require up-to-date branches
+- Require status checks to pass
+- Allow force pushes for emergency fixes
+
+## Release Branch Protection
+- Required reviewers: 2 (1 senior dev + 1 QA)
+- Require up-to-date branches
+- Require status checks to pass
+- Require conversation resolution
+- Restrict force pushes
+
+## Feature Branch Protection
+- No protection required
+- Encourage pull requests for visibility
+- Require tests to pass before merge
+
+## Required Status Checks
+- Lint (ESLint)
+- Type Check (TypeScript)
+- Unit Tests
+- Build Verification
+- Security Scan (for release and main branches)
+
+## Additional Rules
+- No direct pushes to main or release branches
+- All changes must go through pull requests
+- Feature branches should be deleted after merge
+- Release branches kept for 3 months post-deployment
