@@ -344,7 +344,7 @@ describe('AI Generation Service Integration', () => {
       );
 
       expect(results).toHaveLength(3);
-      results.forEach(result => {
+      results.forEach((result: ComponentGenerationResult) => {
         expect(result.code).toContain('export default function Button');
       });
     });

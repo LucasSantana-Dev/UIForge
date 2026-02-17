@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import { TEST_CONFIG } from '../../test-config';
 import crypto from 'crypto';
 
 describe('Database RLS Policies', () => {
@@ -28,14 +29,14 @@ describe('Database RLS Policies', () => {
     await adminSupabase.auth.admin.createUser({
       id: USER_1_ID,
       email: `user1-${USER_1_ID}@test.com`,
-      password: 'TestPassword123!',
+      password: TEST_CONFIG.PASSWORDS.USER,
       email_confirm: true,
     });
 
     await adminSupabase.auth.admin.createUser({
       id: USER_2_ID,
       email: `user2-${USER_2_ID}@test.com`,
-      password: 'TestPassword123!',
+      password: TEST_CONFIG.PASSWORDS.USER,
       email_confirm: true,
     });
   });
@@ -61,7 +62,7 @@ describe('Database RLS Policies', () => {
       // Sign in as User 1
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: `user1-${USER_1_ID}@test.com`,
-        password: 'TestPassword123!',
+        password: TEST_CONFIG.PASSWORDS.USER,
       });
 
       expect(signInError).toBeNull();
@@ -89,7 +90,7 @@ describe('Database RLS Policies', () => {
       // Sign in as User 1
       await supabase.auth.signInWithPassword({
         email: `user1-${USER_1_ID}@test.com`,
-        password: 'TestPassword123!',
+        password: TEST_CONFIG.PASSWORDS.USER,
       });
 
       // Try to read User 2's profile
@@ -115,7 +116,7 @@ describe('Database RLS Policies', () => {
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: `user1-${USER_1_ID}@test.com`,
-        password: 'TestPassword123!',
+        password: TEST_CONFIG.PASSWORDS.USER,
       });
 
       expect(error).toBeNull();
@@ -149,7 +150,7 @@ describe('Database RLS Policies', () => {
       // Sign in first
       await supabase.auth.signInWithPassword({
         email: `user1-${USER_1_ID}@test.com`,
-        password: 'TestPassword123!',
+        password: TEST_CONFIG.PASSWORDS.USER,
       });
 
       // Sign out
