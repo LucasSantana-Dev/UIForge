@@ -3,7 +3,7 @@
  * Tests for component generation React hook
  */
 
-import { renderHook, act, waitFor } from '@testing-library/react';
+import { renderHook, act } from '@testing-library/react';
 import { useGeneration } from '@/hooks/use-generation';
 import { useCreateGeneration } from '@/hooks/use-generations';
 
@@ -24,7 +24,7 @@ describe('useGeneration', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseCreateGeneration.mockReturnValue(mockCreateGeneration);
-    
+
     // Reset stream generation mock
     mockStreamGeneration.mockImplementation(async function* () {
       yield { type: 'start' };
@@ -38,7 +38,7 @@ describe('useGeneration', () => {
 
   it('should initialize with default state', () => {
     const { result } = renderHook(() => useGeneration());
-    
+
     expect(result.current.isGenerating).toBe(false);
     expect(result.current.error).toBe(null);
     expect(result.current.code).toBe('');
@@ -49,7 +49,7 @@ describe('useGeneration', () => {
   describe('startGeneration', () => {
     it('should start generation successfully', async () => {
       const { result } = renderHook(() => useGeneration('test-project-id'));
-      
+
       const options = {
         framework: 'react' as const,
         componentLibrary: 'tailwind' as const,
@@ -57,7 +57,7 @@ describe('useGeneration', () => {
         style: 'modern' as const,
         typescript: false,
       };
-      
+
       await act(async () => {
         await result.current.startGeneration({
           ...options,
@@ -65,7 +65,7 @@ describe('useGeneration', () => {
           prompt: 'Create a button component',
         });
       });
-      
+
       expect(result.current.isGenerating).toBe(false);
       expect(result.current.code).toBe('export default function Button() { return <button>Click me</button>; }');
       expect(result.current.error).toBe(null);
@@ -74,12 +74,12 @@ describe('useGeneration', () => {
 
     it('should handle generation errors', async () => {
       const { result } = renderHook(() => useGeneration());
-      
+
       mockStreamGeneration.mockImplementation(async function* () {
         yield { type: 'start' };
         yield { type: 'error', message: 'Generation failed' };
       });
-      
+
       const options = {
         framework: 'react' as const,
         componentLibrary: 'tailwind' as const,
@@ -87,7 +87,7 @@ describe('useGeneration', () => {
         style: 'modern' as const,
         typescript: false,
       };
-      
+
       await act(async () => {
         await result.current.startGeneration({
           ...options,
@@ -95,7 +95,7 @@ describe('useGeneration', () => {
           prompt: 'Create a button component',
         });
       });
-      
+
       expect(result.current.isGenerating).toBe(false);
       expect(result.current.error).toBe('Generation failed');
       expect(result.current.code).toBe('');
@@ -103,7 +103,7 @@ describe('useGeneration', () => {
 
     it('should save to database when project ID is provided', async () => {
       const { result } = renderHook(() => useGeneration('test-project-id'));
-      
+
       const options = {
         framework: 'react' as const,
         componentLibrary: 'tailwind' as const,
@@ -111,7 +111,7 @@ describe('useGeneration', () => {
         style: 'modern' as const,
         typescript: false,
       };
-      
+
       await act(async () => {
         await result.current.startGeneration({
           ...options,
@@ -119,7 +119,7 @@ describe('useGeneration', () => {
           prompt: 'Create a button component',
         });
       });
-      
+
       expect(mockCreateGeneration.mutateAsync).toHaveBeenCalledWith({
         project_id: 'test-project-id',
         prompt: 'Create a button component',
@@ -135,7 +135,7 @@ describe('useGeneration', () => {
 
     it('should update progress during generation', async () => {
       const { result } = renderHook(() => useGeneration());
-      
+
       mockStreamGeneration.mockImplementation(async function* () {
         yield { type: 'start' };
         yield { type: 'chunk', content: 'export' };
@@ -146,7 +146,7 @@ describe('useGeneration', () => {
         yield { type: 'chunk', content: '}' };
         yield { type: 'complete' };
       });
-      
+
       const options = {
         framework: 'react' as const,
         componentLibrary: 'tailwind' as const,
@@ -154,7 +154,7 @@ describe('useGeneration', () => {
         style: 'modern' as const,
         typescript: false,
       };
-      
+
       act(() => {
         result.current.startGeneration({
           ...options,
@@ -162,24 +162,20 @@ describe('useGeneration', () => {
           prompt: 'Create a button component',
         });
       });
-      
+
       expect(result.current.isGenerating).toBe(true);
-      
-      await waitFor(() => {
-        expect(result.current.progress).toBeGreaterThan(0);
-      });
-      
-      await waitFor(() => {
-        expect(result.current.isGenerating).toBe(false);
-        expect(result.current.progress).toBe(100);
-      });
+
+      // The mock should complete immediately, so we can check the final state
+      expect(result.current.progress).toBeGreaterThan(0);
+      expect(result.current.isGenerating).toBe(false);
+      expect(result.current.progress).toBe(100);
     });
   });
 
   describe('stopGeneration', () => {
     it('should stop ongoing generation', async () => {
       const { result } = renderHook(() => useGeneration());
-      
+
       // Mock a long-running generation
       mockStreamGeneration.mockImplementation(async function* () {
         yield { type: 'start' };
@@ -187,7 +183,7 @@ describe('useGeneration', () => {
         yield { type: 'chunk', content: 'test' };
         yield { type: 'complete' };
       });
-      
+
       const options = {
         framework: 'react' as const,
         componentLibrary: 'tailwind' as const,
@@ -195,7 +191,7 @@ describe('useGeneration', () => {
         style: 'modern' as const,
         typescript: false,
       };
-      
+
       // Start generation
       act(() => {
         result.current.startGeneration({
@@ -204,25 +200,25 @@ describe('useGeneration', () => {
           prompt: 'Create a button component',
         });
       });
-      
+
       expect(result.current.isGenerating).toBe(true);
-      
+
       // Stop generation
       act(() => {
         result.current.stopGeneration();
       });
-      
+
       expect(result.current.isGenerating).toBe(false);
       expect(result.current.error).toBe('Generation cancelled');
     });
 
     it('should handle stop when no generation is active', () => {
       const { result } = renderHook(() => useGeneration());
-      
+
       act(() => {
         result.current.stopGeneration();
       });
-      
+
       expect(result.current.isGenerating).toBe(false);
       expect(result.current.error).toBe(null);
     });
@@ -231,7 +227,7 @@ describe('useGeneration', () => {
   describe('reset', () => {
     it('should reset hook state', async () => {
       const { result } = renderHook(() => useGeneration());
-      
+
       // Generate some code
       const options = {
         framework: 'react' as const,
@@ -240,7 +236,7 @@ describe('useGeneration', () => {
         style: 'modern' as const,
         typescript: false,
       };
-      
+
       await act(async () => {
         await result.current.startGeneration({
           ...options,
@@ -248,14 +244,14 @@ describe('useGeneration', () => {
           prompt: 'Create a button component',
         });
       });
-      
+
       expect(result.current.code).toBeTruthy();
-      
+
       // Reset
       act(() => {
         result.current.reset();
       });
-      
+
       expect(result.current.code).toBe('');
       expect(result.current.isGenerating).toBe(false);
       expect(result.current.error).toBe(null);
@@ -267,7 +263,7 @@ describe('useGeneration', () => {
   describe('concurrent generations', () => {
     it('should handle multiple generations in sequence', async () => {
       const { result } = renderHook(() => useGeneration());
-      
+
       const options = {
         framework: 'react' as const,
         componentLibrary: 'tailwind' as const,
@@ -275,7 +271,7 @@ describe('useGeneration', () => {
         style: 'modern' as const,
         typescript: false,
       };
-      
+
       // First generation
       await act(async () => {
         await result.current.startGeneration({
@@ -284,9 +280,9 @@ describe('useGeneration', () => {
           prompt: 'Create a button component',
         });
       });
-      
+
       expect(result.current.code).toContain('Button');
-      
+
       // Second generation
       await act(async () => {
         await result.current.startGeneration({
@@ -295,7 +291,7 @@ describe('useGeneration', () => {
           prompt: 'Create a card component',
         });
       });
-      
+
       expect(result.current.code).toContain('Card');
     });
   });
@@ -303,9 +299,9 @@ describe('useGeneration', () => {
   describe('error handling', () => {
     it('should handle database save errors gracefully', async () => {
       const { result } = renderHook(() => useGeneration('test-project-id'));
-      
+
       mockCreateGeneration.mutateAsync.mockRejectedValue(new Error('Database error'));
-      
+
       const options = {
         framework: 'react' as const,
         componentLibrary: 'tailwind' as const,
@@ -313,7 +309,7 @@ describe('useGeneration', () => {
         style: 'modern' as const,
         typescript: false,
       };
-      
+
       await act(async () => {
         await result.current.startGeneration({
           ...options,
@@ -321,7 +317,7 @@ describe('useGeneration', () => {
           prompt: 'Create a button component',
         });
       });
-      
+
       // Generation should still complete despite database error
       expect(result.current.isGenerating).toBe(false);
       expect(result.current.code).toContain('Button');
@@ -330,13 +326,13 @@ describe('useGeneration', () => {
 
     it('should handle stream interruption', async () => {
       const { result } = renderHook(() => useGeneration());
-      
+
       mockStreamGeneration.mockImplementation(async function* () {
         yield { type: 'start' };
         yield { type: 'chunk', content: 'export default' };
         // Stream stops without complete
       });
-      
+
       const options = {
         framework: 'react' as const,
         componentLibrary: 'tailwind' as const,
@@ -344,7 +340,7 @@ describe('useGeneration', () => {
         style: 'modern' as const,
         typescript: false,
       };
-      
+
       await act(async () => {
         await result.current.startGeneration({
           ...options,
@@ -352,7 +348,7 @@ describe('useGeneration', () => {
           prompt: 'Create a button component',
         });
       });
-      
+
       // Should handle incomplete stream gracefully
       expect(result.current.isGenerating).toBe(false);
       expect(result.current.code).toBe('export default');
@@ -362,7 +358,7 @@ describe('useGeneration', () => {
   describe('events tracking', () => {
     it('should track generation events', async () => {
       const { result } = renderHook(() => useGeneration());
-      
+
       const options = {
         framework: 'react' as const,
         componentLibrary: 'tailwind' as const,
@@ -370,7 +366,7 @@ describe('useGeneration', () => {
         style: 'modern' as const,
         typescript: false,
       };
-      
+
       await act(async () => {
         await result.current.startGeneration({
           ...options,
@@ -378,7 +374,7 @@ describe('useGeneration', () => {
           prompt: 'Create a button component',
         });
       });
-      
+
       expect(result.current.events).toHaveLength(6); // start + 4 chunks + complete
       expect(result.current.events[0].type).toBe('start');
       expect(result.current.events[result.current.events.length - 1].type).toBe('complete');
@@ -386,12 +382,12 @@ describe('useGeneration', () => {
 
     it('should track error events', async () => {
       const { result } = renderHook(() => useGeneration());
-      
+
       mockStreamGeneration.mockImplementation(async function* () {
         yield { type: 'start' };
         yield { type: 'error', message: 'Generation failed' };
       });
-      
+
       const options = {
         framework: 'react' as const,
         componentLibrary: 'tailwind' as const,
@@ -399,7 +395,7 @@ describe('useGeneration', () => {
         style: 'modern' as const,
         typescript: false,
       };
-      
+
       await act(async () => {
         await result.current.startGeneration({
           ...options,
@@ -407,7 +403,7 @@ describe('useGeneration', () => {
           prompt: 'Create a button component',
         });
       });
-      
+
       expect(result.current.events).toHaveLength(2); // start + error
       expect(result.current.events[0].type).toBe('start');
       expect(result.current.events[1].type).toBe('error');
