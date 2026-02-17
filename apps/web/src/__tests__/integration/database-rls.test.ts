@@ -2,6 +2,9 @@ import { createClient } from '@supabase/supabase-js';
 import { TEST_CONFIG } from '../../../test-config';
 import crypto from 'crypto';
 
+// Explicitly type the TEST_CONFIG to help TypeScript
+const config = TEST_CONFIG as typeof TEST_CONFIG;
+
 describe('Database RLS Policies', () => {
   const USER_1_ID = crypto.randomUUID();
   const USER_2_ID = crypto.randomUUID();
@@ -29,14 +32,14 @@ describe('Database RLS Policies', () => {
     await adminSupabase.auth.admin.createUser({
       id: USER_1_ID,
       email: `user1-${USER_1_ID}@test.com`,
-      password: TEST_CONFIG.PASSWORDS.USER,
+      password: config.PASSWORDS.USER,
       email_confirm: true,
     });
 
     await adminSupabase.auth.admin.createUser({
       id: USER_2_ID,
       email: `user2-${USER_2_ID}@test.com`,
-      password: TEST_CONFIG.PASSWORDS.USER,
+      password: config.PASSWORDS.USER,
       email_confirm: true,
     });
   });
@@ -62,7 +65,7 @@ describe('Database RLS Policies', () => {
       // Sign in as User 1
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email: `user1-${USER_1_ID}@test.com`,
-        password: TEST_CONFIG.PASSWORDS.USER,
+        password: config.PASSWORDS.USER,
       });
 
       expect(signInError).toBeNull();
@@ -90,7 +93,7 @@ describe('Database RLS Policies', () => {
       // Sign in as User 1
       await supabase.auth.signInWithPassword({
         email: `user1-${USER_1_ID}@test.com`,
-        password: TEST_CONFIG.PASSWORDS.USER,
+        password: config.PASSWORDS.USER,
       });
 
       // Try to read User 2's profile
@@ -116,7 +119,7 @@ describe('Database RLS Policies', () => {
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: `user1-${USER_1_ID}@test.com`,
-        password: TEST_CONFIG.PASSWORDS.USER,
+        password: config.PASSWORDS.USER,
       });
 
       expect(error).toBeNull();
@@ -134,7 +137,7 @@ describe('Database RLS Policies', () => {
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: `user1-${USER_1_ID}@test.com`,
-        password: TEST_CONFIG.PASSWORDS.ADMIN,
+        password: config.PASSWORDS.ADMIN,
       });
 
       expect(error).toBeDefined();
@@ -150,7 +153,7 @@ describe('Database RLS Policies', () => {
       // Sign in first
       await supabase.auth.signInWithPassword({
         email: `user1-${USER_1_ID}@test.com`,
-        password: TEST_CONFIG.PASSWORDS.USER,
+        password: config.PASSWORDS.USER,
       });
 
       // Sign out
