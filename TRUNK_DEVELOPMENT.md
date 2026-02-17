@@ -83,12 +83,12 @@ git push --force origin main
 ### Development Environment
 - Copy `.env.dev.example` to `.env.dev`
 - Configure development variables
-- Deploy with: `./scripts/deploy.sh dev`
+- Deploy via GitHub Actions: "Deploy Application" workflow
 
 ### Production Environment
 - Copy `.env.production.example` to `.env.production`
 - Configure production variables
-- Deploy with: `./scripts/deploy.sh production`
+- Deploy via GitHub Actions: "Deploy Application" workflow
 
 ## 🧪 Quality Gates
 
@@ -199,4 +199,4 @@ git push origin --delete feature/completed-feature
 - [GitHub Actions Workflows](.github/workflows/)
 - [Branch Protection Rules](.github/branch-protection.yml)
 - [Environment Configuration](.env.*.example)
-- [Deployment Scripts](scripts/deploy.sh)
+- [Deployment Workflows](.github/workflows/deploy-admin.yml)

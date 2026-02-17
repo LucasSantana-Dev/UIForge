@@ -1,0 +1,200 @@
+name: Supabase Setup (Admin Only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Setup action'
+        required: true
+        default: 'setup'
+        type: choice
+        options:
+          - setup
+          - link
+          - generate-types
+          - migrate
+      project_ref:
+        description: 'Supabase project reference (if linking)'
+        required: false
+        type: string
+      supabase_url:
+        description: 'Supabase project URL (if setup)'
+        required: false
+        type: string
+      supabase_anon_key:
+        description: 'Supabase anon key (if setup)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  supabase-setup:
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Verify admin access
+        run: |
+          echo "🔐 Verifying admin access for Supabase setup..."
+          AUTHORIZED_ADMINS="LucasSantana-Dev"
+          CURRENT_USER="${{ github.actor }}"
+          
+          if [[ "$AUTHORIZED_ADMINS" == *"$CURRENT_USER"* ]]; then
+            echo "✅ User $CURRENT_USER is authorized for Supabase setup"
+          else
+            echo "❌ User $CURRENT_USER is not authorized"
+            echo "🚨 This workflow requires admin privileges"
+            exit 1
+          fi
+
+      - name: Install Supabase CLI
+        run: |
+          echo "📦 Installing Supabase CLI..."
+          npm install -g @supabase/cli
+
+      - name: Setup environment file
+        if: github.event.inputs.action == 'setup'
+        env:
+          SUPABASE_URL: ${{ github.event.inputs.supabase_url }}
+          SUPABASE_ANON_KEY: ${{ github.event.inputs.supabase_anon_key }}
+        run: |
+          echo "📝 Setting up environment configuration..."
+          
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_ANON_KEY" ]; then
+            echo "❌ Supabase URL and anon key are required for setup"
+            exit 1
+          fi
+          
+          # Create .env.local file
+          cat > apps/web/.env.local << EOF
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
+
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3000
+
+# Feature Flags
+NEXT_PUBLIC_ENABLE_BYOK=true
+NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
+
+# Testing (Optional)
+TEST_USER_EMAIL=test@example.com
+TEST_USER_PASSWORD=testpassword123
+EOF
+          
+          echo "✅ Environment file created successfully!"
+
+      - name: Link to Supabase project
+        if: github.event.inputs.action == 'link'
+        env:
+          PROJECT_REF: ${{ github.event.inputs.project_ref }}
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          echo "🔗 Linking to Supabase project..."
+          
+          if [ -z "$PROJECT_REF" ]; then
+            echo "❌ Project reference is required for linking"
+            exit 1
+          fi
+          
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "❌ SUPABASE_ACCESS_TOKEN secret is required"
+            exit 1
+          fi
+          
+          # Login to Supabase
+          supabase login --token "$SUPABASE_ACCESS_TOKEN"
+          
+          # Link project
+          supabase link --project-ref "$PROJECT_REF"
+          
+          echo "✅ Project linked successfully!"
+
+      - name: Generate TypeScript types
+        if: github.event.inputs.action == 'generate-types'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          echo "📝 Generating TypeScript types..."
+          
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "❌ SUPABASE_ACCESS_TOKEN secret is required"
+            exit 1
+          fi
+          
+          # Login to Supabase
+          supabase login --token "$SUPABASE_ACCESS_TOKEN"
+          
+          # Generate types
+          mkdir -p apps/web/src/lib/supabase
+          supabase gen types typescript --linked > apps/web/src/lib/supabase/database.types.ts
+          
+          echo "✅ TypeScript types generated successfully!"
+
+      - name: Run migrations
+        if: github.event.inputs.action == 'migrate'
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          echo "🗄️ Running database migrations..."
+          
+          if [ -z "$SUPABASE_ACCESS_TOKEN" ]; then
+            echo "❌ SUPABASE_ACCESS_TOKEN secret is required"
+            exit 1
+          fi
+          
+          # Login to Supabase
+          supabase login --token "$SUPABASE_ACCESS_TOKEN"
+          
+          # Run migrations
+          supabase db push
+          
+          echo "✅ Migrations completed successfully!"
+
+      - name: Setup summary
+        run: |
+          echo "## 🔧 Supabase Setup Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Action:** ${{ github.event.inputs.action }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Performed by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          case "${{ github.event.inputs.action }}" in
+            "setup")
+              echo "**Status:** ✅ Environment file created" >> $GITHUB_STEP_SUMMARY
+              echo "**Next Steps:**" >> $GITHUB_STEP_SUMMARY
+              echo "1. Run migrations using this workflow" >> $GITHUB_STEP_SUMMARY
+              echo "2. Generate TypeScript types" >> $GITHUB_STEP_SUMMARY
+              echo "3. Start development server" >> $GITHUB_STEP_SUMMARY
+              ;;
+            "link")
+              echo "**Status:** ✅ Project linked" >> $GITHUB_STEP_SUMMARY
+              echo "**Project Ref:** ${{ github.event.inputs.project_ref }}" >> $GITHUB_STEP_SUMMARY
+              ;;
+            "generate-types")
+              echo "**Status:** ✅ Types generated" >> $GITHUB_STEP_SUMMARY
+              echo "**File:** apps/web/src/lib/supabase/database.types.ts" >> $GITHUB_STEP_SUMMARY
+              ;;
+            "migrate")
+              echo "**Status:** ✅ Migrations completed" >> $GITHUB_STEP_SUMMARY
+              echo "**Database:** Updated to latest schema" >> $GITHUB_STEP_SUMMARY
+              ;;
+          esac
