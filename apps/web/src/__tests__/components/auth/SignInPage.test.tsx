@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SignInPage from '@/app/(auth)/signin/page';
 import { mockSupabaseClient, resetSupabaseMocks } from '../../setup/supabase-mock';
+import { TEST_CONFIG } from '../../../../../test-config';
 
 // Mock Next.js router - already mocked in jest.setup.js but we need to access the mocks
 const mockPush = jest.fn();
@@ -44,13 +45,13 @@ describe('SignInPage', () => {
     const submitButton = screen.getByRole('button', { name: /sign in/i });
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.change(passwordInput, { target: { value: TEST_CONFIG.PASSWORDS.USER } });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockSupabaseClient.auth.signInWithPassword).toHaveBeenCalledWith({
         email: 'test@example.com',
-        password: 'password123',
+        password: TEST_CONFIG.PASSWORDS.USER,
       });
     });
 
@@ -97,7 +98,7 @@ describe('SignInPage', () => {
     const submitButton = screen.getByRole('button', { name: /sign in/i });
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.change(passwordInput, { target: { value: TEST_CONFIG.PASSWORDS.USER } });
     fireEvent.click(submitButton);
 
     // Wait for loading state to be set

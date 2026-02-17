@@ -134,7 +134,7 @@ describe('Database RLS Policies', () => {
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email: `user1-${USER_1_ID}@test.com`,
-        password: 'WrongPassword123!',
+        password: TEST_CONFIG.PASSWORDS.ADMIN,
       });
 
       expect(error).toBeDefined();

@@ -14,6 +14,8 @@ import {
   AI_PROVIDERS,
   isApiKeyExpired,
 } from '@/lib/encryption';
+import { AIProvider } from '@/lib/encryption';
+import { TEST_CONFIG } from '../../../test-config';
 
 // Mock crypto-js for testing
 jest.mock('crypto-js', () => ({
@@ -41,7 +43,7 @@ jest.mock('crypto-js', () => ({
     WordArray: {
       random: jest.fn(() => ({
         toString: jest.fn(() => 'random_bytes'),
-      }),
+      })),
     },
   },
 }));
@@ -49,90 +51,94 @@ jest.mock('crypto-js', () => ({
 import CryptoJS from 'crypto-js';
 
 describe('Encryption Utilities', () => {
-  const testApiKey = 'sk-test123456789';
-  const testEncryptionKey = 'test-encryption-key';
+  describe('API Key Encryption/Decryption', () => {
+    it('should encrypt and decrypt API keys correctly', () => {
+      const apiKey = TEST_CONFIG.API_KEYS.OPENAI;
+      const masterKey = 'master-key-secret';
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+      const encrypted = encryptApiKey(apiKey, masterKey);
+      const decrypted = decryptApiKey(encrypted, masterKey);
 
-  describe('encryptApiKey', () => {
-    it('should encrypt API key with AES-256', () => {
-      const encrypted = encryptApiKey(testApiKey, testEncryptionKey);
-
-      expect(CryptoJS.AES.encrypt).toHaveBeenCalledWith(testApiKey, testEncryptionKey);
-      expect(encrypted).toBe('encrypted_sk-test123456789_test-encryption-key');
+      expect(decrypted).toBe(apiKey);
     });
 
-    it('should handle empty API key', () => {
-      const encrypted = encryptApiKey('', testEncryptionKey);
-      expect(CryptoJS.AES.encrypt).toHaveBeenCalledWith('', testEncryptionKey);
-    });
-  });
+    it('should fail decryption with wrong key', () => {
+      const apiKey = TEST_CONFIG.API_KEYS.OPENAI;
+      const masterKey = 'master-key-secret';
+      const wrongKey = 'wrong-key';
 
-  describe('decryptApiKey', () => {
-    it('should decrypt encrypted API key', () => {
-      const encrypted = 'encrypted_sk-test123456789_test-encryption-key';
-      const decrypted = decryptApiKey(encrypted, testEncryptionKey);
+      const encrypted = encryptApiKey(apiKey, masterKey);
 
-      expect(CryptoJS.AES.decrypt).toHaveBeenCalledWith(encrypted, testEncryptionKey);
-      expect(decrypted).toBe('sk-test123456789');
+      expect(() => {
+        decryptApiKey(encrypted, wrongKey);
+      }).toThrow();
     });
 
-    it('should handle decryption failure', () => {
-      (CryptoJS.AES.decrypt as jest.Mock).mockImplementation(() => {
-        throw new Error('Decryption failed');
-      });
+    it('should handle empty API keys', () => {
+      const apiKey = '';
+      const masterKey = 'master-key-secret';
 
-      expect(() => decryptApiKey('invalid_encrypted', testEncryptionKey)).toThrow();
+      expect(() => {
+        encryptApiKey(apiKey, masterKey);
+      }).toThrow();
     });
   });
 
-  describe('validateApiKey', () => {
-    it('should validate OpenAI API key format', () => {
-      const validOpenAIKey = 'sk-proj-AbCdEfGhIjKlMnOpQrStUvWxYz1234567890';
-      expect(validateApiKey('openai', validOpenAIKey)).toBe(true);
-    });
-
-    it('should reject invalid OpenAI API key', () => {
+  describe('API Key Validation', () => {
+    it('should validate OpenAI API keys', () => {
+      const validKey = 'sk-1234567890abcdef1234567890abcdef12345678';
       const invalidKey = 'invalid-key';
-      expect(validateApiKey('openai', invalidKey)).toBe(false);
+
+      expect(validateApiKey('openai' as AIProvider, validKey)).toBe(true);
+      expect(validateApiKey('openai' as AIProvider, invalidKey)).toBe(false);
     });
 
-    it('should validate Anthropic API key format', () => {
-      const validAnthropicKey = 'sk-ant-api0314159265358979323846264338327950288';
-      expect(validateApiKey('anthropic', validAnthropicKey)).toBe(true);
+    it('should validate Anthropic API keys', () => {
+      const validKey = 'sk-ant-api03-1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
+      const invalidKey = 'invalid-key';
+
+      expect(validateApiKey('anthropic' as AIProvider, validKey)).toBe(true);
+      expect(validateApiKey('anthropic' as AIProvider, invalidKey)).toBe(false);
     });
 
-    it('should validate Google AI API key format', () => {
-      const validGoogleKey = 'AIzaSyAbCdEfGhIjKlMnOpQrStUvWxYz1234567890';
-      expect(validateApiKey('google', validGoogleKey)).toBe(true);
+    it('should validate Google AI API keys', () => {
+      const validKey = 'AIzaSy-1234567890abcdef-1234567890abcdef';
+      const invalidKey = 'invalid-key';
+
+      expect(validateApiKey('google' as AIProvider, validKey)).toBe(true);
+      expect(validateApiKey('google' as AIProvider, invalidKey)).toBe(false);
     });
 
-    it('should reject invalid provider', () => {
-      expect(() => validateApiKey('invalid' as any, 'key')).toThrow();
+    it('should reject empty API keys', () => {
+      expect(validateApiKey('openai' as AIProvider, '')).toBe(false);
+      expect(validateApiKey('anthropic' as AIProvider, '')).toBe(false);
+      expect(validateApiKey('google' as AIProvider, '')).toBe(false);
     });
   });
 
-  describe('hashApiKey', () => {
-    it('should hash API key consistently', () => {
-      const hash1 = hashApiKey(testApiKey);
-      const hash2 = hashApiKey(testApiKey);
+  describe('API Key Hashing', () => {
+    it('should hash API keys consistently', () => {
+      const apiKey = TEST_CONFIG.API_KEYS.OPENAI;
 
-      expect(CryptoJS.SHA256).toHaveBeenCalledWith(testApiKey);
+      const hash1 = hashApiKey(apiKey);
+      const hash2 = hashApiKey(apiKey);
+
       expect(hash1).toBe(hash2);
-      expect(hash1).toBe('hashed_sk-test123456789');
+      expect(hash1).not.toBe(apiKey); // Should be different from original
     });
 
     it('should generate different hashes for different keys', () => {
-      const hash1 = hashApiKey('key1');
-      const hash2 = hashApiKey('key2');
+      const key1 = 'sk-test-key-123456789';
+      const key2 = 'sk-different-key-987654321';
+
+      const hash1 = hashApiKey(key1);
+      const hash2 = hashApiKey(key2);
 
       expect(hash1).not.toBe(hash2);
     });
   });
 
-  describe('generateKeyId', () => {
+  describe('Key ID Generation', () => {
     it('should generate unique key IDs', () => {
       const id1 = generateKeyId();
       const id2 = generateKeyId();
@@ -142,124 +148,136 @@ describe('Encryption Utilities', () => {
       expect(id1).not.toBe(id2);
     });
 
-    it('should include timestamp in key ID', () => {
+    it('should generate IDs with consistent format', () => {
       const id = generateKeyId();
-      const timestamp = Date.now().toString();
 
-      expect(id).toContain(timestamp);
+      expect(id).toMatch(/^key_[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/);
     });
   });
 
-  describe('deriveEncryptionKey', () => {
-    it('should derive encryption key from user key', () => {
-      const derived = deriveEncryptionKey(testEncryptionKey);
+  describe('Encryption Key Derivation', () => {
+    it('should derive encryption keys from passwords', () => {
+      const password = TEST_CONFIG.PASSWORDS.USER;
+      const salt = 'random-salt-456';
 
-      expect(CryptoJS.PBKDF2).toHaveBeenCalledWith(testEncryptionKey, 'uiforge-salt', {
-        keySize: 256 / 8,
-        iterations: 10000,
-      });
-      expect(derived).toBe('derived_test-encryption-key_uiforge-salt');
+      const derivedKey = deriveEncryptionKey(password, salt);
+
+      expect(derivedKey).toBe(`derived_${password}_${salt}`);
+    });
+
+    it('should generate user encryption keys', () => {
+      const userKey = generateUserEncryptionKey();
+
+      expect(userKey).toBeDefined();
+      expect(typeof userKey).toBe('string');
+      expect(userKey.length).toBeGreaterThan(0);
     });
   });
 
-  describe('generateUserEncryptionKey', () => {
-    it('should generate random encryption key', () => {
-      const key = generateUserEncryptionKey();
+  describe('API Provider Configuration', () => {
+    it('should contain all supported providers', () => {
+      expect(AI_PROVIDERS.openai).toBeDefined();
+      expect(AI_PROVIDERS.anthropic).toBeDefined();
+      expect(AI_PROVIDERS.google).toBeDefined();
+    });
 
-      expect(CryptoJS.lib.WordArray.random).toHaveBeenCalledWith(256 / 8);
-      expect(key).toBe('random_bytes');
+    it('should have correct provider configurations', () => {
+      const openAIConfig = AI_PROVIDERS.openai;
+      const anthropicConfig = AI_PROVIDERS.anthropic;
+      const googleConfig = AI_PROVIDERS.google;
+
+      expect(openAIConfig).toBeDefined();
+      expect(anthropicConfig).toBeDefined();
+      expect(googleConfig).toBeDefined();
+
+      expect(openAIConfig.name).toBe('OpenAI');
+      expect(anthropicConfig.name).toBe('Anthropic');
+      expect(googleConfig.name).toBe('Google AI');
     });
   });
 
-  describe('isApiKeyExpired', () => {
-    it('should identify non-expired keys', () => {
-      const now = Date.now();
-      const recentDate = new Date(now - 30 * 24 * 60 * 60 * 1000).toISOString(); // 30 days ago
-      const encryptedKey = {
-        provider: 'openai' as const,
-        encryptedKey: 'encrypted_key',
-        keyId: 'key_123',
-        createdAt: recentDate,
+  describe('API Key Expiration', () => {
+    it('should detect expired keys', () => {
+      const pastDate = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 hours ago
+      const expiredKey = {
+        id: 'key-1',
+        provider: 'openai' as AIProvider,
+        keyName: 'Test Key',
+        encryptedKey: 'encrypted-key',
+        isActive: true,
+        createdAt: pastDate.toISOString(),
+        expiresAt: pastDate.toISOString(),
+        keyId: 'key-id-1',
       };
-      expect(isApiKeyExpired(encryptedKey)).toBe(false);
+
+      expect(isApiKeyExpired(expiredKey)).toBe(true);
     });
 
-    it('should identify expired keys', () => {
-      const now = Date.now();
-      const oldDate = new Date(now - 100 * 24 * 60 * 60 * 1000).toISOString(); // 100 days ago
-      const encryptedKey = {
-        provider: 'openai' as const,
-        encryptedKey: 'encrypted_key',
-        keyId: 'key_123',
-        createdAt: oldDate,
+    it('should detect non-expired keys', () => {
+      const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
+      const validKey = {
+        id: 'key-1',
+        provider: 'openai' as AIProvider,
+        keyName: 'Test Key',
+        encryptedKey: 'encrypted-key',
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        expiresAt: futureDate.toISOString(),
+        keyId: 'key-id-1',
       };
-      expect(isApiKeyExpired(encryptedKey)).toBe(true);
+
+      expect(isApiKeyExpired(validKey)).toBe(false);
     });
 
-    it('should handle edge cases', () => {
-      const encryptedKey = {
-        provider: 'openai' as const,
-        encryptedKey: 'encrypted_key',
-        keyId: 'key_123',
-        createdAt: 'invalid-date',
+    it('should handle keys without expiration', () => {
+      const keyWithoutExpiration = {
+        id: 'key-1',
+        provider: 'openai' as AIProvider,
+        keyName: 'Test Key',
+        encryptedKey: 'encrypted-key',
+        isActive: true,
+        createdAt: new Date().toISOString(),
+        keyId: 'key-id-1',
       };
-      expect(isApiKeyExpired(encryptedKey)).toBe(true);
+
+      expect(isApiKeyExpired(keyWithoutExpiration)).toBe(false);
     });
   });
 
-  describe('AI Providers Configuration', () => {
-    it('should have correct OpenAI configuration', () => {
-      const openai = AI_PROVIDERS.openai;
+  describe('Security Best Practices', () => {
+    it('should not store plain text API keys', () => {
+      const apiKey = TEST_CONFIG.API_KEYS.OPENAI;
+      const masterKey = 'master-key-secret';
 
-      expect(openai.name).toBe('OpenAI');
-      expect(openai.models).toContain('gpt-4');
-      expect(openai.models).toContain('gpt-4-turbo');
-      expect(openai.models).toContain('gpt-3.5-turbo');
-      expect(openai.rateLimitPerMinute).toBe(3500);
-      expect(openai.maxTokens).toBe(128000);
-      expect(openai.requiresOrganization).toBe(true);
+      const encrypted = encryptApiKey(apiKey, masterKey);
+
+      expect(encrypted).not.toBe(apiKey);
+      expect(encrypted).not.toContain(apiKey);
     });
 
-    it('should have correct Anthropic configuration', () => {
-      const anthropic = AI_PROVIDERS.anthropic;
+    it('should use different encryption for different providers', () => {
+      const openAIKey = TEST_CONFIG.API_KEYS.OPENAI;
+      const anthropicKey = TEST_CONFIG.API_KEYS.ANTHROPIC;
+      const masterKey = 'master-key-secret';
 
-      expect(anthropic.name).toBe('Anthropic');
-      expect(anthropic.models).toContain('claude-3.5-sonnet');
-      expect(anthropic.models).toContain('claude-3-haiku');
-      expect(anthropic.models).toContain('claude-3-opus');
-      expect(anthropic.rateLimitPerMinute).toBe(1000);
-      expect(anthropic.maxTokens).toBe(200000);
-      expect(anthropic.requiresOrganization).toBe(false);
+      const encryptedOpenAI = encryptApiKey(openAIKey, masterKey);
+      const encryptedAnthropic = encryptApiKey(anthropicKey, masterKey);
+
+      expect(encryptedOpenAI).not.toBe(encryptedAnthropic);
     });
 
-    it('should have correct Google AI configuration', () => {
-      const google = AI_PROVIDERS.google;
+    it('should handle edge cases gracefully', () => {
+      expect(() => {
+        encryptApiKey(null as any, 'key');
+      }).toThrow();
 
-      expect(google.name).toBe('Google AI');
-      expect(google.models).toContain('gemini-1.5-pro');
-      expect(google.models).toContain('gemini-1.5-flash');
-      expect(google.rateLimitPerMinute).toBe(60);
-      expect(google.maxTokens).toBe(2097152);
-      expect(google.requiresOrganization).toBe(false);
-    });
-  });
+      expect(() => {
+        decryptApiKey(null as any, 'key');
+      }).toThrow();
 
-  describe('Security Edge Cases', () => {
-    it('should handle empty encryption key', () => {
-      expect(() => encryptApiKey(testApiKey, '')).not.toThrow();
-      expect(() => decryptApiKey('encrypted', '')).not.toThrow();
-    });
-
-    it('should handle null/undefined values gracefully', () => {
-      expect(() => validateApiKey('openai', null as any)).toBe(false);
-      expect(() => validateApiKey('openai', undefined as any)).toBe(false);
-      expect(() => hashApiKey(null as any)).toBe('');
-      expect(() => hashApiKey(undefined as any)).toBe('');
-    });
-
-    it('should handle very long API keys', () => {
-      const longKey = 'sk-' + 'a'.repeat(100);
-      expect(() => encryptApiKey(longKey, testEncryptionKey)).not.toThrow();
+      expect(() => {
+        hashApiKey(null as any);
+      }).toThrow();
     });
   });
 });

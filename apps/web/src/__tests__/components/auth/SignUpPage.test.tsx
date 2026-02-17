@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SignUpPage from '@/app/(auth)/signup/page';
 import { mockSupabaseClient, resetSupabaseMocks } from '../../setup/supabase-mock';
+import { TEST_CONFIG } from '../../../../../test-config';
 
 describe('SignUpPage', () => {
   beforeEach(() => {
@@ -30,13 +31,13 @@ describe('SignUpPage', () => {
     const submitButton = screen.getByRole('button', { name: /create account/i });
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.change(passwordInput, { target: { value: TEST_CONFIG.PASSWORDS.USER } });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
       expect(mockSupabaseClient.auth.signUp).toHaveBeenCalledWith({
         email: 'test@example.com',
-        password: 'password123',
+        password: TEST_CONFIG.PASSWORDS.USER,
         options: {
           emailRedirectTo: expect.stringContaining('/auth/callback'),
         },
@@ -64,7 +65,7 @@ describe('SignUpPage', () => {
     fireEvent.change(emailInput, {
       target: { value: 'existing@example.com' },
     });
-    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.change(passwordInput, { target: { value: TEST_CONFIG.PASSWORDS.USER } });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -84,7 +85,7 @@ describe('SignUpPage', () => {
     const submitButton = screen.getByRole('button', { name: /create account/i });
 
     fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-    fireEvent.change(passwordInput, { target: { value: 'password123' } });
+    fireEvent.change(passwordInput, { target: { value: TEST_CONFIG.PASSWORDS.USER } });
     fireEvent.click(submitButton);
 
     // Wait for loading state to be set
