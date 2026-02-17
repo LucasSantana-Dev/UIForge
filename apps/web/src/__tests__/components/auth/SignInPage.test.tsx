@@ -1,116 +1,196 @@
-import '@testing-library/jest-dom';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import SignInPage from '@/app/(auth)/signin/page';
-import { mockSupabaseClient, resetSupabaseMocks } from '../../setup/supabase-mock';
+/**
+ * Sign In Page Component Tests
+ * Tests for the user authentication interface
+ */
+
+import { render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { SignInPage } from '@/components/auth/SignInPage';
 import { TEST_CONFIG } from '../../../../../test-config';
 
-// Mock Next.js router - already mocked in jest.setup.js but we need to access the mocks
-const mockPush = jest.fn();
-const mockRefresh = jest.fn();
-
-// Override the global mock for this test file
+// Mock Next.js router
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: mockPush,
-    refresh: mockRefresh,
+    push: jest.fn(),
+    replace: jest.fn(),
   }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+// Mock Supabase auth
+jest.mock('@/lib/supabase/client', () => ({
+  signIn: jest.fn(),
+  signUp: jest.fn(),
 }));
 
 describe('SignInPage', () => {
   beforeEach(() => {
-    resetSupabaseMocks();
-    mockPush.mockClear();
-    mockRefresh.mockClear();
+    jest.clearAllMocks();
   });
 
-  it('renders the sign in form', () => {
-    render(<SignInPage />);
+  it('should render sign in form', () => {
+    const { getByLabelText, getByRole } = render(<SignInPage />);
 
-    expect(screen.getByRole('heading', { name: /sign in to your account/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sign in/i })).toBeInTheDocument();
+    expect(getByLabelText(/email/i)).toBeInTheDocument();
+    expect(getByLabelText(/password/i)).toBeInTheDocument();
+    expect(getByRole('button', { name: /sign in/i })).toBeInTheDocument();
   });
 
-  it('handles successful sign in', async () => {
-    mockSupabaseClient.auth.signInWithPassword.mockResolvedValue({
-      data: { user: { id: '123', email: 'test@example.com' }, session: {} },
-      error: null,
+  it('should show sign up link', () => {
+    const { getByText } = render(<SignInPage />);
+
+    expect(getByText(/don't have an account/i)).toBeInTheDocument();
+    expect(getByText(/sign up/i)).toBeInTheDocument();
+  });
+
+  it('should validate email input', async () => {
+    const { getByLabelText, getByRole, getByText } = render(<SignInPage />);
+
+    const emailInput = getByLabelText(/email/i);
+    const signInButton = getByRole('button', { name: /sign in/i });
+
+    // Try to submit with empty email
+    await userEvent.clear(emailInput);
+    await userEvent.click(signInButton);
+
+    expect(getByText(/email is required/i)).toBeInTheDocument();
+  });
+
+  it('should validate password input', async () => {
+    const { getByLabelText, getByRole, getByText } = render(<SignInPage />);
+
+    const passwordInput = getByLabelText(/password/i);
+    const signInButton = getByRole('button', { name: /sign in/i });
+
+    // Try to submit with empty password
+    await userEvent.clear(passwordInput);
+    await userEvent.click(signInButton);
+
+    expect(getByText(/password is required/i)).toBeInTheDocument();
+  });
+
+  it('should validate email format', async () => {
+    const { getByLabelText, getByRole, getByText } = render(<SignInPage />);
+
+    const emailInput = getByLabelText(/email/i);
+    const signInButton = getByRole('button', { name: /sign in/i });
+
+    // Enter invalid email
+    await userEvent.type(emailInput, 'invalid-email');
+    await userEvent.click(signInButton);
+
+    expect(getByText(/please enter a valid email/i)).toBeInTheDocument();
+  });
+
+  it('should handle form submission with valid data', async () => {
+    const { signIn } = require('@/lib/supabase/client');
+    const { getByLabelText, getByRole } = render(<SignInPage />);
+
+    const emailInput = getByLabelText(/email/i);
+    const passwordInput = getByLabelText(/password/i);
+    const signInButton = getByRole('button', { name: /sign in/i });
+
+    // Fill form with valid data
+    await userEvent.type(emailInput, 'test@example.com');
+    await userEvent.type(passwordInput, TEST_CONFIG.PASSWORDS.USER);
+
+    // Submit form
+    await userEvent.click(signInButton);
+
+    // Should call signIn function
+    expect(signIn).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      password: TEST_CONFIG.PASSWORDS.USER,
+    });
+  });
+
+  it('should show loading state during submission', async () => {
+    const { signIn } = require('@/lib/supabase/client');
+    signIn.mockImplementation(() => new Promise(() => {})); // Never resolves
+
+    const { getByLabelText, getByRole } = render(<SignInPage />);
+
+    const emailInput = getByLabelText(/email/i);
+    const passwordInput = getByLabelText(/password/i);
+    const signInButton = getByRole('button', { name: /sign in/i });
+
+    await userEvent.type(emailInput, 'test@example.com');
+    await userEvent.type(passwordInput, TEST_CONFIG.PASSWORDS.USER);
+    await userEvent.click(signInButton);
+
+    // Should show loading state
+    expect(signInButton).toBeDisabled();
+    expect(signInButton).toHaveTextContent(/signing in/i);
+  });
+
+  it('should handle sign in errors', async () => {
+    const { signIn } = require('@/lib/supabase/client');
+    signIn.mockRejectedValue(new Error('Invalid credentials'));
+
+    const { getByLabelText, getByRole, getByText } = render(<SignInPage />);
+
+    const emailInput = getByLabelText(/email/i);
+    const passwordInput = getByLabelText(/password/i);
+    const signInButton = getByRole('button', { name: /sign in/i });
+
+    await userEvent.type(emailInput, 'test@example.com');
+    await userEvent.type(passwordInput, 'wrongpassword');
+    await userEvent.click(signInButton);
+
+    // Should show error message
+    expect(getByText(/invalid credentials/i)).toBeInTheDocument();
+  });
+
+  it('should navigate to sign up page', async () => {
+    const { useRouter } = require('next/navigation');
+    const mockPush = jest.fn();
+    useRouter.mockReturnValue({
+      push: mockPush,
+      replace: jest.fn(),
     });
 
-    render(<SignInPage />);
+    const { getByText } = render(<SignInPage />);
 
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole('button', { name: /sign in/i });
+    const signUpLink = getByText(/sign up/i);
+    await userEvent.click(signUpLink);
 
-    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-    fireEvent.change(passwordInput, { target: { value: TEST_CONFIG.PASSWORDS.USER } });
-    fireEvent.click(submitButton);
+    expect(mockPush).toHaveBeenCalledWith('/signup');
+  });
 
-    await waitFor(() => {
-      expect(mockSupabaseClient.auth.signInWithPassword).toHaveBeenCalledWith({
-        email: 'test@example.com',
-        password: TEST_CONFIG.PASSWORDS.USER,
-      });
+  it('should handle redirect after successful sign in', async () => {
+    const { signIn } = require('@/lib/supabase/client');
+    const { useRouter } = require('next/navigation');
+    const mockReplace = jest.fn();
+    useRouter.mockReturnValue({
+      push: jest.fn(),
+      replace: mockReplace,
     });
+
+    signIn.mockResolvedValue({ user: { id: '123', email: 'test@example.com' } });
+
+    const { getByLabelText, getByRole } = render(<SignInPage />);
+
+    const emailInput = getByLabelText(/email/i);
+    const passwordInput = getByLabelText(/password/i);
+    const signInButton = getByRole('button', { name: /sign in/i });
+
+    await userEvent.type(emailInput, 'test@example.com');
+    await userEvent.type(passwordInput, TEST_CONFIG.PASSWORDS.USER);
+    await userEvent.click(signInButton);
 
     // Should redirect to dashboard
-    await waitFor(() => {
-      expect(mockPush).toHaveBeenCalledWith('/dashboard');
-      expect(mockRefresh).toHaveBeenCalled();
-    });
+    expect(mockReplace).toHaveBeenCalledWith('/dashboard');
   });
 
-  it('handles sign in error', async () => {
-    mockSupabaseClient.auth.signInWithPassword.mockResolvedValue({
-      data: { user: null, session: null },
-      error: { message: 'Invalid login credentials', name: 'AuthError', status: 400 },
-    });
+  it('should remember me option', () => {
+    const { getByLabelText } = render(<SignInPage />);
 
-    render(<SignInPage />);
-
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole('button', { name: /sign in/i });
-
-    fireEvent.change(emailInput, { target: { value: 'wrong@example.com' } });
-    fireEvent.change(passwordInput, { target: { value: 'wrongpassword' } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText(/invalid login credentials/i)).toBeInTheDocument();
-    }, { timeout: 3000 });
-
-    // Should not redirect
-    expect(mockPush).not.toHaveBeenCalled();
+    expect(getByLabelText(/remember me/i)).toBeInTheDocument();
   });
 
-  it('shows loading state during sign in', async () => {
-    mockSupabaseClient.auth.signInWithPassword.mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ data: { user: null, session: null }, error: null }), 100))
-    );
+  it('should show forgot password link', () => {
+    const { getByText } = render(<SignInPage />);
 
-    render(<SignInPage />);
-
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole('button', { name: /sign in/i });
-
-    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-    fireEvent.change(passwordInput, { target: { value: TEST_CONFIG.PASSWORDS.USER } });
-    fireEvent.click(submitButton);
-
-    // Wait for loading state to be set
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /signing in/i })).toBeDisabled();
-    });
-  });
-
-  it('has link to sign up page', () => {
-    render(<SignInPage />);
-
-    const signUpLink = screen.getByRole('link', { name: /sign up/i });
-    expect(signUpLink).toHaveAttribute('href', '/signup');
+    expect(getByText(/forgot password/i)).toBeInTheDocument();
   });
 });

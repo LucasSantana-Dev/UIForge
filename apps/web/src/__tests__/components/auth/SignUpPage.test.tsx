@@ -1,103 +1,246 @@
-import '@testing-library/jest-dom';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import SignUpPage from '@/app/(auth)/signup/page';
-import { mockSupabaseClient, resetSupabaseMocks } from '../../setup/supabase-mock';
+/**
+ * Sign Up Page Component Tests
+ * Tests for the user registration interface
+ */
+
+import { render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { SignUpPage } from '@/components/auth/SignUpPage';
 import { TEST_CONFIG } from '../../../../../test-config';
+
+// Mock Next.js router
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+  }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+// Mock Supabase auth
+jest.mock('@/lib/supabase/client', () => ({
+  signUp: jest.fn(),
+  signIn: jest.fn(),
+}));
 
 describe('SignUpPage', () => {
   beforeEach(() => {
-    resetSupabaseMocks();
+    jest.clearAllMocks();
   });
 
-  it('renders the sign up form', () => {
-    render(<SignUpPage />);
+  it('should render sign up form', () => {
+    const { getByLabelText, getByRole } = render(<SignUpPage />);
 
-    expect(screen.getByRole('heading', { name: /create your account/i })).toBeInTheDocument();
-    expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sign up/i })).toBeInTheDocument();
+    expect(getByLabelText(/email/i)).toBeInTheDocument();
+    expect(getByLabelText(/password/i)).toBeInTheDocument();
+    expect(getByLabelText(/confirm password/i)).toBeInTheDocument();
+    expect(getByRole('button', { name: /sign up/i })).toBeInTheDocument();
   });
 
-  it('handles successful sign up', async () => {
-    mockSupabaseClient.auth.signUp.mockResolvedValue({
-      data: { user: { id: '123', email: 'test@example.com' } },
-      error: null,
-    });
+  it('should show sign in link', () => {
+    const { getByText } = render(<SignUpPage />);
 
-    render(<SignUpPage />);
+    expect(getByText(/already have an account/i)).toBeInTheDocument();
+    expect(getByText(/sign in/i)).toBeInTheDocument();
+  });
 
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+  it('should validate email input', async () => {
+    const { getByLabelText, getByRole, getByText } = render(<SignUpPage />);
 
-    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-    fireEvent.change(passwordInput, { target: { value: TEST_CONFIG.PASSWORDS.USER } });
-    fireEvent.click(submitButton);
+    const emailInput = getByLabelText(/email/i);
+    const signUpButton = getByRole('button', { name: /sign up/i });
 
-    await waitFor(() => {
-      expect(mockSupabaseClient.auth.signUp).toHaveBeenCalledWith({
-        email: 'test@example.com',
-        password: TEST_CONFIG.PASSWORDS.USER,
-        options: {
-          emailRedirectTo: expect.stringContaining('/auth/callback'),
-        },
-      });
-    });
+    // Try to submit with empty email
+    await userEvent.clear(emailInput);
+    await userEvent.click(signUpButton);
 
-    // Should show success message
-    await waitFor(() => {
-      expect(screen.getByText(/check your email/i)).toBeInTheDocument();
+    expect(getByText(/email is required/i)).toBeInTheDocument();
+  });
+
+  it('should validate password input', async () => {
+    const { getByLabelText, getByRole, getByText } = render(<SignUpPage />);
+
+    const passwordInput = getByLabelText(/password/i);
+    const signUpButton = getByRole('button', { name: /sign up/i });
+
+    // Try to submit with empty password
+    await userEvent.clear(passwordInput);
+    await userEvent.click(signUpButton);
+
+    expect(getByText(/password is required/i)).toBeInTheDocument();
+  });
+
+  it('should validate password confirmation', async () => {
+    const { getByLabelText, getByRole, getByText } = render(<SignUpPage />);
+
+    const passwordInput = getByLabelText(/password/i);
+    const confirmPasswordInput = getByLabelText(/confirm password/i);
+    const signUpButton = getByRole('button', { name: /sign up/i });
+
+    // Enter different passwords
+    await userEvent.type(passwordInput, TEST_CONFIG.PASSWORDS.USER);
+    await userEvent.type(confirmPasswordInput, 'different456');
+    await userEvent.click(signUpButton);
+
+    expect(getByText(/passwords do not match/i)).toBeInTheDocument();
+  });
+
+  it('should validate email format', async () => {
+    const { getByLabelText, getByRole, getByText } = render(<SignUpPage />);
+
+    const emailInput = getByLabelText(/email/i);
+    const signUpButton = getByRole('button', { name: /sign up/i });
+
+    // Enter invalid email
+    await userEvent.type(emailInput, 'invalid-email');
+    await userEvent.click(signUpButton);
+
+    expect(getByText(/please enter a valid email/i)).toBeInTheDocument();
+  });
+
+  it('should validate password strength', async () => {
+    const { getByLabelText, getByRole, getByText } = render(<SignUpPage />);
+
+    const passwordInput = getByLabelText(/password/i);
+    const confirmPasswordInput = getByLabelText(/confirm password/i);
+    const signUpButton = getByRole('button', { name: /sign up/i });
+
+    // Enter weak password
+    await userEvent.type(passwordInput, '123');
+    await userEvent.type(confirmPasswordInput, '123');
+    await userEvent.click(signUpButton);
+
+    expect(getByText(/password must be at least 8 characters/i)).toBeInTheDocument();
+  });
+
+  it('should handle form submission with valid data', async () => {
+    const { signUp } = require('@/lib/supabase/client');
+    const { getByLabelText, getByRole } = render(<SignUpPage />);
+
+    const emailInput = getByLabelText(/email/i);
+    const passwordInput = getByLabelText(/password/i);
+    const confirmPasswordInput = getByLabelText(/confirm password/i);
+    const signUpButton = getByRole('button', { name: /sign up/i });
+
+    // Fill form with valid data
+    await userEvent.type(emailInput, 'test@example.com');
+    await userEvent.type(passwordInput, TEST_CONFIG.PASSWORDS.USER);
+    await userEvent.type(confirmPasswordInput, 'password123');
+
+    // Submit form
+    await userEvent.click(signUpButton);
+
+    // Should call signUp function
+    expect(signUp).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      password: TEST_CONFIG.PASSWORDS.USER,
     });
   });
 
-  it('handles sign up error', async () => {
-    mockSupabaseClient.auth.signUp.mockResolvedValue({
-      data: { user: null, session: null },
-      error: { message: 'Email already registered', name: 'AuthError', status: 400 },
-    });
+  it('should show loading state during submission', async () => {
+    const { signUp } = require('@/lib/supabase/client');
+    signUp.mockImplementation(() => new Promise(() => {})); // Never resolves
 
-    render(<SignUpPage />);
+    const { getByLabelText, getByRole } = render(<SignUpPage />);
 
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const emailInput = getByLabelText(/email/i);
+    const passwordInput = getByLabelText(/password/i);
+    const confirmPasswordInput = getByLabelText(/confirm password/i);
+    const signUpButton = getByRole('button', { name: /sign up/i });
 
-    fireEvent.change(emailInput, {
-      target: { value: 'existing@example.com' },
-    });
-    fireEvent.change(passwordInput, { target: { value: TEST_CONFIG.PASSWORDS.USER } });
-    fireEvent.click(submitButton);
+    await userEvent.type(emailInput, 'test@example.com');
+    await userEvent.type(passwordInput, TEST_CONFIG.PASSWORDS.USER);
+    await userEvent.type(confirmPasswordInput, 'password123');
+    await userEvent.click(signUpButton);
 
-    await waitFor(() => {
-      expect(screen.getByText(/email already registered/i)).toBeInTheDocument();
-    }, { timeout: 3000 });
+    // Should show loading state
+    expect(signUpButton).toBeDisabled();
+    expect(signUpButton).toHaveTextContent(/signing up/i);
   });
 
-  it('shows loading state during sign up', async () => {
-    mockSupabaseClient.auth.signUp.mockImplementation(
-      () => new Promise((resolve) => setTimeout(() => resolve({ data: { user: null }, error: null }), 100))
-    );
+  it('should handle sign up errors', async () => {
+    const { signUp } = require('@/lib/supabase/client');
+    signUp.mockRejectedValue(new Error('User already exists'));
 
-    render(<SignUpPage />);
+    const { getByLabelText, getByRole, getByText } = render(<SignUpPage />);
 
-    const emailInput = screen.getByLabelText(/email/i);
-    const passwordInput = screen.getByLabelText(/password/i);
-    const submitButton = screen.getByRole('button', { name: /create account/i });
+    const emailInput = getByLabelText(/email/i);
+    const passwordInput = getByLabelText(/password/i);
+    const confirmPasswordInput = getByLabelText(/confirm password/i);
+    const signUpButton = getByRole('button', { name: /sign up/i });
 
-    fireEvent.change(emailInput, { target: { value: 'test@example.com' } });
-    fireEvent.change(passwordInput, { target: { value: TEST_CONFIG.PASSWORDS.USER } });
-    fireEvent.click(submitButton);
+    await userEvent.type(emailInput, 'test@example.com');
+    await userEvent.type(passwordInput, TEST_CONFIG.PASSWORDS.USER);
+    await userEvent.type(confirmPasswordInput, 'password123');
+    await userEvent.click(signUpButton);
 
-    // Wait for loading state to be set
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /creating account/i })).toBeDisabled();
-    });
+    // Should show error message
+    expect(getByText(/user already exists/i)).toBeInTheDocument();
   });
 
-  it('has link to sign in page', () => {
-    render(<SignUpPage />);
+  it('should navigate to sign in page', async () => {
+    const { useRouter } = require('next/navigation');
+    const mockPush = jest.fn();
+    useRouter.mockReturnValue({
+      push: mockPush,
+      replace: jest.fn(),
+    });
 
-    const signInLink = screen.getByRole('link', { name: /sign in/i });
-    expect(signInLink).toHaveAttribute('href', '/signin');
+    const { getByText } = render(<SignUpPage />);
+
+    const signInLink = getByText(/sign in/i);
+    await userEvent.click(signInLink);
+
+    expect(mockPush).toHaveBeenCalledWith('/signin');
+  });
+
+  it('should handle redirect after successful sign up', async () => {
+    const { signUp } = require('@/lib/supabase/client');
+    const { useRouter } = require('next/navigation');
+    const mockReplace = jest.fn();
+    useRouter.mockReturnValue({
+      push: jest.fn(),
+      replace: mockReplace,
+    });
+
+    signUp.mockResolvedValue({ user: { id: '123', email: 'test@example.com' } });
+
+    const { getByLabelText, getByRole } = render(<SignUpPage />);
+
+    const emailInput = getByLabelText(/email/i);
+    const passwordInput = getByLabelText(/password/i);
+    const confirmPasswordInput = getByLabelText(/confirm password/i);
+    const signUpButton = getByRole('button', { name: /sign up/i });
+
+    await userEvent.type(emailInput, 'test@example.com');
+    await userEvent.type(passwordInput, TEST_CONFIG.PASSWORDS.USER);
+    await userEvent.type(confirmPasswordInput, 'password123');
+    await userEvent.click(signUpButton);
+
+    // Should redirect to dashboard
+    expect(mockReplace).toHaveBeenCalledWith('/dashboard');
+  });
+
+  it('should show terms and conditions checkbox', () => {
+    const { getByLabelText } = render(<SignUpPage />);
+
+    expect(getByLabelText(/i agree to the terms and conditions/i)).toBeInTheDocument();
+  });
+
+  it('should require terms acceptance', async () => {
+    const { getByLabelText, getByRole, getByText } = render(<SignUpPage />);
+
+    const emailInput = getByLabelText(/email/i);
+    const passwordInput = getByLabelText(/password/i);
+    const confirmPasswordInput = getByLabelText(/confirm password/i);
+    const signUpButton = getByRole('button', { name: /sign up/i });
+
+    // Fill form but don't accept terms
+    await userEvent.type(emailInput, 'test@example.com');
+    await userEvent.type(passwordInput, TEST_CONFIG.PASSWORDS.USER);
+    await userEvent.type(confirmPasswordInput, 'password123');
+    await userEvent.click(signUpButton);
+
+    expect(getByText(/you must accept the terms and conditions/i)).toBeInTheDocument();
   });
 });
