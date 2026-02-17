@@ -4,11 +4,14 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Code2 } from 'lucide-react';
+import { OAuthButton } from '@/components/auth/oauth-button';
+import { signInWithGoogle, signInWithGitHub } from '@/lib/auth/oauth';
 
 export default function SignUpPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [oauthLoading, setOAuthLoading] = useState<'google' | 'github' | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
@@ -37,16 +40,26 @@ export default function SignUpPage() {
   };
 
   const handleGoogleSignUp = async () => {
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    setOAuthLoading('google');
+    setError(null);
+
+    const { error } = await signInWithGoogle();
 
     if (error) {
       setError(error.message);
+      setOAuthLoading(null);
+    }
+  };
+
+  const handleGitHubSignUp = async () => {
+    setOAuthLoading('github');
+    setError(null);
+
+    const { error } = await signInWithGitHub();
+
+    if (error) {
+      setError(error.message);
+      setOAuthLoading(null);
     }
   };
 
@@ -153,12 +166,18 @@ export default function SignUpPage() {
             </div>
           </div>
 
-          <button
-            onClick={handleGoogleSignUp}
-            className="w-full rounded-md border px-4 py-2 text-sm font-medium hover:bg-accent"
-          >
-            Sign up with Google
-          </button>
+          <div className="space-y-3">
+            <OAuthButton
+              provider="google"
+              onClick={handleGoogleSignUp}
+              disabled={oauthLoading === 'google'}
+            />
+            <OAuthButton
+              provider="github"
+              onClick={handleGitHubSignUp}
+              disabled={oauthLoading === 'github'}
+            />
+          </div>
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Already have an account?{' '}
