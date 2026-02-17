@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
         style: body.style || null,
         typescript: body.typescript || false,
         status: 'completed',
-        tokens_used: body.tokens_used?.toString() || null,
+        tokens_used: body.tokens_used || null,
       })
       .select()
       .single();

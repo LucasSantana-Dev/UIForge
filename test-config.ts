@@ -10,14 +10,14 @@ export const TEST_CONFIG = {
     ANTHROPIC: 'sk-ant-test-anthropic-key-1234567890abcdef',
     GEMINI: 'test-gemini-key-1234567890abcdef',
   },
-  
-  // Test passwords (these are not real passwords)
+
+  // Test passwords (these are not real passwords - for testing only)
   PASSWORDS: {
-    USER: 'TestPassword123!',
-    ADMIN: 'AdminPassword456!',
-    WEAK: 'password123',
+    USER: 'TestPassword123!', // Test password - not a real secret
+    ADMIN: 'AdminPassword456!', // Test password - not a real secret
+    WEAK: 'password123', // Test password - not a real secret
   },
-  
+
   // Test user data
   USERS: {
     VALID: {
@@ -29,7 +29,7 @@ export const TEST_CONFIG = {
       name: 'Admin User',
     },
   },
-  
+
   // Encryption test vectors
   ENCRYPTION: {
     TEST_DATA: 'This is test data for encryption',
