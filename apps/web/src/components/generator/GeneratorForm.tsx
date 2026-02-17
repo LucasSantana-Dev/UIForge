@@ -24,6 +24,7 @@ interface GeneratorFormProps {
   onGenerate: (code: string, settings: any) => void;
   onGenerating: () => void;
   isGenerating: boolean;
+  initialDescription?: string;
 }
 
 export default function GeneratorForm({
@@ -32,6 +33,7 @@ export default function GeneratorForm({
   onGenerate,
   onGenerating,
   isGenerating,
+  initialDescription,
 }: GeneratorFormProps) {
   const generation = useGeneration();
   const [currentSettings, setCurrentSettings] = useState({
@@ -45,16 +47,25 @@ export default function GeneratorForm({
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
+    watch,
   } = useForm<GeneratorFormData>({
     resolver: zodResolver(generatorSchema),
     defaultValues: {
       componentName: '',
-      prompt: '',
+      prompt: initialDescription || '',
       componentLibrary: framework === 'react' ? 'shadcn' : 'tailwind',
       style: 'modern',
       typescript: true,
     },
   });
+
+  // Set initial description if provided
+  useEffect(() => {
+    if (initialDescription) {
+      setValue('prompt', initialDescription);
+    }
+  }, [initialDescription, setValue]);
 
   const onSubmit = async (data: GeneratorFormData) => {
     try {

@@ -83,7 +83,7 @@ describe('BYOK Storage', () => {
 
     it('should handle database upgrade', async () => {
       return new Promise<void>((resolve) => {
-        mockOpenDBRequest.onupgradeneeded = (event: any) => {
+        (mockOpenDBRequest.onupgradeneeded as any) = (event: any) => {
           expect(event.target.result.createObjectStore).toHaveBeenCalled();
           resolve();
         };
@@ -214,7 +214,7 @@ describe('BYOK Storage', () => {
 
     it('should handle storage errors gracefully', async () => {
       const error = new Error('Storage failed');
-      mockTransaction.onerror = jest.fn((callback) => {
+      (mockTransaction.onerror as any) = jest.fn((callback) => {
         callback({ target: { error } });
       });
 
@@ -223,7 +223,7 @@ describe('BYOK Storage', () => {
 
     it('should handle retrieval errors', async () => {
       const error = new Error('Retrieval failed');
-      mockTransaction.onerror = jest.fn((callback) => {
+      (mockTransaction.onerror as any) = jest.fn((callback) => {
         callback({ target: { error } });
       });
 

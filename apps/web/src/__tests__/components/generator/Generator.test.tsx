@@ -1,11 +1,11 @@
 /**
- * Generator Component Tests
+ * ComponentGenerator Component Tests
  * Tests for the main component generation interface
  */
 
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Generator } from '@/components/generator/Generator';
+import ComponentGenerator from '@/components/generator/ComponentGenerator';
 import { useGeneration } from '@/hooks/use-generation';
 import { useAIKeyStore } from '@/stores/ai-keys';
 import { TEST_CONFIG } from '../../../../../../test-config';
@@ -54,7 +54,7 @@ jest.mock('@/components/ui/input', () => ({
 
 jest.mock('@/components/ui/select', () => ({
   Select: ({ children, onValueChange, value, ...props }: any) => (
-    <div onChange={(e) => onValueChange?.(e.target.value)} value={value} {...props}>
+    <div onChange={(e) => onValueChange?.((e.target as HTMLSelectElement).value)} value={value} {...props}>
       {children}
     </div>
   ),
@@ -94,7 +94,7 @@ jest.mock('@/components/ui/progress', () => ({
 const mockUseGeneration = useGeneration as jest.MockedFunction<typeof useGeneration>;
 const mockUseAIKeyStore = useAIKeyStore as jest.MockedFunction<typeof useAIKeyStore>;
 
-describe('Generator Component', () => {
+describe('ComponentGenerator Component', () => {
   const mockGeneration = {
     isGenerating: false,
     progress: 0,
@@ -144,18 +144,16 @@ describe('Generator Component', () => {
   });
 
   it('should render generator interface', () => {
-    render(<Generator />);
+    const { getByText } = render(<ComponentGenerator projectId="test-project" />);
 
-    expect(screen.getByText(/component generator/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/component name/i)).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/describe your component/i)).toBeInTheDocument();
+    expect(getByText(/component generator/i)).toBeInTheDocument();
   });
 
   it('should show API key status', () => {
-    render(<Generator />);
+    const { getByText } = render(<ComponentGenerator projectId="test-project" />);
 
-    expect(screen.getByText(/api keys configured/i)).toBeInTheDocument();
-    expect(screen.getByText(/openai/i)).toBeInTheDocument();
+    expect(getByText(/api keys configured/i)).toBeInTheDocument();
+    expect(getByText(/openai/i)).toBeInTheDocument();
   });
 
   it('should disable generation when no API keys', () => {
@@ -165,51 +163,51 @@ describe('Generator Component', () => {
       apiKeys: [],
     });
 
-    render(<Generator />);
+    const { getByRole } = render(<ComponentGenerator projectId="test-project" />);
 
-    const generateButton = screen.getByRole('button', { name: /generate/i });
+    const generateButton = getByRole('button', { name: /generate/i });
     expect(generateButton).toBeDisabled();
   });
 
   describe('form validation', () => {
     it('should show validation errors for empty fields', async () => {
       const user = userEvent.setup();
-      render(<Generator />);
+      const { getByRole, getByText, getByPlaceholderText } = render(<ComponentGenerator projectId="test-project" />);
 
-      const generateButton = screen.getByRole('button', { name: /generate/i });
+      const generateButton = getByRole('button', { name: /generate/i });
       await user.click(generateButton);
 
-      expect(screen.getByText(/component name is required/i)).toBeInTheDocument();
-      expect(screen.getByText(/description is required/i)).toBeInTheDocument();
+      expect(getByText(/component name is required/i)).toBeInTheDocument();
+      expect(getByText(/description is required/i)).toBeInTheDocument();
     });
 
     it('should show validation error for invalid component name', async () => {
       const user = userEvent.setup();
-      render(<Generator />);
+      const { getByPlaceholderText, getByRole, getByText } = render(<ComponentGenerator projectId="test-project" />);
 
-      const nameInput = screen.getByPlaceholderText(/component name/i);
+      const nameInput = getByPlaceholderText(/component name/i);
       await user.type(nameInput, '123 Invalid');
 
-      const generateButton = screen.getByRole('button', { name: /generate/i });
+      const generateButton = getByRole('button', { name: /generate/i });
       await user.click(generateButton);
 
-      expect(screen.getByText(/invalid component name/i)).toBeInTheDocument();
+      expect(getByText(/invalid component name/i)).toBeInTheDocument();
     });
 
     it('should show validation error for short description', async () => {
       const user = userEvent.setup();
-      render(<Generator />);
+      const { getByPlaceholderText, getByRole, getByText } = render(<ComponentGenerator projectId="test-project" />);
 
-      const nameInput = screen.getByPlaceholderText(/component name/i);
-      const descriptionInput = screen.getByPlaceholderText(/describe your component/i);
+      const nameInput = getByPlaceholderText(/component name/i);
+      const descriptionInput = getByPlaceholderText(/describe your component/i);
 
       await user.type(nameInput, 'ValidComponent');
       await user.type(descriptionInput, 'Too short');
 
-      const generateButton = screen.getByRole('button', { name: /generate/i });
+      const generateButton = getByRole('button', { name: /generate/i });
       await user.click(generateButton);
 
-      expect(screen.getByText(/description must be at least/i)).toBeInTheDocument();
+      expect(getByText(/description must be at least/i)).toBeInTheDocument();
     });
   });
 
@@ -218,11 +216,11 @@ describe('Generator Component', () => {
       const user = userEvent.setup();
       mockGeneration.startGeneration.mockResolvedValue(undefined);
 
-      render(<Generator />);
+      const { getByPlaceholderText, getByRole, getByLabelText } = render(<ComponentGenerator projectId="test-project" />);
 
-      const nameInput = screen.getByPlaceholderText(/component name/i);
-      const descriptionInput = screen.getByPlaceholderText(/describe your component/i);
-      const generateButton = screen.getByRole('button', { name: /generate/i });
+      const nameInput = getByPlaceholderText(/component name/i);
+      const descriptionInput = getByPlaceholderText(/describe your component/i);
+      const generateButton = getByRole('button', { name: /generate/i });
 
       await user.type(nameInput, 'TestButton');
       await user.type(descriptionInput, 'A test button component with modern styling');
@@ -246,11 +244,11 @@ describe('Generator Component', () => {
         progress: 45,
       });
 
-      render(<Generator />);
+      const { getByText, getByRole } = render(<ComponentGenerator projectId="test-project" />);
 
-      expect(screen.getByText(/generating/i)).toBeInTheDocument();
-      expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '45');
-      expect(screen.getByRole('button', { name: /stop/i })).toBeInTheDocument();
+      expect(getByText(/generating/i)).toBeInTheDocument();
+      expect(getByRole('progressbar')).toHaveAttribute('aria-valuenow', '45');
+      expect(getByRole('button', { name: /stop/i })).toBeInTheDocument();
     });
 
     it('should display generated code', async () => {
@@ -259,10 +257,10 @@ describe('Generator Component', () => {
         code: 'export default function Button() {\n  return <button>Click me</button>;\n}',
       });
 
-      render(<Generator />);
+      const { getByText } = render(<ComponentGenerator projectId="test-project" />);
 
-      expect(screen.getByText(/generated code/i)).toBeInTheDocument();
-      expect(screen.getByText(/export default function Button/)).toBeInTheDocument();
+      expect(getByText(/generated code/i)).toBeInTheDocument();
+      expect(getByText(/export default function Button/)).toBeInTheDocument();
     });
 
     it('should display generation errors', async () => {
@@ -271,10 +269,10 @@ describe('Generator Component', () => {
         error: 'Generation failed: API error',
       });
 
-      render(<Generator />);
+      const { getByText } = render(<ComponentGenerator projectId="test-project" />);
 
-      expect(screen.getByText(/generation failed/i)).toBeInTheDocument();
-      expect(screen.getByText(/api error/i)).toBeInTheDocument();
+      expect(getByText(/generation failed/i)).toBeInTheDocument();
+      expect(getByText(/api error/i)).toBeInTheDocument();
     });
 
     it('should allow stopping generation', async () => {
@@ -284,9 +282,9 @@ describe('Generator Component', () => {
         isGenerating: true,
       });
 
-      render(<Generator />);
+      const { getByRole } = render(<ComponentGenerator projectId="test-project" />);
 
-      const stopButton = screen.getByRole('button', { name: /stop/i });
+      const stopButton = getByRole('button', { name: /stop/i });
       await user.click(stopButton);
 
       expect(mockGeneration.stopGeneration).toHaveBeenCalled();
@@ -294,17 +292,17 @@ describe('Generator Component', () => {
 
     it('should allow resetting form', async () => {
       const user = userEvent.setup();
-      render(<Generator />);
+      const { getByPlaceholderText, getByRole } = render(<ComponentGenerator projectId="test-project" />);
 
       // Fill form
-      const nameInput = screen.getByPlaceholderText(/component name/i);
-      const descriptionInput = screen.getByPlaceholderText(/describe your component/i);
+      const nameInput = getByPlaceholderText(/component name/i);
+      const descriptionInput = getByPlaceholderText(/describe your component/i);
 
       await user.type(nameInput, 'TestButton');
       await user.type(descriptionInput, 'A test button');
 
       // Reset
-      const resetButton = screen.getByRole('button', { name: /reset/i });
+      const resetButton = getByRole('button', { name: /reset/i });
       await user.click(resetButton);
 
       expect(mockGeneration.reset).toHaveBeenCalled();
@@ -316,14 +314,14 @@ describe('Generator Component', () => {
   describe('framework and library selection', () => {
     it('should allow framework selection', async () => {
       const user = userEvent.setup();
-      render(<Generator />);
+      const { getByPlaceholderText, getByRole, getByLabelText } = render(<ComponentGenerator projectId="test-project" />);
 
-      const frameworkSelect = screen.getByLabelText(/framework/i);
+      const frameworkSelect = getByLabelText(/framework/i);
       await user.selectOptions(frameworkSelect, 'vue');
 
-      const nameInput = screen.getByPlaceholderText(/component name/i);
-      const descriptionInput = screen.getByPlaceholderText(/describe your component/i);
-      const generateButton = screen.getByRole('button', { name: /generate/i });
+      const nameInput = getByPlaceholderText(/component name/i);
+      const descriptionInput = getByPlaceholderText(/describe your component/i);
+      const generateButton = getByRole('button', { name: /generate/i });
 
       await user.type(nameInput, 'TestButton');
       await user.type(descriptionInput, 'A test button component');
@@ -336,14 +334,14 @@ describe('Generator Component', () => {
 
     it('should allow component library selection', async () => {
       const user = userEvent.setup();
-      render(<Generator />);
+      const { getByPlaceholderText, getByRole, getByLabelText } = render(<ComponentGenerator projectId="test-project" />);
 
-      const librarySelect = screen.getByLabelText(/component library/i);
+      const librarySelect = getByLabelText(/component library/i);
       await user.selectOptions(librarySelect, 'mui');
 
-      const nameInput = screen.getByPlaceholderText(/component name/i);
-      const descriptionInput = screen.getByPlaceholderText(/describe your component/i);
-      const generateButton = screen.getByRole('button', { name: /generate/i });
+      const nameInput = getByPlaceholderText(/component name/i);
+      const descriptionInput = getByPlaceholderText(/describe your component/i);
+      const generateButton = getByRole('button', { name: /generate/i });
 
       await user.type(nameInput, 'TestButton');
       await user.type(descriptionInput, 'A test button component');
@@ -356,14 +354,14 @@ describe('Generator Component', () => {
 
     it('should allow style selection', async () => {
       const user = userEvent.setup();
-      render(<Generator />);
+      const { getByPlaceholderText, getByRole, getByLabelText } = render(<ComponentGenerator projectId="test-project" />);
 
-      const styleSelect = screen.getByLabelText(/style/i);
+      const styleSelect = getByLabelText(/style/i);
       await user.selectOptions(styleSelect, 'minimal');
 
-      const nameInput = screen.getByPlaceholderText(/component name/i);
-      const descriptionInput = screen.getByPlaceholderText(/describe your component/i);
-      const generateButton = screen.getByRole('button', { name: /generate/i });
+      const nameInput = getByPlaceholderText(/component name/i);
+      const descriptionInput = getByPlaceholderText(/describe your component/i);
+      const generateButton = getByRole('button', { name: /generate/i });
 
       await user.type(nameInput, 'TestButton');
       await user.type(descriptionInput, 'A test button component');
@@ -376,14 +374,14 @@ describe('Generator Component', () => {
 
     it('should toggle TypeScript option', async () => {
       const user = userEvent.setup();
-      render(<Generator />);
+      const { getByPlaceholderText, getByRole, getByLabelText } = render(<ComponentGenerator projectId="test-project" />);
 
-      const typescriptCheckbox = screen.getByLabelText(/typescript/i);
+      const typescriptCheckbox = getByLabelText(/typescript/i);
       await user.click(typescriptCheckbox);
 
-      const nameInput = screen.getByPlaceholderText(/component name/i);
-      const descriptionInput = screen.getByPlaceholderText(/describe your component/i);
-      const generateButton = screen.getByRole('button', { name: /generate/i });
+      const nameInput = getByPlaceholderText(/component name/i);
+      const descriptionInput = getByPlaceholderText(/describe your component/i);
+      const generateButton = getByRole('button', { name: /generate/i });
 
       await user.type(nameInput, 'TestButton');
       await user.type(descriptionInput, 'A test button component');
@@ -402,9 +400,9 @@ describe('Generator Component', () => {
         code: 'export default function Button() {\n  return <button>Click me</button>;\n}',
       });
 
-      render(<Generator />);
+      const { getByRole } = render(<ComponentGenerator projectId="test-project" />);
 
-      expect(screen.getByRole('button', { name: /copy code/i })).toBeInTheDocument();
+      expect(getByRole('button', { name: /copy code/i })).toBeInTheDocument();
     });
 
     it('should show download code button when code is generated', () => {
@@ -413,9 +411,9 @@ describe('Generator Component', () => {
         code: 'export default function Button() {\n  return <button>Click me</button>;\n}',
       });
 
-      render(<Generator />);
+      const { getByRole } = render(<ComponentGenerator projectId="test-project" />);
 
-      expect(screen.getByRole('button', { name: /download/i })).toBeInTheDocument();
+      expect(getByRole('button', { name: /download/i })).toBeInTheDocument();
     });
 
     it('should show export options when code is generated', () => {
@@ -424,9 +422,9 @@ describe('Generator Component', () => {
         code: 'export default function Button() {\n  return <button>Click me</button>;\n}',
       });
 
-      render(<Generator />);
+      const { getByText } = render(<ComponentGenerator projectId="test-project" />);
 
-      expect(screen.getByText(/export options/i)).toBeInTheDocument();
+      expect(getByText(/export options/i)).toBeInTheDocument();
     });
   });
 
@@ -436,10 +434,10 @@ describe('Generator Component', () => {
       global.innerWidth = 375;
       global.dispatchEvent(new Event('resize'));
 
-      render(<Generator />);
+      const { getByRole } = render(<ComponentGenerator projectId="test-project" />);
 
       // Should stack form elements vertically on mobile
-      const form = screen.getByRole('form');
+      const form = getByRole('form');
       expect(form).toHaveClass('mobile-layout');
     });
 
@@ -448,20 +446,20 @@ describe('Generator Component', () => {
       global.innerWidth = 320;
       global.dispatchEvent(new Event('resize'));
 
-      render(<Generator />);
+      const { queryByLabelText } = render(<ComponentGenerator projectId="test-project" />);
 
       // Should hide some advanced options on small screens
-      expect(screen.queryByLabelText(/component library/i)).not.toBeInTheDocument();
+      expect(queryByLabelText(/component library/i)).not.toBeInTheDocument();
     });
   });
 
   describe('accessibility', () => {
     it('should have proper ARIA labels', () => {
-      render(<Generator />);
+      const { getByRole, getByPlaceholderText } = render(<ComponentGenerator projectId="test-project" />);
 
-      expect(screen.getByRole('form')).toHaveAttribute('aria-label', 'component generation form');
-      expect(screen.getByPlaceholderText(/component name/i)).toHaveAttribute('aria-required', 'true');
-      expect(screen.getByPlaceholderText(/describe your component/i)).toHaveAttribute('aria-required', 'true');
+      expect(getByRole('form')).toHaveAttribute('aria-label', 'component generation form');
+      expect(getByPlaceholderText(/component name/i)).toHaveAttribute('aria-required', 'true');
+      expect(getByPlaceholderText(/describe your component/i)).toHaveAttribute('aria-required', 'true');
     });
 
     it('should announce generation progress to screen readers', () => {
@@ -471,26 +469,26 @@ describe('Generator Component', () => {
         progress: 50,
       });
 
-      render(<Generator />);
+      const { getByRole } = render(<ComponentGenerator projectId="test-project" />);
 
-      const progressbar = screen.getByRole('progressbar');
+      const progressbar = getByRole('progressbar');
       expect(progressbar).toHaveAttribute('aria-live', 'polite');
       expect(progressbar).toHaveAttribute('aria-label', 'generation progress 50%');
     });
 
     it('should support keyboard navigation', async () => {
       const user = userEvent.setup();
-      render(<Generator />);
+      const { getByPlaceholderText, getByRole } = render(<ComponentGenerator projectId="test-project" />);
 
       // Tab through form fields
       await user.tab();
-      expect(screen.getByPlaceholderText(/component name/i)).toHaveFocus();
+      expect(getByPlaceholderText(/component name/i)).toHaveFocus();
 
       await user.tab();
-      expect(screen.getByPlaceholderText(/describe your component/i)).toHaveFocus();
+      expect(getByPlaceholderText(/describe your component/i)).toHaveFocus();
 
       await user.tab();
-      expect(screen.getByRole('button', { name: /generate/i })).toHaveFocus();
+      expect(getByRole('button', { name: /generate/i })).toHaveFocus();
     });
   });
 
@@ -499,62 +497,58 @@ describe('Generator Component', () => {
       const user = userEvent.setup();
       mockGeneration.startGeneration.mockRejectedValue(new Error('Network error'));
 
-      render(<Generator />);
+      const { getByPlaceholderText, getByRole, getByText } = render(<ComponentGenerator projectId="test-project" />);
 
-      const nameInput = screen.getByPlaceholderText(/component name/i);
-      const descriptionInput = screen.getByPlaceholderText(/describe your component/i);
-      const generateButton = screen.getByRole('button', { name: /generate/i });
+      const nameInput = getByPlaceholderText(/component name/i);
+      const descriptionInput = getByPlaceholderText(/describe your component/i);
+      const generateButton = getByRole('button', { name: /generate/i });
 
       await user.type(nameInput, 'TestButton');
       await user.type(descriptionInput, 'A test button component');
       await user.click(generateButton);
 
-      await waitFor(() => {
-        expect(screen.getByText(/network error/i)).toBeInTheDocument();
-      });
+      expect(getByText(/network error/i)).toBeInTheDocument();
     });
 
     it('should handle API rate limiting', async () => {
       const user = userEvent.setup();
       mockGeneration.startGeneration.mockRejectedValue(new Error('Rate limit exceeded'));
 
-      render(<Generator />);
+      const { getByPlaceholderText, getByRole, getByText } = render(<ComponentGenerator projectId="test-project" />);
 
-      const nameInput = screen.getByPlaceholderText(/component name/i);
-      const descriptionInput = screen.getByPlaceholderText(/describe your component/i);
-      const generateButton = screen.getByRole('button', { name: /generate/i });
+      const nameInput = getByPlaceholderText(/component name/i);
+      const descriptionInput = getByPlaceholderText(/describe your component/i);
+      const generateButton = getByRole('button', { name: /generate/i });
 
       await user.type(nameInput, 'TestButton');
       await user.type(descriptionInput, 'A test button component');
       await user.click(generateButton);
 
-      await waitFor(() => {
-        expect(screen.getByText(/rate limit exceeded/i)).toBeInTheDocument();
-        expect(screen.getByText(/please try again later/i)).toBeInTheDocument();
-      });
+      expect(getByText(/rate limit exceeded/i)).toBeInTheDocument();
+        expect(getByText(/please try again later/i)).toBeInTheDocument();
     });
   });
 
   describe('performance', () => {
     it('should debounce form validation', async () => {
       const user = userEvent.setup();
-      render(<Generator />);
+      const { getByPlaceholderText, queryByText } = render(<ComponentGenerator projectId="test-project" />);
 
-      const nameInput = screen.getByPlaceholderText(/component name/i);
+      const nameInput = getByPlaceholderText(/component name/i);
 
       // Type rapidly
       await user.type(nameInput, 'Test');
       await user.type(nameInput, 'Component');
 
       // Should only validate once after typing stops
-      expect(screen.queryByText(/invalid component name/i)).not.toBeInTheDocument();
+      expect(queryByText(/invalid component name/i)).not.toBeInTheDocument();
     });
 
     it('should not re-render unnecessarily', () => {
-      const { rerender } = render(<Generator />);
+      const { rerender } = render(<ComponentGenerator projectId="test-project" />);
 
       // Re-render with same props
-      rerender(<Generator />);
+      rerender(<ComponentGenerator projectId="test-project" />);
 
       // Should not cause unnecessary re-renders
       expect(mockUseGeneration).toHaveBeenCalledTimes(2);

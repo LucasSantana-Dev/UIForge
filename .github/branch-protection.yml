@@ -5,10 +5,11 @@
 - Require up-to-date branches
 - Require status checks to pass
 - Require linear history
-- **ALLOW FORCE PUSHES ONLY** (No direct commits allowed)
-- **DISABLE NORMAL PUSHES** (Only --force allowed)
-- **REQUIRE PULL REQUESTS** (All changes via PR)
-- **FORCE PUSH RESTRICTION** (Only maintainers can force push)
+- ALLOW FORCE PUSHES ONLY (No direct commits allowed)
+- DISABLE NORMAL PUSHES (Only --force allowed)
+- REQUIRE PULL REQUESTS (All changes via PR)
+- FORCE PUSH RESTRICTION (Only maintainers can force push)
+- NO BYPASS SCRIPTS (No scripts allowed to circumvent rules)
 
 ## Dev Branch Protection  
 - Required reviewers: 1

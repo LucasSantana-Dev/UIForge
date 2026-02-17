@@ -55,7 +55,7 @@ This document outlines the security measures and configurations implemented for 
 ### Latest Scan Results
 - **Dependencies**: 0 vulnerabilities
 - **Code Issues**: 0 security issues
-- **Severity Breakdown**: 
+- **Severity Breakdown**:
   - Critical: 0
   - High: 0
   - Medium: 0
@@ -122,7 +122,7 @@ snyk test --all-projects
 snyk code test
 
 # Scan Docker images
-snyk container test node:22-slim
+snyk container test node:22.22.0-trixie-slim
 
 # Monitor project continuously
 snyk monitor --all-projects

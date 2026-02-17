@@ -1,0 +1,37 @@
+# Cloudflare Pages configuration for UIForge Web App
+name = "uiforge-web"
+main = "src/app/page.tsx"
+compatibility_date = "2024-02-15"
+compatibility_flags = ["nodejs_compat"]
+
+# Environment variables
+[env.production.vars]
+NEXT_PUBLIC_SUPABASE_URL = ""
+NEXT_PUBLIC_SUPABASE_ANON_KEY = ""
+NEXT_PUBLIC_API_URL = "https://api.uiforge.workers.dev"
+
+# Build configuration
+[build]
+command = "npm run build"
+cwd = "."
+watch_dir = "src"
+
+# Pages configuration
+pages_build_output_dir = ".next"
+
+# KV namespace for caching (optional)
+[[kv_namespaces]]
+binding = "UIFORGE_CACHE"
+id = ""
+preview_id = ""
+
+# D1 database (optional)
+[[d1_databases]]
+binding = "UIFORGE_DB"
+database_name = "uiforge-db"
+database_id = ""
+
+# R2 bucket for assets (optional)
+[[r2_buckets]]
+binding = "UIFORGE_ASSETS"
+bucket_name = "uiforge-assets"

@@ -2,7 +2,7 @@
 
 > **Zero-cost AI-powered UI generation platform**
 >
-> Transform ideas into production-ready code with AI. Built with Next.js 15, Supabase, and modern web technologies. 100% free forever.
+> Transform ideas into production-ready code with AI. Built with Next.js 15, Supabase, and modern web technologies. 100% free.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
@@ -18,7 +18,7 @@
 [![Styling](https://img.shields.io/badge/Styling-Tailwind_CSS-06B6D4)](https://tailwindcss.com/)
 [![Monorepo](https://img.shields.io/badge/Monorepo-Turborepo-FF6B35)](https://turbo.build/)
 [![AI Integration](https://img.shields.io/badge/AI-MCP-8B5CF6)](https://modelcontextprotocol.io/)
-[![Free Forever](https://img.shields.io/badge/Free-Forever-10B981)](https://uiforge.dev)
+[![Free](https://img.shields.io/badge/Free-Forever-10B981)](https://uiforge.dev)
 
 ## ✨ Features
 

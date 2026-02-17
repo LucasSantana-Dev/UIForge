@@ -1,8 +1,9 @@
 /**
- * Cloudflare Workers API - Simple Implementation
- * Full UIForge API implementation for Cloudflare Workers without Express dependencies
+ * Cloudflare Workers API - Enhanced with Google AI Integration
+ * Full UIForge API implementation for Cloudflare Workers with BYOK support
  */
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import { convertWireframeToFigma } from './services/wireframe-to-figma-enhanced';
 
 // Environment interface for Cloudflare Workers
@@ -155,8 +156,8 @@ async function handleHealth(env: Env): Promise<Response> {
   }
 }
 
-// Simple component generation using Gemini API directly
-async function handleGenerate(request: Request, _env: Env): Promise<Response> {
+// Component generation using Google AI
+async function handleGenerate(request: Request, env: Env): Promise<Response> {
   try {
     if (!checkRateLimit(request, 10, 60 * 60 * 1000).allowed) {
       return new Response(JSON.stringify({
@@ -169,19 +170,35 @@ async function handleGenerate(request: Request, _env: Env): Promise<Response> {
     }
 
     const body = await request.json() as WireframeRequest;
-    
-    // Placeholder implementation - would integrate with Gemini API
-    const response = {
-      component: `// Generated ${body.framework} component for ${body.description}`,
+
+    // Initialize Google AI
+    const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
+    const model = genAI.getGenerativeModel({ model: 'gemini-3-flash-preview' });
+
+    // Create prompt based on request parameters
+    const prompt = createGenerationPrompt(body);
+
+    // Generate content
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+
+    const generatedCode = response.text();
+
+    return new Response(JSON.stringify({
+      component: generatedCode,
       framework: body.framework,
       componentLibrary: body.componentLibrary || 'none',
-      typescript: body.typescript ?? true
-    };
-
-    return new Response(JSON.stringify(response), {
+      typescript: body.typescript ?? true,
+      metadata: {
+        model: 'gemini-3-flash-preview',
+        generatedAt: new Date().toISOString(),
+        tokens: (response.usageMetadata?.promptTokenCount || 0) + (response.usageMetadata?.candidatesTokenCount || 0)
+      }
+    }), {
       headers: { 'Content-Type': 'application/json' }
     });
   } catch (error) {
+    console.error('Generation error:', error);
     return new Response(JSON.stringify({
       error: 'Generation failed',
       message: error instanceof Error ? error.message : 'Unknown error'
@@ -190,6 +207,27 @@ async function handleGenerate(request: Request, _env: Env): Promise<Response> {
       headers: { 'Content-Type': 'application/json' }
     });
   }
+}
+
+// Create generation prompt for Google AI
+function createGenerationPrompt(options: WireframeRequest): string {
+  const framework = options.framework || 'react';
+  const library = options.componentLibrary || 'tailwind';
+  const typescript = options.typescript ? 'TypeScript' : 'JavaScript';
+
+  return `Generate a ${framework} component for: ${options.description}
+
+Requirements:
+- Use ${library} for styling
+- Write in ${typescript}
+- Include proper imports
+- Make it responsive
+- Add appropriate props interface
+- Include comments for clarity
+- Follow modern best practices
+- Export as default
+
+The component should be production-ready and follow ${framework} conventions.`;
 }
 
 // Wireframe generation handler
@@ -260,7 +298,7 @@ async function handleFigmaExport(request: Request, _env: Env): Promise<Response>
     }
 
     const body = await request.json() as { wireframe: GeneratedWireframe };
-    
+
     // Convert wireframe to Figma format
     const figmaData = convertWireframeToFigma(body.wireframe, {
       includeStyles: true,
@@ -345,7 +383,7 @@ function generateSimpleWireframe(options: WireframeRequest): WireframeResponse {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    
+
     // CORS headers
     const corsHeaders = {
       'Access-Control-Allow-Origin': '*',
@@ -362,31 +400,31 @@ export default {
       switch (url.pathname) {
         case '/health':
           return handleHealth(env);
-        
+
         case '/api/generate':
           if (request.method === 'POST') {
             return handleGenerate(request, env);
           }
           break;
-        
+
         case '/api/wireframe':
           if (request.method === 'POST') {
             return handleWireframe(request);
           }
           break;
-        
+
         case '/api/wireframe/templates':
           if (request.method === 'GET') {
             return handleWireframeTemplates();
           }
           break;
-        
+
         case '/api/figma/export':
           if (request.method === 'POST') {
             return handleFigmaExport(request, env);
           }
           break;
-        
+
         default:
           return new Response('Not found', { status: 404 });
       }

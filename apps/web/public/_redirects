@@ -1,0 +1,10 @@
+# Handle Next.js routing
+/api/* /api/:splat 200
+
+# Redirect old routes to new ones
+/generate /generate 200
+/templates /templates 200
+/projects /projects 200
+
+# Handle SPA routing for client-side routes
+/* /index.html 200

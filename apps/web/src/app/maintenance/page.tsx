@@ -1,4 +1,5 @@
-import { Code2, Wrench, Clock, Github } from 'lucide-react';
+import Image from 'next/image';
+import { Wrench, Clock, Github } from 'lucide-react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ export default function MaintenancePage() {
       <div className="mx-auto max-w-2xl text-center">
         {/* Logo */}
         <Link href="/" className="inline-flex items-center gap-2 mb-8">
-          <Code2 className="h-10 w-10 text-primary" />
+          <Image src="/anvil-logo.svg" alt="UIForge" width={40} height={40} className="flex-shrink-0" />
           <span className="text-2xl font-bold">UIForge</span>
         </Link>
 

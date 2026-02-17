@@ -12,7 +12,7 @@ description: Work with Docker and mcp-gateway integration. Use when editing Dock
 
 ## Dockerfile
 
-- Multi-stage build: `node:22-slim` builder → production
+- Multi-stage build: `node:22.22.0-trixie-slim` builder → production
 - Builder: `npm ci` → `npm run build`
 - Production: `npm ci --omit=dev` → copy `dist/`
 - Entry: `CMD ["node", "dist/index.js"]`

@@ -8,7 +8,7 @@ This repository uses Trunk Based Development with automated deployment workflows
 - **`main`**: Production-ready code, always deployable
   - **IMPORTANT**: Only accepts force pushes (`git push --force`)
   - Normal pushes are blocked by automation
-  - Use `./scripts/push-main.sh` for safe force pushes
+  - Use `git push --force origin main` for deliberate force pushes
 - **`dev`**: Development environment, continuously deployed
 - **`release/1.0.0`**: Release branch for version 1.0.0
 
@@ -72,8 +72,10 @@ git checkout main
 git merge release/1.0.0
 
 # Force push to main (REQUIRED - only force pushes allowed)
-./scripts/push-main.sh "Release v1.0.0 deployment"
-# OR manually: git push --force origin main
+git push --force origin main
+
+# Note: No bypass scripts - use direct git commands
+# This ensures deliberate, conscious pushes to production
 ```
 
 ## 🔧 Environment Setup
@@ -124,7 +126,7 @@ git checkout -b hotfix/critical-bug
 # Deploy immediately (force push required)
 git checkout main
 git merge hotfix/critical-bug
-./scripts/push-main.sh "Hotfix: critical bug fix"
+git push --force origin main
 ```
 
 ### Rollback Production
@@ -145,7 +147,7 @@ git push -f origin v0.9.0:main
 ### How to Push to Main
 ```bash
 # Use the safe script (recommended)
-./scripts/push-main.sh "Your commit message"
+git push --force origin main
 
 # Or manual force push
 git push --force origin main

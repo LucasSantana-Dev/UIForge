@@ -11,7 +11,7 @@ compatibility_flags = ["nodejs_compat"]
 format = "modules"
 
 # Account ID (replace with your Cloudflare account ID)
-# account_id = "your-account-id"
+account_id = "your-account-id"
 
 # Environment variables (set via wrangler secret put)
 # - SUPABASE_URL
@@ -32,7 +32,7 @@ vars = { NODE_ENV = "production" }
 [vars]
 # Secrets are automatically bound as environment variables
 
-# Routes
+# Routes (commented out until zone is created)
 # [[routes]]
 # pattern = "api.uiforge.dev/*"
 # zone_name = "uiforge.dev"

@@ -99,12 +99,12 @@ describe('IndexedDB Storage', () => {
       await storage.init();
 
       expect(global.indexedDB.open).toHaveBeenCalledWith('UIForgeKeys', 1);
-      expect(storage.db).toBe(mockDatabase);
+      expect((storage as any).db).toBe(mockDatabase);
     });
 
     it('should handle database upgrade', async () => {
       return new Promise<void>((resolve) => {
-        mockOpenDBRequest.onupgradeneeded = (event: any) => {
+        (mockOpenDBRequest.onupgradeneeded as any) = (event: any) => {
           expect(event.target.result.createObjectStore).toHaveBeenCalledWith('apiKeys', {
             keyPath: 'keyId',
           });
@@ -141,7 +141,7 @@ describe('IndexedDB Storage', () => {
 
     it('should handle storage errors', async () => {
       const error = new Error('Storage failed');
-      mockTransaction.onerror = jest.fn((callback) => {
+      (mockTransaction.onerror as any) = jest.fn((callback) => {
         callback({ target: { error } });
       });
 
@@ -170,7 +170,7 @@ describe('IndexedDB Storage', () => {
 
     it('should handle retrieval errors', async () => {
       const error = new Error('Retrieval failed');
-      mockTransaction.onerror = jest.fn((callback) => {
+      (mockTransaction.onerror as any) = jest.fn((callback) => {
         callback({ target: { error } });
       });
 
@@ -200,7 +200,7 @@ describe('IndexedDB Storage', () => {
 
     it('should handle getAll errors', async () => {
       const error = new Error('GetAll failed');
-      mockTransaction.onerror = jest.fn((callback) => {
+      (mockTransaction.onerror as any) = jest.fn((callback) => {
         callback({ target: { error } });
       });
 
@@ -224,7 +224,7 @@ describe('IndexedDB Storage', () => {
 
     it('should handle update errors', async () => {
       const error = new Error('Update failed');
-      mockTransaction.onerror = jest.fn((callback) => {
+      (mockTransaction.onerror as any) = jest.fn((callback) => {
         callback({ target: { error } });
       });
 
@@ -242,7 +242,7 @@ describe('IndexedDB Storage', () => {
 
     it('should handle delete errors', async () => {
       const error = new Error('Delete failed');
-      mockTransaction.onerror = jest.fn((callback) => {
+      (mockTransaction.onerror as any) = jest.fn((callback) => {
         callback({ target: { error } });
       });
 
@@ -287,7 +287,7 @@ describe('IndexedDB Storage', () => {
 
     it('should handle preference storage errors', async () => {
       const error = new Error('Preference storage failed');
-      mockTransaction.onerror = jest.fn((callback) => {
+      (mockTransaction.onerror as any) = jest.fn((callback) => {
         callback({ target: { error } });
       });
 
@@ -343,7 +343,7 @@ describe('IndexedDB Storage', () => {
 
     it('should handle clear errors', async () => {
       const error = new Error('Clear failed');
-      mockTransaction.onerror = jest.fn((callback) => {
+      (mockTransaction.onerror as any) = jest.fn((callback) => {
         callback({ target: { error } });
       });
 

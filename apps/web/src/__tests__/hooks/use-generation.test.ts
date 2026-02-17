@@ -19,11 +19,27 @@ const mockStreamGeneration = require('@/lib/api/generation').streamGeneration;
 describe('useGeneration', () => {
   const mockCreateGeneration = {
     mutateAsync: jest.fn().mockResolvedValue({}),
+    data: undefined,
+    error: null,
+    isError: false,
+    isPending: false,
+    isSuccess: false,
+    isIdle: true,
+    mutate: jest.fn(),
+    reset: jest.fn(),
+    status: 'idle' as const,
+    failureCount: 0,
+    failureReason: null,
+    errorUpdatedAt: 0,
+    isPaused: false,
+    submittedAt: 0,
+    variables: undefined,
+    context: undefined,
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseCreateGeneration.mockReturnValue(mockCreateGeneration);
+    mockUseCreateGeneration.mockReturnValue(mockCreateGeneration as any);
 
     // Reset stream generation mock
     mockStreamGeneration.mockImplementation(async function* () {

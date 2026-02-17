@@ -1,4 +1,4 @@
-import { Code2 } from 'lucide-react';
+import Image from 'next/image';
 
 export default function Loading() {
   return (
@@ -6,7 +6,7 @@ export default function Loading() {
       <div className="flex flex-col items-center gap-4">
         {/* Logo with pulse animation */}
         <div className="animate-pulse">
-          <Code2 className="h-12 w-12 text-primary" />
+          <Image src="/anvil-logo.svg" alt="UIForge" width={48} height={48} className="flex-shrink-0" />
         </div>
 
         {/* Loading spinner */}

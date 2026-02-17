@@ -132,9 +132,9 @@ export async function POST(request: NextRequest) {
       generation: {
         ...generation,
         project_id: generation.project_id?.toString() || '',
-        tokens_used: generation.tokens_used || null,
+        tokens_used: generation.tokens_used?.toString() || null,
       }
-    }, 201);
+    }, '201');
 
   } catch (error) {
     console.error('Generations POST error:', error);

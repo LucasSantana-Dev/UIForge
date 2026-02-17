@@ -9,22 +9,22 @@ import '@testing-library/jest-dom';
 export const TEST_CONFIG = {
   timeout: 10000,
   API_KEYS: {
-    OPENAI: 'sk-1234567890abcdef1234567890abcdef12345678',
-    ANTHROPIC: 'sk-ant-api03-1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
-    GOOGLE: 'AIzaSy-1234567890abcdef-1234567890abcdef',
+    OPENAI: process.env.TEST_OPENAI_API_KEY || 'sk-test-key-for-testing-only',
+    ANTHROPIC: process.env.TEST_ANTHROPIC_API_KEY || 'sk-ant-test-key-for-testing-only',
+    GOOGLE: process.env.TEST_GOOGLE_API_KEY || 'AIza-test-key-for-testing-only',
   },
   PASSWORDS: {
-    VALID: 'password123', // Test password - not a real secret
-    INVALID: 'wrong', // Test password - not a real secret
+    VALID: process.env.TEST_VALID_PASSWORD || 'test-password-123',
+    INVALID: process.env.TEST_INVALID_PASSWORD || 'wrong',
   },
   USER: {
-    EMAIL: 'test@example.com',
-    PASSWORD: 'password123', // Test password - not a real secret
+    EMAIL: process.env.TEST_USER_EMAIL || 'test@example.com',
+    PASSWORD: process.env.TEST_USER_PASSWORD || 'test-password-123',
   },
   ENCRYPTION: {
-    KEY: 'test-encryption-key-32-characters-long-123456', // Test key - not a real secret
-    IV: 'test-iv-16-chars-1234', // Test IV - not a real secret
-    TEST_KEY: 'test-key-for-encryption-testing-123456', // Test key - not a real secret
+    KEY: process.env.TEST_ENCRYPTION_KEY || 'a'.repeat(32),
+    IV: process.env.TEST_ENCRYPTION_IV || 'b'.repeat(16),
+    TEST_KEY: process.env.TEST_ENCRYPTION_TEST_KEY || 'c'.repeat(42),
   },
 };
 

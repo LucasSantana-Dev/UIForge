@@ -2,13 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FolderIcon, FileTextIcon, SettingsIcon, PlusIcon } from 'lucide-react';
+import { FolderIcon, FileTextIcon, SettingsIcon, PlusIcon, KeyIcon } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 const navigation = [
   { name: 'Projects', href: '/projects', icon: FolderIcon },
   { name: 'Templates', href: '/templates', icon: FileTextIcon },
+  { name: 'AI Keys', href: '/ai-keys', icon: KeyIcon },
   { name: 'Settings', href: '/settings', icon: SettingsIcon },
 ];
 

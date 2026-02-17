@@ -114,3 +114,69 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+export async function GET() {
+  return new Response(
+    JSON.stringify({
+      message: 'UI Generation API',
+      version: '1.0.0',
+      status: 'active',
+      endpoints: {
+        'POST /api/generate': {
+          description: 'Generate UI components with AI',
+          method: 'POST',
+          contentType: 'application/json',
+          parameters: {
+            description: 'string (required) - Description of the component to generate',
+            framework: 'string (optional) - Target framework (react, vue, angular, svelte)',
+            componentLibrary: 'string (optional) - Component library (tailwind, mui, chakra, shadcn, none)',
+            style: 'string (optional) - Style preference (modern, minimal, colorful)',
+            typescript: 'boolean (optional) - Generate TypeScript code'
+          },
+          example: {
+            description: 'A responsive navigation bar with logo and menu items',
+            framework: 'react',
+            componentLibrary: 'tailwind',
+            typescript: true
+          }
+        },
+        'POST /api/generate/validate': {
+          description: 'Validate generated code',
+          method: 'POST',
+          contentType: 'application/json',
+          parameters: {
+            code: 'string (required) - Code to validate',
+            language: 'string (required) - Programming language'
+          }
+        }
+      },
+      notes: [
+        'This API provides Server-Sent Events (SSE) streaming for real-time generation',
+        'Authentication is required via Authorization header',
+        'Rate limits may apply based on subscription tier'
+      ]
+    }),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=3600',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
+      }
+    }
+  );
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400'
+    }
+  });
+}

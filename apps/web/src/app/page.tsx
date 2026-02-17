@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { ArrowRight, Code2, Sparkles, Zap } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight, Sparkles, Zap, CheckCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function HomePage() {
@@ -13,7 +14,7 @@ export default async function HomePage() {
       <header className="border-b">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <Code2 className="h-6 w-6 text-primary" />
+            <Image src="/anvil-logo.svg" alt="UIForge" width={24} height={24} className="flex-shrink-0" />
             <span className="text-xl font-bold">UIForge</span>
             <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
               Beta
@@ -95,7 +96,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="border-t bg-muted/50 py-24">
+        <section className="border-t bg-gradient-to-b from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 py-24">
           <div className="container mx-auto px-4">
             <div className="grid gap-8 md:grid-cols-3">
               <div className="space-y-4 rounded-lg border bg-card p-6">
@@ -110,7 +111,7 @@ export default async function HomePage() {
 
               <div className="space-y-4 rounded-lg border bg-card p-6">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <Code2 className="h-6 w-6 text-primary" />
+                  <CheckCircle className="h-6 w-6 text-primary" />
                 </div>
                 <h3 className="text-xl font-semibold">Production Ready</h3>
                 <p className="text-muted-foreground">
@@ -134,7 +135,7 @@ export default async function HomePage() {
 
       <footer className="border-t py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2026 UIForge. Open source and free forever.</p>
+          <p>© 2026 UIForge. Open source and free.</p>
         </div>
       </footer>
     </div>

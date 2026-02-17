@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 # Multi-stage build for UIForge API
-FROM node:22-slim AS builder
+FROM node:22.22.0-trixie-slim AS builder
 
 # Set working directory
 WORKDIR /app
@@ -20,7 +20,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:22-slim AS production
+FROM node:22.22.0-trixie-slim AS production
 
 # Set working directory
 WORKDIR /app
