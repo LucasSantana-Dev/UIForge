@@ -13,18 +13,18 @@ const providerConfig = {
   google: {
     name: 'Google',
     icon: Gmail,
-    bgColor: 'bg-white',
-    textColor: 'text-gray-900',
-    borderColor: 'border-gray-300',
-    hoverBg: 'hover:bg-gray-50',
+    bgColor: 'bg-background',
+    textColor: 'text-foreground',
+    borderColor: 'border-border',
+    hoverBg: 'hover:bg-accent',
   },
   github: {
     name: 'GitHub',
     icon: Github,
-    bgColor: 'bg-gray-900',
-    textColor: 'text-white',
-    borderColor: 'border-gray-700',
-    hoverBg: 'hover:bg-gray-800',
+    bgColor: 'bg-card',
+    textColor: 'text-card-foreground',
+    borderColor: 'border-border',
+    hoverBg: 'hover:bg-accent',
   },
 };
 

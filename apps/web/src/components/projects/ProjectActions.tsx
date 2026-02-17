@@ -31,7 +31,7 @@ export default function ProjectActions({ projectId, projectName }: ProjectAction
       <div className="relative">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="p-1 rounded hover:bg-gray-100"
+          className="p-1 rounded hover:bg-accent"
         >
           <MoreVerticalIcon className="h-5 w-5 text-gray-400" />
         </button>
@@ -48,7 +48,7 @@ export default function ProjectActions({ projectId, projectName }: ProjectAction
                     router.push(`/projects/${projectId}/edit`);
                     setMenuOpen(false);
                   }}
-                  className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="flex items-center w-full px-4 py-2 text-sm text-foreground hover:bg-accent"
                 >
                   <Edit2Icon className="mr-3 h-4 w-4" />
                   Edit
@@ -58,7 +58,7 @@ export default function ProjectActions({ projectId, projectName }: ProjectAction
                     setDeleteConfirmOpen(true);
                     setMenuOpen(false);
                   }}
-                  className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                  className="flex items-center w-full px-4 py-2 text-sm text-destructive hover:bg-accent"
                 >
                   <TrashIcon className="mr-3 h-4 w-4" />
                   Delete
@@ -79,7 +79,7 @@ export default function ProjectActions({ projectId, projectName }: ProjectAction
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setDeleteConfirmOpen(false)}
-                className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                className="px-4 py-2 border border rounded-md text-sm font-medium text-foreground hover:bg-accent"
               >
                 Cancel
               </button>

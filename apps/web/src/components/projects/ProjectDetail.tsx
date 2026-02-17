@@ -49,7 +49,7 @@ export default function ProjectDetail({ projectId }: ProjectDetailProps) {
         <div className="flex items-center space-x-3">
           <Link
             href={`/projects/${project.id}/edit`}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="inline-flex items-center px-4 py-2 border border rounded-md text-sm font-medium text-foreground hover:bg-accent"
           >
             <Edit2Icon className="h-4 w-4 mr-2" />
             Edit

@@ -93,7 +93,7 @@ function generateMockWireframe(request: WireframeRequest): WireframeResponse {
         y: 0,
         width: width,
         height: 64,
-        backgroundColor: '#1f2937',
+        backgroundColor: '#121214',
         children: [
           {
             id: 'logo',
@@ -175,7 +175,7 @@ function generateMockWireframe(request: WireframeRequest): WireframeResponse {
         y: 100,
         width: width - 40,
         height: height - 140,
-        backgroundColor: '#f9fafb',
+        backgroundColor: '#ffffff',
         border: '1px solid #e5e7eb'
       }
     );
@@ -191,7 +191,7 @@ function generateMockWireframe(request: WireframeRequest): WireframeResponse {
         theme: request.style === 'low-fidelity' ? 'wireframe' : 
                request.style === 'high-fidelity' ? 'detailed' : 'interactive',
         colors: request.style === 'low-fidelity' ? ['#000000', '#ffffff'] : 
-                ['#1f2937', '#3b82f6', '#10b981', '#f59e0b'],
+                ['#121214', '#3b82f6', '#10b981', '#f59e0b'],
         typography: {
           fontFamily: request.framework === 'react' ? 'Inter' : 
                      request.framework === 'vue' ? 'Inter' :

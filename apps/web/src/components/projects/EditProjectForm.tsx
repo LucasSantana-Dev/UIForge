@@ -79,14 +79,14 @@ export default function EditProjectForm({ projectId }: EditProjectFormProps) {
       )}
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="name" className="block text-sm font-medium text-foreground mb-2">
           Project Name *
         </label>
         <input
           {...register('name')}
           type="text"
           id="name"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border rounded-md focus:ring-blue-500 focus:border-blue-500"
           placeholder="My Awesome Project"
         />
         {errors.name && (
@@ -95,14 +95,14 @@ export default function EditProjectForm({ projectId }: EditProjectFormProps) {
       </div>
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="description" className="block text-sm font-medium text-foreground mb-2">
           Description
         </label>
         <textarea
           {...register('description')}
           id="description"
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border rounded-md focus:ring-blue-500 focus:border-blue-500"
           placeholder="A brief description of your project..."
         />
         {errors.description && (
@@ -111,13 +111,13 @@ export default function EditProjectForm({ projectId }: EditProjectFormProps) {
       </div>
 
       <div>
-        <label htmlFor="framework" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="framework" className="block text-sm font-medium text-foreground mb-2">
           Framework *
         </label>
         <select
           {...register('framework')}
           id="framework"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border rounded-md focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="react">React</option>
           <option value="vue">Vue</option>
@@ -133,7 +133,7 @@ export default function EditProjectForm({ projectId }: EditProjectFormProps) {
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="px-4 py-2 border border rounded-md text-sm font-medium text-foreground hover:bg-accent"
         >
           Cancel
         </button>

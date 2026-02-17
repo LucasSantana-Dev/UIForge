@@ -21,7 +21,7 @@ export default function ProjectList() {
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="h-64 bg-gray-200 animate-pulse rounded-lg"
+            className="h-64 bg-muted animate-pulse rounded-lg"
           />
         ))}
       </div>

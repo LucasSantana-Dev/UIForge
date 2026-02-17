@@ -35,7 +35,7 @@ export default function MarketingPage() {
               from natural language descriptions. No more boilerplate, just beautiful code.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 gap-2">
+              <Button size="lg" className="bg-primary-foreground hover:bg-accent gap-2">
                 <Rocket className="w-5 h-5" />
                 Start Building Free
               </Button>
@@ -49,7 +49,7 @@ export default function MarketingPage() {
       </section>
 
       {/* Social Proof */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+      <section className="py-16 bg-gray-50 dark:bg-background">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Trusted by Developers Worldwide</h2>
@@ -107,7 +107,7 @@ export default function MarketingPage() {
             </Card>
 
             <Card className="p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <div className="w-12 h-12 bg-purple-100 dark:bg-primary/20 rounded-lg flex items-center justify-center mx-auto mb-4">
                 <Palette className="w-6 h-6 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Design System Integration</h3>
@@ -150,7 +150,7 @@ export default function MarketingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+      <section className="py-16 bg-gray-50 dark:bg-background">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">How It Works</h2>
@@ -171,7 +171,7 @@ export default function MarketingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
               <h3 className="text-xl font-semibold mb-2">AI Generates Code</h3>
@@ -214,7 +214,7 @@ export default function MarketingPage() {
                 "UIForge has completely changed how I build UI components. What used to take hours now takes minutes!"
               </p>
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+                <div className="w-10 h-10 bg-muted-foreground rounded-full mr-3"></div>
                 <div>
                   <div className="font-medium">Sarah Chen</div>
                   <div className="text-sm text-muted-foreground">Frontend Developer</div>
@@ -232,7 +232,7 @@ export default function MarketingPage() {
                 "The quality of generated code is impressive. It's clean, follows best practices, and works out of the box."
               </p>
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+                <div className="w-10 h-10 bg-muted-foreground rounded-full mr-3"></div>
                 <div>
                   <div className="font-medium">Mike Johnson</div>
                   <div className="text-sm text-muted-foreground">Full Stack Developer</div>
@@ -250,7 +250,7 @@ export default function MarketingPage() {
                 "The template library is a game-changer. I can start with a solid foundation and customize from there."
               </p>
               <div className="flex items-center">
-                <div className="w-10 h-10 bg-gray-300 rounded-full mr-3"></div>
+                <div className="w-10 h-10 bg-muted-foreground rounded-full mr-3"></div>
                 <div>
                   <div className="font-medium">Emily Davis</div>
                   <div className="text-sm text-muted-foreground">UI/UX Designer</div>
@@ -262,7 +262,7 @@ export default function MarketingPage() {
       </section>
 
       {/* Pricing */}
-      <section className="py-16 bg-gray-50 dark:bg-gray-900">
+      <section className="py-16 bg-gray-50 dark:bg-background">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Simple, Transparent Pricing</h2>
@@ -345,7 +345,7 @@ export default function MarketingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+      <section className="py-16 bg-gradient-to-r from-primary to-accent text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">
             Ready to 10x Your Development Speed?
@@ -354,11 +354,11 @@ export default function MarketingPage() {
             Join thousands of developers building better UI faster with UIForge
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 gap-2">
+            <Button size="lg" className="bg-primary-foreground hover:bg-accent gap-2">
               <Rocket className="w-5 h-5" />
               Start Building Free
             </Button>
-            <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600 gap-2">
+            <Button size="lg" variant="outline" className="border-primary text-primary hover:bg-background hover:text-primary gap-2">
               <ArrowRight className="w-5 h-5" />
               View Demo
             </Button>
@@ -367,18 +367,18 @@ export default function MarketingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-gray-900 text-white">
+      <footer className="py-12 bg-background text-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <h3 className="text-lg font-semibold mb-4">UIForge</h3>
-              <p className="text-gray-400">
+              <p className="text-muted-foreground">
                 AI-powered UI component generation for modern web applications.
               </p>
             </div>
             <div>
               <h4 className="font-medium mb-4">Product</h4>
-              <ul className="space-y-2 text-gray-400">
+              <ul className="space-y-2 text-muted-foreground">
                 <li>Features</li>
                 <li>Pricing</li>
                 <li>Templates</li>
@@ -387,7 +387,7 @@ export default function MarketingPage() {
             </div>
             <div>
               <h4 className="font-medium mb-4">Resources</h4>
-              <ul className="space-y-2 text-gray-400">
+              <ul className="space-y-2 text-muted-foreground">
                 <li>Documentation</li>
                 <li>Blog</li>
                 <li>Community</li>
@@ -402,7 +402,7 @@ export default function MarketingPage() {
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <div className="border-t border mt-8 pt-8 text-center text-muted-foreground">
             <p>&copy; 2026 UIForge. All rights reserved.</p>
           </div>
         </div>
