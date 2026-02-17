@@ -6,6 +6,9 @@ This repository uses Trunk Based Development with automated deployment workflows
 
 ### Main Branches
 - **`main`**: Production-ready code, always deployable
+  - **IMPORTANT**: Only accepts force pushes (`git push --force`)
+  - Normal pushes are blocked by automation
+  - Use `./scripts/push-main.sh` for safe force pushes
 - **`dev`**: Development environment, continuously deployed
 - **`release/1.0.0`**: Release branch for version 1.0.0
 
@@ -67,7 +70,10 @@ git push origin release/1.0.0
 # Merge release to main (triggers deployment)
 git checkout main
 git merge release/1.0.0
-git push origin main
+
+# Force push to main (REQUIRED - only force pushes allowed)
+./scripts/push-main.sh "Release v1.0.0 deployment"
+# OR manually: git push --force origin main
 ```
 
 ## 🔧 Environment Setup
@@ -115,11 +121,10 @@ git checkout -b hotfix/critical-bug
 # Fix the issue
 # ... make changes ...
 
-# Deploy immediately
-git push origin hotfix/critical-bug
+# Deploy immediately (force push required)
 git checkout main
 git merge hotfix/critical-bug
-git push origin main
+./scripts/push-main.sh "Hotfix: critical bug fix"
 ```
 
 ### Rollback Production
@@ -128,6 +133,33 @@ git push origin main
 git checkout v0.9.0
 git push -f origin v0.9.0:main
 ```
+
+## 🚨 Main Branch Force-Only Policy
+
+### Why Force-Only?
+- Ensures deliberate, conscious deployments to production
+- Prevents accidental pushes that could trigger deployments
+- Requires explicit confirmation for production changes
+- Maintains audit trail of who authorized production deployments
+
+### How to Push to Main
+```bash
+# Use the safe script (recommended)
+./scripts/push-main.sh "Your commit message"
+
+# Or manual force push
+git push --force origin main
+```
+
+### What Gets Blocked
+- Normal `git push` to main branch
+- Direct commits without proper review
+- Unauthorized user force pushes
+
+### What Gets Allowed
+- Force pushes from authorized users
+- Pull requests to main (for review)
+- Merges from release branches (with force push)
 
 ## 📊 Monitoring
 
