@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: UIForge Documentation
+    url: https://github.com/LucasSantana-Dev/UIForge/docs
+    about: Ask a question about our documentation
+  - name: UIForge Discussions
+    url: https://github.com/LucasSantana-Dev/UIForge/discussions
+    about: Ask and answer questions about UIForge
+  - name: UIForge Security Policy
+    url: https://github.com/LucasSantana-Dev/UIForge/security/policy
+    about: Learn about our security policy and reporting
