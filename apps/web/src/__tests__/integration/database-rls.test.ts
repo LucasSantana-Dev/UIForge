@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { TEST_CONFIG } from '../../test-config';
+import { TEST_CONFIG } from '../../../test-config';
 import crypto from 'crypto';
 
 describe('Database RLS Policies', () => {

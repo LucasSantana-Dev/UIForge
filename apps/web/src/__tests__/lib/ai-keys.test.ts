@@ -7,7 +7,7 @@ import { aiKeyManager } from '@/lib/ai-keys';
 import { storage } from '@/lib/storage';
 import { encryptApiKey, decryptApiKey, validateApiKey as validateKeyFormat, AIProvider } from '@/lib/encryption';
 import { EncryptedApiKey } from '@/lib/encryption';
-import { TEST_CONFIG } from '../../../../test-config';
+import { TEST_CONFIG } from '../../../test-config';
 
 // Mock storage
 jest.mock('@/lib/storage');

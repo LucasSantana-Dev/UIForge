@@ -7,7 +7,7 @@ import { act, renderHook } from '@testing-library/react';
 import { useAIKeyStore } from '@/stores/ai-keys';
 import { aiKeyManager } from '@/lib/ai-keys';
 import { AIProvider } from '@/lib/encryption';
-import { TEST_CONFIG } from '../../../../test-config';
+import { TEST_CONFIG } from '../../../test-config';
 
 // Mock the AI key manager
 jest.mock('@/lib/ai-keys');
