@@ -5,6 +5,7 @@
 
 import { storage } from '@/lib/storage';
 import { EncryptedApiKey, AIProvider } from '@/lib/encryption';
+import { TEST_CONFIG } from '../../../test-config';
 
 // Mock IndexedDB
 const mockObjectStore = {
@@ -272,7 +273,7 @@ describe('IndexedDB Storage', () => {
   describe('setUserPreferences', () => {
     it('should store user preferences', async () => {
       const preferences = {
-        encryptionKey: 'test_key',
+        encryptionKey: TEST_CONFIG.ENCRYPTION.TEST_KEY,
         defaultProvider: 'openai' as AIProvider,
         geminiFallbackEnabled: true,
         usageTrackingEnabled: false,
@@ -291,7 +292,7 @@ describe('IndexedDB Storage', () => {
       });
 
       const preferences = {
-        encryptionKey: 'test_key',
+        encryptionKey: TEST_CONFIG.ENCRYPTION.TEST_KEY,
         defaultProvider: 'openai' as AIProvider,
         geminiFallbackEnabled: true,
         usageTrackingEnabled: false,
@@ -304,7 +305,7 @@ describe('IndexedDB Storage', () => {
   describe('getUserPreferences', () => {
     it('should retrieve user preferences', async () => {
       const preferences = {
-        encryptionKey: 'test_key',
+        encryptionKey: TEST_CONFIG.ENCRYPTION.TEST_KEY,
         defaultProvider: 'openai' as AIProvider,
         geminiFallbackEnabled: true,
         usageTrackingEnabled: false,
