@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { Search, Filter } from 'lucide-react';
 import { TemplateCard } from '@/components/templates/TemplateCard';
 import { TemplatePreview } from '@/components/templates/TemplatePreview';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { useRouter } from 'next/navigation';
 
 // Template data structure
@@ -321,7 +319,7 @@ function TemplatesPage() {
             </div>
             <h3 className="text-lg font-semibold mb-2">No templates found</h3>
             <p className="text-sm text-muted-foreground">
-              Try adjusting your search or filters to find what you're looking for.
+              Try adjusting your search or filters to find what you&apos;re looking for.
             </p>
           </div>
         )}
