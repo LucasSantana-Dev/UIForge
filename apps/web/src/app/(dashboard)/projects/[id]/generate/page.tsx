@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import ComponentGenerator from '@/components/generator/ComponentGenerator';
 import { ArrowLeftIcon } from 'lucide-react';

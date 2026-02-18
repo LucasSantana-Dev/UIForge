@@ -10,41 +10,42 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
-import { 
-  Plus, 
-  Key, 
-  Settings, 
-  Trash2, 
-  Edit, 
-  Star, 
-  StarOff,
-  Shield,
+import {
+  Plus,
+  Key,
+  Settings,
+  Trash2,
+  XCircle,
   AlertCircle,
-  CheckCircle,
-  XCircle
+  Star,
+  Shield,
+  Edit
 } from 'lucide-react';
-import { useAIKeyStore, useApiKeyForProvider, useProviderConfig } from '@/stores/ai-keys';
-import { AIProvider } from '@/lib/encryption';
+import { useAIKeyStore } from '@/stores/ai-keys';
+import { AIProvider, AI_PROVIDERS } from '@/lib/encryption';
 import { AddApiKeyDialog } from './AddApiKeyDialog';
 import { EditApiKeyDialog } from './EditApiKeyDialog';
 import { UsageStats } from './UsageStats';
 
+function isExpired(createdAt: string): boolean {
+  const daysSinceCreation = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
+  return daysSinceCreation > 90;
+}
+
 export function AIKeyManager() {
   const {
     apiKeys,
-    loading,
     error,
     showAddKeyDialog,
     selectedProvider,
     editingKeyId,
+    usageStats,
     setShowAddKeyDialog,
     setSelectedProvider,
     setEditingKeyId,
     deleteApiKey,
     setDefaultApiKey,
     loadUsageStats,
-    usageStats,
     clearError,
   } = useAIKeyStore();
 
@@ -101,11 +102,6 @@ export function AIKeyManager() {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
-  };
-
-  const isExpired = (createdAt: string) => {
-    const daysSinceCreation = (Date.now() - new Date(createdAt).getTime()) / (1000 * 60 * 60 * 24);
-    return daysSinceCreation > 90;
   };
 
   if (error) {
@@ -171,9 +167,9 @@ export function AIKeyManager() {
           </Card>
         ) : (
           apiKeys.map((apiKey) => {
-            const config = useProviderConfig(apiKey.provider);
             const isDefault = apiKey.isDefault;
             const expired = isExpired(apiKey.createdAt);
+            const config = AI_PROVIDERS[apiKey.provider];
 
             return (
               <Card key={apiKey.keyId} className={expired ? 'border-orange-200' : ''}>
