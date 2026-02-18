@@ -1,8 +1,8 @@
 {
-  "name": "@forge-ai/webapp",
+  "name": "@forgespace/webapp",
   "version": "0.2.1",
   "private": true,
-  "description": "Zero-cost web application for AI-driven UI generation",
+  "description": "Forgespace web application for AI-driven UI generation",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -26,27 +26,14 @@
     "validate": "npm run lint:check && npm run format:check && npm run test",
     "pre-commit": "npm run lint && npm run format && npm run test",
     "prepack": "npm run build",
-    "publish": "npm publish --access public",
-    "integrate": "node scripts/integrate.js",
-    "integrate:mcp-gateway": "node scripts/integrate.js --project=mcp-gateway",
-    "integrate:uiforge-mcp": "node scripts/integrate.js --project=uiforge-mcp",
-    "integrate:uiforge-webapp": "node scripts/integrate.js --project=uiforge-webapp",
     "validate-patterns": "npm run lint:check && npm run format:check && ./scripts/security/validate-no-secrets.sh",
     "security-scan": "./scripts/security/scan-for-secrets.sh",
     "feature-list": "./scripts/forge-features list"
   },
   "lint-staged": {
-    "apps/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix --max-warnings 0",
-      "prettier --write"
-    ],
-    "packages/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix --max-warnings 0",
-      "prettier --write"
-    ],
-    "*.{json,md,yml,yaml}": [
-      "prettier --write"
-    ]
+    "apps/**/*.{js,jsx,ts,tsx}": ["eslint --fix --max-warnings 0", "prettier --write"],
+    "packages/**/*.{js,jsx,ts,tsx}": ["eslint --fix --max-warnings 0", "prettier --write"],
+    "*.{json,md,yml,yaml}": ["prettier --write"]
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.1",
