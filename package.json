@@ -37,6 +37,7 @@
     ]
   },
   "devDependencies": {
+    "@uiforge/forge-patterns": "file:../forge-patterns",
     "@commitlint/cli": "^20.4.1",
     "@commitlint/config-conventional": "^20.4.1",
     "@types/crypto-js": "^4.2.2",
@@ -52,7 +53,7 @@
     "wrangler": "^4.65.0"
   },
   "engines": {
-    "node": ">=20",
+    "node": ">=22",
     "npm": ">=10"
   },
   "packageManager": "npm@10.9.2",
