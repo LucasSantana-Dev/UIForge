@@ -4,11 +4,11 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit, setRateLimitHeaders, type RateLimitResult } from './rate-limit';
+import { checkRateLimit } from './rate-limit';
 import { verifySession } from './auth';
 import { ValidationError, type APIError } from './errors';
 import { errorResponse, apiErrorResponse } from './response';
-import { z, type ZodSchema } from 'zod';
+import { type ZodSchema } from 'zod';
 
 type RouteHandler = (
   request: NextRequest,
@@ -46,10 +46,19 @@ export function withRateLimit(
       const result = await checkRateLimit(request, limit, window);
 
       if (!result.allowed) {
+        const retryAfter = Math.ceil((result.resetAt - Date.now()) / 1000);
         const response = errorResponse('Rate limit exceeded', 429, {
-          retry_after: Math.ceil((result.resetAt - Date.now()) / 1000),
+          retry_after: retryAfter,
         });
-        return NextResponse.json(response, { status: 429 });
+        return NextResponse.json(response, {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': String(limit),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': String(result.resetAt),
+            'Retry-After': String(retryAfter),
+          },
+        });
       }
 
       const response = await handler(request, context);

@@ -24,10 +24,6 @@ import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 const RATE_LIMIT = 120;
 const RATE_WINDOW = 60000; // 1 minute
 
-interface RouteContext {
-  params: Promise<{ id: string }>;
-}
-
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }

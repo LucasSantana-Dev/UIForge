@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,7 +27,7 @@ export default function DocsPage() {
               Everything you need to build with UIForge
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Comprehensive guides, API references, and examples to help you get the most out of UIForge's AI-powered component generation.
+              Comprehensive guides, API references, and examples to help you get the most out of UIForge&apos;s AI-powered component generation.
             </p>
             <div className="flex gap-4 justify-center">
               <Button size="lg" className="gap-2">

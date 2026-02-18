@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Image from 'next/image';
 import { Wrench, Clock, Github } from 'lucide-react';
 import Link from 'next/link';

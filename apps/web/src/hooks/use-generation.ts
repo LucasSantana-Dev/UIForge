@@ -49,7 +49,6 @@ export function useGeneration(projectId?: string) {
       abortControllerRef.current = new AbortController();
 
       let chunkCount = 0;
-      let totalChunks = 0;
       let code = '';
       let tokensUsed = 0;
 
@@ -68,7 +67,6 @@ export function useGeneration(projectId?: string) {
         switch (event.type) {
           case 'start':
             chunkCount = 0;
-            totalChunks = 0;
             code = '';
             tokensUsed = 0;
             break;
