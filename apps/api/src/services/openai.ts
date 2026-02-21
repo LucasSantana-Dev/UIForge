@@ -53,8 +53,8 @@ function buildPrompt(options: GenerateComponentOptions): string {
       ? 'tsx'
       : 'ts'
     : framework === 'react'
-    ? 'jsx'
-    : 'js';
+      ? 'jsx'
+      : 'js';
 
   return `Generate a ${framework} component with the following specifications:
 
@@ -105,12 +105,13 @@ export async function generateComponent(
       messages: [
         {
           role: 'system',
-          content: 'You are an expert frontend developer who specializes in creating high-quality, production-ready components. Always provide clean, well-structured code with proper TypeScript typing.'
+          content:
+            'You are an expert frontend developer who specializes in creating high-quality, production-ready components. Always provide clean, well-structured code with proper TypeScript typing.',
         },
         {
           role: 'user',
-          content: prompt
-        }
+          content: prompt,
+        },
       ],
       max_tokens: 4000,
       temperature: 0.7,
@@ -147,12 +148,18 @@ export async function generateComponent(
 
     // Try fallback model if primary fails
     const currentModel = options.model || DEFAULT_MODEL;
-    if (String(currentModel) !== String(FALLBACK_MODEL) && String(DEFAULT_MODEL) !== String(FALLBACK_MODEL) && String(currentModel) !== String(DEFAULT_MODEL)) {
+    if (
+      String(currentModel) !== String(FALLBACK_MODEL) &&
+      String(DEFAULT_MODEL) !== String(FALLBACK_MODEL) &&
+      String(currentModel) !== String(DEFAULT_MODEL)
+    ) {
       logger.info('Retrying with fallback model', { model: FALLBACK_MODEL });
       return generateComponent({ ...options, model: FALLBACK_MODEL });
     }
 
-    throw new Error(`Failed to generate component with OpenAI: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to generate component with OpenAI: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -180,12 +187,13 @@ export async function* streamComponentGeneration(
       messages: [
         {
           role: 'system',
-          content: 'You are an expert frontend developer who specializes in creating high-quality, production-ready components. Always provide clean, well-structured code with proper TypeScript typing.'
+          content:
+            'You are an expert frontend developer who specializes in creating high-quality, production-ready components. Always provide clean, well-structured code with proper TypeScript typing.',
         },
         {
           role: 'user',
-          content: prompt
-        }
+          content: prompt,
+        },
       ],
       max_tokens: 4000,
       temperature: 0.7,
@@ -223,13 +231,19 @@ export async function* streamComponentGeneration(
 
     // Try fallback model if primary fails
     const currentModel = options.model || DEFAULT_MODEL;
-    if (String(currentModel) !== String(FALLBACK_MODEL) && String(DEFAULT_MODEL) !== String(FALLBACK_MODEL) && String(currentModel) !== String(DEFAULT_MODEL)) {
+    if (
+      String(currentModel) !== String(FALLBACK_MODEL) &&
+      String(DEFAULT_MODEL) !== String(FALLBACK_MODEL) &&
+      String(currentModel) !== String(DEFAULT_MODEL)
+    ) {
       logger.info('Retrying stream with fallback model', { model: FALLBACK_MODEL });
       yield* streamComponentGeneration({ ...options, model: FALLBACK_MODEL });
       return;
     }
 
-    throw new Error(`Failed to stream component generation with OpenAI: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to stream component generation with OpenAI: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 

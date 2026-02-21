@@ -82,9 +82,7 @@ export async function* streamGeneration(
 /**
  * Generate component with streaming (returns full result)
  */
-export async function generateComponent(
-  options: GenerationOptions
-): Promise<GenerationResult> {
+export async function generateComponent(options: GenerationOptions): Promise<GenerationResult> {
   let code = '';
   let finalEvent: GenerationEvent | null = null;
 
@@ -121,7 +119,10 @@ export async function generateComponent(
 /**
  * Validate generated code
  */
-export async function validateCode(code: string, language: string): Promise<{
+export async function validateCode(
+  code: string,
+  language: string
+): Promise<{
   valid: boolean;
   language: string;
   timestamp: number;
@@ -144,7 +145,10 @@ export async function validateCode(code: string, language: string): Promise<{
 /**
  * Format generated code
  */
-export async function formatCode(code: string, language: string): Promise<{
+export async function formatCode(
+  code: string,
+  language: string
+): Promise<{
   code: string;
   language: string;
   timestamp: number;
@@ -202,9 +206,7 @@ export interface WireframeResult {
 /**
  * Generate wireframe with streaming support
  */
-export async function* streamWireframe(
-  options: WireframeOptions
-): AsyncGenerator<WireframeEvent> {
+export async function* streamWireframe(options: WireframeOptions): AsyncGenerator<WireframeEvent> {
   const response = await fetch('/api/wireframe', {
     method: 'POST',
     headers: {
@@ -253,9 +255,7 @@ export async function* streamWireframe(
 /**
  * Generate wireframe (returns full result)
  */
-export async function generateWireframe(
-  options: WireframeOptions
-): Promise<WireframeResult> {
+export async function generateWireframe(options: WireframeOptions): Promise<WireframeResult> {
   let finalEvent: WireframeEvent | null = null;
 
   for await (const event of streamWireframe(options)) {

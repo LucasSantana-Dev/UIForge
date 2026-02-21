@@ -2,6 +2,7 @@
   "name": "uiforge-webapp",
   "version": "0.2.1",
   "private": true,
+  "license": "MIT",
   "description": "Zero-cost web application for AI-driven UI generation",
   "workspaces": [
     "apps/*",
@@ -26,11 +27,11 @@
   },
   "lint-staged": {
     "apps/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix --max-warnings 0",
+      "eslint --fix --max-warnings 0 --no-warn-ignored",
       "prettier --write"
     ],
     "packages/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix --max-warnings 0",
+      "eslint --fix --max-warnings 0 --no-warn-ignored",
       "prettier --write"
     ],
     "*.{json,md,yml,yaml}": [

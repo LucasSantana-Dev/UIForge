@@ -37,7 +37,7 @@ const templates: Template[] = [
     preview: '/templates/preview/navigation-bar.png',
     usage: 1250,
     rating: 4.8,
-    createdAt: '2026-02-15'
+    createdAt: '2026-02-15',
   },
   {
     id: 'hero-section',
@@ -51,7 +51,7 @@ const templates: Template[] = [
     preview: '/templates/preview/hero-section.png',
     usage: 980,
     rating: 4.7,
-    createdAt: '2026-02-14'
+    createdAt: '2026-02-14',
   },
   {
     id: 'contact-form',
@@ -65,7 +65,7 @@ const templates: Template[] = [
     preview: '/templates/preview/contact-form.png',
     usage: 750,
     rating: 4.6,
-    createdAt: '2026-02-13'
+    createdAt: '2026-02-13',
   },
   {
     id: 'pricing-card',
@@ -79,7 +79,7 @@ const templates: Template[] = [
     preview: '/templates/preview/pricing-card.png',
     usage: 620,
     rating: 4.5,
-    createdAt: '2026-02-12'
+    createdAt: '2026-02-12',
   },
   {
     id: 'modal-dialog',
@@ -93,7 +93,7 @@ const templates: Template[] = [
     preview: '/templates/preview/modal-dialog.png',
     usage: 580,
     rating: 4.4,
-    createdAt: '2026-02-11'
+    createdAt: '2026-02-11',
   },
   {
     id: 'data-table',
@@ -107,7 +107,7 @@ const templates: Template[] = [
     preview: '/templates/preview/data-table.png',
     usage: 450,
     rating: 4.3,
-    createdAt: '2026-02-10'
+    createdAt: '2026-02-10',
   },
   {
     id: 'sidebar-menu',
@@ -121,7 +121,7 @@ const templates: Template[] = [
     preview: '/templates/preview/sidebar-menu.png',
     usage: 520,
     rating: 4.6,
-    createdAt: '2026-02-09'
+    createdAt: '2026-02-09',
   },
   {
     id: 'loading-spinner',
@@ -135,7 +135,7 @@ const templates: Template[] = [
     preview: '/templates/preview/loading-spinner.png',
     usage: 890,
     rating: 4.7,
-    createdAt: '2026-02-08'
+    createdAt: '2026-02-08',
   },
   {
     id: 'card-grid',
@@ -149,7 +149,7 @@ const templates: Template[] = [
     preview: '/templates/preview/card-grid.png',
     usage: 780,
     rating: 4.5,
-    createdAt: '2026-02-07'
+    createdAt: '2026-02-07',
   },
   {
     id: 'search-bar',
@@ -163,8 +163,8 @@ const templates: Template[] = [
     preview: '/templates/preview/search-bar.png',
     usage: 420,
     rating: 4.4,
-    createdAt: '2026-02-06'
-  }
+    createdAt: '2026-02-06',
+  },
 ];
 
 const categories = [
@@ -175,7 +175,7 @@ const categories = [
   'E-commerce',
   'Overlay',
   'Data Display',
-  'Feedback'
+  'Feedback',
 ];
 
 const difficulties = ['All', 'beginner', 'intermediate', 'advanced'];
@@ -190,13 +190,15 @@ export function TemplatesClient() {
   const [previewOpen, setPreviewOpen] = useState(false);
 
   // Filter templates
-  const filteredTemplates = templates.filter(template => {
-    const matchesSearch = template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         template.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         template.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredTemplates = templates.filter((template) => {
+    const matchesSearch =
+      template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      template.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      template.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesCategory = selectedCategory === 'All' || template.category === selectedCategory;
-    const matchesDifficulty = selectedDifficulty === 'All' || template.difficulty === selectedDifficulty;
+    const matchesDifficulty =
+      selectedDifficulty === 'All' || template.difficulty === selectedDifficulty;
 
     return matchesSearch && matchesCategory && matchesDifficulty;
   });
@@ -223,7 +225,7 @@ export function TemplatesClient() {
       template: template.id,
       framework: template.framework,
       componentLibrary: template.componentLibrary,
-      description: template.description
+      description: template.description,
     });
 
     router.push(`/generate?${params.toString()}`);
@@ -268,8 +270,10 @@ export function TemplatesClient() {
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="px-3 py-1 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
             >
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
               ))}
             </select>
           </div>
@@ -280,8 +284,10 @@ export function TemplatesClient() {
             onChange={(e) => setSelectedDifficulty(e.target.value)}
             className="px-3 py-1 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           >
-            {difficulties.map(difficulty => (
-              <option key={difficulty} value={difficulty}>{difficulty}</option>
+            {difficulties.map((difficulty) => (
+              <option key={difficulty} value={difficulty}>
+                {difficulty}
+              </option>
             ))}
           </select>
 
@@ -302,7 +308,7 @@ export function TemplatesClient() {
       {/* Templates Grid */}
       <div className="flex-1 overflow-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {sortedTemplates.map(template => (
+          {sortedTemplates.map((template) => (
             <TemplateCard
               key={template.id}
               template={template}

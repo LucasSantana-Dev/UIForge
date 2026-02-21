@@ -26,12 +26,10 @@ export async function uploadToStorage(
 ): Promise<StorageUploadResult> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .upload(path, content, {
-      contentType,
-      upsert: true,
-    });
+  const { data, error } = await supabase.storage.from(bucket).upload(path, content, {
+    contentType,
+    upsert: true,
+  });
 
   if (error) {
     throw new Error(`Storage upload failed: ${error.message}`);
@@ -75,10 +73,7 @@ export async function downloadFromStorage(
 /**
  * Delete file from Supabase Storage
  */
-export async function deleteFromStorage(
-  bucket: string,
-  path: string
-): Promise<void> {
+export async function deleteFromStorage(bucket: string, path: string): Promise<void> {
   const supabase = await createClient();
 
   const { error } = await supabase.storage.from(bucket).remove([path]);
@@ -111,11 +106,15 @@ export function generateComponentStoragePath(
   const validIdPattern = /^[a-zA-Z0-9_-]+$/;
 
   if (!validIdPattern.test(projectId)) {
-    throw new Error('Invalid projectId: must contain only alphanumeric characters, hyphens, and underscores');
+    throw new Error(
+      'Invalid projectId: must contain only alphanumeric characters, hyphens, and underscores'
+    );
   }
 
   if (!validIdPattern.test(componentId)) {
-    throw new Error('Invalid componentId: must contain only alphanumeric characters, hyphens, and underscores');
+    throw new Error(
+      'Invalid componentId: must contain only alphanumeric characters, hyphens, and underscores'
+    );
   }
 
   const extension = getFileExtension(framework);
@@ -141,14 +140,8 @@ function getFileExtension(framework: string): string {
 /**
  * Validate file size (in bytes)
  */
-export function validateFileSize(
-  content: string | Buffer,
-  maxSizeBytes: number
-): boolean {
-  const size =
-    typeof content === 'string'
-      ? Buffer.byteLength(content, 'utf8')
-      : content.length;
+export function validateFileSize(content: string | Buffer, maxSizeBytes: number): boolean {
+  const size = typeof content === 'string' ? Buffer.byteLength(content, 'utf8') : content.length;
 
   return size <= maxSizeBytes;
 }

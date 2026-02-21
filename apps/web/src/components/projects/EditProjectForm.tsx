@@ -42,7 +42,9 @@ export default function EditProjectForm({ projectId }: EditProjectFormProps) {
       reset({
         name: project.name,
         description: project.description || '',
-        framework: isValidFramework ? (project.framework as 'react' | 'vue' | 'angular' | 'svelte') : 'react',
+        framework: isValidFramework
+          ? (project.framework as 'react' | 'vue' | 'angular' | 'svelte')
+          : 'react',
       });
     }
   }, [project, reset]);
@@ -89,9 +91,7 @@ export default function EditProjectForm({ projectId }: EditProjectFormProps) {
           className="w-full px-3 py-2 border border rounded-md focus:ring-blue-500 focus:border-blue-500"
           placeholder="My Awesome Project"
         />
-        {errors.name && (
-          <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
-        )}
+        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
       </div>
 
       <div>

@@ -8,20 +8,9 @@ import type { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
-import {
-  successResponse,
-  createdResponse,
-  errorResponse,
-} from '@/lib/api/response';
-import {
-  UnauthorizedError,
-  ForbiddenError,
-  ValidationError,
-} from '@/lib/api/errors';
-import {
-  createComponentSchema,
-  componentQuerySchema,
-} from '@/lib/api/validation/components';
+import { successResponse, createdResponse, errorResponse } from '@/lib/api/response';
+import { UnauthorizedError, ForbiddenError, ValidationError } from '@/lib/api/errors';
+import { createComponentSchema, componentQuerySchema } from '@/lib/api/validation/components';
 import {
   uploadToStorage,
   generateComponentStoragePath,
@@ -37,11 +26,7 @@ import {
 export async function GET(request: NextRequest) {
   try {
     // Rate limiting
-    const { allowed, remaining, resetAt } = await checkRateLimit(
-      request,
-      120,
-      60 * 1000
-    );
+    const { allowed, remaining, resetAt } = await checkRateLimit(request, 120, 60 * 1000);
 
     if (!allowed) {
       const response = errorResponse('Rate limit exceeded', 429);
@@ -111,11 +96,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Rate limiting
-    const { allowed, remaining, resetAt } = await checkRateLimit(
-      request,
-      120,
-      60 * 1000
-    );
+    const { allowed, remaining, resetAt } = await checkRateLimit(request, 120, 60 * 1000);
 
     if (!allowed) {
       const response = errorResponse('Rate limit exceeded', 429);
@@ -160,9 +141,7 @@ export async function POST(request: NextRequest) {
 
     // Validate framework compatibility
     if (validated.framework !== project.framework) {
-      throw new ValidationError(
-        'Component framework must match project framework'
-      );
+      throw new ValidationError('Component framework must match project framework');
     }
 
     // Validate code content size
@@ -199,12 +178,7 @@ export async function POST(request: NextRequest) {
         validated.framework
       );
 
-      await uploadToStorage(
-        STORAGE_BUCKETS.PROJECT_FILES,
-        storagePath,
-        code_content,
-        'text/plain'
-      );
+      await uploadToStorage(STORAGE_BUCKETS.PROJECT_FILES, storagePath, code_content, 'text/plain');
 
       // Update component with storage path
       const { error: updateError } = await supabase
@@ -236,7 +210,10 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (reloadError || !updatedComponent) {
-        console.error('Component reload failed:', { componentId: component.id, error: reloadError });
+        console.error('Component reload failed:', {
+          componentId: component.id,
+          error: reloadError,
+        });
         // Merge known storage path into component
         component.code_storage_path = storagePath;
       } else {

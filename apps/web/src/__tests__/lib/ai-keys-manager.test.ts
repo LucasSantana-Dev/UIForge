@@ -35,14 +35,16 @@ describe('AI Keys Manager', () => {
       lastUsed: '2026-02-17T12:00:00.000Z',
       isDefault: false,
     });
-    mockStorage.getApiKeys.mockResolvedValue([{
-      provider: testProvider,
-      encryptedKey: 'encrypted_test_key',
-      keyId: testKeyId,
-      createdAt: '2026-02-17T00:00:00.000Z',
-      lastUsed: '2026-02-17T12:00:00.000Z',
-      isDefault: false,
-    }]);
+    mockStorage.getApiKeys.mockResolvedValue([
+      {
+        provider: testProvider,
+        encryptedKey: 'encrypted_test_key',
+        keyId: testKeyId,
+        createdAt: '2026-02-17T00:00:00.000Z',
+        lastUsed: '2026-02-17T12:00:00.000Z',
+        isDefault: false,
+      },
+    ]);
     mockStorage.getDefaultApiKey.mockResolvedValue({
       provider: testProvider,
       encryptedKey: 'encrypted_test_key',
@@ -92,16 +94,18 @@ describe('AI Keys Manager', () => {
     it('should handle invalid API key format', async () => {
       mockValidateApiKey.mockReturnValue(false);
 
-      await expect(aiKeyManager.addApiKey(testProvider, 'invalid-key', testEncryptionKey))
-        .rejects.toThrow('Invalid API key format');
+      await expect(
+        aiKeyManager.addApiKey(testProvider, 'invalid-key', testEncryptionKey)
+      ).rejects.toThrow('Invalid API key format');
     });
 
     it('should handle storage errors', async () => {
       const error = new Error('Storage failed');
       mockStorage.storeApiKey.mockRejectedValue(error);
 
-      await expect(aiKeyManager.addApiKey(testProvider, testApiKey, testEncryptionKey))
-        .rejects.toThrow('Storage failed');
+      await expect(
+        aiKeyManager.addApiKey(testProvider, testApiKey, testEncryptionKey)
+      ).rejects.toThrow('Storage failed');
     });
   });
 
@@ -127,13 +131,15 @@ describe('AI Keys Manager', () => {
 
     it('should handle decryption errors gracefully', async () => {
       // Mock decryption failure by returning invalid encrypted data
-      mockStorage.getApiKeys.mockResolvedValue([{
-        provider: testProvider,
-        encryptedKey: 'invalid_encrypted_data',
-        keyId: testKeyId,
-        createdAt: '2026-02-17T00:00:00.000Z',
-        isDefault: false,
-      }]);
+      mockStorage.getApiKeys.mockResolvedValue([
+        {
+          provider: testProvider,
+          encryptedKey: 'invalid_encrypted_data',
+          keyId: testKeyId,
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: false,
+        },
+      ]);
 
       const result = await aiKeyManager.getApiKeys(testEncryptionKey);
 
@@ -178,8 +184,9 @@ describe('AI Keys Manager', () => {
     it('should handle non-existent key', async () => {
       mockStorage.getApiKey.mockResolvedValue(null);
 
-      await expect(aiKeyManager.updateApiKey('non_existent', testApiKey, testEncryptionKey))
-        .rejects.toThrow('API key not found');
+      await expect(
+        aiKeyManager.updateApiKey('non_existent', testApiKey, testEncryptionKey)
+      ).rejects.toThrow('API key not found');
     });
   });
 
@@ -214,8 +221,9 @@ describe('AI Keys Manager', () => {
     it('should handle non-existent key', async () => {
       mockStorage.getApiKey.mockResolvedValue(null);
 
-      await expect(aiKeyManager.setDefaultApiKey('non_existent'))
-        .rejects.toThrow('API key not found');
+      await expect(aiKeyManager.setDefaultApiKey('non_existent')).rejects.toThrow(
+        'API key not found'
+      );
     });
   });
 
@@ -238,7 +246,7 @@ describe('AI Keys Manager', () => {
       const result = await aiKeyManager.getUsageStats();
 
       expect(result.totalKeys).toBe(0);
-      expect(Object.values(result.keysByProvider).every(count => count === 0)).toBe(true);
+      expect(Object.values(result.keysByProvider).every((count) => count === 0)).toBe(true);
     });
   });
 
@@ -255,9 +263,13 @@ describe('AI Keys Manager', () => {
       global.fetch = jest.fn().mockResolvedValue({
         ok: true,
         json: async () => ({
-          choices: [{
-            message: { content: 'export default function Button() { return <button>Click me</button>; }' }
-          }],
+          choices: [
+            {
+              message: {
+                content: 'export default function Button() { return <button>Click me</button>; }',
+              },
+            },
+          ],
           usage: { prompt_tokens: 50, completion_tokens: 100 },
         }),
       });
@@ -276,29 +288,34 @@ describe('AI Keys Manager', () => {
     it('should handle API errors gracefully', async () => {
       global.fetch = jest.fn().mockRejectedValue(new Error('API Error'));
 
-      await expect(aiKeyManager.makeGenerationRequest(mockRequest, testEncryptionKey))
-        .rejects.toThrow('API Error');
+      await expect(
+        aiKeyManager.makeGenerationRequest(mockRequest, testEncryptionKey)
+      ).rejects.toThrow('API Error');
     });
 
     it('should handle no default key available', async () => {
       mockStorage.getDefaultApiKey.mockResolvedValue(null);
 
-      await expect(aiKeyManager.makeGenerationRequest(mockRequest, testEncryptionKey))
-        .rejects.toThrow('No default API key found');
+      await expect(
+        aiKeyManager.makeGenerationRequest(mockRequest, testEncryptionKey)
+      ).rejects.toThrow('No default API key found');
     });
   });
 
   describe('Edge Cases', () => {
     it('should handle empty encryption key', async () => {
-      await expect(aiKeyManager.addApiKey(testProvider, testApiKey, ''))
-        .rejects.toThrow('Encryption key is required');
+      await expect(aiKeyManager.addApiKey(testProvider, testApiKey, '')).rejects.toThrow(
+        'Encryption key is required'
+      );
     });
 
     it('should handle null/undefined values', async () => {
-      await expect(aiKeyManager.addApiKey(testProvider, null as any, testEncryptionKey))
-        .rejects.toThrow('API key is required');
-      await expect(aiKeyManager.addApiKey(testProvider, testApiKey, null as any))
-        .rejects.toThrow('Encryption key is required');
+      await expect(
+        aiKeyManager.addApiKey(testProvider, null as any, testEncryptionKey)
+      ).rejects.toThrow('API key is required');
+      await expect(aiKeyManager.addApiKey(testProvider, testApiKey, null as any)).rejects.toThrow(
+        'Encryption key is required'
+      );
     });
 
     it('should handle concurrent operations', async () => {
@@ -334,9 +351,7 @@ describe('AI Keys Manager', () => {
       await aiKeyManager.addApiKey(testProvider, testApiKey, testEncryptionKey);
 
       // Ensure no sensitive data is logged
-      expect(consoleSpy).not.toHaveBeenCalledWith(
-        expect.stringContaining(testApiKey)
-      );
+      expect(consoleSpy).not.toHaveBeenCalledWith(expect.stringContaining(testApiKey));
 
       consoleSpy.mockRestore();
     });
@@ -345,8 +360,9 @@ describe('AI Keys Manager', () => {
       const error = new Error('Storage security error');
       mockStorage.storeApiKey.mockRejectedValue(error);
 
-      await expect(aiKeyManager.addApiKey(testProvider, testApiKey, testEncryptionKey))
-        .rejects.toThrow('Storage security error');
+      await expect(
+        aiKeyManager.addApiKey(testProvider, testApiKey, testEncryptionKey)
+      ).rejects.toThrow('Storage security error');
     });
   });
 
@@ -369,11 +385,14 @@ describe('AI Keys Manager', () => {
         }),
       });
 
-      await aiKeyManager.makeGenerationRequest({
-        provider: testProvider,
-        model: 'gpt-4',
-        prompt: 'test',
-      }, testEncryptionKey);
+      await aiKeyManager.makeGenerationRequest(
+        {
+          provider: testProvider,
+          model: 'gpt-4',
+          prompt: 'test',
+        },
+        testEncryptionKey
+      );
 
       expect(mockStorage.updateApiKeyUsage).toHaveBeenCalledWith(testKeyId);
     });

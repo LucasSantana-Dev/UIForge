@@ -36,9 +36,14 @@ describe('AI Generation Service Integration', () => {
     });
 
     it('should handle different frameworks', () => {
-      const frameworks: Array<'react' | 'vue' | 'angular' | 'svelte'> = ['react', 'vue', 'angular', 'svelte'];
-      
-      frameworks.forEach(framework => {
+      const frameworks: Array<'react' | 'vue' | 'angular' | 'svelte'> = [
+        'react',
+        'vue',
+        'angular',
+        'svelte',
+      ];
+
+      frameworks.forEach((framework) => {
         const request: ComponentGenerationRequest = {
           ...validRequest,
           framework,
@@ -48,9 +53,15 @@ describe('AI Generation Service Integration', () => {
     });
 
     it('should handle different component libraries', () => {
-      const libraries: Array<'tailwind' | 'mui' | 'chakra' | 'shadcn' | 'none'> = ['tailwind', 'mui', 'chakra', 'shadcn', 'none'];
-      
-      libraries.forEach(library => {
+      const libraries: Array<'tailwind' | 'mui' | 'chakra' | 'shadcn' | 'none'> = [
+        'tailwind',
+        'mui',
+        'chakra',
+        'shadcn',
+        'none',
+      ];
+
+      libraries.forEach((library) => {
         const request: ComponentGenerationRequest = {
           ...validRequest,
           componentLibrary: library,
@@ -60,9 +71,14 @@ describe('AI Generation Service Integration', () => {
     });
 
     it('should handle different AI providers', () => {
-      const providers: Array<'openai' | 'anthropic' | 'google' | 'auto'> = ['openai', 'anthropic', 'google', 'auto'];
-      
-      providers.forEach(provider => {
+      const providers: Array<'openai' | 'anthropic' | 'google' | 'auto'> = [
+        'openai',
+        'anthropic',
+        'google',
+        'auto',
+      ];
+
+      providers.forEach((provider) => {
         const request: ComponentGenerationRequest = {
           ...validRequest,
           aiProvider: provider,
@@ -142,9 +158,14 @@ describe('AI Generation Service Integration', () => {
 
   describe('Type Safety', () => {
     it('should enforce framework types', () => {
-      const validFrameworks: Array<'react' | 'vue' | 'angular' | 'svelte'> = ['react', 'vue', 'angular', 'svelte'];
-      
-      validFrameworks.forEach(framework => {
+      const validFrameworks: Array<'react' | 'vue' | 'angular' | 'svelte'> = [
+        'react',
+        'vue',
+        'angular',
+        'svelte',
+      ];
+
+      validFrameworks.forEach((framework) => {
         const request: ComponentGenerationRequest = {
           framework,
           description: 'Test component',
@@ -155,9 +176,14 @@ describe('AI Generation Service Integration', () => {
     });
 
     it('should enforce AI provider types', () => {
-      const validProviders: Array<'openai' | 'anthropic' | 'google' | 'auto'> = ['openai', 'anthropic', 'google', 'auto'];
-      
-      validProviders.forEach(provider => {
+      const validProviders: Array<'openai' | 'anthropic' | 'google' | 'auto'> = [
+        'openai',
+        'anthropic',
+        'google',
+        'auto',
+      ];
+
+      validProviders.forEach((provider) => {
         const request: ComponentGenerationRequest = {
           framework: 'react',
           description: 'Test component',
@@ -168,9 +194,15 @@ describe('AI Generation Service Integration', () => {
     });
 
     it('should enforce component library types', () => {
-      const validLibraries: Array<'tailwind' | 'mui' | 'chakra' | 'shadcn' | 'none'> = ['tailwind', 'mui', 'chakra', 'shadcn', 'none'];
-      
-      validLibraries.forEach(library => {
+      const validLibraries: Array<'tailwind' | 'mui' | 'chakra' | 'shadcn' | 'none'> = [
+        'tailwind',
+        'mui',
+        'chakra',
+        'shadcn',
+        'none',
+      ];
+
+      validLibraries.forEach((library) => {
         const request: ComponentGenerationRequest = {
           framework: 'react',
           componentLibrary: library,

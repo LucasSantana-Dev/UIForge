@@ -52,9 +52,7 @@ export function useComponents(projectId: string | undefined) {
     queryFn: async () => {
       if (!projectId) throw new Error('Project ID is required');
 
-      const response = await fetch(
-        `/api/components?project_id=${projectId}`
-      );
+      const response = await fetch(`/api/components?project_id=${projectId}`);
 
       if (!response.ok) {
         const error = await response.json();
@@ -167,13 +165,7 @@ export function useDeleteComponent() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      componentId,
-      projectId,
-    }: {
-      componentId: string;
-      projectId: string;
-    }) => {
+    mutationFn: async ({ componentId, projectId }: { componentId: string; projectId: string }) => {
       const response = await fetch(`/api/components/${componentId}`, {
         method: 'DELETE',
       });

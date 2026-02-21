@@ -19,7 +19,7 @@ import {
   AlertCircle,
   Star,
   Shield,
-  Edit
+  Edit,
 } from 'lucide-react';
 import { useAIKeyStore } from '@/stores/ai-keys';
 import { AIProvider, AI_PROVIDERS } from '@/lib/encryption';
@@ -130,10 +130,7 @@ export function AIKeyManager() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setShowUsageStats(!showUsageStats)}
-          >
+          <Button variant="outline" onClick={() => setShowUsageStats(!showUsageStats)}>
             <Settings className="h-4 w-4 mr-2" />
             {showUsageStats ? 'Hide Stats' : 'Show Stats'}
           </Button>
@@ -145,9 +142,7 @@ export function AIKeyManager() {
       </div>
 
       {/* Usage Stats */}
-      {showUsageStats && usageStats && (
-        <UsageStats stats={usageStats} />
-      )}
+      {showUsageStats && usageStats && <UsageStats stats={usageStats} />}
 
       {/* API Keys List */}
       <div className="grid gap-4">
@@ -176,16 +171,10 @@ export function AIKeyManager() {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="text-2xl">
-                        {getProviderIcon(apiKey.provider)}
-                      </div>
+                      <div className="text-2xl">{getProviderIcon(apiKey.provider)}</div>
                       <div>
-                        <CardTitle className="text-lg">
-                          {config.name}
-                        </CardTitle>
-                        <CardDescription>
-                          {apiKey.keyId}
-                        </CardDescription>
+                        <CardTitle className="text-lg">{config.name}</CardTitle>
+                        <CardDescription>{apiKey.keyId}</CardDescription>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

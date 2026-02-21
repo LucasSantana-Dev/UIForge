@@ -45,11 +45,14 @@ export async function createTestUser(page: Page, email: string, password: string
   await page.goto('/signup');
 
   await page.getByLabel(/email/i).fill(email);
-  await page.getByLabel(/password/i).first().fill(password);
+  await page
+    .getByLabel(/password/i)
+    .first()
+    .fill(password);
 
   // If there's a confirm password field
   const confirmPasswordField = page.getByLabel(/confirm.*password/i);
-  if (await confirmPasswordField.count() > 0) {
+  if ((await confirmPasswordField.count()) > 0) {
     await confirmPasswordField.fill(password);
   }
 
@@ -64,11 +67,11 @@ export async function createTestUser(page: Page, email: string, password: string
  */
 export async function signOut(page: Page): Promise<void> {
   // Click user menu
-  const userMenuButton = page.locator('button[aria-label*="user"]').or(
-    page.locator('button').filter({ has: page.locator('img[alt*="avatar"]') })
-  );
+  const userMenuButton = page
+    .locator('button[aria-label*="user"]')
+    .or(page.locator('button').filter({ has: page.locator('img[alt*="avatar"]') }));
 
-  if (await userMenuButton.count() > 0) {
+  if ((await userMenuButton.count()) > 0) {
     await userMenuButton.click();
 
     // Click sign out

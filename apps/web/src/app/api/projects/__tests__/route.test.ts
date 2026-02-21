@@ -15,9 +15,7 @@ jest.mock('@/lib/api/auth');
 jest.mock('@/lib/api/rate-limit');
 
 const mockCreateClient = createClient as jest.MockedFunction<typeof createClient>;
-const mockVerifySession = auth.verifySession as jest.MockedFunction<
-  typeof auth.verifySession
->;
+const mockVerifySession = auth.verifySession as jest.MockedFunction<typeof auth.verifySession>;
 const mockCheckRateLimit = rateLimit.checkRateLimit as jest.MockedFunction<
   typeof rateLimit.checkRateLimit
 >;
@@ -111,9 +109,7 @@ describe('Projects API - GET /api/projects', () => {
       from: mockFrom,
     } as any);
 
-    const request = new NextRequest(
-      'http://localhost/api/projects?search=test'
-    );
+    const request = new NextRequest('http://localhost/api/projects?search=test');
     await GET(request);
 
     expect(mockFrom).toHaveBeenCalledWith('projects');
@@ -140,18 +136,14 @@ describe('Projects API - GET /api/projects', () => {
       }),
     } as any);
 
-    const request = new NextRequest(
-      'http://localhost/api/projects?framework=react'
-    );
+    const request = new NextRequest('http://localhost/api/projects?framework=react');
     await GET(request);
 
     expect(mockEq).toHaveBeenCalledWith('framework', 'react');
   });
 
   it('should return 401 when not authenticated', async () => {
-    mockVerifySession.mockRejectedValue(
-      new UnauthorizedError('Not authenticated')
-    );
+    mockVerifySession.mockRejectedValue(new UnauthorizedError('Not authenticated'));
 
     const request = new NextRequest('http://localhost/api/projects');
     const response = await GET(request);
@@ -322,9 +314,7 @@ describe('Projects API - POST /api/projects', () => {
   });
 
   it('should return 401 when not authenticated', async () => {
-    mockVerifySession.mockRejectedValue(
-      new UnauthorizedError('Not authenticated')
-    );
+    mockVerifySession.mockRejectedValue(new UnauthorizedError('Not authenticated'));
 
     const request = new NextRequest('http://localhost/api/projects', {
       method: 'POST',

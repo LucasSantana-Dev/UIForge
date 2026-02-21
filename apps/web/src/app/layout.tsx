@@ -3,7 +3,7 @@ import { Inter } from 'next/font/google';
 import { QueryProvider } from '@/components/providers/query-provider';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['latin'], preload: false });
 
 export const metadata: Metadata = {
   title: 'UIForge - AI-Driven UI Generation',

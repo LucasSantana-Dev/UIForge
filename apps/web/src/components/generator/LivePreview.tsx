@@ -23,11 +23,11 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
 
         // Create preview HTML
         const previewHTML = createPreviewHTML(code, framework);
-        
+
         iframeDoc.open();
         iframeDoc.write(previewHTML);
         iframeDoc.close();
-        
+
         // Clear any previous error after successful render
         setTimeout(() => setError(null), 0);
       } catch (err) {

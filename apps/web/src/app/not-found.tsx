@@ -10,7 +10,13 @@ export default function NotFound() {
       <div className="mx-auto max-w-2xl text-center">
         {/* Logo */}
         <Link href="/" className="inline-flex items-center gap-2 mb-8">
-          <Image src="/anvil-logo.svg" alt="UIForge" width={40} height={40} className="flex-shrink-0" />
+          <Image
+            src="/anvil-logo.svg"
+            alt="UIForge"
+            width={40}
+            height={40}
+            className="flex-shrink-0"
+          />
           <span className="text-2xl font-bold">UIForge</span>
         </Link>
 

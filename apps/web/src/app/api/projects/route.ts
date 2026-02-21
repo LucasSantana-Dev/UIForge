@@ -58,9 +58,7 @@ export async function GET(request: NextRequest) {
 
     // Apply filters
     if (query.search) {
-      dbQuery = dbQuery.or(
-        `name.ilike.%${query.search}%,description.ilike.%${query.search}%`
-      );
+      dbQuery = dbQuery.or(`name.ilike.%${query.search}%,description.ilike.%${query.search}%`);
     }
 
     if (query.framework) {

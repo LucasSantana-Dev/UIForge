@@ -3,11 +3,7 @@
  */
 
 import { NextRequest } from 'next/server';
-import {
-  checkRateLimit,
-  enforceRateLimit,
-  setRateLimitHeaders,
-} from '../rate-limit';
+import { checkRateLimit, enforceRateLimit, setRateLimitHeaders } from '../rate-limit';
 import { RateLimitError } from '../errors';
 
 // Mock getSession
@@ -29,7 +25,15 @@ describe('Rate Limiting', () => {
 
   describe('checkRateLimit', () => {
     it('should allow first request', async () => {
-      mockGetSession.mockResolvedValue({ user: { id: 'user-123', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any });
+      mockGetSession.mockResolvedValue({
+        user: {
+          id: 'user-123',
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: '2024-01-01T00:00:00Z',
+        } as any,
+      });
       const request = new NextRequest('http://localhost/api/test');
 
       const result = await checkRateLimit(request, 10, 60000);
@@ -40,7 +44,15 @@ describe('Rate Limiting', () => {
     });
 
     it('should track requests per user', async () => {
-      mockGetSession.mockResolvedValue({ user: { id: 'user-123', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any });
+      mockGetSession.mockResolvedValue({
+        user: {
+          id: 'user-123',
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: '2024-01-01T00:00:00Z',
+        } as any,
+      });
       const request = new NextRequest('http://localhost/api/test');
 
       // First request
@@ -60,7 +72,15 @@ describe('Rate Limiting', () => {
     });
 
     it('should block requests after limit exceeded', async () => {
-      mockGetSession.mockResolvedValue({ user: { id: 'user-123', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any });
+      mockGetSession.mockResolvedValue({
+        user: {
+          id: 'user-123',
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: '2024-01-01T00:00:00Z',
+        } as any,
+      });
       const request = new NextRequest('http://localhost/api/test');
 
       // Exhaust limit
@@ -74,7 +94,15 @@ describe('Rate Limiting', () => {
     });
 
     it('should reset after window expires', async () => {
-      mockGetSession.mockResolvedValue({ user: { id: 'user-123', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any });
+      mockGetSession.mockResolvedValue({
+        user: {
+          id: 'user-123',
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: '2024-01-01T00:00:00Z',
+        } as any,
+      });
       const request = new NextRequest('http://localhost/api/test');
 
       // Exhaust limit
@@ -127,9 +155,7 @@ describe('Rate Limiting', () => {
       await checkRateLimit(request, 2, 60000);
       await checkRateLimit(request, 2, 60000);
 
-      await expect(enforceRateLimit(request, 2, 60000)).rejects.toThrow(
-        RateLimitError
-      );
+      await expect(enforceRateLimit(request, 2, 60000)).rejects.toThrow(RateLimitError);
     });
 
     it('should include retry after in error', async () => {
@@ -145,9 +171,7 @@ describe('Rate Limiting', () => {
         fail('Should have thrown');
       } catch (error) {
         expect(error).toBeInstanceOf(RateLimitError);
-        expect((error as RateLimitError).details?.retry_after).toBeGreaterThan(
-          0
-        );
+        expect((error as RateLimitError).details?.retry_after).toBeGreaterThan(0);
       }
     });
   });

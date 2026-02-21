@@ -99,7 +99,11 @@ describe('AI Keys Store', () => {
         await result.current.addApiKey(testProvider, testApiKey);
       });
 
-      expect(mockAIKeyManager.addApiKey).toHaveBeenCalledWith(testProvider, testApiKey, testEncryptionKey);
+      expect(mockAIKeyManager.addApiKey).toHaveBeenCalledWith(
+        testProvider,
+        testApiKey,
+        testEncryptionKey
+      );
       expect(result.current.loading).toBe(false);
     });
 
@@ -137,15 +141,17 @@ describe('AI Keys Store', () => {
     });
 
     it('should load API keys', async () => {
-      const mockKeys = [{
-        provider: testProvider,
-        keyId: testKeyId,
-        encryptedKey: 'encrypted_key',
-        keyName: 'Test Key',
-        createdAt: '2026-02-17T12:00:00.000Z',
-        lastUsed: '2026-02-17T12:00:00.000Z',
-        isDefault: false,
-      }];
+      const mockKeys = [
+        {
+          provider: testProvider,
+          keyId: testKeyId,
+          encryptedKey: 'encrypted_key',
+          keyName: 'Test Key',
+          createdAt: '2026-02-17T12:00:00.000Z',
+          lastUsed: '2026-02-17T12:00:00.000Z',
+          isDefault: false,
+        },
+      ];
       mockAIKeyManager.getApiKeys.mockResolvedValue(mockKeys);
 
       const { result } = renderHook(() => useAIKeyStore());
@@ -190,7 +196,11 @@ describe('AI Keys Store', () => {
         await result.current.updateApiKey(testKeyId, 'new-api-key');
       });
 
-      expect(mockAIKeyManager.updateApiKey).toHaveBeenCalledWith(testKeyId, 'new-api-key', testEncryptionKey);
+      expect(mockAIKeyManager.updateApiKey).toHaveBeenCalledWith(
+        testKeyId,
+        'new-api-key',
+        testEncryptionKey
+      );
     });
 
     it('should handle update errors', async () => {
@@ -368,13 +378,15 @@ describe('AI Keys Store', () => {
       expect(result.current.apiKeys.length).toBe(0);
 
       // Add a key
-      mockAIKeyManager.getApiKeys.mockResolvedValue([{
-        provider: testProvider,
-        keyId: testKeyId,
-        encryptedKey: 'encrypted_key',
-        createdAt: '2026-02-17T00:00:00.000Z',
-        isDefault: false,
-      }]);
+      mockAIKeyManager.getApiKeys.mockResolvedValue([
+        {
+          provider: testProvider,
+          keyId: testKeyId,
+          encryptedKey: 'encrypted_key',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: false,
+        },
+      ]);
 
       await act(async () => {
         await result.current.loadApiKeys();
@@ -418,8 +430,8 @@ describe('AI Keys Store', () => {
       });
 
       // Compute keys by provider
-      const openaiKeys = result.current.apiKeys.filter(key => key.provider === 'openai');
-      const anthropicKeys = result.current.apiKeys.filter(key => key.provider === 'anthropic');
+      const openaiKeys = result.current.apiKeys.filter((key) => key.provider === 'openai');
+      const anthropicKeys = result.current.apiKeys.filter((key) => key.provider === 'anthropic');
 
       expect(openaiKeys).toHaveLength(2);
       expect(anthropicKeys).toHaveLength(1);
@@ -438,7 +450,9 @@ describe('AI Keys Store', () => {
       mockAIKeyManager.addApiKey.mockRejectedValueOnce(new Error('First error'));
 
       await act(async () => {
-        await expect(result.current.addApiKey(testProvider, testApiKey)).rejects.toThrow('First error');
+        await expect(result.current.addApiKey(testProvider, testApiKey)).rejects.toThrow(
+          'First error'
+        );
       });
 
       // Second operation succeeds

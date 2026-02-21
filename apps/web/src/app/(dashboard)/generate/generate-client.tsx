@@ -133,7 +133,8 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
               </Badge>
             </div>
             <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
-              This template has been pre-loaded. You can customize it further or generate new components.
+              This template has been pre-loaded. You can customize it further or generate new
+              components.
             </p>
           </div>
         )}
@@ -178,13 +179,15 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
 
 export function GenerateClient() {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center h-full">
-        <Card className="p-6 max-w-md">
-          <p className="text-sm text-muted-foreground">Loading...</p>
-        </Card>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-full">
+          <Card className="p-6 max-w-md">
+            <p className="text-sm text-muted-foreground">Loading...</p>
+          </Card>
+        </div>
+      }
+    >
       <GeneratePageClient />
     </Suspense>
   );

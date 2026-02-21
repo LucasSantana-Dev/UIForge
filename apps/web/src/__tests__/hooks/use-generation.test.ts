@@ -13,7 +13,9 @@ jest.mock('@/lib/api/generation', () => ({
   streamGeneration: jest.fn(),
 }));
 
-const mockUseCreateGeneration = useCreateGeneration as jest.MockedFunction<typeof useCreateGeneration>;
+const mockUseCreateGeneration = useCreateGeneration as jest.MockedFunction<
+  typeof useCreateGeneration
+>;
 const mockStreamGeneration = require('@/lib/api/generation').streamGeneration;
 
 describe('useGeneration', () => {
@@ -83,7 +85,9 @@ describe('useGeneration', () => {
       });
 
       expect(result.current.isGenerating).toBe(false);
-      expect(result.current.code).toBe('export default function Button() { return <button>Click me</button>; }');
+      expect(result.current.code).toBe(
+        'export default function Button() { return <button>Click me</button>; }'
+      );
       expect(result.current.error).toBe(null);
       expect(result.current.progress).toBe(100);
     });
@@ -195,7 +199,7 @@ describe('useGeneration', () => {
       // Mock a long-running generation
       mockStreamGeneration.mockImplementation(async function* () {
         yield { type: 'start' };
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Long delay
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Long delay
         yield { type: 'chunk', content: 'test' };
         yield { type: 'complete' };
       });

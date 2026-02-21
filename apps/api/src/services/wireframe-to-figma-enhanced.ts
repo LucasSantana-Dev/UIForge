@@ -68,11 +68,13 @@ export function convertWireframeToFigma(
   });
 
   // Extract and convert styles
-  const styles = includeStyles ? extractEnhancedStyles(wireframe.styles || {}, compLibrary) : {
-    colors: {},
-    textStyles: {},
-    effects: {},
-  };
+  const styles = includeStyles
+    ? extractEnhancedStyles(wireframe.styles || {}, compLibrary)
+    : {
+        colors: {},
+        textStyles: {},
+        effects: {},
+      };
 
   // Create Figma document structure
   const document = createFigmaDocument(wireframe, nodes, {
@@ -96,11 +98,14 @@ export function convertWireframeToFigma(
 /**
  * Create component library with variants
  */
-function createComponentLibrary(elements: any[], options: {
-  useAutoLayout: boolean;
-  createVariants: boolean;
-  optimizeForPrototype: boolean;
-}) {
+function createComponentLibrary(
+  elements: any[],
+  options: {
+    useAutoLayout: boolean;
+    createVariants: boolean;
+    optimizeForPrototype: boolean;
+  }
+) {
   const { useAutoLayout, createVariants, optimizeForPrototype } = options;
   const components: any[] = [];
   const componentMap = new Map();
@@ -129,7 +134,7 @@ function createComponentLibrary(elements: any[], options: {
 function groupElementsByType(elements: any[]) {
   const groups: Record<string, any[]> = {};
 
-  elements.forEach(element => {
+  elements.forEach((element) => {
     const key = getComponentKey(element);
     if (!groups[key]) groups[key] = [];
     groups[key].push(element);
@@ -188,22 +193,26 @@ function createComponentWithVariants(
     // Create variants for different states
     const variants = createComponentVariants(elements);
     baseComponent.children = variants;
-    baseComponent.variants = createVariants ? [
-      {
-        name: 'State',
-        type: 'VARIANT',
-        values: ['Default', 'Hover', 'Pressed', 'Disabled'],
-        defaultValue: 'Default',
-      }
-    ] : undefined;
+    baseComponent.variants = createVariants
+      ? [
+          {
+            name: 'State',
+            type: 'VARIANT',
+            values: ['Default', 'Hover', 'Pressed', 'Disabled'],
+            defaultValue: 'Default',
+          },
+        ]
+      : undefined;
   } else {
     // Single component
     const mainElement = elements[0];
-    baseComponent.children = [convertElementToNode(mainElement, 0, {
-      scaleFactor: 1,
-      useAutoLayout,
-      optimizeForPrototype,
-    })];
+    baseComponent.children = [
+      convertElementToNode(mainElement, 0, {
+        scaleFactor: 1,
+        useAutoLayout,
+        optimizeForPrototype,
+      }),
+    ];
   }
 
   // Add Auto Layout if enabled
@@ -528,10 +537,14 @@ function addNodePrototypeOptimizations(node: any, element: any) {
 /**
  * Create Figma document structure
  */
-function createFigmaDocument(wireframe: any, nodes: any[], options: {
-  useAutoLayout: boolean;
-  optimizeForPrototype: boolean;
-}) {
+function createFigmaDocument(
+  wireframe: any,
+  nodes: any[],
+  options: {
+    useAutoLayout: boolean;
+    optimizeForPrototype: boolean;
+  }
+) {
   const { useAutoLayout } = options;
 
   const document = {
@@ -695,6 +708,6 @@ function mapTypeToFigma(type: string): string {
 function toPascalCase(str: string): string {
   return str
     .split(/[-_\s]/)
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
     .join('');
 }

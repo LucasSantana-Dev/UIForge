@@ -103,13 +103,19 @@ const MockDashboard = () => {
       ) : (
         <div>
           <p>{generations.length} generations</p>
-          <p>{generations.reduce((sum: number, g: Generation) => sum + (g.tokens_used || 0), 0)} tokens used</p>
+          <p>
+            {generations.reduce((sum: number, g: Generation) => sum + (g.tokens_used || 0), 0)}{' '}
+            tokens used
+          </p>
           <ul>
             {generations.map((g: Generation) => (
               <li key={g.id}>
                 <span>{g.component_name}</span>
                 <span>{g.framework.charAt(0).toUpperCase() + g.framework.slice(1)}</span>
-                <span>{g.component_library?.charAt(0).toUpperCase() + (g.component_library?.slice(1) ?? '')}</span>
+                <span>
+                  {g.component_library?.charAt(0).toUpperCase() +
+                    (g.component_library?.slice(1) ?? '')}
+                </span>
               </li>
             ))}
           </ul>
@@ -166,7 +172,14 @@ describe('MockDashboard', () => {
     it('should display API keys when available', () => {
       mockUseAIKeyStore.mockReturnValue({
         ...defaultStore,
-        apiKeys: [{ provider: 'openai', keyName: 'OpenAI Key', isActive: true, createdAt: new Date().toISOString() }],
+        apiKeys: [
+          {
+            provider: 'openai',
+            keyName: 'OpenAI Key',
+            isActive: true,
+            createdAt: new Date().toISOString(),
+          },
+        ],
       } as any);
       mockUseGenerations.mockReturnValue(createMockGenerationsResult() as any);
 
@@ -190,18 +203,36 @@ describe('MockDashboard', () => {
   describe('Recent Generations', () => {
     const mockGenerations: Generation[] = [
       {
-        id: '1', user_id: 'u1', project_id: 'p1', component_name: 'Button',
-        generated_code: 'export default function Button() {}', framework: 'react',
-        component_library: 'tailwind', style: 'modern', typescript: true,
-        tokens_used: 150, prompt: 'Create a button', status: 'completed',
-        created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+        id: '1',
+        user_id: 'u1',
+        project_id: 'p1',
+        component_name: 'Button',
+        generated_code: 'export default function Button() {}',
+        framework: 'react',
+        component_library: 'tailwind',
+        style: 'modern',
+        typescript: true,
+        tokens_used: 150,
+        prompt: 'Create a button',
+        status: 'completed',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       },
       {
-        id: '2', user_id: 'u1', project_id: 'p1', component_name: 'Card',
-        generated_code: 'export default function Card() {}', framework: 'react',
-        component_library: 'tailwind', style: 'modern', typescript: true,
-        tokens_used: 200, prompt: 'Create a card', status: 'completed',
-        created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+        id: '2',
+        user_id: 'u1',
+        project_id: 'p1',
+        component_name: 'Card',
+        generated_code: 'export default function Card() {}',
+        framework: 'react',
+        component_library: 'tailwind',
+        style: 'modern',
+        typescript: true,
+        tokens_used: 200,
+        prompt: 'Create a card',
+        status: 'completed',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       },
     ];
 
@@ -257,16 +288,36 @@ describe('MockDashboard', () => {
     it('should display generation statistics', () => {
       const mockGenerations: Generation[] = [
         {
-          id: '1', user_id: 'u1', project_id: 'p1', component_name: 'Button',
-          generated_code: '', framework: 'react', component_library: 'tailwind',
-          style: 'modern', typescript: true, tokens_used: 150, prompt: 'btn',
-          status: 'completed', created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+          id: '1',
+          user_id: 'u1',
+          project_id: 'p1',
+          component_name: 'Button',
+          generated_code: '',
+          framework: 'react',
+          component_library: 'tailwind',
+          style: 'modern',
+          typescript: true,
+          tokens_used: 150,
+          prompt: 'btn',
+          status: 'completed',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         },
         {
-          id: '2', user_id: 'u1', project_id: 'p1', component_name: 'Card',
-          generated_code: '', framework: 'react', component_library: 'tailwind',
-          style: 'modern', typescript: true, tokens_used: 200, prompt: 'card',
-          status: 'completed', created_at: new Date().toISOString(), updated_at: new Date().toISOString(),
+          id: '2',
+          user_id: 'u1',
+          project_id: 'p1',
+          component_name: 'Card',
+          generated_code: '',
+          framework: 'react',
+          component_library: 'tailwind',
+          style: 'modern',
+          typescript: true,
+          tokens_used: 200,
+          prompt: 'card',
+          status: 'completed',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         },
       ];
 

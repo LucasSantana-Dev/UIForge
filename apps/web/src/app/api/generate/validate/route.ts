@@ -5,10 +5,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (!body.code || !body.language) {
-      return new Response(
-        JSON.stringify({ error: 'Code and language are required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Code and language are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     // Forward to Cloudflare Workers API
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
         headers: {
           'Content-Type': 'application/json',
           ...(request.headers.get('authorization') && {
-            'Authorization': request.headers.get('authorization')!
+            Authorization: request.headers.get('authorization')!,
           }),
         },
         body: JSON.stringify(body),
@@ -49,13 +49,10 @@ export async function POST(request: NextRequest) {
           contentType = 'text/plain';
         }
 
-        return new Response(
-          typeof errorData === 'string' ? errorData : JSON.stringify(errorData),
-          {
-            status: response.status,
-            headers: { 'Content-Type': contentType }
-          }
-        );
+        return new Response(typeof errorData === 'string' ? errorData : JSON.stringify(errorData), {
+          status: response.status,
+          headers: { 'Content-Type': contentType },
+        });
       }
 
       let data;
@@ -69,32 +66,31 @@ export async function POST(request: NextRequest) {
         contentType = 'text/plain';
       }
 
-      return new Response(
-        typeof data === 'string' ? data : JSON.stringify(data),
-        { status: 200, headers: { 'Content-Type': contentType } }
-      );
-
+      return new Response(typeof data === 'string' ? data : JSON.stringify(data), {
+        status: 200,
+        headers: { 'Content-Type': contentType },
+      });
     } catch (error) {
       clearTimeout(timeoutId);
 
       if (error instanceof Error && error.name === 'AbortError') {
-        return new Response(
-          JSON.stringify({ error: 'Request timeout' }),
-          { status: 408, headers: { 'Content-Type': 'application/json' } }
-        );
+        return new Response(JSON.stringify({ error: 'Request timeout' }), {
+          status: 408,
+          headers: { 'Content-Type': 'application/json' },
+        });
       }
 
       console.error('Validation error:', error);
-      return new Response(
-        JSON.stringify({ error: 'Internal server error' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Internal server error' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
   } catch (outerError) {
     console.error('Outer validation error:', outerError);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }

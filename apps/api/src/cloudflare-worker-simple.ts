@@ -108,7 +108,11 @@ function getRateLimitKey(request: Request): string {
   return ip;
 }
 
-function checkRateLimit(request: Request, limit: number, windowMs: number): { allowed: boolean; resetAt?: number } {
+function checkRateLimit(
+  request: Request,
+  limit: number,
+  windowMs: number
+): { allowed: boolean; resetAt?: number } {
   const key = getRateLimitKey(request);
   const now = Date.now();
   const record = rateLimits.get(key);
@@ -136,23 +140,29 @@ function checkRateLimit(request: Request, limit: number, windowMs: number): { al
 async function handleHealth(env: Env): Promise<Response> {
   try {
     // Simple health check - just return OK
-    return new Response(JSON.stringify({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      version: '1.0.0',
-      environment: env.NODE_ENV || 'development'
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+        environment: env.NODE_ENV || 'development',
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   } catch (error) {
-    return new Response(JSON.stringify({
-      status: 'unhealthy',
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        status: 'unhealthy',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString(),
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -160,16 +170,19 @@ async function handleHealth(env: Env): Promise<Response> {
 async function handleGenerate(request: Request, env: Env): Promise<Response> {
   try {
     if (!checkRateLimit(request, 10, 60 * 60 * 1000).allowed) {
-      return new Response(JSON.stringify({
-        error: 'Rate limit exceeded',
-        resetAt: Date.now() + 60 * 60 * 1000
-      }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded',
+          resetAt: Date.now() + 60 * 60 * 1000,
+        }),
+        {
+          status: 429,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
-    const body = await request.json() as WireframeRequest;
+    const body = (await request.json()) as WireframeRequest;
 
     // Initialize Google AI
     const genAI = new GoogleGenerativeAI(env.GEMINI_API_KEY);
@@ -184,28 +197,36 @@ async function handleGenerate(request: Request, env: Env): Promise<Response> {
 
     const generatedCode = response.text();
 
-    return new Response(JSON.stringify({
-      component: generatedCode,
-      framework: body.framework,
-      componentLibrary: body.componentLibrary || 'none',
-      typescript: body.typescript ?? true,
-      metadata: {
-        model: 'gemini-3-flash-preview',
-        generatedAt: new Date().toISOString(),
-        tokens: (response.usageMetadata?.promptTokenCount || 0) + (response.usageMetadata?.candidatesTokenCount || 0)
+    return new Response(
+      JSON.stringify({
+        component: generatedCode,
+        framework: body.framework,
+        componentLibrary: body.componentLibrary || 'none',
+        typescript: body.typescript ?? true,
+        metadata: {
+          model: 'gemini-3-flash-preview',
+          generatedAt: new Date().toISOString(),
+          tokens:
+            (response.usageMetadata?.promptTokenCount || 0) +
+            (response.usageMetadata?.candidatesTokenCount || 0),
+        },
+      }),
+      {
+        headers: { 'Content-Type': 'application/json' },
       }
-    }), {
-      headers: { 'Content-Type': 'application/json' }
-    });
+    );
   } catch (error) {
     console.error('Generation error:', error);
-    return new Response(JSON.stringify({
-      error: 'Generation failed',
-      message: error instanceof Error ? error.message : 'Unknown error'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Generation failed',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -234,29 +255,35 @@ The component should be production-ready and follow ${framework} conventions.`;
 async function handleWireframe(request: Request): Promise<Response> {
   try {
     if (!checkRateLimit(request, 5, 60 * 60 * 1000).allowed) {
-      return new Response(JSON.stringify({
-        error: 'Rate limit exceeded',
-        resetAt: Date.now() + 60 * 60 * 1000
-      }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded',
+          resetAt: Date.now() + 60 * 60 * 1000,
+        }),
+        {
+          status: 429,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
-    const body = await request.json() as WireframeRequest;
+    const body = (await request.json()) as WireframeRequest;
     const wireframe = generateSimpleWireframe(body);
 
     return new Response(JSON.stringify(wireframe), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    return new Response(JSON.stringify({
-      error: 'Wireframe generation failed',
-      message: error instanceof Error ? error.message : 'Unknown error'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Wireframe generation failed',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -268,19 +295,19 @@ async function handleWireframeTemplates(): Promise<Response> {
       name: 'Mobile App Screen',
       description: 'Basic mobile app layout with header and content',
       framework: 'react',
-      componentType: 'mobile'
+      componentType: 'mobile',
     },
     {
       id: 'web-dashboard',
       name: 'Web Dashboard',
       description: 'Dashboard layout with sidebar and main content',
       framework: 'react',
-      componentType: 'web'
-    }
+      componentType: 'web',
+    },
   ];
 
   return new Response(JSON.stringify({ templates }), {
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
   });
 }
 
@@ -288,35 +315,41 @@ async function handleWireframeTemplates(): Promise<Response> {
 async function handleFigmaExport(request: Request, _env: Env): Promise<Response> {
   try {
     if (!checkRateLimit(request, 3, 60 * 60 * 1000).allowed) {
-      return new Response(JSON.stringify({
-        error: 'Rate limit exceeded',
-        resetAt: Date.now() + 60 * 60 * 1000
-      }), {
-        status: 429,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded',
+          resetAt: Date.now() + 60 * 60 * 1000,
+        }),
+        {
+          status: 429,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
-    const body = await request.json() as { wireframe: GeneratedWireframe };
+    const body = (await request.json()) as { wireframe: GeneratedWireframe };
 
     // Convert wireframe to Figma format
     const figmaData = convertWireframeToFigma(body.wireframe, {
       includeStyles: true,
       scaleFactor: 1,
-      useAutoLayout: true
+      useAutoLayout: true,
     });
 
     return new Response(JSON.stringify(figmaData), {
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    return new Response(JSON.stringify({
-      error: 'Figma export failed',
-      message: error instanceof Error ? error.message : 'Unknown error'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Figma export failed',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -331,7 +364,7 @@ function generateSimpleWireframe(options: WireframeRequest): WireframeResponse {
       y: 0,
       width: 375,
       height: 60,
-      fills: [{ type: 'SOLID', color: { r: 59, g: 130, b: 246, a: 1 } }]
+      fills: [{ type: 'SOLID', color: { r: 59, g: 130, b: 246, a: 1 } }],
     },
     {
       id: 'content',
@@ -341,8 +374,8 @@ function generateSimpleWireframe(options: WireframeRequest): WireframeResponse {
       y: 60,
       width: 375,
       height: 600,
-      fills: [{ type: 'SOLID', color: { r: 249, g: 250, b: 251, a: 1 } }]
-    }
+      fills: [{ type: 'SOLID', color: { r: 249, g: 250, b: 251, a: 1 } }],
+    },
   ];
 
   const wireframe: GeneratedWireframe = {
@@ -357,16 +390,16 @@ function generateSimpleWireframe(options: WireframeRequest): WireframeResponse {
         background: '#F9FAFB',
         surface: '#FFFFFF',
         text: '#111827',
-        border: '#E5E7EB'
+        border: '#E5E7EB',
       },
       spacing: {
         xs: 4,
         sm: 8,
         md: 16,
         lg: 24,
-        xl: 32
-      }
-    }
+        xl: 32,
+      },
+    },
   };
 
   return {
@@ -374,8 +407,8 @@ function generateSimpleWireframe(options: WireframeRequest): WireframeResponse {
     metadata: {
       version: '1.0.0',
       generatedAt: new Date().toISOString(),
-      outputFormat: options.outputFormat || 'figma'
-    }
+      outputFormat: options.outputFormat || 'figma',
+    },
   };
 }
 
@@ -431,13 +464,16 @@ export default {
 
       return new Response('Method not allowed', { status: 405 });
     } catch (error) {
-      return new Response(JSON.stringify({
-        error: 'Internal server error',
-        message: error instanceof Error ? error.message : 'Unknown error'
-      }), {
-        status: 500,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Internal server error',
+          message: error instanceof Error ? error.message : 'Unknown error',
+        }),
+        {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        }
+      );
     }
-  }
+  },
 };

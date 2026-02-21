@@ -33,7 +33,6 @@ export default [
       parserOptions: {
         ecmaVersion: 'latest',
         sourceType: 'module',
-        project: './apps/api/tsconfig.json',
       },
       globals: {
         console: 'readonly',
@@ -94,7 +93,6 @@ export default [
         ecmaVersion: 'latest',
         sourceType: 'module',
         ecmaFeatures: { jsx: true },
-        project: './apps/web/tsconfig.json',
       },
       globals: {
         console: 'readonly',

@@ -107,15 +107,11 @@ describe('Authentication Helpers', () => {
 
   describe('verifyOwnership', () => {
     it('should not throw when user owns resource', async () => {
-      await expect(
-        verifyOwnership('user-123', 'user-123')
-      ).resolves.not.toThrow();
+      await expect(verifyOwnership('user-123', 'user-123')).resolves.not.toThrow();
     });
 
     it('should throw ForbiddenError when user does not own resource', async () => {
-      await expect(verifyOwnership('user-123', 'user-456')).rejects.toThrow(
-        ForbiddenError
-      );
+      await expect(verifyOwnership('user-123', 'user-456')).rejects.toThrow(ForbiddenError);
       await expect(verifyOwnership('user-123', 'user-456')).rejects.toThrow(
         'You do not own this resource'
       );

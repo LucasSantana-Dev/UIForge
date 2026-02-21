@@ -4,7 +4,13 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle } from 'lucide-react';
 import { WireframePreview } from '@/components/wireframe/WireframePreview';
@@ -90,9 +96,7 @@ export function WireframeClient() {
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight">
-            Wireframe Generator
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">Wireframe Generator</h1>
           <p className="mt-2 text-muted-foreground">
             Create wireframes for your UI components and export to Figma
           </p>
@@ -247,9 +251,7 @@ export function WireframeClient() {
                   </div>
                 )}
 
-                {wireframe && !isGenerating && (
-                  <WireframePreview wireframe={wireframe} />
-                )}
+                {wireframe && !isGenerating && <WireframePreview wireframe={wireframe} />}
               </CardContent>
             </Card>
           </div>
@@ -258,10 +260,7 @@ export function WireframeClient() {
 
       {/* Figma Export Dialog */}
       {showExportDialog && wireframe && (
-        <FigmaExportDialog
-          wireframe={wireframe}
-          onClose={() => setShowExportDialog(false)}
-        />
+        <FigmaExportDialog wireframe={wireframe} onClose={() => setShowExportDialog(false)} />
       )}
     </div>
   );
