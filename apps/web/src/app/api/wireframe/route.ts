@@ -44,10 +44,10 @@ function getDimensions(componentType: string): [number, number] {
 
 function generateMockWireframe(request: WireframeRequest): WireframeResponse {
   const [width, height] = getDimensions(request.componentType);
-  
+
   // Mock wireframe generation based on description
   const elements = [];
-  
+
   if (request.description.toLowerCase().includes('login')) {
     elements.push(
       {
@@ -58,7 +58,7 @@ function generateMockWireframe(request: WireframeRequest): WireframeResponse {
         width: width - 40,
         height: 40,
         label: 'Email',
-        placeholder: 'you@example.com'
+        placeholder: 'you@example.com',
       },
       {
         id: 'password-input',
@@ -69,7 +69,7 @@ function generateMockWireframe(request: WireframeRequest): WireframeResponse {
         height: 40,
         label: 'Password',
         placeholder: '••••••••',
-        inputType: 'password'
+        inputType: 'password',
       },
       {
         id: 'login-button',
@@ -79,79 +79,77 @@ function generateMockWireframe(request: WireframeRequest): WireframeResponse {
         width: width - 40,
         height: 48,
         text: 'Sign In',
-        variant: 'primary'
+        variant: 'primary',
       }
     );
   }
-  
+
   if (request.description.toLowerCase().includes('header')) {
-    elements.push(
-      {
-        id: 'header',
-        type: 'container',
-        x: 0,
-        y: 0,
-        width: width,
-        height: 64,
-        backgroundColor: '#121214',
-        children: [
-          {
-            id: 'logo',
-            type: 'text',
-            x: 20,
-            y: 20,
-            width: 100,
-            height: 24,
-            text: 'Logo',
-            fontSize: 18,
-            color: '#ffffff'
-          },
-          {
-            id: 'nav-items',
-            type: 'container',
-            x: width - 200,
-            y: 20,
-            width: 180,
-            height: 24,
-            children: [
-              {
-                id: 'nav-home',
-                type: 'text',
-                x: 0,
-                y: 0,
-                width: 40,
-                height: 24,
-                text: 'Home',
-                fontSize: 14,
-                color: '#ffffff'
-              },
-              {
-                id: 'nav-about',
-                type: 'text',
-                x: 50,
-                y: 0,
-                width: 50,
-                height: 24,
-                text: 'About',
-                fontSize: 14,
-                color: '#ffffff'
-              },
-              {
-                id: 'nav-contact',
-                type: 'text',
-                x: 110,
-                y: 0,
-                width: 60,
-                height: 24,
-                text: 'Contact',
-                fontSize: 14,
-                color: '#ffffff'
-              }
-            ]
-          }
-        ]
-      }
-    );
+    elements.push({
+      id: 'header',
+      type: 'container',
+      x: 0,
+      y: 0,
+      width: width,
+      height: 64,
+      backgroundColor: '#121214',
+      children: [
+        {
+          id: 'logo',
+          type: 'text',
+          x: 20,
+          y: 20,
+          width: 100,
+          height: 24,
+          text: 'Logo',
+          fontSize: 18,
+          color: '#ffffff',
+        },
+        {
+          id: 'nav-items',
+          type: 'container',
+          x: width - 200,
+          y: 20,
+          width: 180,
+          height: 24,
+          children: [
+            {
+              id: 'nav-home',
+              type: 'text',
+              x: 0,
+              y: 0,
+              width: 40,
+              height: 24,
+              text: 'Home',
+              fontSize: 14,
+              color: '#ffffff',
+            },
+            {
+              id: 'nav-about',
+              type: 'text',
+              x: 50,
+              y: 0,
+              width: 50,
+              height: 24,
+              text: 'About',
+              fontSize: 14,
+              color: '#ffffff',
+            },
+            {
+              id: 'nav-contact',
+              type: 'text',
+              x: 110,
+              y: 0,
+              width: 60,
+              height: 24,
+              text: 'Contact',
+              fontSize: 14,
+              color: '#ffffff',
+            },
+          ],
+        },
+      ],
+    });
   }
 
   // Add some default elements if no specific patterns found
@@ -166,7 +164,7 @@ function generateMockWireframe(request: WireframeRequest): WireframeResponse {
         height: 32,
         text: 'Component Title',
         fontSize: 24,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
       },
       {
         id: 'content',
@@ -176,7 +174,7 @@ function generateMockWireframe(request: WireframeRequest): WireframeResponse {
         width: width - 40,
         height: height - 140,
         backgroundColor: '#ffffff',
-        border: '1px solid #e5e7eb'
+        border: '1px solid #e5e7eb',
       }
     );
   }
@@ -188,30 +186,41 @@ function generateMockWireframe(request: WireframeRequest): WireframeResponse {
       height,
       elements,
       styles: {
-        theme: request.style === 'low-fidelity' ? 'wireframe' : 
-               request.style === 'high-fidelity' ? 'detailed' : 'interactive',
-        colors: request.style === 'low-fidelity' ? ['#000000', '#ffffff'] : 
-                ['#121214', '#3b82f6', '#10b981', '#f59e0b'],
+        theme:
+          request.style === 'low-fidelity'
+            ? 'wireframe'
+            : request.style === 'high-fidelity'
+              ? 'detailed'
+              : 'interactive',
+        colors:
+          request.style === 'low-fidelity'
+            ? ['#000000', '#ffffff']
+            : ['#121214', '#3b82f6', '#10b981', '#f59e0b'],
         typography: {
-          fontFamily: request.framework === 'react' ? 'Inter' : 
-                     request.framework === 'vue' ? 'Inter' :
-                     request.framework === 'angular' ? 'Roboto' : 'System',
-          fontSize: '14px'
-        }
-      }
+          fontFamily:
+            request.framework === 'react'
+              ? 'Inter'
+              : request.framework === 'vue'
+                ? 'Inter'
+                : request.framework === 'angular'
+                  ? 'Roboto'
+                  : 'System',
+          fontSize: '14px',
+        },
+      },
     },
     metadata: {
       framework: request.framework,
       componentType: request.componentType,
       generatedAt: new Date().toISOString(),
-      outputFormat: request.outputFormat
-    }
+      outputFormat: request.outputFormat,
+    },
   };
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json() as WireframeRequest;
+    const body = (await request.json()) as WireframeRequest;
 
     // Validate request body
     if (!body.description || typeof body.description !== 'string') {
@@ -232,7 +241,9 @@ export async function POST(request: NextRequest) {
     const validFrameworks = ['react', 'vue', 'angular', 'svelte'];
     if (!validFrameworks.includes(body.framework)) {
       return new Response(
-        JSON.stringify({ error: `Invalid framework. Must be one of: ${validFrameworks.join(', ')}` }),
+        JSON.stringify({
+          error: `Invalid framework. Must be one of: ${validFrameworks.join(', ')}`,
+        }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -241,7 +252,9 @@ export async function POST(request: NextRequest) {
     const validComponentTypes = ['mobile', 'web', 'desktop', 'tablet'];
     if (!validComponentTypes.includes(body.componentType)) {
       return new Response(
-        JSON.stringify({ error: `Invalid component type. Must be one of: ${validComponentTypes.join(', ')}` }),
+        JSON.stringify({
+          error: `Invalid component type. Must be one of: ${validComponentTypes.join(', ')}`,
+        }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -259,7 +272,9 @@ export async function POST(request: NextRequest) {
     const validOutputFormats = ['figma', 'json', 'svg', 'png'];
     if (!validOutputFormats.includes(body.outputFormat)) {
       return new Response(
-        JSON.stringify({ error: `Invalid output format. Must be one of: ${validOutputFormats.join(', ')}` }),
+        JSON.stringify({
+          error: `Invalid output format. Must be one of: ${validOutputFormats.join(', ')}`,
+        }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -269,24 +284,20 @@ export async function POST(request: NextRequest) {
 
     // In a real implementation, this would call an AI service
     // For now, we return a mock wireframe based on the description
-    
-    return new Response(
-      JSON.stringify(wireframeData),
-      { 
-        status: 200, 
-        headers: { 
-          'Content-Type': 'application/json',
-          'Cache-Control': 'no-cache'
-        } 
-      }
-    );
 
+    return new Response(JSON.stringify(wireframeData), {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+      },
+    });
   } catch (error) {
     console.error('Wireframe generation error:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
 
@@ -303,24 +314,25 @@ export async function GET() {
             componentType: 'mobile | web | desktop | tablet',
             description: 'string (min 10 characters)',
             style: 'low-fidelity | high-fidelity | prototype',
-            outputFormat: 'figma | json | svg | png'
+            outputFormat: 'figma | json | svg | png',
           },
           example: {
             framework: 'react',
             componentType: 'mobile',
-            description: 'A mobile app login screen with email input, password input, and login button',
+            description:
+              'A mobile app login screen with email input, password input, and login button',
             style: 'high-fidelity',
-            outputFormat: 'json'
-          }
-        }
-      }
+            outputFormat: 'json',
+          },
+        },
+      },
     }),
-    { 
-      status: 200, 
-      headers: { 
+    {
+      status: 200,
+      headers: {
         'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=3600'
-      } 
+        'Cache-Control': 'public, max-age=3600',
+      },
     }
   );
 }

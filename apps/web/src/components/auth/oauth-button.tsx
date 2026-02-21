@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Gmail, Github } from 'lucide-react';
+import { Mail, Github } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface OAuthButtonProps {
@@ -12,7 +12,7 @@ interface OAuthButtonProps {
 const providerConfig = {
   google: {
     name: 'Google',
-    icon: Gmail,
+    icon: Mail,
     bgColor: 'bg-background',
     textColor: 'text-foreground',
     borderColor: 'border-border',

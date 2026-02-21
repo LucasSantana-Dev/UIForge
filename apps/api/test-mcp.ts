@@ -4,7 +4,6 @@
  */
 
 import { createMCPServer } from './src/mcp/server';
-import { CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 async function testMCPServer() {
   console.log('🧪 Testing UIForge MCP Server...\n');
@@ -21,7 +20,8 @@ async function testMCPServer() {
         arguments: {
           framework: 'react',
           componentLibrary: 'shadcn',
-          description: 'A modern login form with email and password fields, submit button, and forgot password link',
+          description:
+            'A modern login form with email and password fields, submit button, and forgot password link',
           style: 'modern',
           typescript: true,
         },

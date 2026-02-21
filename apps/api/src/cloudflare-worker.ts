@@ -20,7 +20,7 @@ const generateSchema = {
   componentLibrary: ['tailwind', 'mui', 'chakra', 'shadcn', 'none'],
   description: { type: 'string', minLength: 10, maxLength: 1000 },
   style: ['modern', 'minimal', 'colorful'],
-  typescript: { type: 'boolean' }
+  typescript: { type: 'boolean' },
 };
 
 // Rate limiting (simple in-memory for Workers)
@@ -32,7 +32,11 @@ function getRateLimitKey(request: Request): string {
   return ip;
 }
 
-function checkRateLimit(request: Request, limit: number, windowMs: number): { allowed: boolean; resetAt?: number } {
+function checkRateLimit(
+  request: Request,
+  limit: number,
+  windowMs: number
+): { allowed: boolean; resetAt?: number } {
   const key = getRateLimitKey(request);
   const now = Date.now();
   const record = rateLimits.get(key);
@@ -58,7 +62,7 @@ async function handleHealth(env: Env): Promise<Response> {
       timestamp: new Date().toISOString(),
       services: {
         supabase: 'disconnected' as 'disconnected' | 'connected',
-        gemini: env.GEMINI_API_KEY ? 'available' : 'not_configured' as const,
+        gemini: env.GEMINI_API_KEY ? 'available' : ('not_configured' as const),
         mcp: 'not_implemented' as const,
         websocket: 'not_implemented' as const,
       },
@@ -69,15 +73,15 @@ async function handleHealth(env: Env): Promise<Response> {
     try {
       const response = await fetch(`${env.SUPABASE_URL}/rest/v1/`, {
         headers: {
-          'apikey': env.SUPABASE_ANON_KEY,
-          'Authorization': `Bearer ${env.SUPABASE_ANON_KEY}`
-        }
+          apikey: env.SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${env.SUPABASE_ANON_KEY}`,
+        },
       });
       health.services.supabase = response.ok ? 'connected' : 'disconnected';
       if (!response.ok) {
         health.status = 'degraded';
       }
-    } catch (error) {
+    } catch {
       health.services.supabase = 'disconnected';
       health.status = 'degraded';
     }
@@ -93,17 +97,20 @@ async function handleHealth(env: Env): Promise<Response> {
 
     return new Response(JSON.stringify(health), {
       status: statusCode,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
     });
-  } catch (error) {
-    return new Response(JSON.stringify({
-      status: 'unhealthy',
-      timestamp: new Date().toISOString(),
-      error: 'Health check failed',
-    }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json' }
-    });
+  } catch {
+    return new Response(
+      JSON.stringify({
+        status: 'unhealthy',
+        timestamp: new Date().toISOString(),
+        error: 'Health check failed',
+      }),
+      {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -113,39 +120,52 @@ async function handleGenerate(request: Request, env: Env): Promise<Response> {
     // Rate limiting
     const rateResult = checkRateLimit(request, 10, 60000); // 10 requests per minute
     if (!rateResult.allowed) {
-      return new Response(JSON.stringify({
-        error: 'Rate limit exceeded',
-        retry_after: Math.ceil((rateResult.resetAt! - Date.now()) / 1000)
-      }), {
-        status: 429,
-        headers: {
-          'Content-Type': 'application/json',
-          'Retry-After': Math.ceil((rateResult.resetAt! - Date.now()) / 1000).toString()
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded',
+          retry_after: Math.ceil((rateResult.resetAt! - Date.now()) / 1000),
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': Math.ceil((rateResult.resetAt! - Date.now()) / 1000).toString(),
+          },
         }
-      });
+      );
     }
 
     // Parse request body
-    const body = await request.json() as any;
+    const body = (await request.json()) as any;
 
     // Validate request
-    if (!body.description || typeof body.description !== 'string' ||
-        body.description.length < 10 || body.description.length > 1000) {
-      return new Response(JSON.stringify({
-        error: 'Invalid description. Must be between 10 and 1000 characters.'
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+    if (
+      !body.description ||
+      typeof body.description !== 'string' ||
+      body.description.length < 10 ||
+      body.description.length > 1000
+    ) {
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid description. Must be between 10 and 1000 characters.',
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     if (!generateSchema.framework.includes(body.framework)) {
-      return new Response(JSON.stringify({
-        error: 'Invalid framework. Must be one of: ' + generateSchema.framework.join(', ')
-      }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Invalid framework. Must be one of: ' + generateSchema.framework.join(', '),
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
 
     // Set up environment for Gemini service
@@ -155,7 +175,7 @@ async function handleGenerate(request: Request, env: Env): Promise<Response> {
         SUPABASE_ANON_KEY: env.SUPABASE_ANON_KEY,
         GEMINI_API_KEY: env.GEMINI_API_KEY,
         NODE_ENV: env.NODE_ENV || 'development',
-      }
+      },
     };
 
     // Stream component generation
@@ -169,7 +189,7 @@ async function handleGenerate(request: Request, env: Env): Promise<Response> {
         } catch (error) {
           controller.error(error);
         }
-      }
+      },
     });
 
     return new Response(stream, {
@@ -179,18 +199,20 @@ async function handleGenerate(request: Request, env: Env): Promise<Response> {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type',
-      }
+      },
     });
-
   } catch (error) {
     logger.error('Generate endpoint error', error);
-    return new Response(JSON.stringify({
-      error: 'Internal server error',
-      message: error instanceof Error ? error.message : 'Unknown error'
-    }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' }
-    });
+    return new Response(
+      JSON.stringify({
+        error: 'Internal server error',
+        message: error instanceof Error ? error.message : 'Unknown error',
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
   }
 }
 
@@ -206,7 +228,7 @@ export default {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
+        },
       });
     }
 
@@ -221,35 +243,43 @@ export default {
       }
 
       if (url.pathname === '/api' && request.method === 'GET') {
-        return new Response(JSON.stringify({
-          message: 'UIForge API is running on Cloudflare Workers',
-          version: '0.1.0',
-          endpoints: ['/health', '/api/generate'],
-          environment: env.NODE_ENV || 'development'
-        }), {
-          headers: { 'Content-Type': 'application/json' }
-        });
+        return new Response(
+          JSON.stringify({
+            message: 'UIForge API is running on Cloudflare Workers',
+            version: '0.1.0',
+            endpoints: ['/health', '/api/generate'],
+            environment: env.NODE_ENV || 'development',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json' },
+          }
+        );
       }
 
       // 404 for unknown routes
-      return new Response(JSON.stringify({
-        error: 'Not Found',
-        message: 'The requested endpoint was not found',
-        available_endpoints: ['/health', '/api/generate', '/api']
-      }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' }
-      });
-
+      return new Response(
+        JSON.stringify({
+          error: 'Not Found',
+          message: 'The requested endpoint was not found',
+          available_endpoints: ['/health', '/api/generate', '/api'],
+        }),
+        {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     } catch (error) {
       logger.error('Worker error', error);
-      return new Response(JSON.stringify({
-        error: 'Internal Server Error',
-        message: 'An unexpected error occurred'
-      }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' }
-      });
+      return new Response(
+        JSON.stringify({
+          error: 'Internal Server Error',
+          message: 'An unexpected error occurred',
+        }),
+        {
+          status: 500,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
     }
-  }
+  },
 };

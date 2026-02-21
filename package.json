@@ -1,7 +1,8 @@
 {
   "name": "uiforge-webapp",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "private": true,
+  "license": "MIT",
   "description": "Zero-cost web application for AI-driven UI generation",
   "workspaces": [
     "apps/*",
@@ -12,6 +13,7 @@
     "build": "turbo run build",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint -- --fix",
+    "lint:shell": "shellcheck --rcfile=.shellcheckrc $(find . -name '*.sh' ! -path '*/node_modules/*') 2>/dev/null || true",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "type-check": "turbo run type-check",
@@ -25,11 +27,11 @@
   },
   "lint-staged": {
     "apps/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix --max-warnings 0",
+      "eslint --fix --max-warnings 0 --no-warn-ignored",
       "prettier --write"
     ],
     "packages/**/*.{js,jsx,ts,tsx}": [
-      "eslint --fix --max-warnings 0",
+      "eslint --fix --max-warnings 0 --no-warn-ignored",
       "prettier --write"
     ],
     "*.{json,md,yml,yaml}": [
@@ -37,6 +39,7 @@
     ]
   },
   "devDependencies": {
+    "@uiforge/forge-patterns": "file:../forge-patterns",
     "@commitlint/cli": "^20.4.1",
     "@commitlint/config-conventional": "^20.4.1",
     "@types/crypto-js": "^4.2.2",
@@ -52,7 +55,7 @@
     "wrangler": "^4.65.0"
   },
   "engines": {
-    "node": ">=20",
+    "node": ">=22",
     "npm": ">=10"
   },
   "packageManager": "npm@10.9.2",

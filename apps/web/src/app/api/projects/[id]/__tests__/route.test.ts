@@ -14,9 +14,7 @@ jest.mock('@/lib/api/auth');
 jest.mock('@/lib/api/rate-limit');
 
 const mockCreateClient = createClient as jest.MockedFunction<typeof createClient>;
-const mockVerifySession = auth.verifySession as jest.MockedFunction<
-  typeof auth.verifySession
->;
+const mockVerifySession = auth.verifySession as jest.MockedFunction<typeof auth.verifySession>;
 const mockCheckRateLimit = rateLimit.checkRateLimit as jest.MockedFunction<
   typeof rateLimit.checkRateLimit
 >;

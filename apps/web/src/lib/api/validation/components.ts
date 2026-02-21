@@ -28,9 +28,7 @@ export const createComponentSchema = z.object({
   props: z.record(z.string(), z.any()).default({}),
 });
 
-export const updateComponentSchema = createComponentSchema
-  .omit({ project_id: true })
-  .partial();
+export const updateComponentSchema = createComponentSchema.omit({ project_id: true }).partial();
 
 export const componentQuerySchema = z.object({
   project_id: z.string().uuid(),

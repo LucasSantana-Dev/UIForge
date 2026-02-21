@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       - run: npm ci
       - run: npm run lint
@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       - run: npm ci
       - run: npm run type-check
@@ -43,7 +43,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       - run: npm ci
       - run: npm run test -- --coverage
@@ -62,7 +62,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       - run: npm ci
       - run: npm run build
@@ -74,7 +74,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       - run: npm ci
       - name: Run security audit
@@ -83,3 +83,28 @@ jobs:
       - name: Check outdated dependencies
         run: npm outdated
         continue-on-error: true
+
+  shell-lint:
+    name: Shell Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shfmt
+        run: sudo apt-get install -y shfmt
+
+      - name: Run shellcheck
+        uses: ludeeus/action-shellcheck@2.0.0
+        env:
+          SHELLCHECK_OPTS: --rcfile=.shellcheckrc
+
+      - name: Check shell formatting
+        run: |
+          ERRORS=0
+          while IFS= read -r -d '' f; do
+            if shfmt -d -i 2 "$f" 2>/dev/null | grep -q .; then
+              echo "Formatting violation: $f"
+              ERRORS=$((ERRORS + 1))
+            fi
+          done < <(find . -name "*.sh" ! -path "*/node_modules/*" -print0)
+          [ "$ERRORS" -eq 0 ] && echo "All shell scripts correctly formatted" || exit 1

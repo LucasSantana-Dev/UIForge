@@ -37,9 +37,7 @@ export default function UserMenu({ user }: UserMenuProps) {
           <Avatar className="h-8 w-8">
             <AvatarFallback>{userInitials}</AvatarFallback>
           </Avatar>
-          <span className="hidden sm:block text-sm font-medium">
-            {user.email}
-          </span>
+          <span className="hidden sm:block text-sm font-medium">{user.email}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">

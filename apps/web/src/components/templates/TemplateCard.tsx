@@ -1,10 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Star, Download, Eye, Code } from 'lucide-react';
+import { Star, Eye, Code } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export interface Template {
   id: string;
@@ -43,7 +50,7 @@ export default function NavigationBar() {
           <div className="flex items-center">
             <span className="text-xl font-bold">Logo</span>
           </div>
-          
+
           <div className="hidden md:flex space-x-8">
             <a href="#" className="text-gray-700 hover:text-blue-600">Home</a>
             <a href="#" className="text-gray-700 hover:text-blue-600">About</a>
@@ -117,7 +124,7 @@ export default function ContactForm() {
   return (
     <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-6">Contact Us</h2>
-      
+
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">Name</label>
@@ -129,7 +136,7 @@ export default function ContactForm() {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium mb-1">Email</label>
           <input
@@ -140,7 +147,7 @@ export default function ContactForm() {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium mb-1">Message</label>
           <textarea
@@ -151,7 +158,7 @@ export default function ContactForm() {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        
+
         <Button type="submit" className="w-full">
           Send Message
         </Button>
@@ -201,7 +208,7 @@ export default function PricingCard() {
               {plan.price}
               <span className="text-lg text-gray-600">/month</span>
             </div>
-            
+
             <ul className="space-y-3 mb-8">
               {plan.features.map((feature, i) => (
                 <li key={i} className="flex items-center">
@@ -210,7 +217,7 @@ export default function PricingCard() {
                 </li>
               ))}
             </ul>
-            
+
             <Button
               className={\`w-full \${
                 plan.highlighted
@@ -236,14 +243,14 @@ export default function ModalDialog() {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <Button onClick={() => setIsOpen(true)}>Open Modal</Button>
-      
+
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div
             className="absolute inset-0 bg-black opacity-50"
             onClick={() => setIsOpen(false)}
           />
-          
+
           <div className="relative bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <button
               onClick={() => setIsOpen(false)}
@@ -251,12 +258,12 @@ export default function ModalDialog() {
             >
               <X size={20} />
             </button>
-            
+
             <h2 className="text-xl font-bold mb-4">Modal Title</h2>
             <p className="text-gray-600 mb-6">
               This is a modal dialog with overlay, close button, and escape key support.
             </p>
-            
+
             <div className="flex justify-end space-x-3">
               <Button variant="outline" onClick={() => setIsOpen(false)}>
                 Cancel
@@ -307,7 +314,7 @@ export default function DataTable() {
   const sortedData = [...data].sort((a, b) => {
     const aValue = a[sortField as keyof typeof a];
     const bValue = b[sortField as keyof typeof b];
-    
+
     if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
     if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
     return 0;
@@ -375,7 +382,7 @@ export default function DataTable() {
           </tbody>
         </table>
       </div>
-      
+
       <div className="mt-4 flex justify-between items-center">
         <div className="text-sm text-gray-600">
           {selectedRows.length} rows selected
@@ -517,17 +524,17 @@ export default function SidebarMenu() {
     <div className="flex items-center justify-center min-h-screen space-x-4">
       {/* Simple Spinner */}
       <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-      
+
       {/* Pulse Spinner */}
       <div className="w-8 h-8 bg-blue-600 rounded-full animate-pulse"></div>
-      
+
       {/* Bouncing Dots */}
       <div className="flex space-x-1">
         <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
         <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
         <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
       </div>
-      
+
       {/* Rotating Square */}
       <div className="w-8 h-8 bg-blue-600 animate-spin" style={{ animationDuration: '2s' }}></div>
     </div>
@@ -588,7 +595,7 @@ export default function SearchBar() {
 
   const handleInputChange = (value: string) => {
     setQuery(value);
-    
+
     if (value.length > 0) {
       const filtered = allSuggestions.filter(suggestion =>
         suggestion.toLowerCase().includes(value.toLowerCase())
@@ -658,11 +665,11 @@ export default function SearchBar() {
       )}
     </div>
   );
-}`
+}`,
 };
 
 export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCardProps) {
-  const [imageError, setImageError] = useState(false);
+  const [imageError] = useState(false);
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -679,7 +686,9 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
 
   const templateWithCode = {
     ...template,
-    code: templateCodes[template.id] || `// Template code for ${template.name}\\nexport default function ${template.name.replace(/\\s+/g, '')}() {\\n  return <div>Template implementation</div>;\\n}`
+    code:
+      templateCodes[template.id] ||
+      `// Template code for ${template.name}\\nexport default function ${template.name.replace(/\\s+/g, '')}() {\\n  return <div>Template implementation</div>;\\n}`,
   };
 
   return (
@@ -710,14 +719,12 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
           </div>
 
           <div className="flex items-center gap-2">
-            <Badge className={getDifficultyColor(template.difficulty)}>
-              {template.difficulty}
-            </Badge>
+            <Badge className={getDifficultyColor(template.difficulty)}>{template.difficulty}</Badge>
             <span className="text-xs text-muted-foreground">{template.category}</span>
           </div>
 
           <div className="flex flex-wrap gap-1">
-            {template.tags.slice(0, 3).map(tag => (
+            {template.tags.slice(0, 3).map((tag) => (
               <Badge key={tag} variant="outline" className="text-xs">
                 {tag}
               </Badge>
@@ -750,11 +757,7 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
             <Eye className="w-4 h-4 mr-1" />
             Preview
           </Button>
-          <Button
-            size="sm"
-            onClick={() => onUseTemplate(templateWithCode)}
-            className="flex-1"
-          >
+          <Button size="sm" onClick={() => onUseTemplate(templateWithCode)} className="flex-1">
             <Code className="w-4 h-4 mr-1" />
             Use Template
           </Button>

@@ -4,14 +4,6 @@ import type { NextRequest } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const generateSchema = {
-  framework: ['react', 'vue', 'angular', 'svelte'],
-  componentLibrary: ['tailwind', 'mui', 'chakra', 'shadcn', 'none'],
-  style: ['modern', 'minimal', 'colorful'],
-  typescript: 'boolean',
-  description: 'string',
-};
-
 export async function POST(request: NextRequest) {
   try {
     // Parse request body
@@ -19,10 +11,10 @@ export async function POST(request: NextRequest) {
 
     // Validate basic structure
     if (!body.description || typeof body.description !== 'string') {
-      return new Response(
-        JSON.stringify({ error: 'Description is required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Description is required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     // Forward to Cloudflare Workers API with SSE
@@ -34,7 +26,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         // Forward auth header if present
         ...(request.headers.get('authorization') && {
-          'Authorization': request.headers.get('authorization')!
+          Authorization: request.headers.get('authorization')!,
         }),
       },
       body: JSON.stringify(body),
@@ -52,22 +44,19 @@ export async function POST(request: NextRequest) {
         contentType = 'text/plain';
       }
 
-      return new Response(
-        typeof errorData === 'string' ? errorData : JSON.stringify(errorData),
-        {
-          status: response.status,
-          headers: { 'Content-Type': contentType }
-        }
-      );
+      return new Response(typeof errorData === 'string' ? errorData : JSON.stringify(errorData), {
+        status: response.status,
+        headers: { 'Content-Type': contentType },
+      });
     }
 
     // Stream the SSE response
     const reader = response.body?.getReader();
     if (!reader) {
-      return new Response(
-        JSON.stringify({ error: 'No response body' }),
-        { status: 500, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'No response body' }), {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     const encoder = new TextEncoder();
@@ -100,18 +89,17 @@ export async function POST(request: NextRequest) {
         headers: {
           'Content-Type': 'text/event-stream',
           'Cache-Control': 'no-cache',
-          'Connection': 'keep-alive',
+          Connection: 'keep-alive',
           'X-Accel-Buffering': 'no',
         },
       }
     );
-
   } catch (error) {
     console.error('Generation error:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }
 
@@ -129,16 +117,17 @@ export async function GET() {
           parameters: {
             description: 'string (required) - Description of the component to generate',
             framework: 'string (optional) - Target framework (react, vue, angular, svelte)',
-            componentLibrary: 'string (optional) - Component library (tailwind, mui, chakra, shadcn, none)',
+            componentLibrary:
+              'string (optional) - Component library (tailwind, mui, chakra, shadcn, none)',
             style: 'string (optional) - Style preference (modern, minimal, colorful)',
-            typescript: 'boolean (optional) - Generate TypeScript code'
+            typescript: 'boolean (optional) - Generate TypeScript code',
           },
           example: {
             description: 'A responsive navigation bar with logo and menu items',
             framework: 'react',
             componentLibrary: 'tailwind',
-            typescript: true
-          }
+            typescript: true,
+          },
         },
         'POST /api/generate/validate': {
           description: 'Validate generated code',
@@ -146,15 +135,15 @@ export async function GET() {
           contentType: 'application/json',
           parameters: {
             code: 'string (required) - Code to validate',
-            language: 'string (required) - Programming language'
-          }
-        }
+            language: 'string (required) - Programming language',
+          },
+        },
       },
       notes: [
         'This API provides Server-Sent Events (SSE) streaming for real-time generation',
         'Authentication is required via Authorization header',
-        'Rate limits may apply based on subscription tier'
-      ]
+        'Rate limits may apply based on subscription tier',
+      ],
     }),
     {
       status: 200,
@@ -163,8 +152,8 @@ export async function GET() {
         'Cache-Control': 'public, max-age=3600',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization'
-      }
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
     }
   );
 }
@@ -176,7 +165,7 @@ export async function OPTIONS() {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Max-Age': '86400'
-    }
+      'Access-Control-Max-Age': '86400',
+    },
   });
 }

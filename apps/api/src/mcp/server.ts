@@ -50,7 +50,8 @@ const UIFORGE_TOOLS: Tool[] = [
   },
   {
     name: 'validateCode',
-    description: 'Check if code contains common patterns (heuristic check, not real syntax validation)',
+    description:
+      'Check if code contains common patterns (heuristic check, not real syntax validation)',
     inputSchema: {
       type: 'object',
       properties: {
@@ -140,14 +141,16 @@ export function createMCPServer(): Server {
 
           // Validate optional fields with defaults
           const validLibraries = ['tailwind', 'mui', 'chakra', 'shadcn', 'none'] as const;
-          const componentLibrary = (!args.componentLibrary || !validLibraries.includes(args.componentLibrary as any))
-            ? 'none'
-            : args.componentLibrary as 'tailwind' | 'mui' | 'chakra' | 'shadcn' | 'none';
+          const componentLibrary =
+            !args.componentLibrary || !validLibraries.includes(args.componentLibrary as any)
+              ? 'none'
+              : (args.componentLibrary as 'tailwind' | 'mui' | 'chakra' | 'shadcn' | 'none');
 
           const validStyles = ['modern', 'minimal', 'colorful'] as const;
-          const style = (!args.style || !validStyles.includes(args.style as any))
-            ? 'modern'
-            : args.style as 'modern' | 'minimal' | 'colorful';
+          const style =
+            !args.style || !validStyles.includes(args.style as any)
+              ? 'modern'
+              : (args.style as 'modern' | 'minimal' | 'colorful');
 
           const typescript = args.typescript !== false;
 

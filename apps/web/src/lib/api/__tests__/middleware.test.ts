@@ -3,13 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  withAuth,
-  withRateLimit,
-  withValidation,
-  withErrorHandling,
-  compose,
-} from '../middleware';
+import { withAuth, withRateLimit, withValidation, withErrorHandling, compose } from '../middleware';
 import { z } from 'zod';
 import * as auth from '../auth';
 import * as rateLimit from '../rate-limit';
@@ -19,9 +13,7 @@ import { UnauthorizedError, ValidationError } from '../errors';
 jest.mock('../auth');
 jest.mock('../rate-limit');
 
-const mockVerifySession = auth.verifySession as jest.MockedFunction<
-  typeof auth.verifySession
->;
+const mockVerifySession = auth.verifySession as jest.MockedFunction<typeof auth.verifySession>;
 const mockCheckRateLimit = rateLimit.checkRateLimit as jest.MockedFunction<
   typeof rateLimit.checkRateLimit
 >;
@@ -40,9 +32,7 @@ describe('API Middleware', () => {
         user: { id: 'user-123' } as any,
       });
 
-      const handler = jest.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
       const wrappedHandler = withAuth(handler);
 
       const request = new NextRequest('http://localhost/api/test');
@@ -53,9 +43,7 @@ describe('API Middleware', () => {
     });
 
     it('should return 401 when not authenticated', async () => {
-      mockVerifySession.mockRejectedValue(
-        new UnauthorizedError('Not authenticated')
-      );
+      mockVerifySession.mockRejectedValue(new UnauthorizedError('Not authenticated'));
 
       const handler = jest.fn();
       const wrappedHandler = withAuth(handler);
@@ -77,9 +65,7 @@ describe('API Middleware', () => {
       });
       mockSetRateLimitHeaders.mockImplementation((res) => res as any);
 
-      const handler = jest.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
       const wrappedHandler = withRateLimit(handler, 100, 60000);
 
       const request = new NextRequest('http://localhost/api/test');
@@ -115,9 +101,7 @@ describe('API Middleware', () => {
     });
 
     it('should call handler with validated data', async () => {
-      const handler = jest.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
       const wrappedHandler = withValidation(handler, schema);
 
       const request = new NextRequest('http://localhost/api/test', {
@@ -127,11 +111,7 @@ describe('API Middleware', () => {
 
       await wrappedHandler(request);
 
-      expect(handler).toHaveBeenCalledWith(
-        request,
-        { name: 'John', age: 30 },
-        undefined
-      );
+      expect(handler).toHaveBeenCalledWith(request, { name: 'John', age: 30 }, undefined);
     });
 
     it('should return 400 for invalid data', async () => {
@@ -152,9 +132,7 @@ describe('API Middleware', () => {
 
   describe('withErrorHandling', () => {
     it('should return response from handler', async () => {
-      const handler = jest.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
       const wrappedHandler = withErrorHandling(handler);
 
       const request = new NextRequest('http://localhost/api/test');
@@ -174,9 +152,7 @@ describe('API Middleware', () => {
     });
 
     it('should handle APIError correctly', async () => {
-      const handler = jest.fn().mockRejectedValue(
-        new ValidationError('Invalid input')
-      );
+      const handler = jest.fn().mockRejectedValue(new ValidationError('Invalid input'));
       const wrappedHandler = withErrorHandling(handler);
 
       const request = new NextRequest('http://localhost/api/test');
@@ -198,15 +174,9 @@ describe('API Middleware', () => {
       });
       mockSetRateLimitHeaders.mockImplementation((res) => res as any);
 
-      const handler = jest.fn().mockResolvedValue(
-        NextResponse.json({ success: true })
-      );
+      const handler = jest.fn().mockResolvedValue(NextResponse.json({ success: true }));
 
-      const composedHandler = compose(
-        withAuth,
-        withRateLimit,
-        withErrorHandling
-      )(handler);
+      const composedHandler = compose(withAuth, withRateLimit, withErrorHandling)(handler);
 
       const request = new NextRequest('http://localhost/api/test');
       await composedHandler(request);

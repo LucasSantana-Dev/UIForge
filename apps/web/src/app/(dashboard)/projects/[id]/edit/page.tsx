@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import EditProjectForm from '@/components/projects/EditProjectForm';
 import { ArrowLeftIcon } from 'lucide-react';

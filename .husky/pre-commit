@@ -1,1 +1,27 @@
-npx lint-staged
+#!/usr/bin/env sh
+set -eu
+
+echo "Running pre-commit gate..."
+
+FAILED=0
+
+# 1. Lint and format (via lint-staged for staged files only)
+echo "  lint-staged..."
+if ! npx lint-staged; then
+  echo "  FAIL: lint/format"
+  FAILED=1
+fi
+
+# 2. TypeScript type check
+echo "  type-check..."
+if ! npm run type-check 2>/dev/null; then
+  echo "  FAIL: type check"
+  FAILED=1
+fi
+
+if [ "$FAILED" -ne 0 ]; then
+  echo "Pre-commit gate failed. Fix the issues above."
+  exit 1
+fi
+
+echo "Pre-commit gate passed."

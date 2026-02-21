@@ -4,16 +4,13 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { checkRateLimit, setRateLimitHeaders, type RateLimitResult } from './rate-limit';
+import { checkRateLimit } from './rate-limit';
 import { verifySession } from './auth';
 import { ValidationError, type APIError } from './errors';
 import { errorResponse, apiErrorResponse } from './response';
-import { z, type ZodSchema } from 'zod';
+import { type ZodSchema } from 'zod';
 
-type RouteHandler = (
-  request: NextRequest,
-  context?: any
-) => Promise<NextResponse>;
+type RouteHandler = (request: NextRequest, context?: any) => Promise<NextResponse>;
 
 /**
  * Wrap route handler with authentication
@@ -46,10 +43,19 @@ export function withRateLimit(
       const result = await checkRateLimit(request, limit, window);
 
       if (!result.allowed) {
+        const retryAfter = Math.ceil((result.resetAt - Date.now()) / 1000);
         const response = errorResponse('Rate limit exceeded', 429, {
-          retry_after: Math.ceil((result.resetAt - Date.now()) / 1000),
+          retry_after: retryAfter,
         });
-        return NextResponse.json(response, { status: 429 });
+        return NextResponse.json(response, {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': String(limit),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': String(result.resetAt),
+            'Retry-After': String(retryAfter),
+          },
+        });
       }
 
       const response = await handler(request, context);
@@ -68,11 +74,7 @@ export function withRateLimit(
  * Wrap route handler with validation
  */
 export function withValidation<T>(
-  handler: (
-    request: NextRequest,
-    data: T,
-    context?: any
-  ) => Promise<NextResponse>,
+  handler: (request: NextRequest, data: T, context?: any) => Promise<NextResponse>,
   schema: ZodSchema<T>
 ): RouteHandler {
   return async (request: NextRequest, context?: any) => {
@@ -109,10 +111,7 @@ export function withErrorHandling(handler: RouteHandler): RouteHandler {
         return apiErrorResponse(error as APIError);
       }
       console.error('Route handler error:', error);
-      return errorResponse(
-        'An unexpected error occurred',
-        500
-      );
+      return errorResponse('An unexpected error occurred', 500);
     }
   };
 }

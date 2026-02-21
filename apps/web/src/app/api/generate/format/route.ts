@@ -5,10 +5,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     if (!body.code || !body.language) {
-      return new Response(
-        JSON.stringify({ error: 'Code and language are required' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Code and language are required' }), {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     // Forward to Cloudflare Workers API
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         ...(request.headers.get('authorization') && {
-          'Authorization': request.headers.get('authorization')!
+          Authorization: request.headers.get('authorization')!,
         }),
       },
       body: JSON.stringify(body),
@@ -37,13 +37,10 @@ export async function POST(request: NextRequest) {
         contentType = 'text/plain';
       }
 
-      return new Response(
-        typeof errorData === 'string' ? errorData : JSON.stringify(errorData),
-        {
-          status: response.status,
-          headers: { 'Content-Type': contentType }
-        }
-      );
+      return new Response(typeof errorData === 'string' ? errorData : JSON.stringify(errorData), {
+        status: response.status,
+        headers: { 'Content-Type': contentType },
+      });
     }
 
     let data;
@@ -57,16 +54,15 @@ export async function POST(request: NextRequest) {
       contentType = 'text/plain';
     }
 
-    return new Response(
-      typeof data === 'string' ? data : JSON.stringify(data),
-      { status: 200, headers: { 'Content-Type': contentType } }
-    );
-
+    return new Response(typeof data === 'string' ? data : JSON.stringify(data), {
+      status: 200,
+      headers: { 'Content-Type': contentType },
+    });
   } catch (error) {
     console.error('Formatting error:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
-      { status: 500, headers: { 'Content-Type': 'application/json' } }
-    );
+    return new Response(JSON.stringify({ error: 'Internal server error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
   }
 }

@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -19,14 +19,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Shield, 
-  Key, 
-  Check, 
-  X, 
-  AlertCircle,
-  RefreshCw
-} from 'lucide-react';
+import { Shield, Check, X, AlertCircle, RefreshCw } from 'lucide-react';
 import { useAIKeyStore, useAIKeys } from '@/stores/ai-keys';
 import { AIProvider, AI_PROVIDERS } from '@/lib/encryption';
 
@@ -39,13 +32,15 @@ interface EditApiKeyDialogProps {
 export function EditApiKeyDialog({ open, onOpenChange, keyId }: EditApiKeyDialogProps) {
   const { updateApiKey, loading, error } = useAIKeyStore();
   const apiKeys = useAIKeys();
-  
-  const currentKey = apiKeys.find(key => key.keyId === keyId);
+
+  const currentKey = apiKeys.find((key) => key.keyId === keyId);
   const [apiKey, setApiKey] = useState('');
   const [showApiKey, setShowApiKey] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (open && currentKey) {
+      // Reset form fields when dialog opens — intentional synchronous reset
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setApiKey('');
       setShowApiKey(false);
     }
@@ -66,7 +61,7 @@ export function EditApiKeyDialog({ open, onOpenChange, keyId }: EditApiKeyDialog
       await updateApiKey(keyId, apiKey.trim());
       setApiKey('');
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       // Error is handled by the store
     }
   };
@@ -115,26 +110,20 @@ export function EditApiKeyDialog({ open, onOpenChange, keyId }: EditApiKeyDialog
             <RefreshCw className="h-5 w-5" />
             Update API Key
           </DialogTitle>
-          <DialogDescription>
-            Update your {config.name} API key
-          </DialogDescription>
+          <DialogDescription>Update your {config.name} API key</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Current Key Info */}
           <div className="bg-muted/50 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-3">
-              <div className="text-xl">
-                {getProviderIcon(currentKey.provider)}
-              </div>
+              <div className="text-xl">{getProviderIcon(currentKey.provider)}</div>
               <div>
                 <h4 className="font-medium">{config.name}</h4>
-                <p className="text-sm text-muted-foreground">
-                  {currentKey.keyId}
-                </p>
+                <p className="text-sm text-muted-foreground">{currentKey.keyId}</p>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4 text-sm text-muted-foreground">
               <div>
                 <div>Created:</div>
@@ -180,11 +169,7 @@ export function EditApiKeyDialog({ open, onOpenChange, keyId }: EditApiKeyDialog
                 className="absolute right-1 top-1 h-7 w-7 p-0"
                 onClick={() => setShowApiKey(!showApiKey)}
               >
-                {showApiKey ? (
-                  <X className="h-4 w-4" />
-                ) : (
-                  <Check className="h-4 w-4" />
-                )}
+                {showApiKey ? <X className="h-4 w-4" /> : <Check className="h-4 w-4" />}
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
@@ -196,8 +181,8 @@ export function EditApiKeyDialog({ open, onOpenChange, keyId }: EditApiKeyDialog
           <Alert>
             <Shield className="h-4 w-4" />
             <AlertDescription>
-              Your new API key will be encrypted locally with AES-256 before storage. 
-              The encrypted key is never sent to our servers in plaintext.
+              Your new API key will be encrypted locally with AES-256 before storage. The encrypted
+              key is never sent to our servers in plaintext.
             </AlertDescription>
           </Alert>
 
@@ -205,8 +190,8 @@ export function EditApiKeyDialog({ open, onOpenChange, keyId }: EditApiKeyDialog
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Make sure your new API key has the same permissions and access level 
-              as the previous one to avoid service interruptions.
+              Make sure your new API key has the same permissions and access level as the previous
+              one to avoid service interruptions.
             </AlertDescription>
           </Alert>
 
@@ -221,18 +206,10 @@ export function EditApiKeyDialog({ open, onOpenChange, keyId }: EditApiKeyDialog
 
           {/* Dialog Actions */}
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              disabled={loading}
-            >
+            <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={!isValid || loading}
-            >
+            <Button type="submit" disabled={!isValid || loading}>
               {loading ? 'Updating...' : 'Update API Key'}
             </Button>
           </DialogFooter>

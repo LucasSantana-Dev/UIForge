@@ -56,7 +56,6 @@ export async function GET(request: NextRequest) {
     }
 
     return successResponse({ generations });
-
   } catch (error) {
     console.error('Generations GET error:', error);
     return errorResponse('Internal server error', 500);
@@ -81,7 +80,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validate required fields
-    const requiredFields = ['project_id', 'prompt', 'component_name', 'generated_code', 'framework'];
+    const requiredFields = [
+      'project_id',
+      'prompt',
+      'component_name',
+      'generated_code',
+      'framework',
+    ];
     for (const field of requiredFields) {
       if (!body[field]) {
         return errorResponse(`${field} is required`, 400);
@@ -128,14 +133,16 @@ export async function POST(request: NextRequest) {
       return errorResponse('Failed to create generation', 500);
     }
 
-    return successResponse({
-      generation: {
-        ...generation,
-        project_id: generation.project_id?.toString() || '',
-        tokens_used: generation.tokens_used?.toString() || null,
-      }
-    }, '201');
-
+    return successResponse(
+      {
+        generation: {
+          ...generation,
+          project_id: generation.project_id?.toString() || '',
+          tokens_used: generation.tokens_used?.toString() || null,
+        },
+      },
+      '201'
+    );
   } catch (error) {
     console.error('Generations POST error:', error);
     return errorResponse('Internal server error', 500);

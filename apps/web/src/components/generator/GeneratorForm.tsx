@@ -28,7 +28,7 @@ interface GeneratorFormProps {
 }
 
 export default function GeneratorForm({
-  projectId,
+  projectId: _projectId,
   framework,
   onGenerate,
   onGenerating,
@@ -48,7 +48,6 @@ export default function GeneratorForm({
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
   } = useForm<GeneratorFormData>({
     resolver: zodResolver(generatorSchema),
     defaultValues: {
@@ -147,14 +146,15 @@ export default function GeneratorForm({
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
               placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
             />
-            {errors.prompt && (
-              <p className="mt-1 text-sm text-red-600">{errors.prompt.message}</p>
-            )}
+            {errors.prompt && <p className="mt-1 text-sm text-red-600">{errors.prompt.message}</p>}
           </div>
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="componentLibrary" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="componentLibrary"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Component Library
               </label>
               <select

@@ -20,15 +20,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
-import { 
-  Shield, 
-  Key, 
-  Check, 
-  X, 
-  AlertCircle,
-  Info,
-  ExternalLink
-} from 'lucide-react';
+import { Shield, Key, Check, X, AlertCircle, Info, ExternalLink } from 'lucide-react';
 import { useAIKeyStore } from '@/stores/ai-keys';
 import { AIProvider, AI_PROVIDERS } from '@/lib/encryption';
 
@@ -38,7 +30,11 @@ interface AddApiKeyDialogProps {
   defaultProvider?: AIProvider;
 }
 
-export function AddApiKeyDialog({ open, onOpenChange, defaultProvider = 'openai' }: AddApiKeyDialogProps) {
+export function AddApiKeyDialog({
+  open,
+  onOpenChange,
+  defaultProvider = 'openai',
+}: AddApiKeyDialogProps) {
   const { addApiKey, loading, error } = useAIKeyStore();
   const [selectedProvider, setSelectedProvider] = useState<AIProvider>(defaultProvider);
   const [apiKey, setApiKey] = useState('');
@@ -55,7 +51,7 @@ export function AddApiKeyDialog({ open, onOpenChange, defaultProvider = 'openai'
       await addApiKey(selectedProvider, apiKey.trim());
       setApiKey('');
       onOpenChange(false);
-    } catch (error) {
+    } catch {
       // Error is handled by the store
     }
   };
@@ -149,9 +145,7 @@ export function AddApiKeyDialog({ open, onOpenChange, defaultProvider = 'openai'
                         : 'border-border hover:border-muted-foreground/50'
                     }`}
                   >
-                    <div className="text-2xl mb-1">
-                      {getProviderIcon(provider as AIProvider)}
-                    </div>
+                    <div className="text-2xl mb-1">{getProviderIcon(provider as AIProvider)}</div>
                     <div className="text-sm font-medium">{config.name}</div>
                     {isSelected && (
                       <div className="absolute top-1 right-1">
@@ -167,9 +161,7 @@ export function AddApiKeyDialog({ open, onOpenChange, defaultProvider = 'openai'
           {/* Provider Info */}
           <div className="bg-muted/50 rounded-lg p-4">
             <div className="flex items-center gap-2 mb-2">
-              <div className="text-xl">
-                {getProviderIcon(selectedProvider)}
-              </div>
+              <div className="text-xl">{getProviderIcon(selectedProvider)}</div>
               <div>
                 <h4 className="font-medium">{config.name}</h4>
                 <p className="text-sm text-muted-foreground">
@@ -177,7 +169,7 @@ export function AddApiKeyDialog({ open, onOpenChange, defaultProvider = 'openai'
                 </p>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4 text-xs text-muted-foreground mb-3">
               <div>
                 <div>Rate Limit:</div>
@@ -222,24 +214,18 @@ export function AddApiKeyDialog({ open, onOpenChange, defaultProvider = 'openai'
                 className="absolute right-1 top-1 h-7 w-7 p-0"
                 onClick={() => setShowApiKey(!showApiKey)}
               >
-                {showApiKey ? (
-                  <X className="h-4 w-4" />
-                ) : (
-                  <Check className="h-4 w-4" />
-                )}
+                {showApiKey ? <X className="h-4 w-4" /> : <Check className="h-4 w-4" />}
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {getApiKeyHelp(selectedProvider)}
-            </p>
+            <p className="text-xs text-muted-foreground">{getApiKeyHelp(selectedProvider)}</p>
           </div>
 
           {/* Security Notice */}
           <Alert>
             <Shield className="h-4 w-4" />
             <AlertDescription>
-              Your API key is encrypted locally with AES-256 before storage. 
-              The encrypted key is never sent to our servers in plaintext.
+              Your API key is encrypted locally with AES-256 before storage. The encrypted key is
+              never sent to our servers in plaintext.
             </AlertDescription>
           </Alert>
 
@@ -262,8 +248,8 @@ export function AddApiKeyDialog({ open, onOpenChange, defaultProvider = 'openai'
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                {config.name} requires an organization ID for team accounts. 
-                Make sure your API key includes the necessary permissions.
+                {config.name} requires an organization ID for team accounts. Make sure your API key
+                includes the necessary permissions.
               </AlertDescription>
             </Alert>
           )}
@@ -279,18 +265,10 @@ export function AddApiKeyDialog({ open, onOpenChange, defaultProvider = 'openai'
 
           {/* Dialog Actions */}
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleClose}
-              disabled={loading}
-            >
+            <Button type="button" variant="outline" onClick={handleClose} disabled={loading}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={!isValid || loading}
-            >
+            <Button type="submit" disabled={!isValid || loading}>
               {loading ? 'Adding...' : 'Add API Key'}
             </Button>
           </DialogFooter>

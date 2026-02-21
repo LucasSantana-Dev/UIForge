@@ -61,7 +61,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
 
   if (!open) return null;
 
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleBackdropClick = (_e: React.MouseEvent<HTMLDivElement>) => {
     onClose();
   };
 

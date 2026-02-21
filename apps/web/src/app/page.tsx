@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Sparkles, Zap, CheckCircle } from 'lucide-react';
@@ -14,7 +16,13 @@ export default async function HomePage() {
       <header className="border-b">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <Image src="/anvil-logo.svg" alt="UIForge" width={24} height={24} className="flex-shrink-0" />
+            <Image
+              src="/anvil-logo.svg"
+              alt="UIForge"
+              width={24}
+              height={24}
+              className="flex-shrink-0"
+            />
             <span className="text-xl font-bold">UIForge</span>
             <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
               Beta

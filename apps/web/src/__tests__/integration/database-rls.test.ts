@@ -19,9 +19,7 @@ describe('Database RLS Policies', () => {
   beforeAll(async () => {
     // Skip if service role key not available
     if (!supabaseServiceKey) {
-      console.warn(
-        'SUPABASE_SERVICE_ROLE_KEY not set - skipping RLS tests'
-      );
+      console.warn('SUPABASE_SERVICE_ROLE_KEY not set - skipping RLS tests');
       return;
     }
 
@@ -71,11 +69,7 @@ describe('Database RLS Policies', () => {
       expect(signInError).toBeNull();
 
       // Try to read own profile (if profiles table exists)
-      const { error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', USER_1_ID)
-        .single();
+      const { error } = await supabase.from('profiles').select('*').eq('id', USER_1_ID).single();
 
       // Either succeeds or table doesn't exist yet
       if (error && !error.message.includes('relation')) {
@@ -97,10 +91,7 @@ describe('Database RLS Policies', () => {
       });
 
       // Try to read User 2's profile
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', USER_2_ID);
+      const { data, error } = await supabase.from('profiles').select('*').eq('id', USER_2_ID);
 
       // Should either return empty data or table doesn't exist
       if (!error || !error.message.includes('relation')) {

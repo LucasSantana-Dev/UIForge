@@ -20,10 +20,10 @@ import { TEST_CONFIG } from '../../../test-config';
 // Mock crypto-js for testing
 jest.mock('crypto-js', () => ({
   AES: {
-    encrypt: jest.fn((text: string, key: string) => ({
-      toString: () => `encrypted_${text}_${key}`,
+    encrypt: jest.fn((text: string, _key: string) => ({
+      toString: () => `encrypted_${text}`,
     })),
-    decrypt: jest.fn((encrypted: string, key: string) => ({
+    decrypt: jest.fn((encrypted: string, _key: string) => ({
       toString: jest.fn(() => {
         if (encrypted.startsWith('encrypted_')) {
           const parts = encrypted.split('_');
@@ -47,8 +47,6 @@ jest.mock('crypto-js', () => ({
     },
   },
 }));
-
-import CryptoJS from 'crypto-js';
 
 describe('Encryption Utilities', () => {
   describe('API Key Encryption/Decryption', () => {
@@ -94,7 +92,8 @@ describe('Encryption Utilities', () => {
     });
 
     it('should validate Anthropic API keys', () => {
-      const validKey = 'sk-ant-api03-1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
+      const validKey =
+        'sk-ant-api03-1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef';
       const invalidKey = 'invalid-key';
 
       expect(validateApiKey(validKey, 'anthropic' as AIProvider)).toBe(true);

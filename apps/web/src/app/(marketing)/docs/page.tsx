@@ -1,16 +1,18 @@
+export const dynamic = 'force-dynamic';
+
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  BookOpen, 
-  Code, 
-  Zap, 
-  Shield, 
-  Rocket, 
+import {
+  BookOpen,
+  Code,
+  Zap,
+  Shield,
+  Rocket,
   Users,
   ArrowRight,
   Github,
-  Twitter
+  Twitter,
 } from 'lucide-react';
 
 export default function DocsPage() {
@@ -21,11 +23,10 @@ export default function DocsPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center">
             <Badge className="mb-4">Documentation</Badge>
-            <h1 className="text-5xl font-bold mb-6">
-              Everything you need to build with UIForge
-            </h1>
+            <h1 className="text-5xl font-bold mb-6">Everything you need to build with UIForge</h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Comprehensive guides, API references, and examples to help you get the most out of UIForge's AI-powered component generation.
+              Comprehensive guides, API references, and examples to help you get the most out of
+              UIForge&apos;s AI-powered component generation.
             </p>
             <div className="flex gap-4 justify-center">
               <Button size="lg" className="gap-2">
@@ -97,7 +98,7 @@ export default function DocsPage() {
       <section className="py-16 bg-muted dark:bg-background">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12">Documentation</h2>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Getting Started */}
             <div className="space-y-6">
@@ -136,9 +137,7 @@ export default function DocsPage() {
                 </Card>
                 <Card className="p-4">
                   <h4 className="font-medium mb-2">Template Library</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Use pre-built component templates
-                  </p>
+                  <p className="text-sm text-muted-foreground">Use pre-built component templates</p>
                 </Card>
                 <Card className="p-4">
                   <h4 className="font-medium mb-2">Project Management</h4>
@@ -155,9 +154,7 @@ export default function DocsPage() {
               <div className="space-y-4">
                 <Card className="p-4">
                   <h4 className="font-medium mb-2">Custom AI Providers</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Integrate your own AI models
-                  </p>
+                  <p className="text-sm text-muted-foreground">Integrate your own AI models</p>
                 </Card>
                 <Card className="p-4">
                   <h4 className="font-medium mb-2">Deployment</h4>
@@ -181,7 +178,7 @@ export default function DocsPage() {
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12">Code Examples</h2>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-4">Basic Component Generation</h3>

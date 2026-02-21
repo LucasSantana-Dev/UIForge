@@ -50,50 +50,38 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
   },
 };
 
-/**
- * Generate a unique encryption key for the user
- */
 export function generateUserEncryptionKey(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
-/**
- * Derive encryption key from user's master key
- */
 export function deriveEncryptionKey(userKey: string, salt: string = 'uiforge-salt'): string {
-  return CryptoJS.PBKDF2(userKey, salt, {
-    keySize: 256 / 32,
-    iterations: 10000,
-  }).toString();
+  return CryptoJS.PBKDF2(userKey, salt, { keySize: 256 / 32, iterations: 10000 }).toString();
 }
 
-/**
- * Encrypt API key with user's encryption key
- */
 export function encryptApiKey(apiKey: string, encryptionKey: string): string {
+  if (apiKey === null || apiKey === undefined) throw new Error('API key is required');
+  if (!apiKey) throw new Error('API key cannot be empty');
   return CryptoJS.AES.encrypt(apiKey, encryptionKey).toString();
 }
 
-/**
- * Decrypt API key with user's encryption key
- */
 export function decryptApiKey(encryptedKey: string, encryptionKey: string): string {
+  if (encryptedKey === null || encryptedKey === undefined)
+    throw new Error('Encrypted key is required');
   try {
     const bytes = CryptoJS.AES.decrypt(encryptedKey, encryptionKey);
-    return bytes.toString(CryptoJS.enc.Utf8);
-  } catch (error) {
+    const result = bytes.toString(CryptoJS.enc.Utf8);
+    if (!result) throw new Error('Failed to decrypt API key. Invalid encryption key.');
+    return result;
+  } catch (e) {
+    if (e instanceof Error && e.message.includes('decrypt')) throw e;
     throw new Error('Failed to decrypt API key. Invalid encryption key.');
   }
 }
 
-/**
- * Validate API key format for specific provider
- */
 export function validateApiKey(apiKey: string, provider: AIProvider): boolean {
   const trimmedKey = apiKey.trim();
-
   switch (provider) {
     case 'openai':
       return trimmedKey.startsWith('sk-') && trimmedKey.length >= 20;
@@ -106,23 +94,19 @@ export function validateApiKey(apiKey: string, provider: AIProvider): boolean {
   }
 }
 
-/**
- * Generate a unique key ID
- */
 export function generateKeyId(): string {
-  return `key_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  const hex = () =>
+    Math.floor(Math.random() * 0x10000)
+      .toString(16)
+      .padStart(4, '0');
+  return `key_${hex()}${hex()}-${hex()}-${hex()}-${hex()}-${hex()}${hex()}${hex()}`;
 }
 
-/**
- * Hash API key for server-side validation (without storing the actual key)
- */
 export function hashApiKey(apiKey: string): string {
+  if (apiKey === null || apiKey === undefined) throw new Error('API key is required for hashing');
   return CryptoJS.SHA256(apiKey).toString();
 }
 
-/**
- * Create encrypted API key object
- */
 export function createEncryptedApiKey(
   provider: AIProvider,
   apiKey: string,
@@ -131,7 +115,6 @@ export function createEncryptedApiKey(
   if (!validateApiKey(apiKey, provider)) {
     throw new Error(`Invalid API key format for ${AI_PROVIDERS[provider].name}`);
   }
-
   return {
     provider,
     encryptedKey: encryptApiKey(apiKey, encryptionKey),
@@ -140,44 +123,30 @@ export function createEncryptedApiKey(
   };
 }
 
-/**
- * Decrypt and return API key
- */
-export function getApiKey(
-  encryptedApiKey: EncryptedApiKey,
-  encryptionKey: string
-): string {
+export function getApiKey(encryptedApiKey: EncryptedApiKey, encryptionKey: string): string {
   return decryptApiKey(encryptedApiKey.encryptedKey, encryptionKey);
 }
 
-/**
- * Check if API key is expired or needs refresh
- */
-export function isApiKeyExpired(encryptedApiKey: EncryptedApiKey): boolean {
+export function isApiKeyExpired(
+  encryptedApiKey: EncryptedApiKey & { expiresAt?: string }
+): boolean {
+  if (encryptedApiKey.expiresAt) {
+    return new Date(encryptedApiKey.expiresAt) < new Date();
+  }
   const createdAt = new Date(encryptedApiKey.createdAt);
-  const now = new Date();
-  const daysSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
-
-  // API keys older than 90 days should be refreshed
+  const daysSinceCreation = (Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
   return daysSinceCreation > 90;
 }
 
-/**
- * Sanitize error messages to avoid exposing sensitive information
- */
 export function sanitizeError(error: unknown): string {
   if (error instanceof Error) {
-    // Remove any potential API keys from error messages
     return error.message.replace(/sk-[a-zA-Z0-9]+/g, 'sk-***');
   }
   return 'An unknown error occurred';
 }
 
-/**
- * Generate a secure random string for session keys
- */
 export function generateSessionKey(): string {
   const array = new Uint8Array(16);
   crypto.getRandomValues(array);
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }

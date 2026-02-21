@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import ProjectList from '@/components/projects/ProjectList';
 import { PlusIcon } from 'lucide-react';
@@ -9,9 +11,7 @@ export default function ProjectsPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Projects</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Manage your UI component projects
-          </p>
+          <p className="mt-2 text-sm text-gray-600">Manage your UI component projects</p>
         </div>
         <Link
           href="/projects/new"

@@ -9,11 +9,7 @@ import type { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
-import {
-  successResponse,
-  noContentResponse,
-  errorResponse,
-} from '@/lib/api/response';
+import { successResponse, noContentResponse, errorResponse } from '@/lib/api/response';
 import {
   UnauthorizedError,
   ForbiddenError,
@@ -44,11 +40,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     const { id } = await context.params;
 
     // Rate limiting
-    const { allowed, remaining, resetAt } = await checkRateLimit(
-      request,
-      120,
-      60 * 1000
-    );
+    const { allowed, remaining, resetAt } = await checkRateLimit(request, 120, 60 * 1000);
 
     if (!allowed) {
       const response = errorResponse('Rate limit exceeded', 429);
@@ -81,11 +73,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
     let code_content = '';
     if (component.code_storage_path) {
       try {
-        code_content = await downloadFromStorage(
+        code_content = (await downloadFromStorage(
           STORAGE_BUCKETS.PROJECT_FILES,
           component.code_storage_path,
           true
-        ) as string;
+        )) as string;
       } catch (storageError) {
         console.error('Failed to download component code:', storageError);
         // Continue without code if storage fails
@@ -126,11 +118,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     const { id } = await context.params;
 
     // Rate limiting
-    const { allowed, remaining, resetAt } = await checkRateLimit(
-      request,
-      120,
-      60 * 1000
-    );
+    const { allowed, remaining, resetAt } = await checkRateLimit(request, 120, 60 * 1000);
 
     if (!allowed) {
       const response = errorResponse('Rate limit exceeded', 429);
@@ -174,9 +162,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
     // Validate framework compatibility if framework is being updated
     if (validated.framework && validated.framework !== project.framework) {
-      throw new ValidationError(
-        'Component framework must match project framework'
-      );
+      throw new ValidationError('Component framework must match project framework');
     }
 
     // Update code in storage if provided
@@ -257,11 +243,7 @@ export async function DELETE(
     const { id } = await params;
 
     // Rate limiting
-    const { allowed, remaining, resetAt } = await checkRateLimit(
-      request,
-      120,
-      60 * 1000
-    );
+    const { allowed, remaining, resetAt } = await checkRateLimit(request, 120, 60 * 1000);
 
     if (!allowed) {
       const response = errorResponse('Rate limit exceeded', 429);
@@ -299,10 +281,7 @@ export async function DELETE(
     // Delete from storage if path exists
     if (component.code_storage_path) {
       try {
-        await deleteFromStorage(
-          STORAGE_BUCKETS.PROJECT_FILES,
-          component.code_storage_path
-        );
+        await deleteFromStorage(STORAGE_BUCKETS.PROJECT_FILES, component.code_storage_path);
       } catch (storageError) {
         console.error('Failed to delete component code:', storageError);
         // Continue with database deletion even if storage fails
@@ -310,10 +289,7 @@ export async function DELETE(
     }
 
     // Delete component record
-    const { error: deleteError } = await supabase
-      .from('components')
-      .delete()
-      .eq('id', id);
+    const { error: deleteError } = await supabase.from('components').delete().eq('id', id);
 
     if (deleteError) {
       console.error('Failed to delete component:', deleteError);

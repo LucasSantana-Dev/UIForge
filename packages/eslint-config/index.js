@@ -6,6 +6,7 @@ module.exports = {
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/no-explicit-any': 'error',
     '@typescript-eslint/consistent-type-imports': ['warn', { prefer: 'type-imports' }],
+    '@typescript-eslint/no-floating-promises': 'error',
 
     // React
     'react-hooks/rules-of-hooks': 'error',
@@ -16,6 +17,9 @@ module.exports = {
     'no-console': ['warn', { allow: ['warn', 'error'] }],
     'prefer-const': 'error',
     'no-var': 'error',
+    'prefer-template': 'warn',
+    'no-duplicate-imports': 'error',
+    'require-await': 'error',
 
     // Accessibility
     'jsx-a11y/alt-text': 'error',

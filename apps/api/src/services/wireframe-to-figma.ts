@@ -38,25 +38,23 @@ export function convertWireframeToFigma(
   const startTime = Date.now();
   const warnings: string[] = [];
 
-  const {
-    includeStyles = true,
-    scaleFactor = 1,
-    useAutoLayout = true,
-  } = options;
+  const { includeStyles = true, scaleFactor = 1, useAutoLayout = true } = options;
 
   // Extract elements from wireframe
   const elements = wireframe.elements || [];
 
   // Convert elements to Figma nodes
-  const nodes = elements.map((element: any, index: number) => 
+  const nodes = elements.map((element: any, index: number) =>
     convertElementToNode(element, index, { scaleFactor, useAutoLayout })
   );
 
   // Extract styles
-  const styles = includeStyles ? extractStyles(wireframe.styles || {}) : {
-    colors: {},
-    textStyles: {},
-  };
+  const styles = includeStyles
+    ? extractStyles(wireframe.styles || {})
+    : {
+        colors: {},
+        textStyles: {},
+      };
 
   return {
     nodes,
@@ -153,7 +151,7 @@ function extractStyles(_styles: any) {
  */
 function extractColorStyles(): Record<string, FigmaFill> {
   const colors: Record<string, FigmaFill> = {};
-  
+
   // Define design system colors
   const designSystemColors = {
     primary: { type: 'SOLID', color: { r: 59, g: 130, b: 246, a: 1 } },
@@ -166,7 +164,7 @@ function extractColorStyles(): Record<string, FigmaFill> {
   };
 
   Object.assign(colors, designSystemColors);
-  
+
   return colors;
 }
 

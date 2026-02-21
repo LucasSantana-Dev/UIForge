@@ -16,26 +16,39 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
   useEffect(() => {
     if (!code || !iframeRef.current) return;
 
-    try {
-      setError(null);
-      const iframeDoc = iframeRef.current.contentDocument;
-      if (!iframeDoc) return;
+    const updatePreview = async () => {
+      try {
+        const iframeDoc = iframeRef.current?.contentDocument;
+        if (!iframeDoc) return;
 
-      // Create preview HTML
-      const previewHTML = createPreviewHTML(code, framework);
-      
-      iframeDoc.open();
-      iframeDoc.write(previewHTML);
-      iframeDoc.close();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to render preview');
-    }
+        // Create preview HTML
+        const previewHTML = createPreviewHTML(code, framework);
+
+        iframeDoc.open();
+        iframeDoc.write(previewHTML);
+        iframeDoc.close();
+
+        // Clear any previous error after successful render
+        setTimeout(() => setError(null), 0);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to render preview');
+      }
+    };
+
+    updatePreview();
   }, [code, framework]);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
     if (iframeRef.current) {
-      iframeRef.current.src = iframeRef.current.src;
+      // Force refresh by clearing and resetting
+      const currentSrc = iframeRef.current.src;
+      iframeRef.current.src = '';
+      setTimeout(() => {
+        if (iframeRef.current) {
+          iframeRef.current.src = currentSrc;
+        }
+      }, 50);
     }
     setTimeout(() => setIsRefreshing(false), 500);
   };

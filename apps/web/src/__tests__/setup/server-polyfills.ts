@@ -40,7 +40,9 @@ class MockRequest {
     try {
       return JSON.parse(this.body);
     } catch (error) {
-      throw new Error(`Failed to parse JSON: ${error instanceof Error ? error.message : 'Invalid JSON'}`);
+      throw new Error(
+        `Failed to parse JSON: ${error instanceof Error ? error.message : 'Invalid JSON'}`
+      );
     }
   }
 
@@ -86,7 +88,9 @@ class MockResponse {
     try {
       return JSON.parse(this.body);
     } catch (error) {
-      throw new Error(`Failed to parse JSON: ${error instanceof Error ? error.message : 'Invalid JSON'}`);
+      throw new Error(
+        `Failed to parse JSON: ${error instanceof Error ? error.message : 'Invalid JSON'}`
+      );
     }
   }
 

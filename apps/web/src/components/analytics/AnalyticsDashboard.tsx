@@ -1,19 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Users, 
-  Eye, 
-  MousePointer, 
-  TrendingUp, 
-  Calendar, 
+import {
+  Users,
+  Eye,
+  MousePointer,
+  TrendingUp,
   Download,
   BarChart3,
   PieChart,
-  Activity
+  Activity,
 } from 'lucide-react';
 
 interface AnalyticsData {
@@ -29,7 +28,7 @@ interface AnalyticsData {
 }
 
 export default function AnalyticsDashboard() {
-  const [data, setData] = useState<AnalyticsData>({
+  const [data] = useState<AnalyticsData>({
     pageViews: 15420,
     uniqueVisitors: 3280,
     bounceRate: 32.5,
@@ -87,7 +86,7 @@ export default function AnalyticsDashboard() {
       ['Avg Session Duration', formatDuration(data.avgSessionDuration)],
     ];
 
-    const csv = csvContent.map(row => row.join(',')).join('\n');
+    const csv = csvContent.map((row) => row.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -104,7 +103,7 @@ export default function AnalyticsDashboard() {
         <div>
           <h2 className="text-2xl font-bold">Analytics Dashboard</h2>
           <p className="text-sm text-muted-foreground">
-            Monitor your app's performance and user engagement
+            Monitor your app&apos;s performance and user engagement
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -232,9 +231,7 @@ export default function AnalyticsDashboard() {
                   <span className="text-sm">{template.name}</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">
-                    {template.uses} uses
-                  </span>
+                  <span className="text-sm text-muted-foreground">{template.uses} uses</span>
                   <Badge variant="secondary" className="text-xs">
                     {template.percentage}%
                   </Badge>

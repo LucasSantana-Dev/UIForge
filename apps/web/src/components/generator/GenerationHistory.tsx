@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useGenerations } from '@/hooks/use-generations';
-import { ClockIcon, CodeIcon, TrashIcon, DownloadIcon } from 'lucide-react';
+import { ClockIcon, CodeIcon, DownloadIcon } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -11,32 +11,23 @@ interface GenerationHistoryProps {
   onSelectGeneration?: (code: string) => void;
 }
 
-export default function GenerationHistory({ projectId, onSelectGeneration }: GenerationHistoryProps) {
+export default function GenerationHistory({
+  projectId,
+  onSelectGeneration,
+}: GenerationHistoryProps) {
   const [expanded, setExpanded] = useState(false);
   const { data: generations, isLoading, error } = useGenerations(projectId);
 
   if (isLoading) {
-    return (
-      <div className="p-4 text-center text-sm text-gray-600">
-        Loading history...
-      </div>
-    );
+    return <div className="p-4 text-center text-sm text-gray-600">Loading history...</div>;
   }
 
   if (error) {
-    return (
-      <div className="p-4 text-center text-sm text-red-600">
-        Error loading history
-      </div>
-    );
+    return <div className="p-4 text-center text-sm text-red-600">Error loading history</div>;
   }
 
   if (!generations || generations.length === 0) {
-    return (
-      <div className="p-4 text-center text-sm text-gray-600">
-        No generations yet
-      </div>
-    );
+    return <div className="p-4 text-center text-sm text-gray-600">No generations yet</div>;
   }
 
   return (
@@ -49,10 +40,12 @@ export default function GenerationHistory({ projectId, onSelectGeneration }: Gen
           <ClockIcon className="h-4 w-4" />
           <span>Generation History ({generations.length})</span>
         </div>
-        <div className={cn(
-          'transform transition-transform duration-200',
-          expanded ? 'rotate-180' : ''
-        )}>
+        <div
+          className={cn(
+            'transform transition-transform duration-200',
+            expanded ? 'rotate-180' : ''
+          )}
+        >
           ▼
         </div>
       </button>
@@ -79,7 +72,7 @@ export default function GenerationHistory({ projectId, onSelectGeneration }: Gen
                       </span>
                     )}
                   </div>
-                  
+
                   <p className="text-xs text-gray-600 line-clamp-2 mb-2">
                     {generation.prompt.substring(0, 100)}
                     {generation.prompt.length > 100 && '...'}
@@ -95,11 +88,7 @@ export default function GenerationHistory({ projectId, onSelectGeneration }: Gen
                         addSuffix: true,
                       })}
                     </span>
-                    {generation.tokens_used && (
-                      <span>
-                        {generation.tokens_used} tokens
-                      </span>
-                    )}
+                    {generation.tokens_used && <span>{generation.tokens_used} tokens</span>}
                   </div>
                 </div>
 

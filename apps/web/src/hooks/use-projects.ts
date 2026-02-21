@@ -31,11 +31,7 @@ export function useProject(id: string) {
   return useQuery({
     queryKey: ['projects', id],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('id', id)
-        .single();
+      const { data, error } = await supabase.from('projects').select('*').eq('id', id).single();
 
       if (error) throw error;
       return data as Project;
@@ -50,7 +46,9 @@ export function useCreateProject() {
 
   return useMutation({
     mutationFn: async (project: Omit<ProjectInsert, 'user_id'>) => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) throw new Error('User not authenticated');
 
       const { data, error } = await supabase
