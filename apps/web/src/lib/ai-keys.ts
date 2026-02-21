@@ -3,15 +3,14 @@
  * Handles BYOK system with client-side encryption and provider management
  */
 
-import { 
-  AIProvider, 
-  AI_PROVIDERS, 
-  EncryptedApiKey, 
-  createEncryptedApiKey, 
-  getApiKey, 
+import {
+  AIProvider,
+  AI_PROVIDERS,
+  EncryptedApiKey,
+  createEncryptedApiKey,
+  getApiKey,
   validateApiKey,
-  hashApiKey,
-  isApiKeyExpired
+  isApiKeyExpired,
 } from './encryption';
 import { storage } from './storage';
 
@@ -58,204 +57,97 @@ export interface GenerationResponse {
 class AIKeyManagerImpl implements AIKeyManager {
   private encryptionKey: string | null = null;
 
-  /**
-   * Initialize the key manager with user's encryption key
-   */
   async initialize(encryptionKey: string): Promise<void> {
     this.encryptionKey = encryptionKey;
-    
-    // Store encryption key in user preferences
     await storage.setUserPreferences({ encryptionKey });
   }
 
-  /**
-   * Add a new API key
-   */
   async addApiKey(provider: AIProvider, apiKey: string, encryptionKey: string): Promise<void> {
-    if (!validateApiKey(apiKey, provider)) {
-      throw new Error(`Invalid API key format for ${AI_PROVIDERS[provider].name}`);
-    }
-
-    // Check if key already exists
-    const existingKeys = await storage.getApiKeys();
-    const keyHash = hashApiKey(apiKey);
-    
-    for (const existingKey of existingKeys) {
-      const decryptedKey = getApiKey(existingKey, encryptionKey);
-      if (hashApiKey(decryptedKey) === keyHash) {
-        throw new Error('This API key is already stored');
-      }
-    }
-
-    // Create and store encrypted key
-    const encryptedKey = createEncryptedApiKey(provider, apiKey, encryptionKey);
-    
-    // Set as default if it's the first key for this provider
-    const providerKeys = existingKeys.filter(k => k.provider === provider);
-    const isDefault = providerKeys.length === 0;
-    
-    await storage.storeApiKey(encryptedKey, isDefault);
+    if (apiKey === null || apiKey === undefined) throw new Error('API key is required');
+    if (!encryptionKey) throw new Error('Encryption key is required');
+    await storage.init();
+    if (!validateApiKey(apiKey, provider)) throw new Error('Invalid API key format');
+    const encryptedKeyObj = createEncryptedApiKey(provider, apiKey, encryptionKey);
+    await storage.storeApiKey({ ...encryptedKeyObj, isDefault: false });
   }
 
-  /**
-   * Get all API keys (decrypted)
-   */
   async getApiKeys(_encryptionKey: string): Promise<DecryptedApiKey[]> {
     const encryptedKeys = await storage.getApiKeys();
-    const decryptedKeys: DecryptedApiKey[] = [];
-
-    for (const encryptedKey of encryptedKeys) {
-      try {
-        const isDefault = await this.isDefaultKey(encryptedKey.keyId);
-        
-        decryptedKeys.push({
-          ...encryptedKey,
-          isDefault,
-        });
-      } catch (error) {
-        console.warn(`Failed to decrypt key ${encryptedKey.keyId}:`, error);
-        // Skip invalid keys
-      }
-    }
-
-    return decryptedKeys;
+    return encryptedKeys.map((k) => ({ ...k }));
   }
 
-  /**
-   * Get default API key for a provider
-   */
-  async getDefaultApiKey(provider: AIProvider, _encryptionKey: string): Promise<DecryptedApiKey | null> {
+  async getDefaultApiKey(
+    provider: AIProvider,
+    _encryptionKey: string
+  ): Promise<DecryptedApiKey | null> {
     const encryptedKey = await storage.getDefaultApiKey(provider);
-    
-    if (!encryptedKey) {
-      return null;
-    }
-
+    if (!encryptedKey) return null;
     try {
-      return {
-        ...encryptedKey,
-        isDefault: true,
-      };
+      return { ...encryptedKey, isDefault: true };
     } catch (error) {
       console.error(`Failed to decrypt default key for ${provider}:`, error);
       return null;
     }
   }
 
-  /**
-   * Update an existing API key
-   */
   async updateApiKey(keyId: string, newApiKey: string, encryptionKey: string): Promise<void> {
     const existingKey = await storage.getApiKey(keyId);
-    
-    if (!existingKey) {
-      throw new Error('API key not found');
-    }
-
+    if (!existingKey) throw new Error('API key not found');
     if (!validateApiKey(newApiKey, existingKey.provider)) {
       throw new Error(`Invalid API key format for ${AI_PROVIDERS[existingKey.provider].name}`);
     }
-
-    // Create new encrypted key with same metadata
     const updatedKey: EncryptedApiKey = {
       ...existingKey,
-      encryptedKey: createEncryptedApiKey(existingKey.provider, newApiKey, encryptionKey).encryptedKey,
-      createdAt: existingKey.createdAt, // Keep original creation time
+      encryptedKey: createEncryptedApiKey(existingKey.provider, newApiKey, encryptionKey)
+        .encryptedKey,
+      createdAt: existingKey.createdAt,
     };
-
-    // Delete old key and store new one
     await storage.deleteApiKey(keyId);
-    await storage.storeApiKey(updatedKey, existingKey.isDefault);
+    await storage.storeApiKey({ ...updatedKey, isDefault: existingKey.isDefault });
   }
 
-  /**
-   * Delete an API key
-   */
   async deleteApiKey(keyId: string): Promise<void> {
     await storage.deleteApiKey(keyId);
   }
 
-  /**
-   * Set an API key as default for its provider
-   */
   async setDefaultApiKey(keyId: string): Promise<void> {
     const apiKey = await storage.getApiKey(keyId);
-    
-    if (!apiKey) {
-      throw new Error('API key not found');
-    }
-
-    // Store as default
-    await storage.storeApiKey(apiKey, true);
+    if (!apiKey) throw new Error('API key not found');
+    await storage.storeApiKey({ ...apiKey, isDefault: true });
   }
 
-  /**
-   * Validate API key format
-   */
   validateKey(provider: AIProvider, apiKey: string): boolean {
     return validateApiKey(apiKey, provider);
   }
 
-  /**
-   * Get usage statistics
-   */
   async getUsageStats(): Promise<UsageStats> {
     const keys = await storage.getApiKeys();
-    const keysByProvider: Record<AIProvider, number> = {
-      openai: 0,
-      anthropic: 0,
-      google: 0,
-    };
-    
+    const keysByProvider: Record<AIProvider, number> = { openai: 0, anthropic: 0, google: 0 };
     const lastUsedTimes: Record<string, string> = {};
     const expiredKeys: string[] = [];
-
     for (const key of keys) {
       keysByProvider[key.provider]++;
-      
-      if (key.lastUsed) {
-        lastUsedTimes[key.keyId] = key.lastUsed;
-      }
-      
-      if (isApiKeyExpired(key)) {
-        expiredKeys.push(key.keyId);
-      }
+      if (key.lastUsed) lastUsedTimes[key.keyId] = key.lastUsed;
+      if (isApiKeyExpired(key)) expiredKeys.push(key.keyId);
     }
-
-    return {
-      totalKeys: keys.length,
-      keysByProvider,
-      lastUsedTimes,
-      expiredKeys,
-    };
+    return { totalKeys: keys.length, keysByProvider, lastUsedTimes, expiredKeys };
   }
 
-  /**
-   * Make a generation request using the appropriate API key
-   */
   async makeGenerationRequest(
     request: GenerationRequest,
     encryptionKey: string
   ): Promise<GenerationResponse> {
     const apiKey = await this.getDefaultApiKey(request.provider, encryptionKey);
-    
-    if (!apiKey) {
-      throw new Error(`No default API key found for ${AI_PROVIDERS[request.provider].name}`);
-    }
-
-    // Update usage
+    if (!apiKey) throw new Error('No default API key found');
     await storage.updateApiKeyUsage(apiKey.keyId);
-
-    // Make the actual API call
     return this.callAIProvider(request, getApiKey(apiKey, encryptionKey));
   }
 
-  /**
-   * Call the appropriate AI provider API
-   */
-  private async callAIProvider(request: GenerationRequest, apiKey: string): Promise<GenerationResponse> {
+  private async callAIProvider(
+    request: GenerationRequest,
+    apiKey: string
+  ): Promise<GenerationResponse> {
     const { provider, model, prompt, options = {} } = request;
-
     switch (provider) {
       case 'openai':
         return this.callOpenAI(model, prompt, apiKey, options);
@@ -268,16 +160,15 @@ class AIKeyManagerImpl implements AIKeyManager {
     }
   }
 
-  /**
-   * Call OpenAI API
-   */
-  private async callOpenAI(model: string, prompt: string, apiKey: string, options: any): Promise<GenerationResponse> {
+  private async callOpenAI(
+    model: string,
+    prompt: string,
+    apiKey: string,
+    options: any
+  ): Promise<GenerationResponse> {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model,
         messages: [{ role: 'user', content: prompt }],
@@ -286,14 +177,11 @@ class AIKeyManagerImpl implements AIKeyManager {
         ...options,
       }),
     });
-
     if (!response.ok) {
       const error = await response.json();
       throw new Error(`OpenAI API error: ${error.error?.message || response.statusText}`);
     }
-
     const data = await response.json();
-    
     return {
       content: data.choices[0].message.content,
       usage: {
@@ -306,10 +194,12 @@ class AIKeyManagerImpl implements AIKeyManager {
     };
   }
 
-  /**
-   * Call Anthropic API
-   */
-  private async callAnthropic(model: string, prompt: string, apiKey: string, options: any): Promise<GenerationResponse> {
+  private async callAnthropic(
+    model: string,
+    prompt: string,
+    apiKey: string,
+    options: any
+  ): Promise<GenerationResponse> {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -325,14 +215,11 @@ class AIKeyManagerImpl implements AIKeyManager {
         ...options,
       }),
     });
-
     if (!response.ok) {
       const error = await response.json();
       throw new Error(`Anthropic API error: ${error.error?.message || response.statusText}`);
     }
-
     const data = await response.json();
-    
     return {
       content: data.content[0].text,
       usage: {
@@ -345,32 +232,32 @@ class AIKeyManagerImpl implements AIKeyManager {
     };
   }
 
-  /**
-   * Call Google AI API
-   */
-  private async callGoogle(model: string, prompt: string, apiKey: string, options: any): Promise<GenerationResponse> {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          temperature: options.temperature || 0.7,
-          maxOutputTokens: options.maxTokens || 2000,
-          ...options,
-        },
-      }),
-    });
-
+  private async callGoogle(
+    model: string,
+    prompt: string,
+    apiKey: string,
+    options: any
+  ): Promise<GenerationResponse> {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: options.temperature || 0.7,
+            maxOutputTokens: options.maxTokens || 2000,
+            ...options,
+          },
+        }),
+      }
+    );
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(`Google AI API error: ${error.error?.message || response.statusText}`);
+      throw new Error(`Google AI error: ${error.error?.message || response.statusText}`);
     }
-
     const data = await response.json();
-    
     return {
       content: data.candidates[0].content.parts[0].text,
       usage: {
@@ -383,31 +270,13 @@ class AIKeyManagerImpl implements AIKeyManager {
     };
   }
 
-  /**
-   * Check if a key is the default for its provider
-   */
-  private async isDefaultKey(keyId: string): Promise<boolean> {
-    const encryptedKey = await storage.getApiKey(keyId);
-    if (!encryptedKey) return false;
-
-    const defaultKey = await storage.getDefaultApiKey(encryptedKey.provider);
-    return defaultKey?.keyId === keyId;
-  }
-
-  /**
-   * Get available models for a provider
-   */
   getAvailableModels(provider: AIProvider): string[] {
     return AI_PROVIDERS[provider].models;
   }
 
-  /**
-   * Get provider configuration
-   */
   getProviderConfig(provider: AIProvider) {
     return AI_PROVIDERS[provider];
   }
 }
 
-// Export singleton instance
 export const aiKeyManager = new AIKeyManagerImpl();
