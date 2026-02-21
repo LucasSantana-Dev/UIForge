@@ -10,14 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import {
-  Settings,
-  Key,
-  Shield,
-  CheckCircle,
-  Info,
-  ExternalLink
-} from 'lucide-react';
+import { Settings, Key, Shield, CheckCircle, Info, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 import { AIKeyManager } from '@/components/ai-keys/AIKeyManager';
 import { useAIKeyStore } from '@/stores/ai-keys';
@@ -34,7 +27,7 @@ export function SettingsClient() {
     geminiFallbackEnabled,
     setGeminiFallbackEnabled,
     usageTrackingEnabled,
-    setUsageTrackingEnabled
+    setUsageTrackingEnabled,
   } = useAIKeyStore();
 
   const [activeTab, setActiveTab] = useState<'overview' | 'ai-keys'>('overview');
@@ -95,12 +88,12 @@ export function SettingsClient() {
   }
 
   const providerStats = Object.entries(AI_PROVIDERS).map(([provider, config]) => {
-    const keysForProvider = apiKeys.filter(key => key.provider === provider);
+    const keysForProvider = apiKeys.filter((key) => key.provider === provider);
     return {
       provider,
       config,
       count: keysForProvider.length,
-      hasDefault: keysForProvider.some(key => key.isDefault),
+      hasDefault: keysForProvider.some((key) => key.isDefault),
     };
   });
 
@@ -160,7 +153,10 @@ export function SettingsClient() {
             </CardHeader>
             <CardContent className="space-y-6">
               {providerStats.map(({ provider, config, count, hasDefault }) => (
-                <div key={provider} className="flex items-center justify-between p-4 border rounded-lg">
+                <div
+                  key={provider}
+                  className="flex items-center justify-between p-4 border rounded-lg"
+                >
                   <div className="flex items-center gap-3">
                     <div className="text-2xl">
                       {provider === 'openai' ? '🤖' : provider === 'anthropic' ? '🧠' : '🔍'}
@@ -193,7 +189,7 @@ export function SettingsClient() {
                 </div>
               ))}
 
-              {providerStats.every(stat => stat.count === 0) && (
+              {providerStats.every((stat) => stat.count === 0) && (
                 <div className="text-center py-8 text-muted-foreground">
                   <Key className="h-12 w-12 mx-auto mb-4 opacity-50" />
                   <p>No AI providers configured yet</p>
@@ -215,9 +211,7 @@ export function SettingsClient() {
                 <Shield className="h-5 w-5" />
                 Privacy & Security
               </CardTitle>
-              <CardDescription>
-                Your data security and privacy settings
-              </CardDescription>
+              <CardDescription>Your data security and privacy settings</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between p-4 border rounded-lg">
@@ -265,9 +259,7 @@ export function SettingsClient() {
           <Card>
             <CardHeader>
               <CardTitle>Preferences</CardTitle>
-              <CardDescription>
-                Customize your experience
-              </CardDescription>
+              <CardDescription>Customize your experience</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center justify-between">
@@ -291,9 +283,7 @@ export function SettingsClient() {
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-medium">Usage Tracking</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Track API usage statistics
-                  </p>
+                  <p className="text-sm text-muted-foreground">Track API usage statistics</p>
                 </div>
                 <Button
                   variant={usageTrackingEnabled ? 'default' : 'outline'}
@@ -310,9 +300,7 @@ export function SettingsClient() {
           <Card>
             <CardHeader>
               <CardTitle>Help & Resources</CardTitle>
-              <CardDescription>
-                Learn more about AI providers and API keys
-              </CardDescription>
+              <CardDescription>Learn more about AI providers and API keys</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -336,9 +324,7 @@ export function SettingsClient() {
                 >
                   <div className="text-lg mb-1">🤖</div>
                   <h4 className="font-medium">OpenAI</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Get your API key
-                  </p>
+                  <p className="text-sm text-muted-foreground">Get your API key</p>
                 </a>
                 <a
                   href="https://console.anthropic.com/"
@@ -348,9 +334,7 @@ export function SettingsClient() {
                 >
                   <div className="text-lg mb-1">🧠</div>
                   <h4 className="font-medium">Anthropic</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Get your API key
-                  </p>
+                  <p className="text-sm text-muted-foreground">Get your API key</p>
                 </a>
                 <a
                   href="https://makersuite.google.com/app/apikey"
@@ -360,9 +344,7 @@ export function SettingsClient() {
                 >
                   <div className="text-lg mb-1">🔍</div>
                   <h4 className="font-medium">Google AI</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Get your API key
-                  </p>
+                  <p className="text-sm text-muted-foreground">Get your API key</p>
                 </a>
               </div>
             </CardContent>

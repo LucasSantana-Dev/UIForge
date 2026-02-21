@@ -45,9 +45,7 @@ export function useGenerations(projectId: string | undefined) {
     queryFn: async () => {
       if (!projectId) throw new Error('Project ID is required');
 
-      const response = await fetch(
-        `/api/generations?project_id=${projectId}`
-      );
+      const response = await fetch(`/api/generations?project_id=${projectId}`);
 
       if (!response.ok) {
         const error = await response.json();

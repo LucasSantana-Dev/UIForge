@@ -95,9 +95,7 @@ export default function SaveToProject({
       </div>
 
       {savedComponentId && (
-        <div className="mt-2 text-xs text-green-600">
-          Component saved successfully!
-        </div>
+        <div className="mt-2 text-xs text-green-600">Component saved successfully!</div>
       )}
     </div>
   );

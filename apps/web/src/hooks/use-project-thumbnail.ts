@@ -26,9 +26,9 @@ export function useProjectThumbnail() {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('project-thumbnails')
-        .getPublicUrl(filePath);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('project-thumbnails').getPublicUrl(filePath);
 
       return publicUrl;
     } catch (err) {

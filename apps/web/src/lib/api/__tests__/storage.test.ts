@@ -12,56 +12,32 @@ import {
 describe('Storage Utilities', () => {
   describe('generateComponentStoragePath', () => {
     it('should generate correct path for React component', () => {
-      const path = generateComponentStoragePath(
-        'project-123',
-        'component-456',
-        'react'
-      );
+      const path = generateComponentStoragePath('project-123', 'component-456', 'react');
       expect(path).toBe('project-123/component-456.tsx');
     });
 
     it('should generate correct path for Vue component', () => {
-      const path = generateComponentStoragePath(
-        'project-123',
-        'component-456',
-        'vue'
-      );
+      const path = generateComponentStoragePath('project-123', 'component-456', 'vue');
       expect(path).toBe('project-123/component-456.vue');
     });
 
     it('should generate correct path for Angular component', () => {
-      const path = generateComponentStoragePath(
-        'project-123',
-        'component-456',
-        'angular'
-      );
+      const path = generateComponentStoragePath('project-123', 'component-456', 'angular');
       expect(path).toBe('project-123/component-456.ts');
     });
 
     it('should generate correct path for Svelte component', () => {
-      const path = generateComponentStoragePath(
-        'project-123',
-        'component-456',
-        'svelte'
-      );
+      const path = generateComponentStoragePath('project-123', 'component-456', 'svelte');
       expect(path).toBe('project-123/component-456.svelte');
     });
 
     it('should generate correct path for HTML', () => {
-      const path = generateComponentStoragePath(
-        'project-123',
-        'component-456',
-        'html'
-      );
+      const path = generateComponentStoragePath('project-123', 'component-456', 'html');
       expect(path).toBe('project-123/component-456.html');
     });
 
     it('should default to txt for unknown framework', () => {
-      const path = generateComponentStoragePath(
-        'project-123',
-        'component-456',
-        'unknown'
-      );
+      const path = generateComponentStoragePath('project-123', 'component-456', 'unknown');
       expect(path).toBe('project-123/component-456.txt');
     });
   });

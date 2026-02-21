@@ -60,7 +60,7 @@ router.post('/', async (req, res) => {
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
+      Connection: 'keep-alive',
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': 'Cache-Control',
     });
@@ -77,39 +77,46 @@ router.post('/', async (req, res) => {
       }
 
       // Validate generated code
-      const isValidCode = await hasCodePatterns(fullCode, options.typescript ? 'typescript' : 'javascript');
+      const isValidCode = await hasCodePatterns(
+        fullCode,
+        options.typescript ? 'typescript' : 'javascript'
+      );
 
       if (!isValidCode) {
-        res.write(`data: ${JSON.stringify({
-          type: 'warning',
-          message: 'Generated code may not be valid'
-        })}\n\n`);
+        res.write(
+          `data: ${JSON.stringify({
+            type: 'warning',
+            message: 'Generated code may not be valid',
+          })}\n\n`
+        );
       }
 
       // Send completion event
-      res.write(`data: ${JSON.stringify({
-        type: 'complete',
-        code: fullCode,
-        isValid: isValidCode
-      })}\n\n`);
+      res.write(
+        `data: ${JSON.stringify({
+          type: 'complete',
+          code: fullCode,
+          isValid: isValidCode,
+        })}\n\n`
+      );
 
       logger.info('Component generation completed', {
         framework: options.framework,
         codeLength: fullCode.length,
         isValid: isValidCode,
       });
-
     } catch (generationError) {
       logger.error('Generation failed', generationError);
 
-      res.write(`data: ${JSON.stringify({
-        type: 'error',
-        error: generationError instanceof Error ? generationError.message : 'Unknown error'
-      })}\n\n`);
+      res.write(
+        `data: ${JSON.stringify({
+          type: 'error',
+          error: generationError instanceof Error ? generationError.message : 'Unknown error',
+        })}\n\n`
+      );
     }
 
     res.end();
-
   } catch (error) {
     logger.error('Route error', error);
 
@@ -119,10 +126,12 @@ router.post('/', async (req, res) => {
         message: error instanceof Error ? error.message : 'Unknown error',
       });
     } else {
-      res.write(`data: ${JSON.stringify({
-        type: 'error',
-        error: 'Internal server error'
-      })}\n\n`);
+      res.write(
+        `data: ${JSON.stringify({
+          type: 'error',
+          error: 'Internal server error',
+        })}\n\n`
+      );
       res.end();
     }
   }
@@ -157,7 +166,6 @@ router.post('/validate', async (req, res) => {
       language,
       length: code.length,
     });
-
   } catch (error) {
     logger.error('Validation error', error);
     res.status(500).json({
@@ -196,7 +204,6 @@ router.post('/format', async (req, res) => {
       formattedCode,
       language,
     });
-
   } catch (error) {
     logger.error('Formatting error', error);
     res.status(500).json({

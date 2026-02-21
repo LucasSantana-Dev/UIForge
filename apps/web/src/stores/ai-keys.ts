@@ -14,17 +14,17 @@ export interface AIKeyState {
   defaultProvider?: AIProvider;
   geminiFallbackEnabled: boolean;
   usageTrackingEnabled: boolean;
-  
+
   // API keys
   apiKeys: DecryptedApiKey[];
   loading: boolean;
   error?: string;
-  
+
   // UI state
   showAddKeyDialog: boolean;
   selectedProvider?: AIProvider;
   editingKeyId?: string;
-  
+
   // Usage stats
   usageStats?: UsageStats;
 }
@@ -32,31 +32,31 @@ export interface AIKeyState {
 export interface AIKeyActions {
   // Initialization
   initialize: (encryptionKey: string) => Promise<void>;
-  
+
   // API key management
   addApiKey: (provider: AIProvider, apiKey: string) => Promise<void>;
   updateApiKey: (keyId: string, apiKey: string) => Promise<void>;
   deleteApiKey: (keyId: string) => Promise<void>;
   setDefaultApiKey: (keyId: string) => Promise<void>;
-  
+
   // UI actions
   setShowAddKeyDialog: (show: boolean) => void;
   setSelectedProvider: (provider: AIProvider) => void;
   setEditingKeyId: (keyId?: string) => void;
-  
+
   // Preferences
   setDefaultProvider: (provider: AIProvider) => void;
   setGeminiFallbackEnabled: (enabled: boolean) => void;
   setUsageTrackingEnabled: (enabled: boolean) => void;
-  
+
   // Data loading
   loadApiKeys: () => Promise<void>;
   loadUsageStats: () => Promise<void>;
-  
+
   // Error handling
   clearError: () => void;
   setError: (error: string) => void;
-  
+
   // Reset
   reset: () => void;
 }
@@ -82,13 +82,15 @@ export const useAIKeyStore = create<AIKeyStore>()(
       // Initialize the store with user's encryption key
       initialize: async (encryptionKey: string) => {
         set({ loading: true, error: undefined });
-        
+
         try {
           await aiKeyManager.initialize(encryptionKey);
           set({ encryptionKey });
           await get().loadApiKeys();
         } catch (error) {
-          set({ error: error instanceof Error ? error.message : 'Failed to initialize AI key manager' });
+          set({
+            error: error instanceof Error ? error.message : 'Failed to initialize AI key manager',
+          });
         } finally {
           set({ loading: false });
         }
@@ -100,7 +102,7 @@ export const useAIKeyStore = create<AIKeyStore>()(
         if (!encryptionKey) return;
 
         set({ loading: true, error: undefined });
-        
+
         try {
           const apiKeys = await aiKeyManager.getApiKeys(encryptionKey);
           set({ apiKeys });
@@ -120,7 +122,7 @@ export const useAIKeyStore = create<AIKeyStore>()(
         }
 
         set({ loading: true, error: undefined });
-        
+
         try {
           await aiKeyManager.addApiKey(provider, apiKey, encryptionKey);
           await get().loadApiKeys();
@@ -141,7 +143,7 @@ export const useAIKeyStore = create<AIKeyStore>()(
         }
 
         set({ loading: true, error: undefined });
-        
+
         try {
           await aiKeyManager.updateApiKey(keyId, apiKey, encryptionKey);
           await get().loadApiKeys();
@@ -156,7 +158,7 @@ export const useAIKeyStore = create<AIKeyStore>()(
       // Delete an API key
       deleteApiKey: async (keyId: string) => {
         set({ loading: true, error: undefined });
-        
+
         try {
           await aiKeyManager.deleteApiKey(keyId);
           await get().loadApiKeys();
@@ -170,7 +172,7 @@ export const useAIKeyStore = create<AIKeyStore>()(
       // Set API key as default
       setDefaultApiKey: async (keyId: string) => {
         set({ loading: true, error: undefined });
-        
+
         try {
           await aiKeyManager.setDefaultApiKey(keyId);
           await get().loadApiKeys();
@@ -264,22 +266,23 @@ export const useAIKeys = () => useAIKeyStore((state) => state.apiKeys);
 export const useDefaultProvider = () => useAIKeyStore((state) => state.defaultProvider);
 export const useAIKeyLoading = () => useAIKeyStore((state) => state.loading);
 export const useAIKeyError = () => useAIKeyStore((state) => state.error);
-export const useAddKeyDialog = () => useAIKeyStore((state) => ({
-  show: state.showAddKeyDialog,
-  provider: state.selectedProvider,
-  editingKeyId: state.editingKeyId,
-}));
+export const useAddKeyDialog = () =>
+  useAIKeyStore((state) => ({
+    show: state.showAddKeyDialog,
+    provider: state.selectedProvider,
+    editingKeyId: state.editingKeyId,
+  }));
 
 // Helper hooks
 export const useApiKeyForProvider = (provider: AIProvider) => {
   const apiKeys = useAIKeys();
-  return apiKeys.find(key => key.provider === provider && key.isDefault);
+  return apiKeys.find((key) => key.provider === provider && key.isDefault);
 };
 
 export const useHasApiKey = (provider?: AIProvider) => {
   const apiKeys = useAIKeys();
   if (provider) {
-    return apiKeys.some(key => key.provider === provider);
+    return apiKeys.some((key) => key.provider === provider);
   }
   return apiKeys.length > 0;
 };

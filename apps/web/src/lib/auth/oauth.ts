@@ -26,9 +26,10 @@ export async function signInWithOAuth(provider: 'google' | 'github') {
   const supabase = createClient();
 
   // SSR-safe base URL
-  const baseUrl = typeof window !== 'undefined'
-    ? window.location.origin
-    : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  const baseUrl =
+    typeof window !== 'undefined'
+      ? window.location.origin
+      : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,

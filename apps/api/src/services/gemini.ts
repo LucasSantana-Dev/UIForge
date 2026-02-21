@@ -59,8 +59,8 @@ function buildPrompt(options: GenerateComponentOptions): string {
       ? 'tsx'
       : 'ts'
     : framework === 'react'
-    ? 'jsx'
-    : 'js';
+      ? 'jsx'
+      : 'js';
 
   return `Generate a ${framework} component with the following specifications:
 
@@ -215,7 +215,12 @@ export async function validateCode(code: string, language: string): Promise<bool
 /**
  * Format code with Gemini (experimental)
  */
-export async function formatCode(code: string, _language: string, apiKey?: string, useUserKey = false): Promise<string> {
+export async function formatCode(
+  code: string,
+  _language: string,
+  apiKey?: string,
+  useUserKey = false
+): Promise<string> {
   try {
     const model = getModel(apiKey, useUserKey);
     const prompt = `Format this ${_language} code following best practices and proper indentation. Return ONLY the formatted code without explanations:

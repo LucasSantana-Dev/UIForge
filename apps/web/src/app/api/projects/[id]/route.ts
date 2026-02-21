@@ -24,10 +24,7 @@ import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 const RATE_LIMIT = 120;
 const RATE_WINDOW = 60000; // 1 minute
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 
@@ -46,11 +43,7 @@ export async function GET(
     const supabase = await createClient();
 
     // Fetch project
-    const { data, error } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('id', id)
-      .single();
+    const { data, error } = await supabase.from('projects').select('*').eq('id', id).single();
 
     if (error || !data) {
       throw new NotFoundError('Project not found');
@@ -73,10 +66,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
 

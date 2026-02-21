@@ -12,11 +12,7 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body>
-        <NextError
-          title="Something went wrong"
-          statusCode={500}
-          withDarkMode={true}
-        />
+        <NextError title="Something went wrong" statusCode={500} withDarkMode={true} />
         <button onClick={() => reset()}>Try again</button>
       </body>
     </html>

@@ -45,7 +45,7 @@ patch(path.join(nextRoot, 'dist/build/utils.js'), [
   {
     description: 'utils.js: isPageStatic returns isStatic:false for /_global-error',
     from: '// Skip page data collection for synthetic _global-error routes\n    if (page === _constants1.UNDERSCORE_GLOBAL_ERROR_ROUTE) {\n        return {\n            isStatic: true,',
-    to:   '// Skip page data collection for synthetic _global-error routes\n    if (page === _constants1.UNDERSCORE_GLOBAL_ERROR_ROUTE) {\n        return {\n            isStatic: false,',
+    to: '// Skip page data collection for synthetic _global-error routes\n    if (page === _constants1.UNDERSCORE_GLOBAL_ERROR_ROUTE) {\n        return {\n            isStatic: false,',
   },
 ]);
 
@@ -53,7 +53,7 @@ patch(path.join(nextRoot, 'dist/build/index.js'), [
   {
     description: 'index.js: exclude /_global-error/page and /_not-found/page from staticPaths',
     from: 'if (!isDynamic) {',
-    to:   "if (!isDynamic && originalAppPath !== '/_global-error/page' && originalAppPath !== '/_not-found/page') {",
+    to: "if (!isDynamic && originalAppPath !== '/_global-error/page' && originalAppPath !== '/_not-found/page') {",
   },
 ]);
 

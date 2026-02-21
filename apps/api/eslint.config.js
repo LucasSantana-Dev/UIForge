@@ -50,7 +50,7 @@ export default [
     },
     rules: {
       ...typescript.configs.recommended.rules,
-      
+
       // TypeScript specific rules
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-function-return-type': 'off',
@@ -58,7 +58,7 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off', // Allow any for now
       '@typescript-eslint/no-non-null-assertion': 'off', // Allow non-null assertions
       '@typescript-eslint/no-namespace': 'off', // Allow namespaces
-      
+
       // General rules
       'no-console': 'off', // Allow console statements
       'no-debugger': 'error',

@@ -21,37 +21,33 @@ jest.mock('@/lib/api/auth');
 jest.mock('@/lib/api/rate-limit');
 jest.mock('@/lib/api/storage');
 
-const mockCreateClient = createClient as jest.MockedFunction<
-  typeof createClient
->;
-const mockVerifySession = verifySession as jest.MockedFunction<
-  typeof verifySession
->;
-const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<
-  typeof checkRateLimit
->;
-const mockUploadToStorage = uploadToStorage as jest.MockedFunction<
-  typeof uploadToStorage
->;
+const mockCreateClient = createClient as jest.MockedFunction<typeof createClient>;
+const mockVerifySession = verifySession as jest.MockedFunction<typeof verifySession>;
+const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;
+const mockUploadToStorage = uploadToStorage as jest.MockedFunction<typeof uploadToStorage>;
 const mockDownloadFromStorage = downloadFromStorage as jest.MockedFunction<
   typeof downloadFromStorage
 >;
-const mockDeleteFromStorage = deleteFromStorage as jest.MockedFunction<
-  typeof deleteFromStorage
->;
-const mockValidateFileSize = validateFileSize as jest.MockedFunction<
-  typeof validateFileSize
->;
+const mockDeleteFromStorage = deleteFromStorage as jest.MockedFunction<typeof deleteFromStorage>;
+const mockValidateFileSize = validateFileSize as jest.MockedFunction<typeof validateFileSize>;
 
 describe('GET /api/components/[id]', () => {
-  const mockUser = { id: '123e4567-e89b-12d3-a456-426614174001', email: 'test@example.com', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any;
+  const mockUser = {
+    id: '123e4567-e89b-12d3-a456-426614174001',
+    email: 'test@example.com',
+    app_metadata: {},
+    user_metadata: {},
+    aud: 'authenticated',
+    created_at: '2024-01-01T00:00:00Z',
+  } as any;
   const mockComponent = {
     id: '123e4567-e89b-12d3-a456-426614174002',
     project_id: '123e4567-e89b-12d3-a456-426614174000',
     name: 'Button',
     component_type: 'button',
     framework: 'react',
-    code_storage_path: '123e4567-e89b-12d3-a456-426614174000/123e4567-e89b-12d3-a456-426614174002.tsx',
+    code_storage_path:
+      '123e4567-e89b-12d3-a456-426614174000/123e4567-e89b-12d3-a456-426614174002.tsx',
     projects: {
       user_id: '123e4567-e89b-12d3-a456-426614174001',
       is_public: false,
@@ -92,7 +88,9 @@ describe('GET /api/components/[id]', () => {
     mockCreateClient.mockResolvedValue(mockSupabase as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123');
-    const response = await GET(request, { params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }) });
+    const response = await GET(request, {
+      params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }),
+    });
     const result = await response.json();
 
     expect(response.status).toBe(200);
@@ -157,7 +155,16 @@ describe('GET /api/components/[id]', () => {
   });
 
   it('should allow access to public project component', async () => {
-    mockVerifySession.mockResolvedValue({ user: { id: 'other-user', email: 'other@example.com', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any });
+    mockVerifySession.mockResolvedValue({
+      user: {
+        id: 'other-user',
+        email: 'other@example.com',
+        app_metadata: {},
+        user_metadata: {},
+        aud: 'authenticated',
+        created_at: '2024-01-01T00:00:00Z',
+      } as any,
+    });
 
     const publicComponent = {
       ...mockComponent,
@@ -179,21 +186,31 @@ describe('GET /api/components/[id]', () => {
     mockCreateClient.mockResolvedValue(mockSupabase as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123');
-    const response = await GET(request, { params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }) });
+    const response = await GET(request, {
+      params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }),
+    });
 
     expect(response.status).toBe(200);
   });
 });
 
 describe('PATCH /api/components/[id]', () => {
-  const mockUser = { id: '123e4567-e89b-12d3-a456-426614174001', email: 'test@example.com', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any;
+  const mockUser = {
+    id: '123e4567-e89b-12d3-a456-426614174001',
+    email: 'test@example.com',
+    app_metadata: {},
+    user_metadata: {},
+    aud: 'authenticated',
+    created_at: '2024-01-01T00:00:00Z',
+  } as any;
   const mockComponent = {
     id: '123e4567-e89b-12d3-a456-426614174002',
     project_id: '123e4567-e89b-12d3-a456-426614174000',
     name: 'Button',
     component_type: 'button',
     framework: 'react',
-    code_storage_path: '123e4567-e89b-12d3-a456-426614174000/123e4567-e89b-12d3-a456-426614174002.tsx',
+    code_storage_path:
+      '123e4567-e89b-12d3-a456-426614174000/123e4567-e89b-12d3-a456-426614174002.tsx',
     projects: {
       user_id: '123e4567-e89b-12d3-a456-426614174001',
       framework: 'react',
@@ -244,7 +261,9 @@ describe('PATCH /api/components/[id]', () => {
     });
     jest.spyOn(request, 'json').mockResolvedValue({ name: 'UpdatedButton' });
 
-    const response = await PATCH(request, { params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }) });
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }),
+    });
     const result = await response.json();
 
     expect(response.status).toBe(200);
@@ -252,7 +271,16 @@ describe('PATCH /api/components/[id]', () => {
   });
 
   it('should reject non-owner updates', async () => {
-    mockVerifySession.mockResolvedValue({ user: { id: 'other-user', email: 'other@example.com', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any });
+    mockVerifySession.mockResolvedValue({
+      user: {
+        id: 'other-user',
+        email: 'other@example.com',
+        app_metadata: {},
+        user_metadata: {},
+        aud: 'authenticated',
+        created_at: '2024-01-01T00:00:00Z',
+      } as any,
+    });
 
     const mockSupabase = {
       from: jest.fn().mockReturnThis(),
@@ -274,7 +302,9 @@ describe('PATCH /api/components/[id]', () => {
     });
     jest.spyOn(request, 'json').mockResolvedValue({ name: 'UpdatedButton' });
 
-    const response = await PATCH(request, { params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }) });
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }),
+    });
     const data = await response.json();
 
     expect(response.status).toBe(403);
@@ -333,13 +363,18 @@ describe('PATCH /api/components/[id]', () => {
 
     mockCreateClient.mockResolvedValue(mockSupabase as any);
 
-    const request = new NextRequest('http://localhost:3000/api/components/123e4567-e89b-12d3-a456-426614174002', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-    });
+    const request = new NextRequest(
+      'http://localhost:3000/api/components/123e4567-e89b-12d3-a456-426614174002',
+      {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+      }
+    );
     jest.spyOn(request, 'json').mockResolvedValue({ framework: 'vue' });
 
-    const response = await PATCH(request, { params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }) });
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }),
+    });
     const data = await response.json();
 
     expect(response.status).toBe(400);
@@ -348,14 +383,22 @@ describe('PATCH /api/components/[id]', () => {
 });
 
 describe('DELETE /api/components/[id]', () => {
-  const mockUser = { id: '123e4567-e89b-12d3-a456-426614174001', email: 'test@example.com', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any;
+  const mockUser = {
+    id: '123e4567-e89b-12d3-a456-426614174001',
+    email: 'test@example.com',
+    app_metadata: {},
+    user_metadata: {},
+    aud: 'authenticated',
+    created_at: '2024-01-01T00:00:00Z',
+  } as any;
   const mockComponent = {
     id: '123e4567-e89b-12d3-a456-426614174002',
     project_id: '123e4567-e89b-12d3-a456-426614174000',
     name: 'Button',
     component_type: 'button',
     framework: 'react',
-    code_storage_path: '123e4567-e89b-12d3-a456-426614174000/123e4567-e89b-12d3-a456-426614174002.tsx',
+    code_storage_path:
+      '123e4567-e89b-12d3-a456-426614174000/123e4567-e89b-12d3-a456-426614174002.tsx',
     projects: {
       user_id: '123e4567-e89b-12d3-a456-426614174001',
     },
@@ -403,7 +446,9 @@ describe('DELETE /api/components/[id]', () => {
     mockCreateClient.mockResolvedValue(mockSupabase as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123');
-    const response = await DELETE(request, { params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }) });
+    const response = await DELETE(request, {
+      params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }),
+    });
 
     expect(response.status).toBe(204);
     expect(mockDeleteFromStorage).toHaveBeenCalledWith(
@@ -413,7 +458,16 @@ describe('DELETE /api/components/[id]', () => {
   });
 
   it('should reject non-owner deletion', async () => {
-    mockVerifySession.mockResolvedValue({ user: { id: 'other-user', email: 'other@example.com', app_metadata: {}, user_metadata: {}, aud: 'authenticated', created_at: '2024-01-01T00:00:00Z' } as any });
+    mockVerifySession.mockResolvedValue({
+      user: {
+        id: 'other-user',
+        email: 'other@example.com',
+        app_metadata: {},
+        user_metadata: {},
+        aud: 'authenticated',
+        created_at: '2024-01-01T00:00:00Z',
+      } as any,
+    });
 
     const mockSupabase = {
       from: jest.fn().mockReturnThis(),
@@ -430,7 +484,9 @@ describe('DELETE /api/components/[id]', () => {
     mockCreateClient.mockResolvedValue(mockSupabase as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123');
-    const response = await DELETE(request, { params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }) });
+    const response = await DELETE(request, {
+      params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }),
+    });
     const data = await response.json();
 
     expect(response.status).toBe(403);
@@ -467,7 +523,9 @@ describe('DELETE /api/components/[id]', () => {
     mockCreateClient.mockResolvedValue(mockSupabase as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123');
-    const response = await DELETE(request, { params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }) });
+    const response = await DELETE(request, {
+      params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }),
+    });
 
     // Should still succeed even if storage deletion fails
     expect(response.status).toBe(204);

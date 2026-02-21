@@ -36,9 +36,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               {project.name}
             </h3>
             {project.description && (
-              <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-                {project.description}
-              </p>
+              <p className="mt-1 text-sm text-gray-600 line-clamp-2">{project.description}</p>
             )}
           </Link>
           <ProjectActions projectId={project.id} projectName={project.name} />

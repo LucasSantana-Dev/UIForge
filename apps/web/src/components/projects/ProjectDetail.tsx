@@ -77,9 +77,7 @@ export default function ProjectDetail({ projectId }: ProjectDetailProps) {
 
         <div className="p-6">
           <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
-          {project.description && (
-            <p className="mt-2 text-gray-600">{project.description}</p>
-          )}
+          {project.description && <p className="mt-2 text-gray-600">{project.description}</p>}
 
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div>

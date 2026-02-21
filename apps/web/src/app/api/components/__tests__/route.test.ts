@@ -17,7 +17,7 @@ describe('GET /api/components', () => {
     app_metadata: {},
     user_metadata: {},
     aud: 'authenticated',
-    created_at: '2024-01-01T00:00:00Z'
+    created_at: '2024-01-01T00:00:00Z',
   };
 
   beforeEach(() => {
@@ -37,14 +37,14 @@ describe('GET /api/components', () => {
       then: jest.fn().mockResolvedValue({
         data: [
           { id: '1', name: 'Button', component_type: 'generated' },
-          { id: '2', name: 'Card', component_type: 'custom' }
+          { id: '2', name: 'Card', component_type: 'custom' },
         ],
-        error: null
-      })
+        error: null,
+      }),
     };
 
     const mockSupabase = {
-      from: jest.fn(() => mockChain)
+      from: jest.fn(() => mockChain),
     };
 
     createClient.mockResolvedValue(mockSupabase);
@@ -79,11 +79,11 @@ describe('GET /api/components', () => {
       select: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
       order: jest.fn().mockReturnThis(),
-      then: jest.fn().mockRejectedValue(new Error('Database error'))
+      then: jest.fn().mockRejectedValue(new Error('Database error')),
     };
 
     const mockSupabase = {
-      from: jest.fn(() => mockChain)
+      from: jest.fn(() => mockChain),
     };
 
     createClient.mockResolvedValue(mockSupabase);

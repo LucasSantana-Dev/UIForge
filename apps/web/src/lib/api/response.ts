@@ -10,11 +10,7 @@ export function jsonResponse<T = any>(data: T, status: number = 200) {
   return NextResponse.json(data, { status });
 }
 
-export function errorResponse(
-  message: string,
-  status: number = 500,
-  details?: any
-) {
+export function errorResponse(message: string, status: number = 500, details?: any) {
   return NextResponse.json(
     {
       error: {

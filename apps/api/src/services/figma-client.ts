@@ -92,14 +92,14 @@ export class FigmaClient {
     if (!response.ok) {
       let error: { message?: string };
       try {
-        error = await response.json() as { message?: string };
+        error = (await response.json()) as { message?: string };
       } catch {
         error = { message: response.statusText };
       }
       throw new Error(`Figma API error: ${error.message || response.statusText}`);
     }
 
-    const data = await response.json() as { key: string; name: string };
+    const data = (await response.json()) as { key: string; name: string };
 
     return {
       id: data.key,
@@ -133,7 +133,7 @@ export class FigmaClient {
       throw new Error(`Failed to fetch Figma file: ${response.statusText}`);
     }
 
-    const data = await response.json() as {
+    const data = (await response.json()) as {
       name: string;
       thumbnailUrl?: string;
       lastModified: string;
@@ -201,8 +201,12 @@ export class FigmaClient {
       }
 
       // Add bounding box
-      if (element.x !== undefined && element.y !== undefined &&
-          element.width !== undefined && element.height !== undefined) {
+      if (
+        element.x !== undefined &&
+        element.y !== undefined &&
+        element.width !== undefined &&
+        element.height !== undefined
+      ) {
         node.absoluteBoundingBox = {
           x: element.x,
           y: element.y,
@@ -220,14 +224,14 @@ export class FigmaClient {
    */
   private mapElementTypeToFigma(type: string): FigmaNode['type'] {
     const typeMap: Record<string, FigmaNode['type']> = {
-      'container': 'FRAME',
-      'frame': 'FRAME',
-      'rectangle': 'RECTANGLE',
-      'button': 'RECTANGLE',
-      'input': 'RECTANGLE',
-      'text': 'TEXT',
-      'group': 'GROUP',
-      'component': 'COMPONENT',
+      container: 'FRAME',
+      frame: 'FRAME',
+      rectangle: 'RECTANGLE',
+      button: 'RECTANGLE',
+      input: 'RECTANGLE',
+      text: 'TEXT',
+      group: 'GROUP',
+      component: 'COMPONENT',
     };
 
     return typeMap[type.toLowerCase()] || 'FRAME';
@@ -243,20 +247,24 @@ export class FigmaClient {
     const figmaDocument = {
       name: 'UIForge Wireframe',
       type: 'CANVAS',
-      children: [{
-        id: 'main-frame',
-        name: wireframe.type || 'Wireframe',
-        type: 'FRAME',
-        width: wireframe.width || 375,
-        height: wireframe.height || 812,
-        x: 0,
-        y: 0,
-        children: figmaNodes,
-        fills: [{
-          type: 'SOLID',
-          color: { r: 1, g: 1, b: 1, a: 1 }
-        }],
-      }],
+      children: [
+        {
+          id: 'main-frame',
+          name: wireframe.type || 'Wireframe',
+          type: 'FRAME',
+          width: wireframe.width || 375,
+          height: wireframe.height || 812,
+          x: 0,
+          y: 0,
+          children: figmaNodes,
+          fills: [
+            {
+              type: 'SOLID',
+              color: { r: 1, g: 1, b: 1, a: 1 },
+            },
+          ],
+        },
+      ],
     };
 
     return JSON.stringify(figmaDocument, null, 2);

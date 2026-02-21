@@ -6,10 +6,7 @@
 import type { CorsOptions } from 'cors';
 import { env } from './env';
 
-const allowedOrigins = [
-  env.FRONTEND_URL,
-  env.FRONTEND_URL_PROD,
-].filter(Boolean) as string[];
+const allowedOrigins = [env.FRONTEND_URL, env.FRONTEND_URL_PROD].filter(Boolean) as string[];
 
 export const corsOptions: CorsOptions = {
   origin: (origin, callback) => {

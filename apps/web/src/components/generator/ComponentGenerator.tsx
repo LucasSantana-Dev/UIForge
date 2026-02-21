@@ -52,9 +52,7 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
           <SparklesIcon className="h-6 w-6 text-blue-600" />
           <div>
             <h1 className="text-xl font-bold text-gray-900">Component Generator</h1>
-            <p className="text-sm text-gray-600">
-              Generate {project.framework} components with AI
-            </p>
+            <p className="text-sm text-gray-600">Generate {project.framework} components with AI</p>
           </div>
         </div>
       </div>

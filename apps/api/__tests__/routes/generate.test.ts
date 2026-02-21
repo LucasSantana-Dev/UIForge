@@ -20,10 +20,7 @@ describe('/api/generate', () => {
 
   describe('POST /api/generate', () => {
     it('should return 401 for requests without authentication', async () => {
-      const response = await request(app)
-        .post('/api/generate')
-        .send(validRequestData)
-        .expect(401);
+      const response = await request(app).post('/api/generate').send(validRequestData).expect(401);
 
       // Response body may be undefined for 401 errors
       expect(response.status).toBe(401);
@@ -51,10 +48,7 @@ describe('/api/generate', () => {
     });
 
     it('should handle missing content type', async () => {
-      const response = await request(app)
-        .post('/api/generate')
-        .send(validRequestData)
-        .expect(401); // Auth check happens before content type validation
+      const response = await request(app).post('/api/generate').send(validRequestData).expect(401); // Auth check happens before content type validation
 
       expect(response.status).toBe(401);
     });
@@ -65,10 +59,7 @@ describe('/api/generate', () => {
         description: 'a'.repeat(10000), // Very large description
       };
 
-      const response = await request(app)
-        .post('/api/generate')
-        .send(largeRequest)
-        .expect(401); // Auth check happens first
+      const response = await request(app).post('/api/generate').send(largeRequest).expect(401); // Auth check happens first
 
       expect(response.status).toBe(401);
     });
@@ -82,10 +73,7 @@ describe('/api/generate', () => {
         typescript: false,
       };
 
-      const response = await request(app)
-        .post('/api/generate')
-        .send(invalidRequest)
-        .expect(401); // Auth check happens first
+      const response = await request(app).post('/api/generate').send(invalidRequest).expect(401); // Auth check happens first
 
       expect(response.status).toBe(401);
     });
@@ -96,10 +84,7 @@ describe('/api/generate', () => {
         framework: 'invalid-framework',
       };
 
-      const response = await request(app)
-        .post('/api/generate')
-        .send(invalidRequest)
-        .expect(401); // Auth check happens first
+      const response = await request(app).post('/api/generate').send(invalidRequest).expect(401); // Auth check happens first
 
       expect(response.status).toBe(401);
     });
@@ -110,10 +95,7 @@ describe('/api/generate', () => {
         componentLibrary: 'invalid-library',
       };
 
-      const response = await request(app)
-        .post('/api/generate')
-        .send(invalidRequest)
-        .expect(401); // Auth check happens first
+      const response = await request(app).post('/api/generate').send(invalidRequest).expect(401); // Auth check happens first
 
       expect(response.status).toBe(401);
     });
@@ -124,10 +106,7 @@ describe('/api/generate', () => {
         style: 'invalid-style',
       };
 
-      const response = await request(app)
-        .post('/api/generate')
-        .send(invalidRequest)
-        .expect(401); // Auth check happens first
+      const response = await request(app).post('/api/generate').send(invalidRequest).expect(401); // Auth check happens first
 
       expect(response.status).toBe(401);
     });
@@ -138,10 +117,7 @@ describe('/api/generate', () => {
         aiProvider: 'invalid-provider',
       };
 
-      const response = await request(app)
-        .post('/api/generate')
-        .send(invalidRequest)
-        .expect(401); // Auth check happens first
+      const response = await request(app).post('/api/generate').send(invalidRequest).expect(401); // Auth check happens first
 
       expect(response.status).toBe(401);
     });
@@ -153,10 +129,7 @@ describe('/api/generate', () => {
         description: longDescription,
       };
 
-      const response = await request(app)
-        .post('/api/generate')
-        .send(invalidRequest)
-        .expect(401); // Auth check happens first
+      const response = await request(app).post('/api/generate').send(invalidRequest).expect(401); // Auth check happens first
 
       expect(response.status).toBe(401);
     });
@@ -168,10 +141,7 @@ describe('/api/generate', () => {
         description: shortDescription,
       };
 
-      const response = await request(app)
-        .post('/api/generate')
-        .send(invalidRequest)
-        .expect(401); // Auth check happens first
+      const response = await request(app).post('/api/generate').send(invalidRequest).expect(401); // Auth check happens first
 
       expect(response.status).toBe(401);
     });
@@ -182,10 +152,7 @@ describe('/api/generate', () => {
         typescript: true,
       };
 
-      const response = await request(app)
-        .post('/api/generate')
-        .send(tsRequest)
-        .expect(401); // Auth check happens first
+      const response = await request(app).post('/api/generate').send(tsRequest).expect(401); // Auth check happens first
 
       expect(response.status).toBe(401);
     });
@@ -196,10 +163,7 @@ describe('/api/generate', () => {
         model: 'gpt-3.5-turbo',
       };
 
-      const response = await request(app)
-        .post('/api/generate')
-        .send(modelRequest)
-        .expect(401); // Auth check happens first
+      const response = await request(app).post('/api/generate').send(modelRequest).expect(401); // Auth check happens first
 
       expect(response.status).toBe(401);
     });
@@ -382,9 +346,9 @@ describe('/api/generate', () => {
             expected: 'string',
             received: 'number',
             path: ['description'],
-            message: 'Expected string, received number'
-          }
-        ]
+            message: 'Expected string, received number',
+          },
+        ],
       };
 
       expect(errorResponse.error).toBe('Invalid request body');
@@ -464,7 +428,7 @@ describe('/api/generate', () => {
         .post('/api/validate')
         .send({
           code: 'const x = 1;',
-          language: 'typescript'
+          language: 'typescript',
         })
         .expect(401);
 
@@ -476,7 +440,7 @@ describe('/api/generate', () => {
         .post('/api/validate')
         .send({
           code: '',
-          language: 'typescript'
+          language: 'typescript',
         })
         .expect(401); // Auth check happens first
 
@@ -489,7 +453,7 @@ describe('/api/generate', () => {
         .post('/api/validate')
         .send({
           code: longCode,
-          language: 'typescript'
+          language: 'typescript',
         })
         .expect(401); // Auth check happens first
 
@@ -505,7 +469,7 @@ describe('/api/generate', () => {
           code: 'const x=1;',
           language: 'typescript',
           apiKey: 'test-key',
-          useUserKey: false
+          useUserKey: false,
         })
         .expect(401);
 
@@ -519,7 +483,7 @@ describe('/api/generate', () => {
           code: '',
           language: 'typescript',
           apiKey: 'test-key',
-          useUserKey: false
+          useUserKey: false,
         })
         .expect(401); // Auth check happens first
 
@@ -534,7 +498,7 @@ describe('/api/generate', () => {
           code: longCode,
           language: 'typescript',
           apiKey: 'test-key',
-          useUserKey: false
+          useUserKey: false,
         })
         .expect(401); // Auth check happens first
 

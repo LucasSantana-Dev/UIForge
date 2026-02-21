@@ -3,17 +3,17 @@
  * Handles component generation with multiple AI providers and fallback
  */
 
-import { 
+import {
   generateComponent as generateWithOpenAI,
-  streamComponentGeneration as streamWithOpenAI
+  streamComponentGeneration as streamWithOpenAI,
 } from './openai';
-import { 
+import {
   generateComponent as generateWithAnthropic,
-  streamComponentGeneration as streamWithAnthropic
+  streamComponentGeneration as streamWithAnthropic,
 } from './anthropic';
-import { 
+import {
   generateComponent as generateWithGemini,
-  streamComponentGeneration as streamWithGemini
+  streamComponentGeneration as streamWithGemini,
 } from './gemini';
 import { logger } from '../utils/logger';
 import type { GenerateComponentOptions, ComponentGenerationResult } from '../types/ai';
@@ -25,47 +25,45 @@ export async function generateComponent(
   options: GenerateComponentOptions
 ): Promise<ComponentGenerationResult> {
   const { aiProvider = 'auto', useUserKey = false, userApiKey, ...generationOptions } = options;
-  
+
   // Determine provider strategy
   const providers = getProviderStrategy(aiProvider, useUserKey, !!userApiKey);
-  
+
   let lastError: Error | null = null;
-  
+
   // Try each provider in order
   for (const provider of providers) {
     try {
-      logger.info('Attempting generation with provider', { 
-        provider, 
+      logger.info('Attempting generation with provider', {
+        provider,
         useUserKey: provider.useUserKey,
-        framework: options.framework 
+        framework: options.framework,
       });
-      
+
       const result = await generateWithProvider(provider, generationOptions);
-      
-      logger.info('Generation successful', { 
+
+      logger.info('Generation successful', {
         provider: provider.name,
         model: result.model,
-        tokensUsed: result.tokensUsed 
+        tokensUsed: result.tokensUsed,
       });
-      
+
       return result;
     } catch (error) {
       lastError = error as Error;
-      logger.warn('Generation failed with provider', { 
-        provider: provider.name, 
-        error: lastError.message 
+      logger.warn('Generation failed with provider', {
+        provider: provider.name,
+        error: lastError.message,
       });
-      
+
       // Continue to next provider
       continue;
     }
   }
-  
+
   // All providers failed
   logger.error('All AI providers failed', { lastError: lastError?.message });
-  throw new Error(
-    `All AI providers failed. Last error: ${lastError?.message || 'Unknown error'}`
-  );
+  throw new Error(`All AI providers failed. Last error: ${lastError?.message || 'Unknown error'}`);
 }
 
 /**
@@ -75,50 +73,48 @@ export async function* streamComponentGeneration(
   options: GenerateComponentOptions
 ): AsyncGenerator<string, void, unknown> {
   const { aiProvider = 'auto', useUserKey = false, userApiKey, ...generationOptions } = options;
-  
+
   // Determine provider strategy
   const providers = getProviderStrategy(aiProvider, useUserKey, !!userApiKey);
-  
+
   let lastError: Error | null = null;
-  
+
   // Try each provider in order
   for (const provider of providers) {
     try {
-      logger.info('Attempting streaming generation with provider', { 
-        provider: provider.name, 
+      logger.info('Attempting streaming generation with provider', {
+        provider: provider.name,
         useUserKey: provider.useUserKey,
-        framework: options.framework 
+        framework: options.framework,
       });
-      
+
       const stream = streamWithProvider(provider, generationOptions);
-      
+
       // Yield chunks from successful provider
       for await (const chunk of stream) {
         yield chunk;
       }
-      
-      logger.info('Streaming generation successful', { 
-        provider: provider.name 
+
+      logger.info('Streaming generation successful', {
+        provider: provider.name,
       });
-      
+
       return; // Success, exit function
     } catch (error) {
       lastError = error as Error;
-      logger.warn('Streaming generation failed with provider', { 
-        provider: provider.name, 
-        error: lastError.message 
+      logger.warn('Streaming generation failed with provider', {
+        provider: provider.name,
+        error: lastError.message,
       });
-      
+
       // Continue to next provider
       continue;
     }
   }
-  
+
   // All providers failed
   logger.error('All AI providers failed for streaming', { lastError: lastError?.message });
-  throw new Error(
-    `All AI providers failed. Last error: ${lastError?.message || 'Unknown error'}`
-  );
+  throw new Error(`All AI providers failed. Last error: ${lastError?.message || 'Unknown error'}`);
 }
 
 interface ProviderConfig {
@@ -136,15 +132,15 @@ function getProviderStrategy(
   hasUserKey: boolean
 ): ProviderConfig[] {
   const strategies: ProviderConfig[] = [];
-  
+
   // If user specified a provider and has a key, try it first
   if (aiProvider !== 'auto' && useUserKey && hasUserKey) {
     strategies.push({
       name: aiProvider,
-      useUserKey: true
+      useUserKey: true,
     });
   }
-  
+
   // If user wants to use their keys and has them, try all user keys
   if (useUserKey && hasUserKey) {
     // Add user keys in priority order (can be customized)
@@ -158,10 +154,10 @@ function getProviderStrategy(
       strategies.push({ name: 'google', useUserKey: true });
     }
   }
-  
+
   // Always fallback to Gemini (free tier)
   strategies.push({ name: 'google', useUserKey: false });
-  
+
   return strategies;
 }
 
@@ -177,23 +173,23 @@ async function generateWithProvider(
       return await generateWithOpenAI({
         ...options,
         apiKey: provider.apiKey,
-        useUserKey: provider.useUserKey
+        useUserKey: provider.useUserKey,
       });
-    
+
     case 'anthropic':
       return await generateWithAnthropic({
         ...options,
         apiKey: provider.apiKey,
-        useUserKey: provider.useUserKey
+        useUserKey: provider.useUserKey,
       });
-    
+
     case 'google':
       return await generateWithGemini({
         ...options,
         apiKey: provider.apiKey,
-        useUserKey: provider.useUserKey
+        useUserKey: provider.useUserKey,
       });
-    
+
     default:
       throw new Error(`Unsupported provider: ${provider.name}`);
   }
@@ -211,23 +207,23 @@ function streamWithProvider(
       return streamWithOpenAI({
         ...options,
         apiKey: provider.apiKey,
-        useUserKey: provider.useUserKey
+        useUserKey: provider.useUserKey,
       });
-    
+
     case 'anthropic':
       return streamWithAnthropic({
         ...options,
         apiKey: provider.apiKey,
-        useUserKey: provider.useUserKey
+        useUserKey: provider.useUserKey,
       });
-    
+
     case 'google':
       return streamWithGemini({
         ...options,
         apiKey: provider.apiKey,
-        useUserKey: provider.useUserKey
+        useUserKey: provider.useUserKey,
       });
-    
+
     default:
       throw new Error(`Unsupported provider: ${provider.name}`);
   }
@@ -245,9 +241,9 @@ export function getProviderInfo(provider: 'openai' | 'anthropic' | 'google') {
         maxTokens: 128000,
         rateLimitPerMinute: 3500,
         features: ['function-calling', 'json-mode', 'vision'],
-        pricing: 'Pay-per-token'
+        pricing: 'Pay-per-token',
       };
-    
+
     case 'anthropic':
       return {
         name: 'Anthropic',
@@ -255,9 +251,9 @@ export function getProviderInfo(provider: 'openai' | 'anthropic' | 'google') {
         maxTokens: 200000,
         rateLimitPerMinute: 1000,
         features: ['function-calling', 'vision', 'long-context'],
-        pricing: 'Pay-per-token'
+        pricing: 'Pay-per-token',
       };
-    
+
     case 'google':
       return {
         name: 'Google AI',
@@ -265,9 +261,9 @@ export function getProviderInfo(provider: 'openai' | 'anthropic' | 'google') {
         maxTokens: 2097152,
         rateLimitPerMinute: 60,
         features: ['vision', 'long-context', 'free-tier'],
-        pricing: 'Free tier available'
+        pricing: 'Free tier available',
       };
-    
+
     default:
       throw new Error(`Unknown provider: ${provider}`);
   }
@@ -276,17 +272,20 @@ export function getProviderInfo(provider: 'openai' | 'anthropic' | 'google') {
 /**
  * Validate API key format for provider
  */
-export function validateApiKey(provider: 'openai' | 'anthropic' | 'google', apiKey: string): boolean {
+export function validateApiKey(
+  provider: 'openai' | 'anthropic' | 'google',
+  apiKey: string
+): boolean {
   switch (provider) {
     case 'openai':
       return /^sk-[A-Za-z0-9]{48}$|^sk-proj-[A-Za-z0-9_-]{48}$/.test(apiKey);
-    
+
     case 'anthropic':
       return /^sk-ant-[A-Za-z0-9_-]{95}$/.test(apiKey);
-    
+
     case 'google':
       return /^AIza[A-Za-z0-9_-]{35}$/.test(apiKey);
-    
+
     default:
       return false;
   }

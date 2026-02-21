@@ -50,10 +50,7 @@ export async function getSession(): Promise<Session | null> {
 /**
  * Verify user owns resource by user_id
  */
-export function verifyOwnership(
-  userId: string,
-  resourceUserId: string
-): void {
+export function verifyOwnership(userId: string, resourceUserId: string): void {
   if (userId !== resourceUserId) {
     throw new ForbiddenError('You do not own this resource');
   }

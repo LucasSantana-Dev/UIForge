@@ -7,13 +7,7 @@ import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
-function AppError({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
+function AppError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
     // Log the error to console in development
     if (process.env.NODE_ENV === 'development') {
@@ -27,7 +21,13 @@ function AppError({
       <div className="mx-auto max-w-2xl text-center">
         {/* Logo */}
         <Link href="/" className="inline-flex items-center gap-2 mb-8">
-          <Image src="/anvil-logo.svg" alt="UIForge" width={40} height={40} className="flex-shrink-0" />
+          <Image
+            src="/anvil-logo.svg"
+            alt="UIForge"
+            width={40}
+            height={40}
+            className="flex-shrink-0"
+          />
           <span className="text-2xl font-bold">UIForge</span>
         </Link>
 
@@ -41,7 +41,8 @@ function AppError({
         {/* Error Message */}
         <h1 className="mb-4 text-4xl font-bold tracking-tight">Something went wrong!</h1>
         <p className="mb-8 text-lg text-muted-foreground">
-          We encountered an unexpected error. Please try again or contact support if the problem persists.
+          We encountered an unexpected error. Please try again or contact support if the problem
+          persists.
         </p>
 
         {/* Error Details (Development Only) */}

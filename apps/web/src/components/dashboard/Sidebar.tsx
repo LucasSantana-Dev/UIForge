@@ -19,8 +19,17 @@ export default function Sidebar() {
   return (
     <div className="hidden md:flex md:w-64 md:flex-col">
       <div className="flex flex-col flex-grow pt-5 bg-card border-r overflow-y-auto">
-        <Link href="/dashboard" className="flex items-center flex-shrink-0 px-4 gap-3 hover:opacity-80 transition-opacity">
-          <Image src="/anvil-logo.svg" alt="UIForge" width={32} height={32} className="flex-shrink-0" />
+        <Link
+          href="/dashboard"
+          className="flex items-center flex-shrink-0 px-4 gap-3 hover:opacity-80 transition-opacity"
+        >
+          <Image
+            src="/anvil-logo.svg"
+            alt="UIForge"
+            width={32}
+            height={32}
+            className="flex-shrink-0"
+          />
           <h1 className="text-2xl font-bold">
             <span className="text-muted-foreground">UI</span>
             <span className="text-primary">Forge</span>

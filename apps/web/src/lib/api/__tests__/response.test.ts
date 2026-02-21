@@ -18,7 +18,7 @@ describe('API Response Helpers', () => {
     it('should create JSON response with default status', () => {
       const data = { message: 'test' };
       const response = jsonResponse(data);
-      
+
       expect(response).toBeInstanceOf(NextResponse);
       expect(response.status).toBe(200);
     });
@@ -26,7 +26,7 @@ describe('API Response Helpers', () => {
     it('should create JSON response with custom status', () => {
       const data = { message: 'created' };
       const response = jsonResponse(data, 201);
-      
+
       expect(response.status).toBe(201);
     });
   });
@@ -34,21 +34,21 @@ describe('API Response Helpers', () => {
   describe('errorResponse', () => {
     it('should create error response with default status', () => {
       const response = errorResponse('Something went wrong');
-      
+
       expect(response).toBeInstanceOf(NextResponse);
       expect(response.status).toBe(500);
     });
 
     it('should create error response with custom status', () => {
       const response = errorResponse('Not found', 404);
-      
+
       expect(response.status).toBe(404);
     });
 
     it('should include details when provided', () => {
       const details = { field: 'email' };
       const response = errorResponse('Invalid', 400, details);
-      
+
       expect(response.status).toBe(400);
     });
   });
@@ -57,7 +57,7 @@ describe('API Response Helpers', () => {
     it('should create response from APIError', () => {
       const error = new APIError('Test error', 400, 'TEST_ERROR');
       const response = apiErrorResponse(error);
-      
+
       expect(response).toBeInstanceOf(NextResponse);
       expect(response.status).toBe(400);
     });
@@ -66,7 +66,7 @@ describe('API Response Helpers', () => {
       const details = { errors: ['field1', 'field2'] };
       const error = new ValidationError('Invalid input', details);
       const response = apiErrorResponse(error);
-      
+
       expect(response.status).toBe(400);
     });
   });
@@ -75,7 +75,7 @@ describe('API Response Helpers', () => {
     it('should create success response with data', () => {
       const data = { id: '123', name: 'Test' };
       const response = successResponse(data);
-      
+
       expect(response).toBeInstanceOf(NextResponse);
       expect(response.status).toBe(200);
     });
@@ -83,7 +83,7 @@ describe('API Response Helpers', () => {
     it('should include message when provided', () => {
       const data = { id: '123' };
       const response = successResponse(data, 'Operation successful');
-      
+
       expect(response.status).toBe(200);
     });
   });
@@ -92,7 +92,7 @@ describe('API Response Helpers', () => {
     it('should create 201 response with data', () => {
       const data = { id: '123', name: 'New Item' };
       const response = createdResponse(data);
-      
+
       expect(response).toBeInstanceOf(NextResponse);
       expect(response.status).toBe(201);
     });
@@ -100,7 +100,7 @@ describe('API Response Helpers', () => {
     it('should include message when provided', () => {
       const data = { id: '123' };
       const response = createdResponse(data, 'Created successfully');
-      
+
       expect(response.status).toBe(201);
     });
   });
@@ -108,7 +108,7 @@ describe('API Response Helpers', () => {
   describe('noContentResponse', () => {
     it('should create 204 response with no body', () => {
       const response = noContentResponse();
-      
+
       expect(response).toBeInstanceOf(NextResponse);
       expect(response.status).toBe(204);
     });

@@ -17,7 +17,7 @@ export default [
       'build/**',
       'coverage/**',
       '*.config.js',
-      'test-config.ts'
+      'test-config.ts',
     ],
     languageOptions: {
       parser: typescriptParser,
@@ -68,7 +68,7 @@ export default [
       ...reactHooks.configs.recommended.rules,
       ...jsxA11y.configs.recommended.rules,
       ...prettier.rules,
-      
+
       // TypeScript specific rules
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
       '@typescript-eslint/explicit-function-return-type': 'off',
@@ -76,13 +76,13 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off', // Allow any for now
       '@typescript-eslint/no-non-null-assertion': 'off', // Allow non-null assertions
       '@typescript-eslint/no-require-imports': 'off', // Allow require imports
-      
+
       // React specific rules
       'react/react-in-jsx-scope': 'off',
       'react/prop-types': 'off',
       'react-hooks/rules-of-hooks': 'error',
       'react-hooks/exhaustive-deps': 'warn',
-      
+
       // General rules
       'no-console': 'off', // Allow console statements
       'no-debugger': 'error',

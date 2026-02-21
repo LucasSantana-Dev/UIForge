@@ -10,10 +10,7 @@ import { ValidationError, type APIError } from './errors';
 import { errorResponse, apiErrorResponse } from './response';
 import { type ZodSchema } from 'zod';
 
-type RouteHandler = (
-  request: NextRequest,
-  context?: any
-) => Promise<NextResponse>;
+type RouteHandler = (request: NextRequest, context?: any) => Promise<NextResponse>;
 
 /**
  * Wrap route handler with authentication
@@ -77,11 +74,7 @@ export function withRateLimit(
  * Wrap route handler with validation
  */
 export function withValidation<T>(
-  handler: (
-    request: NextRequest,
-    data: T,
-    context?: any
-  ) => Promise<NextResponse>,
+  handler: (request: NextRequest, data: T, context?: any) => Promise<NextResponse>,
   schema: ZodSchema<T>
 ): RouteHandler {
   return async (request: NextRequest, context?: any) => {
@@ -118,10 +111,7 @@ export function withErrorHandling(handler: RouteHandler): RouteHandler {
         return apiErrorResponse(error as APIError);
       }
       console.error('Route handler error:', error);
-      return errorResponse(
-        'An unexpected error occurred',
-        500
-      );
+      return errorResponse('An unexpected error occurred', 500);
     }
   };
 }

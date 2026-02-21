@@ -53,8 +53,8 @@ function buildPrompt(options: GenerateComponentOptions): string {
       ? 'tsx'
       : 'ts'
     : framework === 'react'
-    ? 'jsx'
-    : 'js';
+      ? 'jsx'
+      : 'js';
 
   return `Generate a ${framework} component with the following specifications:
 
@@ -107,8 +107,8 @@ export async function generateComponent(
       messages: [
         {
           role: 'user',
-          content: prompt
-        }
+          content: prompt,
+        },
       ],
     });
 
@@ -144,12 +144,18 @@ export async function generateComponent(
 
     // Try fallback model if primary fails
     const currentModel = options.model || DEFAULT_MODEL;
-    if (String(currentModel) !== String(FALLBACK_MODEL) && String(DEFAULT_MODEL) !== String(FALLBACK_MODEL) && String(currentModel) !== String(DEFAULT_MODEL)) {
+    if (
+      String(currentModel) !== String(FALLBACK_MODEL) &&
+      String(DEFAULT_MODEL) !== String(FALLBACK_MODEL) &&
+      String(currentModel) !== String(DEFAULT_MODEL)
+    ) {
       logger.info('Retrying with fallback model', { model: FALLBACK_MODEL });
       return generateComponent({ ...options, model: FALLBACK_MODEL });
     }
 
-    throw new Error(`Failed to generate component with Anthropic: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to generate component with Anthropic: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
@@ -179,8 +185,8 @@ export async function* streamComponentGeneration(
       messages: [
         {
           role: 'user',
-          content: prompt
-        }
+          content: prompt,
+        },
       ],
       stream: true,
     });
@@ -216,13 +222,19 @@ export async function* streamComponentGeneration(
 
     // Try fallback model if primary fails
     const currentModel = options.model || DEFAULT_MODEL;
-    if (String(currentModel) !== String(FALLBACK_MODEL) && String(DEFAULT_MODEL) !== String(FALLBACK_MODEL) && String(currentModel) !== String(DEFAULT_MODEL)) {
+    if (
+      String(currentModel) !== String(FALLBACK_MODEL) &&
+      String(DEFAULT_MODEL) !== String(FALLBACK_MODEL) &&
+      String(currentModel) !== String(DEFAULT_MODEL)
+    ) {
       logger.info('Retrying stream with fallback model', { model: FALLBACK_MODEL });
       yield* streamComponentGeneration({ ...options, model: FALLBACK_MODEL });
       return;
     }
 
-    throw new Error(`Failed to stream component generation with Anthropic: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    throw new Error(
+      `Failed to stream component generation with Anthropic: ${error instanceof Error ? error.message : 'Unknown error'}`
+    );
   }
 }
 
