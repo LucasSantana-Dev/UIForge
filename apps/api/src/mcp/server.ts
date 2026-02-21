@@ -10,7 +10,7 @@ import {
   ListToolsRequestSchema,
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
-import { generateComponent, hasCodePatterns, formatCode } from '../services/gemini';
+import { generateComponent, hasCodePatterns, formatCode } from '../services/ai-generation';
 import { logger } from '../utils/logger';
 
 // Define UIForge MCP tools

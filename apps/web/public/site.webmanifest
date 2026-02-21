@@ -1,0 +1,10 @@
+{
+  "name": "UIForge - AI-Driven UI Generation",
+  "short_name": "UIForge",
+  "description": "Generate production-ready UI components with AI. Zero-cost platform for developers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121214",
+  "theme_color": "#9333ea",
+  "orientation": "portrait-primary"
+}

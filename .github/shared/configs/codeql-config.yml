@@ -1,0 +1,48 @@
+name: "UIForge CodeQL Analysis"
+
+# Query packs to use
+queries:
+  # Security and quality queries
+  - uses: security-and-quality
+  - uses: security-extended
+
+  # Custom security queries for specific vulnerabilities
+  - name: Custom Security Queries
+    uses: ./custom-queries
+
+# Paths to include in analysis
+paths:
+  - apps/
+  - packages/
+  - lib/
+
+# Paths to ignore in analysis
+paths-ignore:
+  - node_modules/
+  - .next/
+  - dist/
+  - build/
+
+# Pack configuration
+packs:
+  # Security pack
+  - name: security
+    version: latest
+
+  # Quality pack
+  - name: quality
+    version: latest
+
+# Custom query packs
+packs:
+  - name: uiforge-security
+    version: latest
+
+# Query filters
+query-filters:
+  # Exclude queries with low severity
+  - exclude:
+      severity: low
+
+# Disable default queries
+disable-default-queries: false

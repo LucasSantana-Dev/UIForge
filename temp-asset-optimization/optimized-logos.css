@@ -1,0 +1,138 @@
+/* Optimized Logo Styles */
+
+.logo-container {
+  display: inline-block;
+  position: relative;
+}
+
+.logo-text {
+  background-image: url('/logos/text-logo.webp');
+  background-image: url('/logos/text-logo-optimized.png'); /* Fallback */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 256px;
+  height: 256px;
+}
+
+.logo-anvil {
+  background-image: url('/logos/anvil-logo.webp');
+  background-image: url('/logos/anvil-logo-optimized.png'); /* Fallback */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 256px;
+  height: 256px;
+}
+
+/* Responsive sizes */
+.logo-text-sm {
+  width: 64px;
+  height: 64px;
+  background-image: url('/logos/text-logo-64.webp');
+  background-image: url('/logos/text-logo-64.png'); /* Fallback */
+}
+
+.logo-text-md {
+  width: 128px;
+  height: 128px;
+  background-image: url('/logos/text-logo-128.webp');
+  background-image: url('/logos/text-logo-128.png'); /* Fallback */
+}
+
+.logo-text-lg {
+  width: 256px;
+  height: 256px;
+  background-image: url('/logos/text-logo-256.webp');
+  background-image: url('/logos/text-logo-256.png'); /* Fallback */
+}
+
+.logo-text-xl {
+  width: 512px;
+  height: 512px;
+  background-image: url('/logos/text-logo.webp');
+  background-image: url('/logos/text-logo-optimized.png'); /* Fallback */
+}
+
+.logo-anvil-sm {
+  width: 64px;
+  height: 64px;
+  background-image: url('/logos/anvil-logo-64.webp');
+  background-image: url('/logos/anvil-logo-64.png'); /* Fallback */
+}
+
+.logo-anvil-md {
+  width: 128px;
+  height: 128px;
+  background-image: url('/logos/anvil-logo-128.webp');
+  background-image: url('/logos/anvil-logo-128.png'); /* Fallback */
+}
+
+.logo-anvil-lg {
+  width: 256px;
+  height: 256px;
+  background-image: url('/logos/anvil-logo-256.webp');
+  background-image: url('/logos/anvil-logo-256.png'); /* Fallback */
+}
+
+.logo-anvil-xl {
+  width: 512px;
+  height: 512px;
+  background-image: url('/logos/anvil-logo.webp');
+  background-image: url('/logos/anvil-logo-optimized.png'); /* Fallback */
+}
+
+/* Loading states */
+.logo-loading {
+  background-color: #f3f4f6;
+  border-radius: 8px;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Hover effects */
+.logo-hover:hover {
+  transform: scale(1.05);
+  transition: transform 0.2s ease-in-out;
+}
+
+/* Print styles */
+@media print {
+  .logo-text,
+  .logo-anvil {
+    background-image: url('/logos/text-logo-optimized.png') !important;
+    background-image: url('/logos/anvil-logo-optimized.png') !important;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .logo-text {
+    background-image: url('/logos/text-logo.webp');
+    background-image: url('/logos/text-logo-optimized.png'); /* Use higher quality */
+  }
+  
+  .logo-anvil {
+    background-image: url('/logos/anvil-logo.webp');
+    background-image: url('/logos/anvil-logo-optimized.png'); /* Use higher quality */
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .logo-hover:hover {
+    transform: none;
+  }
+  
+  .logo-loading {
+    animation: none;
+  }
+}

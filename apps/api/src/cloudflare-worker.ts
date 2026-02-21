@@ -3,7 +3,7 @@
  * Full UIForge API implementation for Cloudflare Workers
  */
 
-import { streamComponentGeneration } from './services/gemini';
+import { streamComponentGeneration } from './services/ai-generation';
 import { logger } from './utils/logger';
 
 // Environment interface for Cloudflare Workers

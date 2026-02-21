@@ -6,7 +6,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { streamComponentGeneration } from '../services/ai-generation';
-import { hasCodePatterns, formatCode } from '../services/gemini';
+import { hasCodePatterns, formatCode } from '../services/ai-generation';
 import { logger } from '../utils/logger';
 import { authMiddleware } from '../middleware/auth';
 import { createRateLimiter } from '../middleware/rateLimit';

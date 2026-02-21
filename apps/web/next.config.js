@@ -9,6 +9,20 @@ const nextConfig = {
       },
     ],
   },
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+  },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  poweredByHeader: false,
+  compress: true,
+  turbopack: {},
 };
 
-module.exports = nextConfig;
+// Enable bundle analyzer in production when ANALYZE=true
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
+module.exports = withBundleAnalyzer(nextConfig);

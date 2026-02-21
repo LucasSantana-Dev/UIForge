@@ -1,0 +1,148 @@
+name: CI (Shared Patterns)
+
+on:
+  push:
+    branches: [main, dev, release/*, feature/*]
+  pull_request:
+    branches: [main, dev, release/*, feature/*]
+
+jobs:
+  call-shared-ci:
+    uses: ./.github/workflows/base-ci.yml
+    with:
+      project-type: "webapp"
+      node-version: "22"
+      python-version: "3.12"
+      enable-docker: true
+      enable-security: true
+      enable-coverage: true
+      coverage-threshold: "80"
+      test-parallel: true
+      enable-turbo: true
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Webapp-specific jobs
+  webapp-turbo-build:
+    name: Turbo Monorepo Build
+    runs-on: ubuntu-latest
+    needs: call-shared-ci
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Build all packages
+        run: |
+          npm run build -- --filter="*"
+
+      - name: Verify build outputs
+        run: |
+          find apps -name "dist" -type d | head -5
+          find packages -name "dist" -type d | head -5
+
+  webapp-nextjs-tests:
+    name: Next.js Application Tests
+    runs-on: ubuntu-latest
+    needs: call-shared-ci
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Run Next.js tests
+        run: |
+          npm run test -- --filter="web-admin"
+
+      - name: Run E2E tests
+        run: |
+          npm run test:e2e -- --filter="web-admin"
+
+  webapp-performance-tests:
+    name: Performance and Bundle Analysis
+    runs-on: ubuntu-latest
+    needs: call-shared-ci
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Analyze bundle size
+        run: |
+          npm run build -- --filter="web-admin"
+          npx bundlesize
+
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli@0.12.x
+          lhci autorun
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
+
+  # Additional webapp-specific security checks
+  webapp-security-audit:
+    name: Webapp Security Audit
+    runs-on: ubuntu-latest
+    needs: call-shared-ci
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+
+      - name: Run npm audit
+        run: |
+          npm audit --audit-level=high
+
+      - name: Check for exposed secrets
+        uses: trufflesecurity/trufflehog@v3.93.3
+        with:
+          path: ./
+          base: ${{ github.event_name == 'push' && (github.event.before == '0000000000000000000000000000000000000000' && github.event.repository.default_branch || github.event.before) || github.event.repository.default_branch }}
+          head: ${{ github.event_name == 'push' && github.sha || 'HEAD' }}
+          extra_args: --only-verified
+
+      - name: Run dependency check
+        run: |
+          npm run deps:unused

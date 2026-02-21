@@ -8,22 +8,50 @@ import { EncryptedApiKey, AIProvider } from '@/lib/encryption';
 import { TEST_CONFIG } from '../../../test-config';
 
 // Mock IndexedDB
+// Mock request objects
+const mockRequest = {
+  result: undefined,
+  onsuccess: null as ((event: any) => void) | null,
+  onerror: null as ((event: any) => void) | null,
+} as any;
+
+const mockCursorRequest = {
+  result: null,
+  onsuccess: null as ((event: any) => void) | null,
+  onerror: null as ((event: any) => void) | null,
+  continue: jest.fn(),
+  update: jest.fn(() => mockRequest),
+};
+
+// Mock index request
+const mockIndexRequest = {
+  get: jest.fn(() => mockRequest),
+  openCursor: jest.fn(() => mockCursorRequest),
+  onsuccess: null,
+  onerror: null,
+};
+
+const mockIndex = {
+  get: jest.fn(() => mockIndexRequest),
+  openCursor: jest.fn(() => mockIndexRequest),
+};
+
 const mockObjectStore = {
-  get: jest.fn(),
-  getAll: jest.fn(),
-  put: jest.fn(),
-  delete: jest.fn(),
-  clear: jest.fn(),
-  add: jest.fn(),
-  index: jest.fn(),
-  openCursor: jest.fn(),
+  get: jest.fn(() => mockRequest),
+  getAll: jest.fn(() => mockRequest),
+  put: jest.fn(() => mockRequest),
+  delete: jest.fn(() => mockRequest),
+  clear: jest.fn(() => mockRequest),
+  add: jest.fn(() => mockRequest),
+  index: jest.fn(() => mockIndex),
+  openCursor: jest.fn(() => mockCursorRequest),
 };
 
 const mockTransaction = {
   objectStore: jest.fn(() => mockObjectStore),
-  oncomplete: null,
-  onerror: null,
-  onabort: null,
+  oncomplete: null as ((event: any) => void) | null,
+  onerror: null as ((event: any) => void) | null,
+  onabort: null as ((event: any) => void) | null,
 };
 
 const mockDatabase = {
@@ -78,12 +106,13 @@ describe('IndexedDB Storage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
-    // Reset IndexedDB mocks
-    mockObjectStore.get.mockResolvedValue(undefined);
-    mockObjectStore.getAll.mockResolvedValue([]);
-    mockObjectStore.put.mockResolvedValue(undefined);
-    mockObjectStore.delete.mockResolvedValue(undefined);
-    mockObjectStore.clear.mockResolvedValue(undefined);
+    // Reset request callbacks
+    mockRequest.onsuccess = null;
+    mockRequest.onerror = null;
+    mockCursorRequest.onsuccess = null;
+    mockCursorRequest.onerror = null;
+    mockIndexRequest.onsuccess = null;
+    mockIndexRequest.onerror = null;
 
     // Reset localStorage mocks
     mockLocalStorage.getItem.mockReturnValue(null);
@@ -92,20 +121,93 @@ describe('IndexedDB Storage', () => {
 
     // Reset database mocks
     mockDatabase.objectStoreNames.contains.mockReturnValue(false);
+
+    // Setup IndexedDB open mock to trigger success callback
+    const mockOpen = global.indexedDB.open as jest.Mock;
+    mockOpen.mockImplementation(() => {
+      // Trigger success asynchronously
+      setTimeout(() => {
+        if (mockOpenDBRequest.onsuccess) {
+          (mockOpenDBRequest.onsuccess as (event: any) => void)({ target: { result: mockDatabase } } as any);
+        }
+      }, 0);
+      return mockOpenDBRequest;
+    });
+
+    // Setup transaction mock to trigger completion automatically
+    mockDatabase.transaction.mockImplementation(() => {
+      // Trigger transaction completion after operations
+      setTimeout(() => {
+        if (mockTransaction.oncomplete) {
+          mockTransaction.oncomplete({} as any);
+        }
+      }, 0);
+      return mockTransaction;
+    });
+
+    // Setup request objects to trigger success automatically
+    const setupRequestSuccess = (request: any) => {
+      if (!request || typeof request !== 'object') {
+        return request;
+      }
+      setTimeout(() => {
+        if (request && request.onsuccess) {
+          (request.onsuccess as (event: any) => void)({ target: { result: request.result } } as any);
+        }
+      }, 0);
+      return request;
+    };
+
+    // Ensure all object store methods return proper request objects
+    mockObjectStore.put.mockImplementation(() => {
+      mockRequest.result = undefined;
+      return setupRequestSuccess(mockRequest);
+    });
+    mockObjectStore.get.mockImplementation(() => {
+      mockRequest.result = undefined;
+      return setupRequestSuccess(mockRequest);
+    });
+    mockObjectStore.getAll.mockImplementation(() => {
+      mockRequest.result = [];
+      return setupRequestSuccess(mockRequest);
+    });
+    mockObjectStore.delete.mockImplementation(() => {
+      mockRequest.result = undefined;
+      return setupRequestSuccess(mockRequest);
+    });
+    mockObjectStore.clear.mockImplementation(() => {
+      mockRequest.result = undefined;
+      return setupRequestSuccess(mockRequest);
+    });
+    mockObjectStore.add.mockImplementation(() => {
+      mockRequest.result = undefined;
+      return setupRequestSuccess(mockRequest);
+    });
+
+    // Setup cursor for index operations
+    mockCursorRequest.result = null; // No cursor found by default
+    mockIndexRequest.openCursor.mockImplementation(() => {
+      setTimeout(() => {
+        if (mockCursorRequest.onsuccess) {
+          mockCursorRequest.onsuccess({ target: { result: null } } as any);
+        }
+      }, 0);
+      return mockCursorRequest;
+    });
   });
 
   describe('init', () => {
     it('should initialize database successfully', async () => {
       await storage.init();
 
-      expect(global.indexedDB.open).toHaveBeenCalledWith('UIForgeKeys', 1);
+      expect(global.indexedDB.open).toHaveBeenCalledWith('uiforge_storage', 1);
       expect((storage as any).db).toBe(mockDatabase);
     });
 
     it('should handle database upgrade', async () => {
       return new Promise<void>((resolve) => {
         (mockOpenDBRequest.onupgradeneeded as any) = (event: any) => {
-          expect(event.target.result.createObjectStore).toHaveBeenCalledWith('apiKeys', {
+          expect(event.target.result.createObjectStore).toHaveBeenCalledWith('api_keys', {
             keyPath: 'keyId',
           });
           expect(event.target.result.createObjectStore).toHaveBeenCalledWith('user_preferences', {
@@ -136,7 +238,18 @@ describe('IndexedDB Storage', () => {
       await storage.storeApiKey(testEncryptedKey);
 
       expect(mockDatabase.transaction).toHaveBeenCalledWith(['api_keys'], 'readwrite');
-      expect(mockObjectStore.put).toHaveBeenCalledWith(testEncryptedKey);
+      // Check that put was called with the transformed data (ignoring callback functions)
+      expect(mockObjectStore.put).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: `api_key_${testEncryptedKey.keyId}`,
+          provider: testEncryptedKey.provider,
+          encryptedKey: testEncryptedKey.encryptedKey,
+          keyId: testEncryptedKey.keyId,
+          createdAt: testEncryptedKey.createdAt,
+          lastUsed: testEncryptedKey.lastUsed,
+          isDefault: false,
+        })
+      );
     });
 
     it('should handle storage errors', async () => {
@@ -151,7 +264,16 @@ describe('IndexedDB Storage', () => {
 
   describe('getApiKey', () => {
     it('should retrieve API key by ID', async () => {
-      mockObjectStore.get.mockResolvedValue(testEncryptedKey);
+      const request = { ...mockRequest, result: testEncryptedKey };
+      request.onsuccess = jest.fn();
+      mockObjectStore.get.mockReturnValue(request);
+
+      // Trigger success callback
+      setTimeout(() => {
+        if (request.onsuccess) {
+          request.onsuccess({ target: { result: testEncryptedKey } } as any);
+        }
+      }, 0);
 
       const result = await storage.getApiKey('key_test_123');
 
@@ -161,7 +283,16 @@ describe('IndexedDB Storage', () => {
     });
 
     it('should return null for non-existent key', async () => {
-      mockObjectStore.get.mockResolvedValue(undefined);
+      const request = { ...mockRequest, result: undefined };
+      request.onsuccess = jest.fn();
+      mockObjectStore.get.mockReturnValue(request);
+
+      // Trigger success callback
+      setTimeout(() => {
+        if (request.onsuccess) {
+          request.onsuccess({ target: { result: undefined } } as any);
+        }
+      }, 0);
 
       const result = await storage.getApiKey('non_existent');
 
@@ -181,7 +312,16 @@ describe('IndexedDB Storage', () => {
   describe('getApiKeys', () => {
     it('should retrieve all API keys', async () => {
       const keys = [testEncryptedKey];
-      mockObjectStore.getAll.mockResolvedValue(keys);
+      const request = { ...mockRequest, result: keys };
+      request.onsuccess = jest.fn();
+      mockObjectStore.getAll.mockReturnValue(request);
+
+      // Trigger success callback
+      setTimeout(() => {
+        if (request.onsuccess) {
+          request.onsuccess({ target: { result: keys } } as any);
+        }
+      }, 0);
 
       const result = await storage.getApiKeys();
 
@@ -191,7 +331,17 @@ describe('IndexedDB Storage', () => {
     });
 
     it('should return empty array when no keys exist', async () => {
-      mockObjectStore.getAll.mockResolvedValue([]);
+      const keys: any[] = [];
+      const request = { ...mockRequest, result: keys };
+      request.onsuccess = jest.fn();
+      mockObjectStore.getAll.mockReturnValue(request);
+
+      // Trigger success callback
+      setTimeout(() => {
+        if (request.onsuccess) {
+          request.onsuccess({ target: { result: keys } } as any);
+        }
+      }, 0);
 
       const result = await storage.getApiKeys();
 
@@ -210,8 +360,27 @@ describe('IndexedDB Storage', () => {
 
   describe('updateApiKeyUsage', () => {
     it('should update API key usage timestamp', async () => {
-      const updatedKey = { ...testEncryptedKey, lastUsed: '2026-02-17T13:00:00.000Z' };
-      mockObjectStore.get.mockResolvedValue(testEncryptedKey);
+      const getRequest = { ...mockRequest, result: testEncryptedKey };
+      getRequest.onsuccess = jest.fn();
+      mockObjectStore.get.mockReturnValue(getRequest);
+
+      // Trigger get success callback
+      setTimeout(() => {
+        if (getRequest.onsuccess) {
+          getRequest.onsuccess({ target: { result: testEncryptedKey } } as any);
+        }
+      }, 0);
+
+      const putRequest = { ...mockRequest, result: undefined };
+      putRequest.onsuccess = jest.fn();
+      mockObjectStore.put.mockReturnValue(putRequest);
+
+      // Trigger put success callback
+      setTimeout(() => {
+        if (putRequest.onsuccess) {
+          putRequest.onsuccess({ target: { result: undefined } } as any);
+        }
+      }, 0);
 
       await storage.updateApiKeyUsage('key_test_123');
 

@@ -1,9 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useCreateComponent } from '@/hooks/use-components';
-import { CheckIcon, FolderIcon, SaveIcon } from 'lucide-react';
+import { CheckIcon, FolderIcon, SaveIcon, GithubIcon, RefreshCwIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Badge } from '@/components/ui/badge';
 
 interface SaveToProjectProps {
   projectId: string;
@@ -14,6 +17,13 @@ interface SaveToProjectProps {
   style?: string;
   typescript: boolean;
   onSave?: (componentId: string) => void;
+}
+
+interface GitHubSyncStatus {
+  isConnected: boolean;
+  isSyncing: boolean;
+  lastSyncAt?: string;
+  syncEnabled: boolean;
 }
 
 export default function SaveToProject({
@@ -28,7 +38,36 @@ export default function SaveToProject({
 }: SaveToProjectProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [savedComponentId, setSavedComponentId] = useState<string | null>(null);
+  const [syncToGitHub, setSyncToGitHub] = useState(false);
+  const [githubSyncStatus, setGithubSyncStatus] = useState<GitHubSyncStatus>({
+    isConnected: false,
+    isSyncing: false,
+    syncEnabled: false,
+  });
+  const [isSyncing, setIsSyncing] = useState(false);
   const createComponent = useCreateComponent();
+
+  // Check GitHub sync status for the project
+  useEffect(() => {
+    const checkGitHubStatus = async () => {
+      try {
+        const response = await fetch(`/api/github/sync/${projectId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setGithubSyncStatus({
+            isConnected: data.isConnected,
+            isSyncing: data.isSyncing,
+            lastSyncAt: data.lastSyncAt,
+            syncEnabled: data.syncEnabled,
+          });
+        }
+      } catch (error) {
+        console.error('Failed to check GitHub status:', error);
+      }
+    };
+
+    checkGitHubStatus();
+  }, [projectId]);
 
   const handleSave = async () => {
     try {
@@ -50,6 +89,11 @@ export default function SaveToProject({
 
       setSavedComponentId(result.id);
       onSave?.(result.id);
+
+      // Trigger GitHub sync if enabled and connected
+      if (syncToGitHub && githubSyncStatus.isConnected && githubSyncStatus.syncEnabled) {
+        await triggerGitHubSync(result.id);
+      }
     } catch (error) {
       console.error('Failed to save component:', error);
     } finally {
@@ -57,8 +101,35 @@ export default function SaveToProject({
     }
   };
 
+  const triggerGitHubSync = async (componentId: string) => {
+    try {
+      setIsSyncing(true);
+
+      const response = await fetch(`/api/github/sync/${projectId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          direction: 'to_github',
+          components: [componentId],
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('GitHub sync triggered:', data);
+      }
+    } catch (error) {
+      console.error('Failed to trigger GitHub sync:', error);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   return (
-    <div className="border-t border-gray-200 p-4 bg-gray-50">
+    <div className="border-t border-gray-200 p-4 bg-gray-50 space-y-4">
+      {/* Main save section */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">
           <FolderIcon className="h-4 w-4 mr-2" />
@@ -94,11 +165,50 @@ export default function SaveToProject({
         </button>
       </div>
 
-      {savedComponentId && (
-        <div className="mt-2 text-xs text-green-600">
-          Component saved successfully!
+      {/* GitHub sync section */}
+      {githubSyncStatus.isConnected && (
+        <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
+              <GithubIcon className="h-4 w-4 text-blue-600" />
+              <span className="text-sm text-gray-700">Sync to GitHub</span>
+            </div>
+            <Switch
+              checked={syncToGitHub}
+              onCheckedChange={setSyncToGitHub}
+              disabled={!githubSyncStatus.syncEnabled}
+            />
+          </div>
+          {githubSyncStatus.lastSyncAt && (
+            <div className="text-xs text-gray-500">
+              Last sync: {new Date(githubSyncStatus.lastSyncAt).toLocaleString()}
+            </div>
+          )}
         </div>
       )}
+
+      {/* Status indicators */}
+      <div className="flex items-center justify-between">
+        {savedComponentId && (
+          <div className="text-xs text-green-600">
+            Component saved successfully!
+          </div>
+        )}
+
+        {isSyncing && (
+          <div className="flex items-center text-xs text-blue-600">
+            <RefreshCwIcon className="h-3 w-3 mr-1 animate-spin" />
+            Syncing to GitHub...
+          </div>
+        )}
+
+        {githubSyncStatus.isConnected && syncToGitHub && !isSyncing && savedComponentId && (
+          <Badge variant="secondary" className="text-xs">
+            <GithubIcon className="h-3 w-3 mr-1" />
+            GitHub sync enabled
+          </Badge>
+        )}
+      </div>
     </div>
   );
 }

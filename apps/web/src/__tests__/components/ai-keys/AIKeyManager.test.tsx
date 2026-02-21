@@ -35,10 +35,21 @@ describe('AIKeyManager', () => {
     ],
     loading: false,
     error: null,
+    usageStats: {},
+    showAddKeyDialog: false,
+    selectedProvider: null,
+    editingKeyId: null,
     addApiKey: jest.fn(),
     removeApiKey: jest.fn(),
     updateApiKey: jest.fn(),
     toggleApiKey: jest.fn(),
+    setShowAddKeyDialog: jest.fn(),
+    setSelectedProvider: jest.fn(),
+    setEditingKeyId: jest.fn(),
+    deleteApiKey: jest.fn(),
+    setDefaultApiKey: jest.fn(),
+    loadUsageStats: jest.fn(),
+    clearError: jest.fn(),
   };
 
   beforeEach(() => {
@@ -49,9 +60,9 @@ describe('AIKeyManager', () => {
   it('should render AI key manager', () => {
     const { getByText } = render(<AIKeyManager />);
 
-    expect(getByText('AI API Keys')).toBeInTheDocument();
-    expect(getByText('OpenAI Key')).toBeInTheDocument();
-    expect(getByText('Anthropic Key')).toBeInTheDocument();
+    expect(getByText('API Keys')).toBeInTheDocument();
+    expect(getByText('OpenAI')).toBeInTheDocument();
+    expect(getByText('Anthropic')).toBeInTheDocument();
   });
 
   it('should show loading state', () => {
@@ -170,8 +181,8 @@ describe('AIKeyManager', () => {
     expect(keys).toHaveLength(2);
 
     // Should be sorted by provider name
-    expect(keys[0]).toHaveTextContent('Anthropic Key');
-    expect(keys[1]).toHaveTextContent('OpenAI Key');
+    expect(keys[0]).toHaveTextContent('Anthropic');
+    expect(keys[1]).toHaveTextContent('OpenAI');
   });
 
   it('should show API key status indicators', () => {
