@@ -26,12 +26,10 @@ jobs:
       with:
         node-version: '22'
         cache: 'npm'
-        cache-dependency-path: apps/${{ matrix.app }}/package-lock.json
-        
+        cache-dependency-path: package-lock.json
+
     - name: Install dependencies
-      run: |
-        cd apps/${{ matrix.app }}
-        npm ci
+      run: npm ci --legacy-peer-deps
         
     - name: Run Snyk to check for vulnerabilities
       uses: snyk/actions/node@master
