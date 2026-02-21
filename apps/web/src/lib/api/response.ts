@@ -66,3 +66,23 @@ export function createdResponse<T = any>(data: T, message?: string) {
 export function noContentResponse() {
   return new NextResponse(null, { status: 204 });
 }
+
+export function notFoundResponse(message?: string) {
+  return errorResponse(message || 'Not Found', 404);
+}
+
+export function unauthorizedResponse(message?: string) {
+  return errorResponse(message || 'Unauthorized', 401);
+}
+
+export function forbiddenResponse(message?: string) {
+  return errorResponse(message || 'Forbidden', 403);
+}
+
+export function badRequestResponse(message?: string) {
+  return errorResponse(message || 'Bad Request', 400);
+}
+
+export function internalServerErrorResponse(message?: string) {
+  return errorResponse(message || 'Internal Server Error', 500);
+}

@@ -12,6 +12,7 @@ import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 // Routes
 import healthRouter from './routes/health';
 import generateRouter from './routes/generate';
+import aiSimplifiedRouter from './routes/ai-simplified';
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use((req: express.Request, _res: express.Response, next: express.NextFunctio
 // Routes
 app.use('/health', healthRouter);
 app.use('/api', generateRouter);
+app.use('/api/ai', aiSimplifiedRouter); // Zero-cost AI routes
 
 // 404 handler (must be before error handler)
 app.use(notFoundHandler);

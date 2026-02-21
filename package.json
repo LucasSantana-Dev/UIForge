@@ -1,8 +1,9 @@
 {
   "name": "uiforge-webapp",
-  "version": "0.2.1",
+  "version": "0.2.0",
   "private": true,
   "description": "Zero-cost web application for AI-driven UI generation",
+  "license": "MIT",
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -21,7 +22,12 @@
     "deps:update": "ncu -u && npm install",
     "deps:unused": "depcheck",
     "clean": "turbo run clean && rm -rf node_modules",
-    "prepare": "husky"
+    "prepare": "husky",
+    "forge-patterns": "node scripts/forge-patterns-cli.js",
+    "forge-patterns:list": "node scripts/forge-patterns-cli.js list",
+    "forge-patterns:validate": "node scripts/forge-patterns-cli.js validate",
+    "forge-patterns:init": "node scripts/forge-patterns-cli.js init",
+    "forge-patterns:test": "node scripts/test-forge-patterns.js"
   },
   "lint-staged": {
     "apps/**/*.{js,jsx,ts,tsx}": [
@@ -37,9 +43,9 @@
     ]
   },
   "devDependencies": {
-    "@uiforge/forge-patterns": "file:../forge-patterns",
     "@commitlint/cli": "^20.4.1",
     "@commitlint/config-conventional": "^20.4.1",
+    "@forgespace/core": "^1.1.5",
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^22.0.0",
     "depcheck": "^1.4.7",
@@ -61,6 +67,7 @@
     "@hookform/resolvers": "^5.2.2",
     "@modelcontextprotocol/sdk": "^1.26.0",
     "@monaco-editor/react": "^4.7.0",
+    "commander": "^11.0.0",
     "crypto-js": "^4.2.0",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.564.0",

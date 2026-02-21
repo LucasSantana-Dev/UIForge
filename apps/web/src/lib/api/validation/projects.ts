@@ -27,6 +27,10 @@ export const createProjectSchema = z.object({
   framework: frameworkEnum,
   component_library: componentLibraryEnum.default('none'),
   is_public: z.boolean().default(false),
+  github_repo_id: z.string().uuid().optional(),
+  github_branch: z.string().default('main'),
+  repo_structure: z.record(z.string(), z.any()).default({}),
+  github_sync_enabled: z.boolean().default(false),
 });
 
 export const updateProjectSchema = createProjectSchema.partial();

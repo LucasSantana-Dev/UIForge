@@ -50,10 +50,20 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Build query
+    // Build query with GitHub repository information
     let dbQuery = supabase
       .from('projects')
-      .select('*', { count: 'exact' })
+      .select(`
+        *,
+        github_repositories(
+          id,
+          repo_name,
+          repo_owner,
+          repo_url,
+          default_branch,
+          is_private
+        )
+      `, { count: 'exact' })
       .eq('user_id', session.user.id);
 
     // Apply filters

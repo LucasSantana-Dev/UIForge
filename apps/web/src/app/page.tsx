@@ -4,6 +4,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Sparkles, Zap, CheckCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
+import { AnimatedBackground } from '@/components/animations/AnimatedBackground';
+import { AnimatedHeading } from '@/components/animations/AnimatedHeading';
+import { AnimatedButton } from '@/components/animations/AnimatedButton';
+import { RotatingSparkles } from '@/components/ui/RotatingSparkles';
+import { ScrollReveal } from '@/components/animations/ScrollReveal';
+import { FeatureCard } from '@/components/animations/FeatureCard';
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -12,8 +18,9 @@ export default async function HomePage() {
   } = await supabase.auth.getUser();
 
   return (
-    <div className="flex min-h-screen flex-col">
-      <header className="border-b">
+    <div className="flex min-h-screen flex-col relative">
+      <AnimatedBackground />
+      <header className="border-b relative z-10">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <Image src="/anvil-logo.svg" alt="UIForge" width={24} height={24} className="flex-shrink-0" />
@@ -50,89 +57,82 @@ export default async function HomePage() {
         </div>
       </header>
 
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         <section className="container mx-auto px-4 py-24 text-center">
           <div className="mx-auto max-w-3xl space-y-8">
-            <div className="inline-flex items-center gap-2 rounded-full border bg-muted px-4 py-2 text-sm">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span>AI-Powered UI Generation</span>
-            </div>
+            <ScrollReveal delay={0.2}>
+              <div className="inline-flex items-center gap-2 rounded-full border bg-muted px-4 py-2 text-sm">
+                <RotatingSparkles />
+                <span>AI-Powered UI Generation</span>
+              </div>
+            </ScrollReveal>
 
-            <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
+            <AnimatedHeading delay={0.4} className="text-5xl font-bold tracking-tight sm:text-6xl">
               Generate Production-Ready
               <span className="text-primary"> UI Components</span>
-            </h1>
+            </AnimatedHeading>
 
-            <p className="text-xl text-muted-foreground">
+            <ScrollReveal delay={0.6} className="text-xl text-muted-foreground">
               Transform your ideas into beautiful, functional UI components with AI. Support for
               React, Next.js, Vue, Angular, and more. Zero cost, unlimited possibilities.
-            </p>
+            </ScrollReveal>
 
-            <div className="flex items-center justify-center gap-4">
+            <ScrollReveal delay={0.8} className="flex items-center justify-center gap-4">
               {!user ? (
-                <Link
+                <AnimatedButton
                   href="/signup"
-                  className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90"
+                  variant="primary"
                 >
                   Start Building Free
                   <ArrowRight className="h-4 w-4" />
-                </Link>
+                </AnimatedButton>
               ) : (
-                <Link
+                <AnimatedButton
                   href="/dashboard"
-                  className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90"
+                  variant="primary"
                 >
                   Go to Dashboard
                   <ArrowRight className="h-4 w-4" />
-                </Link>
+                </AnimatedButton>
               )}
-              <Link
+              <AnimatedButton
                 href="https://github.com/yourusername/uiforge-mcp"
-                className="inline-flex items-center gap-2 rounded-md border px-6 py-3 text-base font-medium hover:bg-accent"
+                variant="secondary"
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 View on GitHub
-              </Link>
-            </div>
+              </AnimatedButton>
+            </ScrollReveal>
           </div>
         </section>
 
-        <section className="border-t bg-gradient-to-b from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 py-24">
+        <ScrollReveal delay={1.0} className="border-t bg-gradient-to-b from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 py-24">
           <div className="container mx-auto px-4">
             <div className="grid gap-8 md:grid-cols-3">
-              <div className="space-y-4 rounded-lg border bg-card p-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <Zap className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold">Lightning Fast</h3>
-                <p className="text-muted-foreground">
-                  Generate components in seconds. No waiting, no setup required.
-                </p>
-              </div>
+              <FeatureCard
+                delay={0.2}
+                icon={<Zap className="h-6 w-6 text-primary" />}
+                title="Lightning Fast"
+                description="Generate components in seconds. No waiting, no setup required."
+              />
 
-              <div className="space-y-4 rounded-lg border bg-card p-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <CheckCircle className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold">Production Ready</h3>
-                <p className="text-muted-foreground">
-                  Clean, maintainable code following best practices and conventions.
-                </p>
-              </div>
+              <FeatureCard
+                delay={0.4}
+                icon={<CheckCircle className="h-6 w-6 text-primary" />}
+                title="Production Ready"
+                description="Clean, maintainable code following best practices and conventions."
+              />
 
-              <div className="space-y-4 rounded-lg border bg-card p-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <Sparkles className="h-6 w-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold">AI-Powered</h3>
-                <p className="text-muted-foreground">
-                  Bring your own AI key or use our free tier. Your choice, your control.
-                </p>
-              </div>
+              <FeatureCard
+                delay={0.6}
+                icon={<Sparkles className="h-6 w-6 text-primary" />}
+                title="AI-Powered"
+                description="Bring your own AI key or use our free tier. Your choice, your control."
+              />
             </div>
           </div>
-        </section>
+        </ScrollReveal>
       </main>
 
       <footer className="border-t py-8">

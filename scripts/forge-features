@@ -1,0 +1,189 @@
+#!/bin/bash
+
+# Forge Features CLI - Centralized Feature Management
+# Controls features across all Forge projects (MCP Gateway, UIForge MCP, UIForge WebApp)
+
+set -e
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Print functions
+print_success() {
+    echo -e "${GREEN}✅ $1${NC}"
+}
+
+print_error() {
+    echo -e "${RED}❌ $1${NC}"
+}
+
+print_warning() {
+    echo -e "${YELLOW}⚠️  $1${NC}"
+}
+
+print_info() {
+    echo -e "${BLUE}ℹ️  $1${NC}"
+}
+
+# Help function
+show_help() {
+    cat << 'EOF'
+Forge Features CLI - Centralized Feature Management
+
+USAGE:
+    forge-features <command> [options] [arguments]
+
+COMMANDS:
+    help, --help, -h              Show this help message
+    list                         List all available features
+    status                       Show current feature status
+    enable <feature>             Enable a feature (requires Unleash server)
+    disable <feature>            Disable a feature (requires Unleash server)
+    validate                     Validate feature toggle configuration
+    version                      Show CLI version information
+
+OPTIONS:
+    --global                     Show global features only
+    --project=<name>            Show project-specific features
+    --format=<json|table>        Output format (default: table)
+    --verbose                    Show detailed information
+
+FEATURE NAMES:
+    Global Features:
+        global.debug-mode         Enable debug logging and monitoring
+        global.beta-features       Enable beta functionality
+        global.experimental-ui    Enable experimental UI components
+        global.enhanced-logging   Enable detailed logging
+        global.maintenance-mode    Put system in maintenance mode
+
+    MCP Gateway Features:
+        mcp-gateway.rate-limiting          Request rate limiting
+        mcp-gateway.request-validation     Input validation middleware
+        mcp-gateway.security-headers       Security headers middleware
+        mcp-gateway.performance-monitoring Performance monitoring
+        mcp-gateway.circuit-breaker        Circuit breaker pattern
+        mcp-gateway.health-checks          Health check endpoints
+
+    UIForge MCP Features:
+        uiforge-mcp.ai-chat               Enable AI chat functionality
+        uiforge-mcp.template-management    Enable template management
+        uiforge-mcp.ui-generation          Enable UI generation features
+        uiforge-mcp.cost-optimization      Enable cost optimization
+        uiforge-mcp.provider-load-balancing Enable provider load balancing
+        uiforge-mcp.streaming-responses    Enable streaming responses
+
+    UIForge WebApp Features:
+        uiforge-webapp.dark-mode           Enable dark mode
+        uiforge-webapp.advanced-analytics   Enable advanced analytics
+        uiforge-webapp.feature-flags-ui    Enable feature flags UI
+
+EXAMPLES:
+    forge-features help
+    forge-features list
+    forge-features list --global
+    forge-features list --project=mcp-gateway
+    forge-features status --global
+    forge-features enable global.debug-mode
+    forge-features disable mcp-gateway.rate-limiting
+    forge-features validate
+
+CONFIGURATION:
+    Environment Variables:
+        UNLEASH_URL           URL of Unleash server
+        UNLEASH_CLIENT_KEY    Client authentication key
+        DEBUG                 Enable debug output
+
+    Configuration Files:
+        patterns/feature-toggles/config/centralized-config.yml
+
+TROUBLESHOOTING:
+    If commands fail, check:
+    1. Unleash server is running (for enable/disable commands)
+    2. Environment variables are set correctly
+    3. Configuration file exists and is valid
+    4. Network connectivity to Unleash server
+
+For more help, see: https://github.com/uiforge/forge-patterns/docs/guides/
+
+Note: This is a simplified version for testing. Full CLI functionality requires Unleash server.
+EOF
+}
+
+# List available features
+list_features() {
+    echo ""
+    echo "📋 Available Features"
+    echo "===================="
+    echo ""
+    echo "Global Features:"
+    echo "  - global.debug-mode"
+    echo "  - global.beta-features"
+    echo "  - global.experimental-ui"
+    echo "  - global.enhanced-logging"
+    echo "  - global.maintenance-mode"
+    echo ""
+    echo "MCP Gateway Features:"
+    echo "  - mcp-gateway.rate-limiting"
+    echo "  - mcp-gateway.security-headers"
+    echo "  - mcp-gateway.performance-monitoring"
+    echo ""
+    echo "UIForge MCP Features:"
+    echo "  - uiforge-mcp.ai-chat"
+    echo "  - uiforge-mcp.template-management"
+    echo "  - uiforge-mcp.ui-generation"
+    echo ""
+    echo "UIForge WebApp Features:"
+    echo "  - uiforge-webapp.dark-mode"
+    echo "  - uiforge-webapp.advanced-analytics"
+    echo ""
+    echo "Note: Use forge-features enable/disable commands when Unleash server is running."
+}
+
+# Main script logic
+case "${1:-}" in
+    "help"|"--help"|"-h")
+        show_help
+        ;;
+    "list")
+        list_features
+        ;;
+    "status")
+        echo "❌ Command not implemented yet: status"
+        echo "This command requires Unleash server integration"
+        exit 1
+        ;;
+    "enable")
+        echo "❌ Command not implemented yet: enable"
+        echo "This command requires Unleash server integration"
+        exit 1
+        ;;
+    "disable")
+        echo "❌ Command not implemented yet: disable"
+        echo "This command requires Unleash server integration"
+        exit 1
+        ;;
+    "validate")
+        echo "❌ Command not implemented yet: validate"
+        echo "This command requires configuration validation logic"
+        exit 1
+        ;;
+    "version")
+        echo "❌ Command not implemented yet: version"
+        echo "This command requires version tracking logic"
+        exit 1
+        ;;
+    "")
+        print_error "Command required"
+        echo "Use 'forge-features help' for usage information"
+        exit 1
+        ;;
+    *)
+        print_error "Unknown command: $1"
+        echo "Use 'forge-features help' for usage information"
+        exit 1
+        ;;
+esac
