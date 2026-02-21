@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import { QueryProvider } from '@/components/providers/query-provider';
 import './globals.css';
 
-const inter = Inter({ subsets: ['latin'], preload: false });
+const inter = localFont({
+  src: '../../../../node_modules/@fontsource-variable/inter/files/inter-latin-wght-normal.woff2',
+  variable: '--font-inter',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'UIForge - AI-Driven UI Generation',
