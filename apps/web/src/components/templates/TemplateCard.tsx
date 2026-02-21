@@ -1,10 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Star, Download, Eye, Code } from 'lucide-react';
+import { Star, Eye, Code } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 
 export interface Template {
   id: string;
@@ -658,7 +665,7 @@ export default function SearchBar() {
       )}
     </div>
   );
-}`
+}`,
 };
 
 export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCardProps) {
@@ -679,7 +686,9 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
 
   const templateWithCode = {
     ...template,
-    code: templateCodes[template.id] || `// Template code for ${template.name}\\nexport default function ${template.name.replace(/\\s+/g, '')}() {\\n  return <div>Template implementation</div>;\\n}`
+    code:
+      templateCodes[template.id] ||
+      `// Template code for ${template.name}\\nexport default function ${template.name.replace(/\\s+/g, '')}() {\\n  return <div>Template implementation</div>;\\n}`,
   };
 
   return (
@@ -710,14 +719,12 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
           </div>
 
           <div className="flex items-center gap-2">
-            <Badge className={getDifficultyColor(template.difficulty)}>
-              {template.difficulty}
-            </Badge>
+            <Badge className={getDifficultyColor(template.difficulty)}>{template.difficulty}</Badge>
             <span className="text-xs text-muted-foreground">{template.category}</span>
           </div>
 
           <div className="flex flex-wrap gap-1">
-            {template.tags.slice(0, 3).map(tag => (
+            {template.tags.slice(0, 3).map((tag) => (
               <Badge key={tag} variant="outline" className="text-xs">
                 {tag}
               </Badge>
@@ -750,11 +757,7 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
             <Eye className="w-4 h-4 mr-1" />
             Preview
           </Button>
-          <Button
-            size="sm"
-            onClick={() => onUseTemplate(templateWithCode)}
-            className="flex-1"
-          >
+          <Button size="sm" onClick={() => onUseTemplate(templateWithCode)} className="flex-1">
             <Code className="w-4 h-4 mr-1" />
             Use Template
           </Button>

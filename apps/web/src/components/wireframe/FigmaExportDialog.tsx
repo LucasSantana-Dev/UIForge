@@ -12,12 +12,18 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Download, ExternalLink, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader2, Download, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface FigmaExportDialogProps {
   wireframe: {
@@ -82,9 +88,9 @@ export function FigmaExportDialog({ wireframe, onClose }: FigmaExportDialogProps
 
     const dataStr = JSON.stringify(exportResult.data, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
-    
+
     const exportFileDefaultName = `${fileName.replace(/\s+/g, '_')}_figma_export.json`;
-    
+
     const linkElement = document.createElement('a');
     linkElement.setAttribute('href', dataUri);
     linkElement.setAttribute('download', exportFileDefaultName);
@@ -174,10 +180,9 @@ export function FigmaExportDialog({ wireframe, onClose }: FigmaExportDialogProps
                 </SelectContent>
               </Select>
               <p className="text-xs text-muted-foreground mt-1">
-                {exportFormat === 'json' 
+                {exportFormat === 'json'
                   ? 'Standard JSON format for manual import or plugin use'
-                  : 'Optimized format for Figma plugin integration'
-                }
+                  : 'Optimized format for Figma plugin integration'}
               </p>
             </div>
           </div>

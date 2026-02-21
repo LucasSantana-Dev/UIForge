@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
@@ -38,7 +38,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     return successResponse({ generation });
-
   } catch (error) {
     console.error('Generation GET error:', error);
     return errorResponse('Internal server error', 500);
@@ -105,14 +104,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     return successResponse({ generation });
-
   } catch (error) {
     console.error('Generation PATCH error:', error);
     return errorResponse('Internal server error', 500);
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id: generationId } = await params;
   try {
     // Rate limiting
@@ -145,10 +146,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 
     // Delete generation
-    const { error } = await supabase
-      .from('generations')
-      .delete()
-      .eq('id', generationId);
+    const { error } = await supabase.from('generations').delete().eq('id', generationId);
 
     if (error) {
       console.error('Failed to delete generation:', error);
@@ -156,7 +154,6 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 
     return successResponse({ message: 'Generation deleted successfully' });
-
   } catch (error) {
     console.error('Generation DELETE error:', error);
     return errorResponse('Internal server error', 500);

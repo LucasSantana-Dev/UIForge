@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,7 +41,7 @@ export default function CustomDomain() {
     if (!newDomain) return;
 
     setIsAdding(true);
-    
+
     // Simulate API call to add domain
     setTimeout(() => {
       const newDomainStatus: DomainStatus = {
@@ -90,7 +90,7 @@ export default function CustomDomain() {
     <div className="space-y-6">
       <Card className="p-6">
         <h3 className="text-lg font-semibold mb-4">Custom Domain Configuration</h3>
-        
+
         {/* Add New Domain */}
         <div className="mb-6">
           <div className="flex gap-2">
@@ -144,7 +144,7 @@ export default function CustomDomain() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-600 mt-2">
-                    Configure these DNS records in your domain provider's dashboard.
+                    Configure these DNS records in your domain provider&apos;s dashboard.
                   </p>
                 </div>
               )}
@@ -153,7 +153,7 @@ export default function CustomDomain() {
               {domain.status === 'pending' && (
                 <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded">
                   <p className="text-sm text-blue-800 dark:text-blue-200">
-                    <strong>Next steps:</strong> Update your DNS records and wait for propagation. 
+                    <strong>Next steps:</strong> Update your DNS records and wait for propagation.
                     This can take up to 24 hours.
                   </p>
                 </div>
@@ -162,7 +162,8 @@ export default function CustomDomain() {
               {domain.status === 'error' && (
                 <div className="mt-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded">
                   <p className="text-sm text-red-800 dark:text-red-200">
-                    <strong>Configuration error:</strong> Please check your DNS records and try again.
+                    <strong>Configuration error:</strong> Please check your DNS records and try
+                    again.
                   </p>
                 </div>
               )}

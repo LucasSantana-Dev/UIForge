@@ -29,17 +29,18 @@ export default function ProjectActions({ projectId, projectName }: ProjectAction
   return (
     <>
       <div className="relative">
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="p-1 rounded hover:bg-accent"
-        >
+        <button onClick={() => setMenuOpen(!menuOpen)} className="p-1 rounded hover:bg-accent">
           <MoreVerticalIcon className="h-5 w-5 text-gray-400" />
         </button>
         {menuOpen && (
           <>
             <div
+              role="presentation"
               className="fixed inset-0 z-10"
               onClick={() => setMenuOpen(false)}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') setMenuOpen(false);
+              }}
             />
             <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
               <div className="py-1">
@@ -74,7 +75,8 @@ export default function ProjectActions({ projectId, projectName }: ProjectAction
           <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Project</h3>
             <p className="text-sm text-gray-600 mb-6">
-              Are you sure you want to delete <strong>{projectName}</strong>? This action cannot be undone.
+              Are you sure you want to delete <strong>{projectName}</strong>? This action cannot be
+              undone.
             </p>
             <div className="flex justify-end space-x-3">
               <button

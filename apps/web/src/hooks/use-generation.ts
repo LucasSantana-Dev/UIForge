@@ -26,64 +26,53 @@ export function useGeneration(projectId?: string) {
   const abortControllerRef = useRef<AbortController | null>(null);
   const createGeneration = useCreateGeneration();
 
-  const startGeneration = useCallback(async (options: GenerationOptions & {
-    componentName: string;
-    prompt: string;
-  }) => {
-    try {
-      // Cancel any ongoing generation
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+  const startGeneration = useCallback(
+    async (
+      options: GenerationOptions & {
+        componentName: string;
+        prompt: string;
       }
-
-      // Reset state
-      setState({
-        isGenerating: true,
-        progress: 0,
-        code: '',
-        error: null,
-        events: [],
-      });
-
-      // Create new abort controller
-      abortControllerRef.current = new AbortController();
-
-      let chunkCount = 0;
-      let code = '';
-      let tokensUsed = 0;
-
-      // Stream generation
-      for await (const event of streamGeneration(options)) {
-        // Check if aborted
-        if (abortControllerRef.current?.signal.aborted) {
-          break;
+    ) => {
+      try {
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
         }
 
-        setState(prev => ({
-          ...prev,
-          events: [...prev.events, event],
-        }));
+        setState({ isGenerating: true, progress: 0, code: '', error: null, events: [] });
 
-        switch (event.type) {
-          case 'start':
-            chunkCount = 0;
-            code = '';
-            tokensUsed = 0;
-            break;
+        abortControllerRef.current = new AbortController();
 
-          case 'chunk':
-            if (event.content) {
-              chunkCount++;
-              code += event.content;
+        let chunkCount = 0;
+        let code = '';
+        let tokensUsed = 0;
 
-              setState(prev => ({
-                ...prev,
-                code,
-                // Estimate progress based on chunk count
-                progress: Math.min((chunkCount / 10) * 100, 95), // Assume ~10 chunks
-              }));
+        for await (const event of streamGeneration(options)) {
+          if (abortControllerRef.current?.signal.aborted) break;
 
-              // Save to database if project ID is provided
+          setState((prev) => ({ ...prev, events: [...prev.events, event] }));
+
+          switch (event.type) {
+            case 'start':
+              chunkCount = 0;
+              code = '';
+              tokensUsed = 0;
+              break;
+
+            case 'chunk':
+              if (event.content) {
+                chunkCount++;
+                code += event.content;
+                setState((prev) => ({
+                  ...prev,
+                  code,
+                  progress: Math.min((chunkCount / 10) * 100, 95),
+                }));
+              }
+              break;
+
+            case 'complete':
+              setState((prev) => ({ ...prev, code, progress: 100, isGenerating: false }));
+
               if (projectId && code) {
                 try {
                   await createGeneration.mutateAsync({
@@ -99,69 +88,48 @@ export function useGeneration(projectId?: string) {
                   });
                 } catch (saveError) {
                   console.error('Failed to save generation:', saveError);
-                  // Don't fail the generation, just log the error
                 }
               }
-            }
-            break;
+              break;
 
-          case 'complete':
-            setState(prev => ({
-              ...prev,
-              code,
-              progress: 100,
-              isGenerating: false,
-            }));
-            break;
-
-          case 'error':
-            setState(prev => ({
-              ...prev,
-              error: event.message || 'Generation failed',
-              isGenerating: false,
-            }));
-            break;
+            case 'error':
+              setState((prev) => ({
+                ...prev,
+                error: event.message || 'Generation failed',
+                isGenerating: false,
+              }));
+              break;
+          }
         }
+
+        setState((prev) => {
+          if (prev.isGenerating) return { ...prev, isGenerating: false };
+          return prev;
+        });
+      } catch (error) {
+        setState((prev) => ({
+          ...prev,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          isGenerating: false,
+        }));
       }
-    } catch (error) {
-      setState(prev => ({
-        ...prev,
-        error: error instanceof Error ? error.message : 'Unknown error',
-        isGenerating: false,
-      }));
-    }
-  }, [projectId, createGeneration]);
+    },
+    [projectId, createGeneration]
+  );
 
   const stopGeneration = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
-      setState(prev => ({
-        ...prev,
-        isGenerating: false,
-        error: 'Generation cancelled',
-      }));
+      setState((prev) => ({ ...prev, isGenerating: false, error: 'Generation cancelled' }));
     }
   }, []);
 
   const reset = useCallback(() => {
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    setState({
-      isGenerating: false,
-      progress: 0,
-      code: '',
-      error: null,
-      events: [],
-    });
+    if (abortControllerRef.current) abortControllerRef.current.abort();
+    setState({ isGenerating: false, progress: 0, code: '', error: null, events: [] });
   }, []);
 
-  return {
-    ...state,
-    startGeneration,
-    stopGeneration,
-    reset,
-  };
+  return { ...state, startGeneration, stopGeneration, reset };
 }
 
 export interface UseGenerationProgressProps {
@@ -205,9 +173,5 @@ export function useGenerationProgress({
     }
   };
 
-  return {
-    latestEvent,
-    statusMessage: getStatusMessage(),
-    getEventIcon,
-  };
+  return { latestEvent, statusMessage: getStatusMessage(), getEventIcon };
 }
