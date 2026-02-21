@@ -6,7 +6,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2022,
     sourceType: 'module',
-    project: './tsconfig.json'
+    project: ['./apps/*/tsconfig.json', './packages/*/tsconfig.json']
   },
   rules: {
     // Forge Patterns additions
