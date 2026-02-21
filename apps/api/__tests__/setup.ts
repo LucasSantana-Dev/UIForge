@@ -23,6 +23,11 @@ global.console = {
 process.env.NODE_ENV = 'test';
 process.env.LOG_LEVEL = 'error';
 
+// Required environment variables for tests (mock values)
+process.env.SUPABASE_URL = process.env.SUPABASE_URL || 'https://test.supabase.co';
+process.env.SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY || 'test-anon-key';
+process.env.GEMINI_API_KEY = process.env.GEMINI_API_KEY || 'test-gemini-key';
+
 // Setup global test utilities
 beforeEach(() => {
   // Clear all mocks before each test
