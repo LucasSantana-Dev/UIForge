@@ -17,9 +17,8 @@ export default function TopBar({ user }: TopBarProps) {
   const { theme, setTheme } = useTheme();
 
   useEffect(() => {
-    if (!mounted) {
-      setTimeout(() => setMounted(true), 0);
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
   }, []);
 
   return (

@@ -19,7 +19,6 @@ describe('Supabase Storage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (mockSupabaseClient as any).storage = mockStorage;
   });
 

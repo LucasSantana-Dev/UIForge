@@ -210,7 +210,6 @@ describe('IndexedDB Storage', () => {
 
   describe('updateApiKeyUsage', () => {
     it('should update API key usage timestamp', async () => {
-      const updatedKey = { ...testEncryptedKey, lastUsed: '2026-02-17T13:00:00.000Z' };
       mockObjectStore.get.mockResolvedValue(testEncryptedKey);
 
       await storage.updateApiKeyUsage('key_test_123');
@@ -298,7 +297,9 @@ describe('IndexedDB Storage', () => {
         usageTrackingEnabled: false,
       };
 
-      await expect(storage.setUserPreferences(preferences)).rejects.toThrow('Preference storage failed');
+      await expect(storage.setUserPreferences(preferences)).rejects.toThrow(
+        'Preference storage failed'
+      );
     });
   });
 
@@ -337,7 +338,10 @@ describe('IndexedDB Storage', () => {
     it('should clear all stored data', async () => {
       await storage.clearAllData();
 
-      expect(mockDatabase.transaction).toHaveBeenCalledWith(['api_keys', 'user_preferences'], 'readwrite');
+      expect(mockDatabase.transaction).toHaveBeenCalledWith(
+        ['api_keys', 'user_preferences'],
+        'readwrite'
+      );
       expect(mockObjectStore.clear).toHaveBeenCalledTimes(2);
     });
 

@@ -102,11 +102,13 @@ describe('BYOK Storage', () => {
       await storage.storeApiKey(testEncryptedKey);
 
       expect(mockDatabase.transaction).toHaveBeenCalledWith(['api_keys'], 'readwrite');
-      expect(mockObjectStore.put).toHaveBeenCalledWith(expect.objectContaining({
-        provider: 'openai',
-        keyId: 'key_test_123',
-        encryptedKey: 'encrypted_test_key',
-      }));
+      expect(mockObjectStore.put).toHaveBeenCalledWith(
+        expect.objectContaining({
+          provider: 'openai',
+          keyId: 'key_test_123',
+          encryptedKey: 'encrypted_test_key',
+        })
+      );
     });
 
     it('should retrieve API key by ID', async () => {
@@ -153,7 +155,10 @@ describe('BYOK Storage', () => {
     it('should clear all data', async () => {
       await storage.clearAllData();
 
-      expect(mockDatabase.transaction).toHaveBeenCalledWith(['api_keys', 'user_preferences'], 'readwrite');
+      expect(mockDatabase.transaction).toHaveBeenCalledWith(
+        ['api_keys', 'user_preferences'],
+        'readwrite'
+      );
       expect(mockObjectStore.clear).toHaveBeenCalled();
     });
   });
@@ -237,11 +242,6 @@ describe('BYOK Storage', () => {
     });
 
     it('should get storage statistics', async () => {
-      const stats = {
-        apiKeysCount: 5,
-        totalSize: '2.5 KB',
-      };
-
       mockObjectStore.getAll.mockResolvedValue([testEncryptedKey]);
 
       const result = await storage.getStorageStats();

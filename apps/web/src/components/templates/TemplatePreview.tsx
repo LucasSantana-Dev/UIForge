@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Code, Copy, Download, Eye, EyeOff } from 'lucide-react';
+import { Copy, Download, Eye, EyeOff } from 'lucide-react';
 import { Template } from './TemplateCard';
 
 interface TemplatePreviewProps {
@@ -14,7 +14,12 @@ interface TemplatePreviewProps {
   onUseTemplate?: (template: Template) => void;
 }
 
-export function TemplatePreview({ template, open, onOpenChange, onUseTemplate }: TemplatePreviewProps) {
+export function TemplatePreview({
+  template,
+  open,
+  onOpenChange,
+  onUseTemplate,
+}: TemplatePreviewProps) {
   const [showCode, setShowCode] = useState(false);
   const [copied, setCopied] = useState(false);
 
@@ -35,10 +40,14 @@ export function TemplatePreview({ template, open, onOpenChange, onUseTemplate }:
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'beginner': return 'bg-green-100 text-green-800';
-      case 'intermediate': return 'bg-yellow-100 text-yellow-800';
-      case 'advanced': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'beginner':
+        return 'bg-green-100 text-green-800';
+      case 'intermediate':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'advanced':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
     }
   };
 
@@ -85,7 +94,7 @@ export function TemplatePreview({ template, open, onOpenChange, onUseTemplate }:
             <div>
               <h3 className="font-semibold mb-2">Tags</h3>
               <div className="flex flex-wrap gap-2">
-                {template.tags.map(tag => (
+                {template.tags.map((tag) => (
                   <Badge key={tag} variant="outline" className="text-xs">
                     {tag}
                   </Badge>
@@ -98,11 +107,7 @@ export function TemplatePreview({ template, open, onOpenChange, onUseTemplate }:
           <div>
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-semibold">Preview</h3>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowCode(!showCode)}
-              >
+              <Button variant="outline" size="sm" onClick={() => setShowCode(!showCode)}>
                 {showCode ? <Eye className="w-4 h-4 mr-2" /> : <EyeOff className="w-4 h-4 mr-2" />}
                 {showCode ? 'Hide Code' : 'Show Code'}
               </Button>

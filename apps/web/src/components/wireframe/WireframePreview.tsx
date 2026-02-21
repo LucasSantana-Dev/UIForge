@@ -154,30 +154,16 @@ export function WireframePreview({ wireframe }: WireframePreviewProps) {
       {/* Toolbar */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleZoomOut}
-            disabled={scale <= 0.5}
-          >
+          <Button variant="outline" size="sm" onClick={handleZoomOut} disabled={scale <= 0.5}>
             <ZoomOut className="h-4 w-4" />
           </Button>
           <span className="text-sm font-medium text-muted-foreground min-w-16 text-center">
             {Math.round(scale * 100)}%
           </span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleZoomIn}
-            disabled={scale >= 2}
-          >
+          <Button variant="outline" size="sm" onClick={handleZoomIn} disabled={scale >= 2}>
             <ZoomIn className="h-4 w-4" />
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleResetZoom}
-          >
+          <Button variant="outline" size="sm" onClick={handleResetZoom}>
             <RotateCcw className="h-4 w-4" />
           </Button>
           <Separator orientation="vertical" className="h-6" />
@@ -194,11 +180,7 @@ export function WireframePreview({ wireframe }: WireframePreviewProps) {
           <Badge variant="secondary">
             {width} × {height}
           </Badge>
-          {metadata && (
-            <Badge variant="outline">
-              {metadata.componentType}
-            </Badge>
-          )}
+          {metadata && <Badge variant="outline">{metadata.componentType}</Badge>}
         </div>
       </div>
 
@@ -235,53 +217,45 @@ export function WireframePreview({ wireframe }: WireframePreviewProps) {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Name</label>
+                <p className="text-sm font-medium text-muted-foreground">Name</p>
                 <p className="text-sm font-mono mt-1">
                   {selectedElementData.name || 'Unnamed Element'}
                 </p>
               </div>
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Type</label>
+                <p className="text-sm font-medium text-muted-foreground">Type</p>
                 <Badge variant="secondary" className="mt-1">
                   {selectedElementData.type}
                 </Badge>
               </div>
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Position</label>
+                <p className="text-sm font-medium text-muted-foreground">Position</p>
                 <p className="text-sm font-mono mt-1">
                   X: {selectedElementData.x || 0}, Y: {selectedElementData.y || 0}
                 </p>
               </div>
               <div>
-                <label className="text-sm font-medium text-muted-foreground">Size</label>
+                <p className="text-sm font-medium text-muted-foreground">Size</p>
                 <p className="text-sm font-mono mt-1">
                   {selectedElementData.width || 0} × {selectedElementData.height || 0}
                 </p>
               </div>
               {selectedElementData.cornerRadius && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Corner Radius
-                  </label>
-                  <p className="text-sm font-mono mt-1">
-                    {selectedElementData.cornerRadius}px
-                  </p>
+                  <p className="text-sm font-medium text-muted-foreground">Corner Radius</p>
+                  <p className="text-sm font-mono mt-1">{selectedElementData.cornerRadius}px</p>
                 </div>
               )}
               {selectedElementData.textContent && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">Text</label>
+                  <p className="text-sm font-medium text-muted-foreground">Text</p>
                   <p className="text-sm mt-1">{selectedElementData.textContent}</p>
                 </div>
               )}
               {selectedElementData.fontSize && (
                 <div>
-                  <label className="text-sm font-medium text-muted-foreground">
-                    Font Size
-                  </label>
-                  <p className="text-sm font-mono mt-1">
-                    {selectedElementData.fontSize}px
-                  </p>
+                  <p className="text-sm font-medium text-muted-foreground">Font Size</p>
+                  <p className="text-sm font-mono mt-1">{selectedElementData.fontSize}px</p>
                 </div>
               )}
             </CardContent>

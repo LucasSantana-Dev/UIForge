@@ -17,7 +17,7 @@ export default function GenerationProgress({
   events,
   error,
 }: GenerationProgressProps) {
-  const { latestEvent, statusMessage, getEventIcon } = useGenerationProgress({
+  const { statusMessage, getEventIcon } = useGenerationProgress({
     isGenerating,
     progress,
     events,
@@ -37,15 +37,13 @@ export default function GenerationProgress({
         ) : (
           <div className="h-5 w-5 rounded-full bg-gray-300" />
         )}
-        
-        <span className={cn(
-          'text-sm font-medium',
-          error
-            ? 'text-red-600'
-            : progress === 100
-            ? 'text-green-600'
-            : 'text-gray-600'
-        )}>
+
+        <span
+          className={cn(
+            'text-sm font-medium',
+            error ? 'text-red-600' : progress === 100 ? 'text-green-600' : 'text-gray-600'
+          )}
+        >
           {statusMessage}
         </span>
       </div>
@@ -63,10 +61,10 @@ export default function GenerationProgress({
               isGenerating
                 ? 'bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse'
                 : error
-                ? 'bg-red-500'
-                : progress === 100
-                ? 'bg-green-500'
-                : 'bg-blue-500'
+                  ? 'bg-red-500'
+                  : progress === 100
+                    ? 'bg-green-500'
+                    : 'bg-blue-500'
             )}
             style={{ width: `${progress}%` }}
           />
@@ -86,8 +84,8 @@ export default function GenerationProgress({
                   event.type === 'error'
                     ? 'bg-red-50 text-red-700'
                     : event.type === 'complete'
-                    ? 'bg-green-50 text-green-700'
-                    : 'bg-blue-50 text-blue-700'
+                      ? 'bg-green-50 text-green-700'
+                      : 'bg-blue-50 text-blue-700'
                 )}
               >
                 <span>{getEventIcon(event.type)}</span>
@@ -95,12 +93,12 @@ export default function GenerationProgress({
                   {event.type === 'chunk'
                     ? `Generated ${event.content?.length || 0} characters`
                     : event.type === 'complete'
-                    ? `Complete (${event.totalLength} characters)`
-                    : event.type === 'start'
-                    ? 'Started generation'
-                    : event.type === 'error'
-                    ? event.message || 'Error occurred'
-                    : 'Processing...'}
+                      ? `Complete (${event.totalLength} characters)`
+                      : event.type === 'start'
+                        ? 'Started generation'
+                        : event.type === 'error'
+                          ? event.message || 'Error occurred'
+                          : 'Processing...'}
                 </span>
                 <span className="text-gray-500">
                   {new Date(event.timestamp).toLocaleTimeString()}
