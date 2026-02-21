@@ -2,6 +2,7 @@
   "name": "uiforge-webapp",
   "version": "0.2.1",
   "private": true,
+  "license": "MIT",
   "description": "Zero-cost web application for AI-driven UI generation",
   "workspaces": [
     "apps/*",
