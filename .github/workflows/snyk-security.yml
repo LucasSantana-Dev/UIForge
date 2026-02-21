@@ -38,9 +38,8 @@ jobs:
       env:
         SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
       with:
-        args: --severity-threshold=high --org=your-org-name --project-name=UIForge-${{ matrix.app }}
+        args: --severity-threshold=high --org=LucasSantana-Dev --project-name=UIForge-${{ matrix.app }}
         command: monitor
-        json: true
         
     - name: Upload Snyk results to GitHub Security tab
       uses: github/codeql-action/upload-sarif@v4
