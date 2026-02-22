@@ -1,62 +1,29 @@
-name: Production Deployment
+name: Production CI
 
 on:
   push:
     branches: [main]
 
 jobs:
-  pre-deploy:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Verify release branch merge
-        run: |
-          if [[ $(git log --oneline --merges | head -1) != *"release/1.0.0"* ]] && [[ $(git log --oneline --merges | head -1) != *"release/"* ]]; then
-            echo "✅ Deployment allowed: Main branch updated"
-          else
-            echo "✅ Deployment allowed: Main branch updated"
-          fi
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '24'
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
-      - name: Run final tests
-        run: npm run test:production || echo "Tests completed with warnings"
-
-  deploy-production:
-    needs: pre-deploy
-    runs-on: ubuntu-latest
-    environment: production
-    steps:
-      - name: Deploy to production
-        run: |
-          echo "🚀 Deploying to production environment (uiforge.com)"
-          echo "📦 Building production assets..."
-          npm run build
-          echo "✅ Production deployment completed"
-      - name: Health check
-        run: |
-          echo "🔍 Running health checks..."
-          echo "✅ Health checks passed"
-      - name: Notify deployment
-        run: |
-          echo "📢 Deployment notification sent"
-          echo "🎉 Production deployment successful!"
-
-  post-deploy:
-    needs: deploy-production
-    runs-on: ubuntu-latest
-    if: success()
-    steps:
-      - name: Create release tag
-        run: |
-          if [[ ${{ github.ref }} == "refs/heads/main" ]]; then
-            echo "🏷️ Creating release tag"
-            git config --global user.name "GitHub Actions"
-            git config --global user.email "actions@github.com"
-            git tag -a v1.0.0-$(date +%Y%m%d-%H%M%S) -m "Production deployment v1.0.0"
-            git push origin v1.0.0-$(date +%Y%m%d-%H%M%S) || echo "Tag already exists or push failed"
-          fi
+      - name: Lint
+        run: npm run lint
+      - name: Type check
+        run: npm run type-check
+      - name: Unit tests
+        run: npm run test -- -- --coverage
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
