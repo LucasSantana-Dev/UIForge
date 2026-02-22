@@ -31,7 +31,7 @@ describe('Project Validation Schemas', () => {
     it('should apply defaults for optional fields', () => {
       const minimalData = {
         name: 'Test Project',
-        framework: 'nextjs',
+        framework: 'react',
       };
 
       const result = createProjectSchema.safeParse(minimalData);
