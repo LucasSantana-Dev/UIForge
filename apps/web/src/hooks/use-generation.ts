@@ -5,6 +5,8 @@
 import { useState, useCallback, useRef } from 'react';
 import { streamGeneration, GenerationOptions, GenerationEvent } from '@/lib/api/generation';
 import { useCreateGeneration } from './use-generations';
+import { useAIKeyStore } from '@/stores/ai-keys';
+import { decryptApiKey } from '@/lib/encryption';
 
 export interface UseGenerationState {
   isGenerating: boolean;
@@ -25,6 +27,7 @@ export function useGeneration(projectId?: string) {
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const createGeneration = useCreateGeneration();
+  const { apiKeys, encryptionKey } = useAIKeyStore();
 
   const startGeneration = useCallback(
     async (
@@ -42,11 +45,25 @@ export function useGeneration(projectId?: string) {
 
         abortControllerRef.current = new AbortController();
 
+        let userApiKey: string | undefined;
+        const googleKey =
+          apiKeys.find((k) => k.provider === 'google' && k.isDefault) ||
+          apiKeys.find((k) => k.provider === 'google');
+        if (googleKey && encryptionKey) {
+          try {
+            userApiKey = decryptApiKey(googleKey.encryptedKey, encryptionKey);
+          } catch {
+            // Fall through to env key
+          }
+        }
+
+        const genOptions = { ...options, userApiKey };
+
         let chunkCount = 0;
         let code = '';
         let tokensUsed = 0;
 
-        for await (const event of streamGeneration(options)) {
+        for await (const event of streamGeneration(genOptions)) {
           if (abortControllerRef.current?.signal.aborted) break;
 
           setState((prev) => ({ ...prev, events: [...prev.events, event] }));
@@ -114,7 +131,7 @@ export function useGeneration(projectId?: string) {
         }));
       }
     },
-    [projectId, createGeneration]
+    [projectId, createGeneration, apiKeys, encryptionKey]
   );
 
   const stopGeneration = useCallback(() => {
