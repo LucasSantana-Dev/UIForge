@@ -14,6 +14,7 @@ export interface GeminiGenerateOptions {
   style?: string;
   typescript?: boolean;
   apiKey?: string;
+  contextAddition?: string;
 }
 
 const SYSTEM_PROMPT = `You are a UI component generator. Generate a single, self-contained React component.
@@ -62,9 +63,12 @@ export async function* generateComponentStream(
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
+    const systemPrompt = options.contextAddition
+      ? `${SYSTEM_PROMPT}\n\n${options.contextAddition}`
+      : SYSTEM_PROMPT;
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.0-flash',
-      systemInstruction: SYSTEM_PROMPT,
+      systemInstruction: systemPrompt,
     });
 
     const userPrompt = buildPrompt(options);

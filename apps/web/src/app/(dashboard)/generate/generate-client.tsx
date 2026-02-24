@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Code, Github, Loader2, Check, AlertTriangle } from 'lucide-react';
+import FeedbackPanel from '@/components/generator/FeedbackPanel';
 
 function GeneratePageClient() {
   const searchParams = useSearchParams();
@@ -28,6 +29,8 @@ function GeneratePageClient() {
   );
   const [prUrl, setPrUrl] = useState<string | null>(null);
   const [pushError, setPushError] = useState<string | null>(null);
+  const [generationId, setGenerationId] = useState<string | null>(null);
+  const [ragEnriched, setRagEnriched] = useState(false);
 
   // Handle template instantiation
   useEffect(() => {
@@ -56,7 +59,14 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
     }
   }, [template, description, framework, componentLibrary]);
 
-  const handleGenerate = async (code: string, settings?: { componentName?: string }) => {
+  const handleGenerate = async (
+    code: string,
+    settings?: {
+      componentName?: string;
+      generationId?: string;
+      ragEnriched?: boolean;
+    }
+  ) => {
     setGeneratedCode(code);
     setIsGenerating(false);
     setIsTemplateMode(false);
@@ -64,6 +74,8 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
     setPrUrl(null);
     setPushError(null);
     if (settings?.componentName) setComponentName(settings.componentName);
+    setGenerationId(settings?.generationId ?? null);
+    setRagEnriched(settings?.ragEnriched ?? false);
   };
 
   const handlePushToGitHub = async () => {
@@ -223,46 +235,49 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
         </div>
       </div>
 
-      {/* Push to GitHub bar */}
+      {/* Actions bar: Feedback + Push to GitHub */}
       {generatedCode && !isGenerating && (
-        <div className="mt-4 flex items-center gap-3 p-3 rounded-lg border bg-card">
-          {pushState === 'idle' && (
-            <Button onClick={handlePushToGitHub} variant="outline" size="sm">
-              <Github className="mr-2 h-4 w-4" />
-              Push to GitHub
-            </Button>
-          )}
-          {pushState === 'pushing' && (
-            <Button disabled variant="outline" size="sm">
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Creating PR...
-            </Button>
-          )}
-          {pushState === 'success' && prUrl && (
-            <div className="flex items-center gap-2 text-sm">
-              <Check className="h-4 w-4 text-green-500" />
-              <span>PR created!</span>
-              <a
-                href={prUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary underline"
-              >
-                View on GitHub
-              </a>
-            </div>
-          )}
-          {(pushState === 'error' || pushState === 'no-repo') && (
-            <div className="flex items-center gap-2 text-sm">
-              <AlertTriangle className="h-4 w-4 text-yellow-500" />
-              <span className="text-muted-foreground">{pushError}</span>
-              {pushState === 'error' && (
-                <Button onClick={handlePushToGitHub} variant="ghost" size="sm">
-                  Retry
-                </Button>
-              )}
-            </div>
-          )}
+        <div className="mt-4 flex items-center justify-between gap-3 p-3 rounded-lg border bg-card">
+          <FeedbackPanel generationId={generationId} ragEnriched={ragEnriched} />
+          <div className="flex items-center gap-3">
+            {pushState === 'idle' && (
+              <Button onClick={handlePushToGitHub} variant="outline" size="sm">
+                <Github className="mr-2 h-4 w-4" />
+                Push to GitHub
+              </Button>
+            )}
+            {pushState === 'pushing' && (
+              <Button disabled variant="outline" size="sm">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating PR...
+              </Button>
+            )}
+            {pushState === 'success' && prUrl && (
+              <div className="flex items-center gap-2 text-sm">
+                <Check className="h-4 w-4 text-green-500" />
+                <span>PR created!</span>
+                <a
+                  href={prUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline"
+                >
+                  View on GitHub
+                </a>
+              </div>
+            )}
+            {(pushState === 'error' || pushState === 'no-repo') && (
+              <div className="flex items-center gap-2 text-sm">
+                <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                <span className="text-muted-foreground">{pushError}</span>
+                {pushState === 'error' && (
+                  <Button onClick={handlePushToGitHub} variant="ghost" size="sm">
+                    Retry
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>

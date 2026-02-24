@@ -4,6 +4,9 @@ import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
 import { generateComponentStream } from '@/lib/services/gemini';
 import { runAllGates } from '@/lib/quality/gates';
+import { enrichPromptWithContext } from '@/lib/services/context-enrichment';
+import { storeGenerationEmbedding } from '@/lib/services/embeddings';
+import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,6 +18,7 @@ const generateSchema = z.object({
   style: z.enum(['modern', 'minimal', 'colorful']).optional(),
   typescript: z.boolean().optional(),
   userApiKey: z.string().min(1).optional(),
+  useRag: z.boolean().optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -29,7 +33,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await verifySession();
+    const { user } = await verifySession();
 
     const body = await request.json();
     const parsed = generateSchema.safeParse(body);
@@ -43,13 +47,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { description, framework, componentLibrary, style, typescript, userApiKey } = parsed.data;
+    const { description, framework, componentLibrary, style, typescript, userApiKey, useRag } =
+      parsed.data;
+
+    let contextAddition = '';
+    if (useRag !== false) {
+      try {
+        const enrichment = await enrichPromptWithContext(description, {
+          framework,
+          apiKey: userApiKey,
+        });
+        contextAddition = enrichment.systemPromptAddition;
+      } catch {
+        // RAG enrichment is best-effort
+      }
+    }
 
     const encoder = new TextEncoder();
 
     const stream = new ReadableStream({
       async start(controller) {
+        let generationId: string | null = null;
+
         try {
+          const supabase = await createClient();
+          const { data: gen } = await supabase
+            .from('generations')
+            .insert({
+              user_id: user.id,
+              prompt: description,
+              framework,
+              status: 'processing',
+              ai_provider: 'google' as const,
+              model_used: 'gemini-2.0-flash',
+            })
+            .select('id')
+            .single();
+          generationId = gen?.id ?? null;
+
           let fullCode = '';
 
           for await (const event of generateComponentStream({
@@ -59,6 +94,7 @@ export async function POST(request: NextRequest) {
             style,
             typescript,
             apiKey: userApiKey,
+            contextAddition,
           })) {
             if (event.type === 'chunk' && event.content) {
               fullCode += event.content;
@@ -66,38 +102,65 @@ export async function POST(request: NextRequest) {
 
             if (event.type === 'complete') {
               const qualityReport = runAllGates(fullCode);
-              const qualityEvent = {
-                type: 'quality',
-                report: qualityReport,
-                timestamp: Date.now(),
-              };
               controller.enqueue(
-                encoder.encode(`data: ${JSON.stringify(qualityEvent)}\n\n`)
+                encoder.encode(
+                  `data: ${JSON.stringify({
+                    type: 'quality',
+                    report: qualityReport,
+                    timestamp: Date.now(),
+                  })}\n\n`
+                )
               );
 
-              const completeEvent = {
-                ...event,
-                code: fullCode,
-                totalLength: fullCode.length,
-                qualityPassed: qualityReport.passed,
-              };
+              if (generationId) {
+                await supabase
+                  .from('generations')
+                  .update({
+                    status: 'completed',
+                    generated_code: fullCode,
+                  })
+                  .eq('id', generationId);
+
+                storeGenerationEmbedding(generationId, description, userApiKey).catch(() => {});
+              }
+
               controller.enqueue(
-                encoder.encode(`data: ${JSON.stringify(completeEvent)}\n\n`)
+                encoder.encode(
+                  `data: ${JSON.stringify({
+                    ...event,
+                    code: fullCode,
+                    generationId,
+                    totalLength: fullCode.length,
+                    qualityPassed: qualityReport.passed,
+                    ragEnriched: contextAddition.length > 0,
+                  })}\n\n`
+                )
               );
               continue;
             }
 
-            const sseData = `data: ${JSON.stringify(event)}\n\n`;
-            controller.enqueue(encoder.encode(sseData));
+            controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
           }
         } catch (error) {
-          const errorEvent = {
-            type: 'error',
-            message: error instanceof Error ? error.message : 'Stream failed',
-            timestamp: Date.now(),
-          };
-          const errData = `data: ${JSON.stringify(errorEvent)}\n\n`;
-          controller.enqueue(encoder.encode(errData));
+          if (generationId) {
+            const supabase = await createClient();
+            await supabase
+              .from('generations')
+              .update({
+                status: 'failed',
+                error_message: error instanceof Error ? error.message : 'Generation failed',
+              })
+              .eq('id', generationId);
+          }
+          controller.enqueue(
+            encoder.encode(
+              `data: ${JSON.stringify({
+                type: 'error',
+                message: error instanceof Error ? error.message : 'Stream failed',
+                timestamp: Date.now(),
+              })}\n\n`
+            )
+          );
         } finally {
           controller.close();
         }
@@ -126,9 +189,10 @@ export async function GET() {
   return new Response(
     JSON.stringify({
       message: 'UI Generation API',
-      version: '2.0.0',
+      version: '2.1.0',
       status: 'active',
       provider: 'gemini-2.0-flash',
+      features: ['rag', 'quality-gates', 'streaming'],
     }),
     {
       status: 200,
