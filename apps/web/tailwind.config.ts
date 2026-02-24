@@ -1,7 +1,6 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  darkMode: 'class',
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -15,48 +14,30 @@ const config: Config = {
         ring: 'hsl(var(--ring))',
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        surface: {
+          0: 'var(--surface-0)',
+          1: 'var(--surface-1)',
+          2: 'var(--surface-2)',
+          3: 'var(--surface-3)',
+          4: 'var(--surface-4)',
+        },
+        brand: {
+          DEFAULT: 'var(--brand)',
+          light: 'var(--brand-light)',
+          dark: 'var(--brand-dark)',
+          muted: 'var(--brand-muted)',
+        },
+        'text-primary': 'var(--text-primary)',
+        'text-secondary': 'var(--text-secondary)',
+        'text-muted': 'var(--text-muted)',
+        'text-brand': 'var(--text-brand)',
+        success: 'var(--success)',
+        warning: 'var(--warning)',
+        error: 'var(--error)',
+        info: 'var(--info)',
         primary: {
           DEFAULT: 'hsl(var(--primary))',
           foreground: 'hsl(var(--primary-foreground))',
-        },
-        purple: {
-          50: '#f3e8ff',
-          100: '#e9d5ff',
-          200: '#d8b4fe',
-          300: '#c084fc',
-          400: '#a855f7',
-          500: '#9333ea',
-          600: '#7c3aed',
-          700: '#6d28d9',
-          800: '#5b21b6',
-          900: '#4c1d95',
-          950: '#2e1065',
-        },
-        violet: {
-          50: '#f5f3ff',
-          100: '#ede9fe',
-          200: '#ddd6fe',
-          300: '#c4b5fd',
-          400: '#a78bfa',
-          500: '#8b5cf6',
-          600: '#7c3aed',
-          700: '#6d28d9',
-          800: '#5b21b6',
-          900: '#4c1d95',
-          950: '#2e1065',
-        },
-        gray: {
-          50: '#f8fafc',
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
         },
         secondary: {
           DEFAULT: 'hsl(var(--secondary))',
@@ -90,6 +71,19 @@ const config: Config = {
           '5': 'hsl(var(--chart-5))',
         },
       },
+      fontFamily: {
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        display: [
+          'var(--font-outfit)',
+          'var(--font-inter)',
+          'sans-serif',
+        ],
+        mono: [
+          'var(--font-jetbrains-mono)',
+          'ui-monospace',
+          'monospace',
+        ],
+      },
       borderRadius: {
         lg: 'var(--radius)',
         md: 'calc(var(--radius) - 2px)',
@@ -97,9 +91,7 @@ const config: Config = {
       },
       keyframes: {
         'accordion-down': {
-          from: {
-            height: '0',
-          },
+          from: { height: '0' },
           to: {
             height: 'var(--radix-accordion-content-height)',
           },
@@ -108,14 +100,39 @@ const config: Config = {
           from: {
             height: 'var(--radix-accordion-content-height)',
           },
-          to: {
-            height: '0',
+          to: { height: '0' },
+        },
+        'siza-fade-in': {
+          from: {
+            opacity: '0',
+            transform: 'translateY(4px)',
+          },
+          to: { opacity: '1', transform: 'translateY(0)' },
+        },
+        'siza-scale-in': {
+          from: { opacity: '0', transform: 'scale(0.96)' },
+          to: { opacity: '1', transform: 'scale(1)' },
+        },
+        'pulse-glow': {
+          '0%, 100%': {
+            boxShadow: '0 0 12px rgba(124,58,237,0.2)',
+          },
+          '50%': {
+            boxShadow: '0 0 24px rgba(124,58,237,0.4)',
           },
         },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'siza-fade-in':
+          'siza-fade-in 0.3s var(--ease-siza) forwards',
+        'siza-scale-in':
+          'siza-scale-in 0.2s var(--ease-siza) forwards',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+      },
+      transitionTimingFunction: {
+        siza: 'var(--ease-siza)',
       },
     },
   },

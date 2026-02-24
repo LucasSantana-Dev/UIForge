@@ -687,8 +687,9 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
   const templateWithCode = {
     ...template,
     code:
+      template.code ||
       templateCodes[template.id] ||
-      `// Template code for ${template.name}\\nexport default function ${template.name.replace(/\\s+/g, '')}() {\\n  return <div>Template implementation</div>;\\n}`,
+      `// Template code for ${template.name}\nexport default function ${template.name.replace(/\s+/g, '')}() {\n  return <div>Template implementation</div>;\n}`,
   };
 
   return (

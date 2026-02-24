@@ -8,8 +8,10 @@ import LivePreview from '@/components/generator/LivePreview';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Code, Github, Loader2, Check, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Code, Github, Loader2, Check, AlertTriangle, Save } from 'lucide-react';
 import FeedbackPanel from '@/components/generator/FeedbackPanel';
+import { SaveTemplateDialog } from '@/components/generator/SaveTemplateDialog';
+import { isFeatureEnabled } from '@/lib/features/flags';
 
 function GeneratePageClient() {
   const searchParams = useSearchParams();
@@ -31,33 +33,48 @@ function GeneratePageClient() {
   const [pushError, setPushError] = useState<string | null>(null);
   const [generationId, setGenerationId] = useState<string | null>(null);
   const [ragEnriched, setRagEnriched] = useState(false);
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
 
-  // Handle template instantiation
+  const githubEnabled = isFeatureEnabled('ENABLE_GITHUB_APP');
+
   useEffect(() => {
-    if (template && description) {
-      const templateCode = `// Template: ${template}
-// Framework: ${framework}
-// Component Library: ${componentLibrary}
+    if (!template) return;
 
-import React from 'react';
+    async function loadTemplate() {
+      try {
+        const res = await fetch(`/api/templates/${template}`);
+        if (res.ok) {
+          const json = await res.json();
+          const t = json.data?.template;
+          const firstFile = t?.code?.files?.[0];
+          if (firstFile?.content) {
+            setGeneratedCode(firstFile.content);
+            setIsTemplateMode(true);
+            return;
+          }
+        }
+      } catch {
+        // fall through to stub
+      }
 
-export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
+      if (description) {
+        const stub = `import React from 'react';
+
+export default function TemplateComponent() {
   return (
     <div className="p-4">
-      <h2>Template: ${template}</h2>
+      <h2>${template}</h2>
       <p>${description}</p>
-      <p>This is a template component that you can customize further.</p>
     </div>
   );
 }`;
-
-      const timerId = setTimeout(() => {
-        setGeneratedCode(templateCode);
+        setGeneratedCode(stub);
         setIsTemplateMode(true);
-      }, 0);
-      return () => clearTimeout(timerId);
+      }
     }
-  }, [template, description, framework, componentLibrary]);
+
+    loadTemplate();
+  }, [template, description]);
 
   const handleGenerate = async (
     code: string,
@@ -133,7 +150,6 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
   const handleClearTemplate = () => {
     setGeneratedCode('');
     setIsTemplateMode(false);
-    // Clear URL parameters
     const url = new URL(window.location.href);
     url.searchParams.delete('template');
     url.searchParams.delete('framework');
@@ -157,7 +173,6 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header with template indicator */}
       <div className="mb-6">
         <div className="flex items-center justify-between">
           <div>
@@ -202,7 +217,6 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
       </div>
 
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
-        {/* Generator Form - Left Panel */}
         <div className="lg:col-span-1">
           <Card className="h-full overflow-hidden">
             <GeneratorForm
@@ -216,7 +230,6 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
           </Card>
         </div>
 
-        {/* Code Editor - Middle Panel */}
         <div className="lg:col-span-1">
           <Card className="h-full overflow-hidden">
             <CodeEditor
@@ -227,7 +240,6 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
           </Card>
         </div>
 
-        {/* Live Preview - Right Panel */}
         <div className="lg:col-span-1">
           <Card className="h-full overflow-hidden">
             <LivePreview code={generatedCode} framework={framework} />
@@ -235,51 +247,66 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
         </div>
       </div>
 
-      {/* Actions bar: Feedback + Push to GitHub */}
       {generatedCode && !isGenerating && (
         <div className="mt-4 flex items-center justify-between gap-3 p-3 rounded-lg border bg-card">
           <FeedbackPanel generationId={generationId} ragEnriched={ragEnriched} />
           <div className="flex items-center gap-3">
-            {pushState === 'idle' && (
-              <Button onClick={handlePushToGitHub} variant="outline" size="sm">
-                <Github className="mr-2 h-4 w-4" />
-                Push to GitHub
-              </Button>
-            )}
-            {pushState === 'pushing' && (
-              <Button disabled variant="outline" size="sm">
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating PR...
-              </Button>
-            )}
-            {pushState === 'success' && prUrl && (
-              <div className="flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 text-green-500" />
-                <span>PR created!</span>
-                <a
-                  href={prUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary underline"
-                >
-                  View on GitHub
-                </a>
-              </div>
-            )}
-            {(pushState === 'error' || pushState === 'no-repo') && (
-              <div className="flex items-center gap-2 text-sm">
-                <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                <span className="text-muted-foreground">{pushError}</span>
-                {pushState === 'error' && (
-                  <Button onClick={handlePushToGitHub} variant="ghost" size="sm">
-                    Retry
+            <Button onClick={() => setSaveDialogOpen(true)} variant="outline" size="sm">
+              <Save className="mr-2 h-4 w-4" />
+              Save as Template
+            </Button>
+
+            {githubEnabled && (
+              <>
+                {pushState === 'idle' && (
+                  <Button onClick={handlePushToGitHub} variant="outline" size="sm">
+                    <Github className="mr-2 h-4 w-4" />
+                    Push to GitHub
                   </Button>
                 )}
-              </div>
+                {pushState === 'pushing' && (
+                  <Button disabled variant="outline" size="sm">
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating PR...
+                  </Button>
+                )}
+                {pushState === 'success' && prUrl && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span>PR created!</span>
+                    <a
+                      href={prUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline"
+                    >
+                      View on GitHub
+                    </a>
+                  </div>
+                )}
+                {(pushState === 'error' || pushState === 'no-repo') && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                    <span className="text-muted-foreground">{pushError}</span>
+                    {pushState === 'error' && (
+                      <Button onClick={handlePushToGitHub} variant="ghost" size="sm">
+                        Retry
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
       )}
+
+      <SaveTemplateDialog
+        open={saveDialogOpen}
+        onOpenChange={setSaveDialogOpen}
+        code={generatedCode}
+        framework={framework}
+      />
     </div>
   );
 }
