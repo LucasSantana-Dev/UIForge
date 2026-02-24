@@ -2,11 +2,11 @@
 
 > **Zero-cost AI-powered UI generation platform**
 >
-> Transform ideas into production-ready code with AI. Built with Next.js 15, Supabase, and modern web technologies. 100% free.
+> Transform ideas into production-ready code with AI. Built with Next.js 16, Supabase, and modern web technologies. 100% free.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-15.1.0-black)](https://nextjs.org/)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen)](https://nodejs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.1.5-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7.0-blue)](https://www.typescriptlang.org/)
 [![Test Coverage](https://img.shields.io/badge/Coverage-25%25-red)](https://github.com/your-org/siza-webapp/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
@@ -25,7 +25,7 @@
 - 🎨 **AI-Powered Generation** - Natural language or screenshot to production-ready UI components
 - 🔐 **Privacy-First** - Bring Your Own Key (BYOK) with client-side encryption
 - 💰 **Zero-Cost** - 100% free tier architecture (up to 50,000 users)
-- 🚀 **Modern Stack** - Next.js 15, Supabase, shadcn/ui, TypeScript
+- 🚀 **Modern Stack** - Next.js 16, Supabase, shadcn/ui, TypeScript
 - 📱 **Responsive Design** - Mobile-first with dark mode optimized
 - ⚡ **Real-time Updates** - Live collaboration via Supabase subscriptions
 - 🎯 **Production Ready** - Monaco editor, live preview, export functionality
@@ -34,7 +34,7 @@
 ## 🏗️ Architecture
 
 ### Frontend Layer
-- **Framework**: Next.js 15 (App Router) + React 18
+- **Framework**: Next.js 16 (App Router) + React 19
 - **Language**: TypeScript (strict mode)
 - **Styling**: Tailwind CSS + shadcn/ui design system
 - **State**: Zustand (minimal re-renders)
@@ -59,7 +59,7 @@
 
 ### Prerequisites
 
-- **Node.js** 20.x or later
+- **Node.js** 22.x or later
 - **npm** 10.x or later
 - **Docker Desktop** (for local Supabase)
 - **Git** for version control
@@ -112,7 +112,7 @@ NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
 ```
 siza-webapp/
 ├── apps/
-│   ├── web/                 # Next.js 15 frontend application
+│   ├── web/                 # Next.js 16 frontend application
 │   │   ├── src/
 │   │   │   ├── app/         # App Router pages & API routes
 │   │   │   ├── components/  # React components (shadcn/ui)
@@ -163,7 +163,7 @@ npm run clean               # Clean all build artifacts
 ### Technology Stack
 
 **Frontend**:
-- ⚛️ React 18 with Next.js 15 App Router
+- ⚛️ React 19 with Next.js 16 App Router
 - 🎨 Tailwind CSS + shadcn/ui component library
 - 📝 TypeScript (strict mode)
 - 🔄 Zustand for state management
@@ -213,27 +213,21 @@ npm run clean               # Clean all build artifacts
 
 ### Production Deployment
 
-#### Frontend (Cloudflare Pages)
+#### Frontend (Cloudflare Workers via OpenNext)
 
-1. **Connect Repository**:
-   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
-   - Pages > Create a project
-   - Connect your Git repository
+Deployment is automated via GitHub Actions (`deploy-web.yml`) on push to `dev` or `main`.
 
-2. **Build Configuration**:
-   ```
-   Framework preset: Next.js
-   Build command: cd apps/web && npm install && npm run build
-   Build output directory: apps/web/.next
-   Root directory: /
-   Node version: 20
-   ```
+1. **Set GitHub Secrets**:
+   - `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
+   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_BASE_URL`
 
-3. **Environment Variables**:
+2. **Manual Deploy**: Use the "Deploy Web App (Admin Only)" workflow dispatch
+
+3. **Environment Variables** (set in Cloudflare dashboard):
    ```env
    NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your-production-anon-key
-   NEXT_PUBLIC_API_URL=https://your-app.pages.dev
+   NEXT_PUBLIC_BASE_URL=https://siza.com
    NEXT_PUBLIC_ENABLE_BYOK=true
    NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
    ```
