@@ -1,4 +1,4 @@
--- UIForge Webapp - Seed Data
+-- Siza Webapp - Seed Data
 -- Version: 0.1.1
 -- Created: 2026-02-15
 -- Description: Sample data for development and testing

@@ -8,7 +8,7 @@ module.exports = {
   env: {
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://api.uiforge.workers.dev',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'https://api.siza.workers.dev',
   },
 
   // Routing configuration
@@ -31,7 +31,7 @@ module.exports = {
       headers: [
         {
           key: 'Access-Control-Allow-Origin',
-          value: 'https://uiforge.workers.dev',
+          value: 'https://siza.workers.dev',
         },
         {
           key: 'Access-Control-Allow-Methods',

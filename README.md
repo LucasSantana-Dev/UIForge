@@ -1,4 +1,4 @@
-# UIForge
+# Siza
 
 > **Zero-cost AI-powered UI generation platform**
 >
@@ -8,17 +8,17 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15.1.0-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7.0-blue)](https://www.typescriptlang.org/)
-[![Test Coverage](https://img.shields.io/badge/Coverage-25%25-red)](https://github.com/your-org/uiforge-webapp/actions)
+[![Test Coverage](https://img.shields.io/badge/Coverage-25%25-red)](https://github.com/your-org/siza-webapp/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
-[![Code Quality](https://img.shields.io/badge/Quality-A-brightgreen)](https://github.com/your-org/uiforge-webapp/actions)
-[![Security](https://img.shields.io/badge/Security-Passed-brightgreen)](https://github.com/your-org/uiforge-webapp/security)
+[![Code Quality](https://img.shields.io/badge/Quality-A-brightgreen)](https://github.com/your-org/siza-webapp/actions)
+[![Security](https://img.shields.io/badge/Security-Passed-brightgreen)](https://github.com/your-org/siza-webapp/security)
 [![Deployment](https://img.shields.io/badge/Deploy-Cloudflare_Pages-orange)](https://pages.cloudflare.com/)
 [![Database](https://img.shields.io/badge/Database-Supabase-3ECF8E)](https://supabase.com/)
 [![UI Framework](https://img.shields.io/badge/UI-shadcn/ui-000000)](https://ui.shadcn.com/)
 [![Styling](https://img.shields.io/badge/Styling-Tailwind_CSS-06B6D4)](https://tailwindcss.com/)
 [![Monorepo](https://img.shields.io/badge/Monorepo-Turborepo-FF6B35)](https://turbo.build/)
 [![AI Integration](https://img.shields.io/badge/AI-MCP-8B5CF6)](https://modelcontextprotocol.io/)
-[![Free](https://img.shields.io/badge/Free-Forever-10B981)](https://uiforge.dev)
+[![Free](https://img.shields.io/badge/Free-Forever-10B981)](https://siza.dev)
 
 ## ✨ Features
 
@@ -30,6 +30,9 @@
 - ⚡ **Real-time Updates** - Live collaboration via Supabase subscriptions
 - 🎯 **Production Ready** - Monaco editor, live preview, export functionality
 - 🧪 **Well Tested** - 80%+ test coverage with Playwright E2E tests
+- 📧 **Transactional Email** - Branded emails via Resend (verification, welcome, password reset)
+- 🎛️ **Feature Flags** - Centralized DB-backed toggle system with admin CRUD and audit log
+- 💳 **Stripe Billing** - Checkout, Customer Portal, webhook sync, usage tracking (Free/Pro tiers)
 
 ## 🏗️ Architecture
 
@@ -49,10 +52,21 @@
 - **API**: Next.js API routes + MCP integration
 
 ### AI Integration
-- **Primary**: Bring Your Own Key (OpenAI, Anthropic, Google AI)
-- **Fallback**: Gemini API (60 requests/minute free tier)
+- **Primary**: Gemini 2.0 Flash (15 RPM free tier) via direct SDK calls
+- **BYOK**: Bring Your Own Key (Google AI) with client-side AES-256 encryption
+- **Streaming**: Server-Sent Events (SSE) for real-time generation output
 - **Protocol**: Model Context Protocol (MCP) for extensible AI tools
-- **Security**: Client-side AES-256 encryption for API keys
+
+### Email & Billing
+- **Email**: Resend SDK with react-email branded templates (verification, welcome, password reset, email change)
+- **Billing**: Stripe Checkout + Customer Portal + Webhook sync to Supabase
+- **Plans**: Free (10 generations/mo, 2 projects) and Pro (500 generations/mo, unlimited projects)
+- **Usage Tracking**: Per-plan quota enforcement on generations and project creation
+
+### Feature Management
+- **Feature Flags**: Database-backed flags in Supabase with env var fallback
+- **Admin CRUD**: REST API for flag management with audit log
+- **Client SDK**: React context provider with polling and localStorage cache
 
 ## 🚀 Quick Start
 
@@ -67,8 +81,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/uiforge-webapp.git
-cd uiforge-webapp
+git clone https://github.com/your-org/siza-webapp.git
+cd siza-webapp
 
 # Install dependencies
 npm install
@@ -102,6 +116,20 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-local-anon-key
 # Feature Flags
 NEXT_PUBLIC_ENABLE_BYOK=true
 NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
+
+# Resend (Email)
+RESEND_API_KEY=re_xxxxx
+RESEND_FROM_EMAIL=noreply@siza.dev
+RESEND_FROM_NAME=Siza
+NEXT_PUBLIC_ENABLE_RESEND_EMAILS=false
+
+# Stripe (Billing)
+STRIPE_SECRET_KEY=sk_test_xxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxx
+STRIPE_PRO_PRICE_ID=price_xxxxx
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
+NEXT_PUBLIC_ENABLE_STRIPE_BILLING=false
+NEXT_PUBLIC_ENABLE_USAGE_LIMITS=false
 ```
 
 > 💡 **Tip**: Use the credentials shown after `supabase start` to fill in the environment variables.
@@ -109,7 +137,7 @@ NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
 ## 📁 Project Structure
 
 ```
-uiforge-webapp/
+siza-webapp/
 ├── apps/
 │   ├── web/                 # Next.js 15 frontend application
 │   │   ├── src/
@@ -187,22 +215,25 @@ npm run clean               # Clean all build artifacts
 ### Key Features Implementation
 
 #### ✅ Completed Features
-- **Authentication**: Email/password + Google/GitHub OAuth
-- **Database**: Complete schema with RLS policies
+- **Authentication**: Email/password + Google/GitHub OAuth + forgot/reset password
+- **Transactional Email**: Branded Resend templates (verification, welcome, password reset)
+- **Feature Flags**: Centralized DB-backed toggles with admin CRUD and audit log
+- **Stripe Billing**: Checkout, Customer Portal, webhook sync, Free/Pro tiers
+- **Usage Tracking**: Per-plan quota enforcement on generations and projects
+- **Database**: 11-table schema with RLS policies
 - **Storage**: Secure file upload with policies
-- **UI System**: shadcn/ui components (8+ components)
-- **Project Management**: Full CRUD operations
+- **UI System**: shadcn/ui components (16+ components)
+- **Project Management**: Full CRUD operations with quota enforcement
 - **Code Editor**: Monaco integration with syntax highlighting
-- **Component Generation**: UI for AI-powered generation
+- **Component Generation**: AI-powered generation with usage limits
 - **Real-time Updates**: Supabase subscriptions
 
 #### 🚧 In Progress
-- **MCP Integration**: AI component generation
+- **MCP Integration**: AI component generation via MCP protocol
 - **Live Preview**: Iframe sandbox for components
 - **Export Features**: Download and deployment options
 
 #### ⏳ Planned Features
-- **AI Key Management**: BYOK with client-side encryption
 - **Template Library**: Pre-built component templates
 - **Collaboration**: Real-time multi-user editing
 - **Advanced Export**: GitHub, Vercel, Netlify deployment
@@ -245,7 +276,7 @@ npm run clean               # Clean all build artifacts
 
 ### Zero-Cost Architecture
 
-UIForge maintains 100% free operation through:
+Siza maintains 100% free operation through:
 
 - **Cloudflare Pages**: Unlimited hosting & bandwidth
 - **Supabase Free Tier**: 50,000 MAU, 500MB DB, 1GB storage
@@ -347,13 +378,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - 📖 **Documentation**: Check the [docs](./docs/) folder
-- 🐛 **Issues**: [Open an issue on GitHub](https://github.com/your-org/uiforge-webapp/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-org/uiforge-webapp/discussions)
-- 📧 **Email**: support@uiforge.dev
+- 🐛 **Issues**: [Open an issue on GitHub](https://github.com/your-org/siza-webapp/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-org/siza-webapp/discussions)
+- 📧 **Email**: support@siza.dev
 
 ---
 
 <div align="center">
-  <p>Built with ❤️ by the UIForge team</p>
+  <p>Built with ❤️ by the Siza team</p>
   <p>Making AI-powered UI development accessible to everyone</p>
 </div>

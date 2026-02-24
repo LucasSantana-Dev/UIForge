@@ -19,6 +19,7 @@ export interface Generation {
   typescript: boolean;
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
   tokens_used?: number;
+  generation_time_ms?: number;
   error_message?: string;
   created_at: string;
   updated_at: string;
@@ -34,6 +35,7 @@ export interface CreateGenerationInput {
   style?: string;
   typescript: boolean;
   tokens_used?: number;
+  generation_time_ms?: number;
 }
 
 /**

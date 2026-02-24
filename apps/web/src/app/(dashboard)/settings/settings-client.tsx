@@ -10,9 +10,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Settings, Key, Shield, CheckCircle, Info, ExternalLink } from 'lucide-react';
+import { Settings, Key, Shield, CheckCircle, Info, ExternalLink, Github } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { AIKeyManager } from '@/components/ai-keys/AIKeyManager';
+import GitHubPanel from '@/components/dashboard/GitHubPanel';
 import { useAIKeyStore } from '@/stores/ai-keys';
 import { generateUserEncryptionKey, deriveEncryptionKey } from '@/lib/encryption';
 import { AI_PROVIDERS } from '@/lib/encryption';
@@ -30,13 +32,15 @@ export function SettingsClient() {
     setUsageTrackingEnabled,
   } = useAIKeyStore();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'ai-keys'>('overview');
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get('tab') === 'github' ? 'github' : 'overview';
+  const [activeTab, setActiveTab] = useState<'overview' | 'ai-keys' | 'github'>(initialTab);
 
   useEffect(() => {
     // Initialize the AI key manager if encryption key exists
     const initKeyManager = async () => {
       // Check if we have an encryption key in localStorage
-      const storedKey = localStorage.getItem('uiforge-encryption-key');
+      const storedKey = localStorage.getItem('siza-encryption-key');
 
       if (storedKey) {
         // Derive the actual encryption key from the stored key
@@ -48,7 +52,7 @@ export function SettingsClient() {
         const derivedKey = deriveEncryptionKey(newKey);
 
         // Store the base key (not the derived one)
-        localStorage.setItem('uiforge-encryption-key', newKey);
+        localStorage.setItem('siza-encryption-key', newKey);
         await initialize(derivedKey);
       }
     };
@@ -134,6 +138,17 @@ export function SettingsClient() {
         >
           <Key className="h-4 w-4 mr-2" />
           AI Keys
+        </button>
+        <button
+          onClick={() => setActiveTab('github')}
+          className={`px-4 py-2 font-medium transition-colors border-b-2 flex items-center ${
+            activeTab === 'github'
+              ? 'border-primary text-primary'
+              : 'border-transparent text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Github className="h-4 w-4 mr-2" />
+          GitHub
         </button>
       </div>
 
@@ -353,6 +368,25 @@ export function SettingsClient() {
       )}
 
       {activeTab === 'ai-keys' && <AIKeyManager />}
+
+      {activeTab === 'github' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Github className="h-5 w-5" />
+                GitHub Integration
+              </CardTitle>
+              <CardDescription>
+                Connect your GitHub account to push generated components directly as pull requests.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <GitHubPanel />
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

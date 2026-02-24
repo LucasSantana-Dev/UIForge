@@ -6,7 +6,7 @@ test.describe('Authentication', () => {
   });
 
   test('should display landing page', async ({ page }) => {
-    await expect(page.locator('text=UIForge')).toBeVisible();
+    await expect(page.locator('text=Siza')).toBeVisible();
     await expect(page.locator('text=Generate Production-Ready')).toBeVisible();
   });
 
@@ -51,7 +51,7 @@ test.describe('Authentication', () => {
     await expect(page).toHaveURL('/signin');
   });
 
-  test('should redirect to dashboard when authenticated', async ({ page, context }) => {
+  test('should redirect to dashboard when authenticated', async ({ page, context: _context }) => {
     // This test requires a test user - skip in CI without test credentials
     test.skip(!process.env.TEST_USER_EMAIL, 'Test user credentials not configured');
 

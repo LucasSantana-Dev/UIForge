@@ -1,6 +1,6 @@
 /**
  * Cloudflare Workers API - Enhanced with Google AI Integration
- * Full UIForge API implementation for Cloudflare Workers with BYOK support
+ * Full Siza API implementation for Cloudflare Workers with BYOK support
  */
 
 import { GoogleGenerativeAI } from '@google/generative-ai';

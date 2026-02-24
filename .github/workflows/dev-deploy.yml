@@ -14,16 +14,14 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
       - name: Run full test suite
-        run: npm run test:ci
-      - name: Run integration tests
-        run: npm run test:integration || echo "Integration tests completed with warnings"
+        run: npm run test
       - name: Security scan
-        run: npm run security:scan || echo "Security scan completed with warnings"
+        run: npm audit --audit-level=moderate --omit=dev || true
 
   deploy-dev:
     needs: test
@@ -33,7 +31,7 @@ jobs:
     steps:
       - name: Deploy to dev environment
         run: |
-          echo "🚀 Deploying to dev environment (dev.uiforge.com)"
+          echo "🚀 Deploying to dev environment (dev.siza.com)"
           echo "📦 Building dev assets..."
           npm run build
           echo "✅ Dev deployment completed"

@@ -73,7 +73,7 @@ const MockDashboard = () => {
 
   return (
     <div data-testid="dashboard">
-      <h1>Welcome to UIForge</h1>
+      <h1>Welcome to Siza</h1>
       <p>Start creating amazing UI components</p>
 
       <button onClick={() => router.push('/dashboard/generate')}>Generate Component</button>
@@ -145,7 +145,7 @@ describe('MockDashboard', () => {
 
       renderWithQueryClient(<MockDashboard />);
 
-      expect(screen.getByText('Welcome to UIForge')).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Siza')).toBeInTheDocument();
       expect(screen.getByText('Start creating amazing UI components')).toBeInTheDocument();
     });
 

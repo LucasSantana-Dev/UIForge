@@ -1,6 +1,6 @@
-# Automated Release Pipeline - UIForge Web App
+# Automated Release Pipeline - Siza Web App
 
-This document describes the automated release pipeline for the UIForge web application, a private monorepo deployment.
+This document describes the automated release pipeline for the Siza web application, a private monorepo deployment.
 
 ## Overview
 
@@ -91,14 +91,14 @@ The pipeline includes several quality gates:
 
 ### Staging Environment
 - **Purpose**: Testing and validation before production
-- **URL**: https://staging.uiforge.app
+- **URL**: https://staging.siza.app
 - **Deployment**: Automatic on release branch merge
 - **Testing**: Full regression and performance tests
 - **Health Checks**: Automated health monitoring
 
 ### Production Environment
 - **Purpose**: Live user-facing application
-- **URL**: https://uiforge.app
+- **URL**: https://siza.app
 - **Deployment**: Automatic after staging validation
 - **Monitoring**: Real-time health and performance monitoring
 - **Rollback**: Manual rollback procedures available

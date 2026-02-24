@@ -12,12 +12,12 @@ export default function NotFound() {
         <Link href="/" className="inline-flex items-center gap-2 mb-8">
           <Image
             src="/anvil-logo.svg"
-            alt="UIForge"
+            alt="Siza"
             width={40}
             height={40}
             className="flex-shrink-0"
           />
-          <span className="text-2xl font-bold">UIForge</span>
+          <span className="text-2xl font-bold">Siza</span>
         </Link>
 
         {/* 404 Illustration */}

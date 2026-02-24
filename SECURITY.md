@@ -1,6 +1,6 @@
-# UIForge Security Configuration
+# Siza Security Configuration
 
-This document outlines the security measures and configurations implemented for the UIForge project.
+This document outlines the security measures and configurations implemented for the Siza project.
 
 ## 🔐 Security Overview
 
@@ -107,8 +107,8 @@ This document outlines the security measures and configurations implemented for 
 
 ## 📞 Security Contacts
 
-- **Security Team**: [security@uiforge.dev]
-- **Vulnerability Reporting**: [security@uiforge.dev]
+- **Security Team**: [security@siza.dev]
+- **Vulnerability Reporting**: [security@siza.dev]
 - **Snyk Organization**: Configured in Snyk dashboard
 
 ## 🛠️ Security Commands

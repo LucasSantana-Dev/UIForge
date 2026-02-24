@@ -8,8 +8,9 @@ export interface GenerationOptions {
   description: string;
   style?: 'modern' | 'minimal' | 'colorful';
   typescript?: boolean;
-  aiProvider?: 'openai' | 'anthropic' | 'google' | 'auto';
-  useUserKey?: boolean;
+  userApiKey?: string;
+  imageBase64?: string;
+  imageMimeType?: 'image/png' | 'image/jpeg' | 'image/webp';
 }
 
 export interface GenerationEvent {
@@ -336,7 +337,7 @@ export async function exportToFigma(
     },
     body: JSON.stringify({
       wireframe,
-      fileName: options.fileName || 'UIForge Wireframe',
+      fileName: options.fileName || 'Siza Wireframe',
       exportFormat: options.exportFormat || 'json',
     }),
   });

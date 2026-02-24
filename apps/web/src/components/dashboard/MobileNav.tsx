@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { XIcon, FolderIcon, FileTextIcon, SettingsIcon, PlusIcon } from 'lucide-react';
+import { XIcon, FolderIcon, FileTextIcon, SettingsIcon, PlusIcon, Github } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 interface MobileNavProps {
@@ -13,6 +13,7 @@ interface MobileNavProps {
 const navigation = [
   { name: 'Projects', href: '/projects', icon: FolderIcon },
   { name: 'Templates', href: '/templates', icon: FileTextIcon },
+  { name: 'GitHub', href: '/settings?tab=github', icon: Github },
   { name: 'Settings', href: '/settings', icon: SettingsIcon },
 ];
 
@@ -90,7 +91,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
         aria-label="Mobile navigation"
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-blue-600">UIForge</h1>
+          <h1 className="text-2xl font-bold text-blue-600">Siza</h1>
           <button
             ref={closeButtonRef}
             type="button"

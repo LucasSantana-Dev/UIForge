@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { verifySession } from '@/lib/api/auth';
-import { checkRateLimit } from '@/lib/api/rate-limit';
+import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, errorResponse } from '@/lib/api/response';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -79,7 +79,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     // Update generation with whitelist
-    const allowedFields = ['prompt', 'parameters', 'result', 'status'];
+    const allowedFields = [
+      'prompt',
+      'status',
+      'component_name',
+      'generated_code',
+      'component_library',
+      'style',
+      'typescript',
+      'generation_time_ms',
+      'quality_score',
+      'user_feedback',
+    ];
     const updates: any = {
       updated_at: new Date().toISOString(),
     };

@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: UIForge Documentation
-    url: https://github.com/LucasSantana-Dev/UIForge/docs
+  - name: Siza Documentation
+    url: https://github.com/LucasSantana-Dev/Siza/docs
     about: Ask a question about our documentation
-  - name: UIForge Discussions
-    url: https://github.com/LucasSantana-Dev/UIForge/discussions
-    about: Ask and answer questions about UIForge
-  - name: UIForge Security Policy
-    url: https://github.com/LucasSantana-Dev/UIForge/security/policy
+  - name: Siza Discussions
+    url: https://github.com/LucasSantana-Dev/Siza/discussions
+    about: Ask and answer questions about Siza
+  - name: Siza Security Policy
+    url: https://github.com/LucasSantana-Dev/Siza/security/policy
     about: Learn about our security policy and reporting

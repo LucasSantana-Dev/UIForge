@@ -3,7 +3,12 @@
  */
 
 import { NextRequest } from 'next/server';
-import { checkRateLimit, enforceRateLimit, setRateLimitHeaders } from '../rate-limit';
+import {
+  checkRateLimit,
+  enforceRateLimit,
+  setRateLimitHeaders,
+  _resetForTesting,
+} from '../rate-limit';
 import { RateLimitError } from '../errors';
 
 // Mock getSession
@@ -15,7 +20,7 @@ const mockGetSession = getSession as jest.MockedFunction<typeof getSession>;
 describe('Rate Limiting', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    // Clear rate limit map between tests
+    _resetForTesting();
     jest.useFakeTimers();
   });
 

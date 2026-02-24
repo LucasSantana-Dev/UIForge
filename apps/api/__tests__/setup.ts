@@ -22,6 +22,9 @@ global.console = {
 // Mock environment variables
 process.env.NODE_ENV = 'test';
 process.env.LOG_LEVEL = 'error';
+process.env.SUPABASE_URL = 'http://localhost:54321';
+process.env.SUPABASE_ANON_KEY = 'test-anon-key';
+process.env.GEMINI_API_KEY = 'test-gemini-key';
 
 // Setup global test utilities
 beforeEach(() => {

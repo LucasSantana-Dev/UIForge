@@ -1,6 +1,6 @@
 /**
  * Cloudflare Workers API
- * Full UIForge API implementation for Cloudflare Workers
+ * Full Siza API implementation for Cloudflare Workers
  */
 
 import { streamComponentGeneration } from './services/gemini';
@@ -245,7 +245,7 @@ export default {
       if (url.pathname === '/api' && request.method === 'GET') {
         return new Response(
           JSON.stringify({
-            message: 'UIForge API is running on Cloudflare Workers',
+            message: 'Siza API is running on Cloudflare Workers',
             version: '0.1.0',
             endpoints: ['/health', '/api/generate'],
             environment: env.NODE_ENV || 'development',

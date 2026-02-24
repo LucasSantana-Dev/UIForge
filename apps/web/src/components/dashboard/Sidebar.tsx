@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { FolderIcon, FileTextIcon, SettingsIcon, PlusIcon, KeyIcon } from 'lucide-react';
+import { FolderIcon, FileTextIcon, SettingsIcon, PlusIcon, KeyIcon, Github } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
@@ -10,6 +10,7 @@ const navigation = [
   { name: 'Projects', href: '/projects', icon: FolderIcon },
   { name: 'Templates', href: '/templates', icon: FileTextIcon },
   { name: 'AI Keys', href: '/ai-keys', icon: KeyIcon },
+  { name: 'GitHub', href: '/settings?tab=github', icon: Github },
   { name: 'Settings', href: '/settings', icon: SettingsIcon },
 ];
 
@@ -25,7 +26,7 @@ export default function Sidebar() {
         >
           <Image
             src="/anvil-logo.svg"
-            alt="UIForge"
+            alt="Siza"
             width={32}
             height={32}
             className="flex-shrink-0"

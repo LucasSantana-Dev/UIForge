@@ -1,6 +1,6 @@
 # Supabase Cloud Setup Guide
 
-Quick guide to set up UIForge with Supabase Cloud instead of local development.
+Quick guide to set up Siza with Supabase Cloud instead of local development.
 
 ## Why Supabase Cloud?
 
@@ -22,7 +22,7 @@ Quick guide to set up UIForge with Supabase Cloud instead of local development.
 1. Click **"New Project"**
 2. Configure:
    - **Organization**: Select or create (e.g., "Personal")
-   - **Name**: `uiforge-dev` (or your preferred name)
+   - **Name**: `siza-dev` (or your preferred name)
    - **Database Password**: Click "Generate a password" and **save it securely**
    - **Region**: Choose closest to you:
      - 🇺🇸 US East (N. Virginia) - `us-east-1`
@@ -267,7 +267,7 @@ When ready to deploy:
 ## Support
 
 - [Supabase Documentation](https://supabase.com/docs)
-- [UIForge Setup Guide](./SETUP_GUIDE.md)
+- [Siza Setup Guide](./SETUP_GUIDE.md)
 - [Database Schema](./DATABASE_SCHEMA.md)
 - [Deployment Guide](./DEPLOYMENT.md)
 

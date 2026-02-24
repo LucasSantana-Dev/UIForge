@@ -33,7 +33,7 @@ jobs:
     steps:
       - name: Deploy to production
         run: |
-          echo "🚀 Deploying to production environment (uiforge.com)"
+          echo "🚀 Deploying to production environment (siza.com)"
           echo "📦 Building production assets..."
           npm run build
           echo "✅ Production deployment completed"

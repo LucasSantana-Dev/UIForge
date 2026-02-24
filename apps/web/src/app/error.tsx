@@ -23,12 +23,12 @@ function AppError({ error, reset }: { error: Error & { digest?: string }; reset:
         <Link href="/" className="inline-flex items-center gap-2 mb-8">
           <Image
             src="/anvil-logo.svg"
-            alt="UIForge"
+            alt="Siza"
             width={40}
             height={40}
             className="flex-shrink-0"
           />
-          <span className="text-2xl font-bold">UIForge</span>
+          <span className="text-2xl font-bold">Siza</span>
         </Link>
 
         {/* Error Icon */}
@@ -76,7 +76,7 @@ function AppError({ error, reset }: { error: Error & { digest?: string }; reset:
         {/* Help Text */}
         <p className="text-sm text-muted-foreground">
           If this problem persists, please{' '}
-          <a href="mailto:support@uiforge.dev" className="text-primary hover:underline">
+          <a href="mailto:support@siza.dev" className="text-primary hover:underline">
             contact support
           </a>
           .

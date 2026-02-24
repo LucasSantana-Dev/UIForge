@@ -8,7 +8,7 @@ export default function Loading() {
         <div className="animate-pulse">
           <Image
             src="/anvil-logo.svg"
-            alt="UIForge"
+            alt="Siza"
             width={48}
             height={48}
             className="flex-shrink-0"

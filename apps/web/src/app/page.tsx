@@ -18,12 +18,12 @@ export default async function HomePage() {
           <div className="flex items-center gap-2">
             <Image
               src="/anvil-logo.svg"
-              alt="UIForge"
+              alt="Siza"
               width={24}
               height={24}
               className="flex-shrink-0"
             />
-            <span className="text-xl font-bold">UIForge</span>
+            <span className="text-xl font-bold">Siza</span>
             <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
               Beta
             </span>
@@ -93,7 +93,7 @@ export default async function HomePage() {
                 </Link>
               )}
               <Link
-                href="https://github.com/yourusername/uiforge-mcp"
+                href="https://github.com/yourusername/siza-mcp"
                 className="inline-flex items-center gap-2 rounded-md border px-6 py-3 text-base font-medium hover:bg-accent"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -143,7 +143,7 @@ export default async function HomePage() {
 
       <footer className="border-t py-8">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2026 UIForge. Open source and free.</p>
+          <p>© 2026 Siza. Open source and free.</p>
         </div>
       </footer>
     </div>

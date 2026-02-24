@@ -161,7 +161,7 @@ jobs:
             ## 🚀 Release v${{ github.event.client_payload.version }}
 
             ### 📦 Application Information
-            **Application**: UIForge Web App  
+            **Application**: Siza Web App  
             **Version**: ${{ github.event.client_payload.version }}
             **Type**: Private monorepo deployment
             **Environment**: Production
@@ -179,8 +179,8 @@ jobs:
             - ✅ Performance validation completed
 
             ### 🔗 Access Information
-            - **Staging**: [Staging Environment](https://staging.uiforge.app)
-            - **Production**: [Production Environment](https://uiforge.app)
+            - **Staging**: [Staging Environment](https://staging.siza.app)
+            - **Production**: [Production Environment](https://siza.app)
 
             ---
 
@@ -214,7 +214,7 @@ jobs:
 
           if [[ "${{ needs.deploy-production.result }}" == "success" ]]; then
             echo "✅ Application successfully deployed to production!" >> $GITHUB_STEP_SUMMARY
-            echo "🌐 Access the application at: https://uiforge.app" >> $GITHUB_STEP_SUMMARY
+            echo "🌐 Access the application at: https://siza.app" >> $GITHUB_STEP_SUMMARY
           else
             echo "❌ Production deployment failed or was skipped" >> $GITHUB_STEP_SUMMARY
           fi

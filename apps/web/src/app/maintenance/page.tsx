@@ -14,12 +14,12 @@ export default function MaintenancePage() {
         <Link href="/" className="inline-flex items-center gap-2 mb-8">
           <Image
             src="/anvil-logo.svg"
-            alt="UIForge"
+            alt="Siza"
             width={40}
             height={40}
             className="flex-shrink-0"
           />
-          <span className="text-2xl font-bold">UIForge</span>
+          <span className="text-2xl font-bold">Siza</span>
         </Link>
 
         {/* Maintenance Icon */}
@@ -32,7 +32,7 @@ export default function MaintenancePage() {
         {/* Message */}
         <h1 className="mb-4 text-4xl font-bold tracking-tight">We&apos;ll be back soon!</h1>
         <p className="mb-8 text-lg text-muted-foreground">
-          UIForge is currently undergoing scheduled maintenance to improve your experience. We
+          Siza is currently undergoing scheduled maintenance to improve your experience. We
           apologize for any inconvenience.
         </p>
 
@@ -79,7 +79,7 @@ export default function MaintenancePage() {
           <div className="flex gap-4">
             <Button asChild variant="outline" size="icon" className="rounded-full">
               <a
-                href="https://github.com/uiforge"
+                href="https://github.com/siza"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"

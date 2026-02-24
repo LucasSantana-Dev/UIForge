@@ -1,8 +1,8 @@
 {
-  "name": "@uiforge/api",
+  "name": "@siza/api",
   "version": "0.1.0",
   "private": true,
-  "description": "UIForge Express API with self-hosted MCP server and Gemini integration",
+  "description": "Siza Express API with self-hosted MCP server and Gemini integration",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

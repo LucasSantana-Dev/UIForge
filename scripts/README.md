@@ -84,12 +84,12 @@ To use these workflows, add these secrets to your GitHub repository:
 ### Development
 - Use **Deploy Application** workflow with `environment: dev`
 - Tests and checks run automatically
-- Deployed to `dev.uiforge.com`
+- Deployed to `dev.siza.com`
 
 ### Production
 - Use **Deploy Application** workflow with `environment: production`
 - Requires release branch merge to main
-- Deployed to `uiforge.com`
+- Deployed to `siza.com`
 - Additional security checks included
 
 ## 🆘 Emergency Procedures

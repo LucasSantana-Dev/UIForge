@@ -1,4 +1,4 @@
-# UIForge API
+# Siza API
 
 Express API server with self-hosted MCP server, Gemini AI integration, and WebSocket collaboration.
 
@@ -86,7 +86,7 @@ npm run type-check
 
 ```bash
 # Build Docker image
-docker build -t uiforge-api .
+docker build -t siza-api .
 
 # Run with Docker Compose (from project root)
 cd ../..
@@ -167,4 +167,4 @@ Response:
 
 ## License
 
-Private - UIForge Project
+Private - Siza Project

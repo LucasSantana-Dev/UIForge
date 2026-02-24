@@ -22,8 +22,6 @@ const actionTypes = {
   REMOVE_TOAST: 'REMOVE_TOAST',
 } as const;
 
-type ActionType = (typeof actionTypes)[keyof typeof actionTypes];
-
 let count = 0;
 
 function genId() {
@@ -33,19 +31,19 @@ function genId() {
 
 type Action =
   | {
-      type: actionTypes.ADD_TOAST;
+      type: typeof actionTypes.ADD_TOAST;
       toast: ToasterToast;
     }
   | {
-      type: actionTypes.UPDATE_TOAST;
+      type: typeof actionTypes.UPDATE_TOAST;
       toast: Partial<ToasterToast>;
     }
   | {
-      type: actionTypes.DISMISS_TOAST;
+      type: typeof actionTypes.DISMISS_TOAST;
       toastId?: ToasterToast['id'];
     }
   | {
-      type: ActionType['REMOVE_TOAST'];
+      type: typeof actionTypes.REMOVE_TOAST;
       toastId?: ToasterToast['id'];
     };
 
