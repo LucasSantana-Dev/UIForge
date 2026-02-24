@@ -70,6 +70,3 @@ POST_CLEANUP_CHECKLIST.md
 
 # Actual environment files with credentials
 .env.docker
-
-# Snyk Security Extension - AI Rules (auto-generated)
-.windsurf/rules/snyk_rules.md
