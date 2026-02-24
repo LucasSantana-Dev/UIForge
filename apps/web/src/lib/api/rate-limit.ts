@@ -124,3 +124,7 @@ export function setRateLimitHeaders(
 
   return response;
 }
+
+export function _resetForTesting(): void {
+  rateLimitMap.clear();
+}
