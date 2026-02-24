@@ -46,7 +46,7 @@ supabase/
 - **Code Editor**: Monaco Editor
 - **AI**: Anthropic SDK, Google Generative AI, MCP SDK
 - **Testing**: Jest (unit) + Playwright (E2E)
-- **Deploy**: Cloudflare Pages (wrangler.toml)
+- **Deploy**: Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`, `wrangler.jsonc`)
 
 ## Architecture
 
@@ -90,10 +90,22 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 
 ## CI/CD
 
-- GitHub Actions: ci.yml, deploy-web.yml, production.yml, release-automation.yml
-- Cloudflare Pages deployment (wrangler)
-- Supabase migrations
-- Secret scanning, npm audit security
+- GitHub Actions: ci.yml, deploy-web.yml, deploy-web-admin.yml, feature-branch.yml, release-branch.yml, release-automation.yml, supabase-setup-admin.yml, secret-scan.yml
+- Cloudflare Workers deployment via OpenNext + wrangler
+- Pre-commit: lint-staged (ESLint + Prettier) + type-check via Husky
+- Supabase migrations, npm audit security, shellcheck + shfmt
+
+## Deployment Gotchas
+
+- **Workers free tier**: 3 MiB (3072 KiB) gzipped limit. Current bundle: ~2882 KiB
+- **WASM stub required**: `@vercel/og` WASM (~1.4 MiB) bundled by Next.js via `next/dist/compiled/` even when unused — stub at deploy time (automated in CI and `scripts/deploy.sh`)
+- **No `export const runtime`** in API routes — OpenNext handles runtime automatically
+- **middleware.ts not proxy.ts**: Next.js 16 proxy.ts is Node.js-only; OpenNext needs `middleware.ts` with `runtime = 'experimental-edge'`
+- **No `setInterval`** in Workers — rate limiter uses bounded lazy cleanup
+- **`_redirects` causes infinite loop** — deleted automatically at deploy time
+- **Turbopack is default** in Next.js 16 — add `turbopack: {}` to next.config.js if using webpack config
+- **Build command**: `cd apps/web && npx opennextjs-cloudflare build`
+- **Deploy command**: `cd apps/web && ./scripts/deploy.sh`
 
 ## Conventions
 
@@ -103,3 +115,10 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 - Supabase SSR auth (`@supabase/ssr`)
 - Conventional commits
 - Trunk-based development
+
+## Claude Code Automation
+
+- **Agents**: `.claude/agents/` — cloudflare-specialist, test-coverage-booster
+- **Skills**: `/deploy-check` (pre-deploy validation), `/supabase-migration` (scaffold migrations)
+- **MCP**: `.mcp.json` — Context7 for library docs (team-shared)
+- **Hooks** (local `.claude/settings.json`): prettier auto-format on edit, .env/lock file protection
