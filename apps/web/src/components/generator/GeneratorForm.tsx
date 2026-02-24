@@ -257,9 +257,7 @@ export default function GeneratorForm({
               <ChevronDownIcon
                 className={`h-4 w-4 transition-transform ${showImageUpload ? 'rotate-180' : ''}`}
               />
-              {image && (
-                <span className="text-xs text-green-600 font-medium ml-1">attached</span>
-              )}
+              {image && <span className="text-xs text-green-600 font-medium ml-1">attached</span>}
             </button>
 
             {showImageUpload && (
@@ -312,9 +310,7 @@ export default function GeneratorForm({
                     />
                   </button>
                 )}
-                {imageError && (
-                  <p className="mt-2 text-sm text-red-600">{imageError}</p>
-                )}
+                {imageError && <p className="mt-2 text-sm text-red-600">{imageError}</p>}
               </div>
             )}
           </div>

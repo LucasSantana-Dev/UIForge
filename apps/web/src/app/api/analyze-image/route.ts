@@ -18,10 +18,10 @@ export async function POST(request: NextRequest) {
   try {
     const rateLimitResult = await checkRateLimit(request, 10, 60000);
     if (!rateLimitResult.allowed) {
-      return new Response(
-        JSON.stringify({ error: 'Rate limit exceeded. Try again shortly.' }),
-        { status: 429, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Try again shortly.' }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     await verifySession();

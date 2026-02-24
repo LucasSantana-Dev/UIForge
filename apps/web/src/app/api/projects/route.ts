@@ -17,6 +17,8 @@ import {
   type APIError,
 } from '@/lib/api';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
+import { checkProjectQuota } from '@/lib/usage/limits';
+import { incrementProjectCount } from '@/lib/usage/tracker';
 
 // Rate limit: 120 req/min for CRUD operations
 const RATE_LIMIT = 120;
@@ -123,6 +125,19 @@ export async function POST(request: NextRequest) {
     // Authentication
     const session = await verifySession();
 
+    // Usage quota check
+    const quota = await checkProjectQuota(session.user.id);
+    if (!quota.allowed) {
+      const response = errorResponse('Project quota exceeded', 429, {
+        quota: {
+          current: quota.current,
+          limit: quota.limit,
+          remaining: quota.remaining,
+        },
+      });
+      return setRateLimitHeaders(response, rateResult, RATE_LIMIT);
+    }
+
     // Parse and validate body
     const body = await request.json();
     const validation = createProjectSchema.safeParse(body);
@@ -151,6 +166,8 @@ export async function POST(request: NextRequest) {
       const response = errorResponse('Failed to create project', 500);
       return setRateLimitHeaders(response, rateResult, RATE_LIMIT);
     }
+
+    incrementProjectCount(session.user.id).catch(() => {});
 
     const response = createdResponse(data, 'Project created successfully');
     return setRateLimitHeaders(response, rateResult, RATE_LIMIT);
