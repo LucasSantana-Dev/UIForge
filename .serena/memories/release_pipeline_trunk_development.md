@@ -9,7 +9,7 @@
 
 ## Release Process
 1. **Feature Development**
-   - Branch from `main`: `git checkout -b feat/feature-name`
+   - Branch from `dev`: `git checkout -b feat/feature-name`
    - Implement feature with atomic commits
    - Update `CHANGELOG.md` with changes
 
@@ -20,14 +20,14 @@
    - Update version in `package.json`
 
 3. **Pull Request**
-   - Open PR to `main`
+   - Open PR to `dev` first
    - CI runs automated checks (lint, test, build)
-   - Require code review approval
+   - After merge to `dev`, open PR from `dev` → `main`
 
 4. **Merge & Deploy**
    - Merge PR to `main`
    - GitHub Actions triggers CI/CD
-   - Auto-deploy to Vercel (web) and Cloudflare Workers (API)
+   - Auto-deploy to Cloudflare Workers via OpenNext (unified web + API)
 
 5. **Post-Deployment**
    - Tag release: `git tag v1.2.3`
@@ -37,7 +37,7 @@
 ## GitHub Actions CI/CD
 - **Trigger**: Push to `main`, PR opened/updated
 - **Jobs**: lint, test, build
-- **Auto-deploy**: Vercel GitHub integration for web, Wrangler for API
+- **Auto-deploy**: Wrangler GitHub Action (`cloudflare/wrangler-action@v3`)
 
 ## Branch Protection Rules
 - `main` branch requires:
