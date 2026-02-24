@@ -8,13 +8,24 @@ export type FeatureFlagName =
   | 'ENABLE_DARK_MODE'
   | 'ENABLE_ANALYTICS'
   | 'ENABLE_MAINTENANCE_MODE'
-  | 'ENABLE_BETA_FEATURES';
+  | 'ENABLE_BETA_FEATURES'
+  | 'ENABLE_GITHUB_APP'
+  | 'ENABLE_QUALITY_GATES'
+  | 'ENABLE_MULTI_LLM';
 
 export interface FeatureFlag {
   name: FeatureFlagName;
   enabled: boolean;
   description: string;
-  category: 'auth' | 'ui' | 'generation' | 'storage' | 'analytics' | 'system';
+  category:
+    | 'auth'
+    | 'ui'
+    | 'generation'
+    | 'storage'
+    | 'analytics'
+    | 'system'
+    | 'integration'
+    | 'quality';
 }
 
 export interface FeatureFlagsConfig {

@@ -12,6 +12,9 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_ANALYTICS: false,
   ENABLE_MAINTENANCE_MODE: false,
   ENABLE_BETA_FEATURES: false,
+  ENABLE_GITHUB_APP: false,
+  ENABLE_QUALITY_GATES: false,
+  ENABLE_MULTI_LLM: false,
 };
 
 // Feature flag metadata
@@ -75,6 +78,24 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_BETA_FEATURES,
     description: 'Enable experimental beta features',
     category: 'system',
+  },
+  {
+    name: 'ENABLE_GITHUB_APP',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_GITHUB_APP,
+    description: 'Enable GitHub App integration for repo linking',
+    category: 'integration',
+  },
+  {
+    name: 'ENABLE_QUALITY_GATES',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_QUALITY_GATES,
+    description: 'Run quality checks before PR creation',
+    category: 'quality',
+  },
+  {
+    name: 'ENABLE_MULTI_LLM',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_MULTI_LLM,
+    description: 'Allow selecting between AI providers',
+    category: 'generation',
   },
 ];
 
