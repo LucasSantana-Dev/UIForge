@@ -11,7 +11,8 @@ export type FeatureFlagName =
   | 'ENABLE_BETA_FEATURES'
   | 'ENABLE_GITHUB_APP'
   | 'ENABLE_QUALITY_GATES'
-  | 'ENABLE_MULTI_LLM';
+  | 'ENABLE_MULTI_LLM'
+  | 'ENABLE_RESEND_EMAILS';
 
 export interface FeatureFlag {
   name: FeatureFlagName;
@@ -25,7 +26,8 @@ export interface FeatureFlag {
     | 'analytics'
     | 'system'
     | 'integration'
-    | 'quality';
+    | 'quality'
+    | 'email';
 }
 
 export interface FeatureFlagsConfig {
