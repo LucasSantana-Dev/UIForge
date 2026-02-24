@@ -15,6 +15,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_GITHUB_APP: false,
   ENABLE_QUALITY_GATES: false,
   ENABLE_MULTI_LLM: false,
+  ENABLE_RESEND_EMAILS: false,
 };
 
 // Feature flag metadata
@@ -96,6 +97,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_MULTI_LLM,
     description: 'Allow selecting between AI providers',
     category: 'generation',
+  },
+  {
+    name: 'ENABLE_RESEND_EMAILS',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_RESEND_EMAILS,
+    description: 'Send transactional emails via Resend SDK',
+    category: 'email',
   },
 ];
 

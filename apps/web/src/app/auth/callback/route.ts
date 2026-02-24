@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { saveProviderToken } from '@/lib/auth/tokens';
+import { sendWelcomeEmail } from '@/lib/email/auth-emails';
 import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
@@ -13,6 +14,7 @@ export async function GET(request: Request) {
 
     if (!error && data.session) {
       const { session } = data;
+      const isNewUser = session.user.created_at === session.user.updated_at;
 
       if (session.provider_token && session.user) {
         const provider = session.user.app_metadata?.provider ?? 'unknown';
@@ -25,6 +27,10 @@ export async function GET(request: Request) {
         } catch {
           // Token persistence is non-blocking
         }
+      }
+
+      if (isNewUser && session.user.email) {
+        sendWelcomeEmail(session.user.email).catch(() => {});
       }
 
       return NextResponse.redirect(`${origin}${next}`);

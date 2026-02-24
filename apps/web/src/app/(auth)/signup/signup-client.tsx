@@ -14,6 +14,8 @@ export function SignUpClient() {
   const [oauthLoading, setOAuthLoading] = useState<'google' | 'github' | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,6 +65,27 @@ export function SignUpClient() {
     }
   };
 
+  const handleResendVerification = async () => {
+    setResending(true);
+    setResendSuccess(false);
+
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        setResendSuccess(true);
+      }
+    } catch {
+      // Silent fail — user can retry
+    } finally {
+      setResending(false);
+    }
+  };
+
   if (success) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-muted/50 px-4">
@@ -78,13 +101,26 @@ export function SignUpClient() {
             </p>
           </div>
 
-          <div className="rounded-lg border bg-card p-8 shadow-sm">
+          <div className="rounded-lg border bg-card p-8 shadow-sm space-y-4">
             <p className="text-center text-sm text-muted-foreground">
               Click the link in the email to confirm your account and start using Siza.
             </p>
+
+            {resendSuccess ? (
+              <p className="text-center text-sm text-green-600">Verification email resent!</p>
+            ) : (
+              <button
+                onClick={handleResendVerification}
+                disabled={resending}
+                className="w-full rounded-md border px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-muted disabled:opacity-50"
+              >
+                {resending ? 'Sending...' : 'Resend verification email'}
+              </button>
+            )}
+
             <Link
               href="/signin"
-              className="mt-6 block w-full rounded-md bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary/90"
+              className="block w-full rounded-md bg-primary px-4 py-2 text-center text-sm font-medium text-primary-foreground hover:bg-primary/90"
             >
               Back to sign in
             </Link>
