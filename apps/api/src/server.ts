@@ -1,5 +1,5 @@
 /**
- * UIForge Express API Server
+ * Siza Express API Server
  * Main entry point for the API
  */
 

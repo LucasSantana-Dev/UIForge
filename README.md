@@ -1,4 +1,4 @@
-# UIForge
+# Siza
 
 > **Zero-cost AI-powered UI generation platform**
 >
@@ -8,17 +8,17 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-15.1.0-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7.0-blue)](https://www.typescriptlang.org/)
-[![Test Coverage](https://img.shields.io/badge/Coverage-25%25-red)](https://github.com/your-org/uiforge-webapp/actions)
+[![Test Coverage](https://img.shields.io/badge/Coverage-25%25-red)](https://github.com/your-org/siza-webapp/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
-[![Code Quality](https://img.shields.io/badge/Quality-A-brightgreen)](https://github.com/your-org/uiforge-webapp/actions)
-[![Security](https://img.shields.io/badge/Security-Passed-brightgreen)](https://github.com/your-org/uiforge-webapp/security)
+[![Code Quality](https://img.shields.io/badge/Quality-A-brightgreen)](https://github.com/your-org/siza-webapp/actions)
+[![Security](https://img.shields.io/badge/Security-Passed-brightgreen)](https://github.com/your-org/siza-webapp/security)
 [![Deployment](https://img.shields.io/badge/Deploy-Cloudflare_Pages-orange)](https://pages.cloudflare.com/)
 [![Database](https://img.shields.io/badge/Database-Supabase-3ECF8E)](https://supabase.com/)
 [![UI Framework](https://img.shields.io/badge/UI-shadcn/ui-000000)](https://ui.shadcn.com/)
 [![Styling](https://img.shields.io/badge/Styling-Tailwind_CSS-06B6D4)](https://tailwindcss.com/)
 [![Monorepo](https://img.shields.io/badge/Monorepo-Turborepo-FF6B35)](https://turbo.build/)
 [![AI Integration](https://img.shields.io/badge/AI-MCP-8B5CF6)](https://modelcontextprotocol.io/)
-[![Free](https://img.shields.io/badge/Free-Forever-10B981)](https://uiforge.dev)
+[![Free](https://img.shields.io/badge/Free-Forever-10B981)](https://siza.dev)
 
 ## ✨ Features
 
@@ -67,8 +67,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/uiforge-webapp.git
-cd uiforge-webapp
+git clone https://github.com/your-org/siza-webapp.git
+cd siza-webapp
 
 # Install dependencies
 npm install
@@ -109,7 +109,7 @@ NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
 ## 📁 Project Structure
 
 ```
-uiforge-webapp/
+siza-webapp/
 ├── apps/
 │   ├── web/                 # Next.js 15 frontend application
 │   │   ├── src/
@@ -245,7 +245,7 @@ npm run clean               # Clean all build artifacts
 
 ### Zero-Cost Architecture
 
-UIForge maintains 100% free operation through:
+Siza maintains 100% free operation through:
 
 - **Cloudflare Pages**: Unlimited hosting & bandwidth
 - **Supabase Free Tier**: 50,000 MAU, 500MB DB, 1GB storage
@@ -347,13 +347,13 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - 📖 **Documentation**: Check the [docs](./docs/) folder
-- 🐛 **Issues**: [Open an issue on GitHub](https://github.com/your-org/uiforge-webapp/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-org/uiforge-webapp/discussions)
-- 📧 **Email**: support@uiforge.dev
+- 🐛 **Issues**: [Open an issue on GitHub](https://github.com/your-org/siza-webapp/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-org/siza-webapp/discussions)
+- 📧 **Email**: support@siza.dev
 
 ---
 
 <div align="center">
-  <p>Built with ❤️ by the UIForge team</p>
+  <p>Built with ❤️ by the Siza team</p>
   <p>Making AI-powered UI development accessible to everyone</p>
 </div>

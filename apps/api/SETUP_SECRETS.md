@@ -29,7 +29,7 @@ After setting all secrets, deploy and test:
 
 ```bash
 npm run deploy
-curl https://api.uiforge.workers.dev/health
+curl https://api.siza.workers.dev/health
 ```
 
 The health endpoint should return `status: "healthy"` with all services connected.

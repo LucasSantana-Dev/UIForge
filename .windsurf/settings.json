@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/claude-code-settings.json",
+  "permissions": { "allow": ["Read", "Write", "Edit", "Grep", "Glob", "Bash"], "deny": [] },
+  "hooks": {
+    "PreCommand": [
+      {
+        "matcher": ".*",
+        "hooks": [{ "type": "command", "command": "bash .windsurf/hooks/pre-command-security.sh" }]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [{ "type": "command", "command": "bash .windsurf/hooks/post-tool-format.sh" }]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "matcher": ".*",
+        "hooks": [{ "type": "command", "command": "bash .windsurf/hooks/session-end-cleanup.sh" }]
+      }
+    ]
+  },
+  "mcpServers": {
+    "brave-search": { "command": "npx @modelcontextprotocol/server-brave-search", "enabled": true },
+    "exa": { "command": "npx @modelcontextprotocol/server-exa", "enabled": true },
+    "memory": { "command": "npx @modelcontextprotocol/server-memory", "enabled": true },
+    "sequential-thinking": {
+      "command": "npx @modelcontextprotocol/server-sequential-thinking",
+      "enabled": true
+    },
+    "tavily": { "command": "npx @modelcontextprotocol/server-tavily", "enabled": true },
+    "snyk": { "command": "npx @modelcontextprotocol/server-snyk", "enabled": true }
+  },
+  "model": "claude-3.5-sonnet",
+  "theme": "dark",
+  "autoSave": true,
+  "contextWindow": { "maxTokens": 200000, "compactThreshold": 0.8 },
+  "tokenOptimization": { "enabled": true, "compactOnThreshold": true, "clearBetweenTasks": true },
+  "ui": { "showLineNumbers": true, "showFileTree": true, "showStatus": true, "compactMode": false },
+  "git": { "autoStage": true, "autoCommit": false, "defaultBranch": "main" },
+  "notifications": { "errors": true, "warnings": true, "success": false, "info": false },
+  "debug": { "enabled": false, "verbose": false },
+  "experimental": { "parallelExecution": true, "smartContext": true }
+}

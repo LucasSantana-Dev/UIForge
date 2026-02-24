@@ -56,7 +56,7 @@ export function generateUserEncryptionKey(): string {
   return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
 
-export function deriveEncryptionKey(userKey: string, salt: string = 'uiforge-salt'): string {
+export function deriveEncryptionKey(userKey: string, salt: string = 'siza-salt'): string {
   return CryptoJS.PBKDF2(userKey, salt, { keySize: 256 / 32, iterations: 10000 }).toString();
 }
 

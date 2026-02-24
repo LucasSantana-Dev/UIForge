@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Forward to Cloudflare Workers API
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.uiforge.workers.dev';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.siza.workers.dev';
 
     const response = await fetch(`${apiUrl}/api/generate/format`, {
       method: 'POST',

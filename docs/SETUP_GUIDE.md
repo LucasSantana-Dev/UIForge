@@ -1,4 +1,4 @@
-# UIForge Webapp - Setup Guide
+# Siza Webapp - Setup Guide
 
 > **Version**: 0.1.1  
 > **Last Updated**: 2026-02-15  
@@ -42,8 +42,8 @@
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-org/uiforge-webapp.git
-cd uiforge-webapp
+git clone https://github.com/your-org/siza-webapp.git
+cd siza-webapp
 ```
 
 ### 2. Install Dependencies
@@ -322,7 +322,7 @@ npm run test:e2e:headed
 1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
 2. Pages > Create a project
 3. Connect your Git repository
-4. Select `uiforge-webapp` repository
+4. Select `siza-webapp` repository
 
 #### 2. Configure Build
 
@@ -434,7 +434,7 @@ Migrations are automatically applied via `supabase db push` or manually in Supab
 - [Supabase Documentation](https://supabase.com/docs)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages)
-- [UIForge plan.MD](../plan.MD)
+- [Siza plan.MD](../plan.MD)
 - [Database Schema Documentation](./DATABASE_SCHEMA.md)
 
 ---

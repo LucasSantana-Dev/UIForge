@@ -1,6 +1,6 @@
 /**
  * Enhanced Wireframe to Figma Converter
- * Converts UIForge wireframe data structures to Figma-compatible formats
+ * Converts Siza wireframe data structures to Figma-compatible formats
  * with Auto Layout, Components, and Variants support
  */
 
@@ -548,7 +548,7 @@ function createFigmaDocument(
   const { useAutoLayout } = options;
 
   const document = {
-    name: wireframe.name || 'UIForge Wireframe',
+    name: wireframe.name || 'Siza Wireframe',
     type: 'DOCUMENT',
     children: [
       {

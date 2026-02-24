@@ -6,7 +6,7 @@
 import { createMCPServer } from './src/mcp/server';
 
 async function testMCPServer() {
-  console.log('🧪 Testing UIForge MCP Server...\n');
+  console.log('🧪 Testing Siza MCP Server...\n');
 
   const server = createMCPServer();
 

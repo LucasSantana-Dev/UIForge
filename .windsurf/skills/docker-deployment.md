@@ -20,9 +20,9 @@ description: Work with Docker and mcp-gateway integration. Use when editing Dock
 
 ## mcp-gateway integration (separate repo)
 
-- `docker-compose.yml`: add `uiforge` service on port `8026`
-- `scripts/gateways.txt`: add `uiforge|http://uiforge:8026/sse|SSE`
-- `scripts/virtual-servers.txt`: add `cursor-design|uiforge`
+- `docker-compose.yml`: add `siza` service on port `8026`
+- `scripts/gateways.txt`: add `siza|http://siza:8026/sse|SSE`
+- `scripts/virtual-servers.txt`: add `cursor-design|siza`
 - `.env.example`: add `UIFORGE_PORT=8026` and `FIGMA_ACCESS_TOKEN=`
 - Gateway wraps stdio via `mcpgateway.translate` → SSE
 
@@ -30,11 +30,11 @@ description: Work with Docker and mcp-gateway integration. Use when editing Dock
 
 - Keep Docker image minimal (slim base, no dev deps in production)
 - Run as non-root user in production
-- Test locally with `docker build -t uiforge-mcp . && docker run --rm uiforge-mcp`
+- Test locally with `docker build -t siza-mcp . && docker run --rm siza-mcp`
 - Stdio transport: server reads from stdin, writes to stdout. No HTTP server needed.
 
 ## Commands
 
-- Build image: `docker build -t uiforge-mcp .`
-- Run locally: `docker run --rm -e FIGMA_ACCESS_TOKEN=xxx uiforge-mcp`
+- Build image: `docker build -t siza-mcp .`
+- Run locally: `docker run --rm -e FIGMA_ACCESS_TOKEN=xxx siza-mcp`
 - Build check: `npm run build` (before Docker build to catch TS errors early)

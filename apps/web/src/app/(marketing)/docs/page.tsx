@@ -23,10 +23,10 @@ export default function DocsPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center">
             <Badge className="mb-4">Documentation</Badge>
-            <h1 className="text-5xl font-bold mb-6">Everything you need to build with UIForge</h1>
+            <h1 className="text-5xl font-bold mb-6">Everything you need to build with Siza</h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
               Comprehensive guides, API references, and examples to help you get the most out of
-              UIForge&apos;s AI-powered component generation.
+              Siza&apos;s AI-powered component generation.
             </p>
             <div className="flex gap-4 justify-center">
               <Button size="lg" className="gap-2">
@@ -107,7 +107,7 @@ export default function DocsPage() {
                 <Card className="p-4">
                   <h4 className="font-medium mb-2">Installation</h4>
                   <p className="text-sm text-muted-foreground">
-                    Set up UIForge in your development environment
+                    Set up Siza in your development environment
                   </p>
                 </Card>
                 <Card className="p-4">
@@ -165,7 +165,7 @@ export default function DocsPage() {
                 <Card className="p-4">
                   <h4 className="font-medium mb-2">API Integration</h4>
                   <p className="text-sm text-muted-foreground">
-                    Use UIForge in your existing projects
+                    Use Siza in your existing projects
                   </p>
                 </Card>
               </div>
@@ -236,7 +236,7 @@ const component = instantiateTemplate(template, {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to start building?</h2>
           <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of developers using UIForge to build better UI components faster
+            Join thousands of developers using Siza to build better UI components faster
           </p>
           <Button size="lg" className="gap-2">
             <Users className="w-5 h-5" />

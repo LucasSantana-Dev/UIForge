@@ -1,4 +1,4 @@
-# UIForge Webapp - Deployment Guide
+# Siza Webapp - Deployment Guide
 
 > **Version**: 0.1.1  
 > **Last Updated**: 2026-02-15  
@@ -12,7 +12,7 @@
 ┌─────────────────────────────────────────────────────────┐
 │                   Cloudflare Pages                      │
 │              (Frontend - Next.js 15)                    │
-│         https://uiforge.pages.dev                       │
+│         https://siza.pages.dev                       │
 └─────────────────────────────────────────────────────────┘
                           │
                           ▼
@@ -72,7 +72,7 @@
 3. Click "New Project"
 4. Configure:
    - **Organization**: Select or create
-   - **Name**: `uiforge-prod`
+   - **Name**: `siza-prod`
    - **Database Password**: Generate strong password (save securely)
    - **Region**: Choose closest to users (e.g., `us-east-1`)
    - **Pricing Plan**: Free
@@ -120,8 +120,8 @@ supabase db diff
      - Add authorization callback URL: `https://your-project.supabase.co/auth/v1/callback`
 
 4. Configure URL Configuration:
-   - **Site URL**: `https://uiforge.pages.dev` (update after Cloudflare deployment)
-   - **Redirect URLs**: Add `https://uiforge.pages.dev/**`
+   - **Site URL**: `https://siza.pages.dev` (update after Cloudflare deployment)
+   - **Redirect URLs**: Add `https://siza.pages.dev/**`
 
 #### 1.4 Get API Credentials
 
@@ -177,7 +177,7 @@ git push origin main
 2. Pages > Create a project
 3. Connect to Git > Select your repository
 4. Configure build:
-   - **Project name**: `uiforge` (or your preferred name)
+   - **Project name**: `siza` (or your preferred name)
    - **Production branch**: `main`
    - **Framework preset**: Next.js
    - **Build command**: `cd apps/web && npm install && npm run build`
@@ -193,7 +193,7 @@ Add these in Cloudflare Pages > Settings > Environment variables:
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-production-anon-key
-NEXT_PUBLIC_API_URL=https://uiforge.pages.dev
+NEXT_PUBLIC_API_URL=https://siza.pages.dev
 NEXT_PUBLIC_ENABLE_BYOK=true
 NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
 NODE_VERSION=20
@@ -203,7 +203,7 @@ NODE_VERSION=20
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://your-staging-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-staging-anon-key
-NEXT_PUBLIC_API_URL=https://preview.uiforge.pages.dev
+NEXT_PUBLIC_API_URL=https://preview.siza.pages.dev
 NEXT_PUBLIC_ENABLE_BYOK=true
 NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
 NODE_VERSION=20
@@ -214,15 +214,15 @@ NODE_VERSION=20
 1. Click "Save and Deploy"
 2. Wait for build to complete (~5-10 minutes)
 3. Monitor build logs for errors
-4. Once deployed, note your URL: `https://uiforge.pages.dev`
+4. Once deployed, note your URL: `https://siza.pages.dev`
 
 #### 2.5 Update Supabase URLs
 
 1. Go back to Supabase Dashboard
 2. Authentication > URL Configuration
 3. Update:
-   - **Site URL**: `https://uiforge.pages.dev`
-   - **Redirect URLs**: `https://uiforge.pages.dev/**`
+   - **Site URL**: `https://siza.pages.dev`
+   - **Redirect URLs**: `https://siza.pages.dev/**`
 
 ---
 
@@ -336,7 +336,7 @@ Runs build command
   ↓
 Deploys to production
   ↓
-https://uiforge.pages.dev
+https://siza.pages.dev
 ```
 
 **Preview** (feature branches):
@@ -349,7 +349,7 @@ Runs build command
   ↓
 Deploys to preview URL
   ↓
-https://feature-new-feature.uiforge.pages.dev
+https://feature-new-feature.siza.pages.dev
 ```
 
 ### GitHub Actions (Optional)
@@ -495,7 +495,7 @@ jobs:
 - [Cloudflare Pages Documentation](https://developers.cloudflare.com/pages)
 - [Supabase Production Checklist](https://supabase.com/docs/guides/platform/going-into-prod)
 - [Next.js Deployment Documentation](https://nextjs.org/docs/deployment)
-- [UIForge plan.MD](../plan.MD)
+- [Siza plan.MD](../plan.MD)
 
 ---
 

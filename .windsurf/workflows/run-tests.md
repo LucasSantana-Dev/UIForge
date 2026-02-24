@@ -1,10 +1,10 @@
 ---
-description: Run the complete test suite for UIForge
+description: Run the complete test suite for Siza
 ---
 
 # Run Tests Workflow
 
-This workflow runs all tests for the UIForge application.
+This workflow runs all tests for the Siza application.
 
 ## Steps
 

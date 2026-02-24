@@ -32,7 +32,7 @@ Review recent work and identify:
 
 ```bash
 # Read the current state
-cat /Users/lucassantana/Desenvolvimento/uiforge-webapp/plan.MD | head -100
+cat /Users/lucassantana/Desenvolvimento/siza-webapp/plan.MD | head -100
 ```
 
 Note:

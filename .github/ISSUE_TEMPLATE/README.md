@@ -1,6 +1,6 @@
 # GitHub Templates
 
-This directory contains templates for creating consistent and comprehensive issues and pull requests in the UIForge repository.
+This directory contains templates for creating consistent and comprehensive issues and pull requests in the Siza repository.
 
 ## 📋 Available Templates
 

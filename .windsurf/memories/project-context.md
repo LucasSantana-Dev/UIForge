@@ -1,8 +1,8 @@
-# UIForge Web App Project Context
+# Siza Web App Project Context
 
 ## Project Overview
 
-UIForge Web App is a **zero-cost Next.js 15 application** for AI-powered UI component generation. Built with Supabase backend and deployed on Cloudflare Pages.
+Siza Web App is a **zero-cost Next.js 15 application** for AI-powered UI component generation. Built with Supabase backend and deployed on Cloudflare Pages.
 
 **Core purpose**: Enable users to generate, preview, and manage React/Next.js UI components through an AI-powered interface with Monaco editor integration, all within free-tier constraints.
 

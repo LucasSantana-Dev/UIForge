@@ -11,7 +11,7 @@ export async function setupAuthenticatedUser(page: Page): Promise<void> {
 
   // For now, we'll use test credentials with a random password
   // In production, you'd want to use Supabase test helpers
-  const testEmail = 'test@uiforge.dev';
+  const testEmail = 'test@siza.dev';
   const testPassword = crypto.randomBytes(16).toString('hex');
 
   // Fill in credentials

@@ -99,7 +99,7 @@ describe.skip('IndexedDB Storage', () => {
     it('should initialize database successfully', async () => {
       await storage.init();
 
-      expect(global.indexedDB.open).toHaveBeenCalledWith('UIForgeKeys', 1);
+      expect(global.indexedDB.open).toHaveBeenCalledWith('SizaKeys', 1);
       expect((storage as any).db).toBe(mockDatabase);
     });
 

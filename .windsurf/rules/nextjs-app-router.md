@@ -203,7 +203,7 @@ export default function NotFound() {
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'UIForge',
+  title: 'Siza',
   description: 'Zero-cost UI component generator',
 };
 

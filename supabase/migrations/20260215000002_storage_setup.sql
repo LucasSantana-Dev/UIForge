@@ -1,4 +1,4 @@
--- UIForge Webapp - Storage Buckets and Policies
+-- Siza Webapp - Storage Buckets and Policies
 -- Version: 0.1.1
 -- Created: 2026-02-15
 -- Description: Supabase Storage buckets for project files, user uploads, and thumbnails

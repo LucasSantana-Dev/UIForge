@@ -1,4 +1,4 @@
-# UIForge Web App Project
+# Siza Web App Project
 
 **When to apply:** Always active — project structure, stack, and conventions.
 

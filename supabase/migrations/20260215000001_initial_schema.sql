@@ -1,4 +1,4 @@
--- UIForge Webapp - Initial Database Schema
+-- Siza Webapp - Initial Database Schema
 -- Version: 0.1.1
 -- Created: 2026-02-15
 -- Description: Core tables for user profiles, projects, components, and generations with RLS

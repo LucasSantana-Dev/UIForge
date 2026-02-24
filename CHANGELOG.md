@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- **`@uiforge/forge-patterns`**: added as dev dependency (local file reference) for shared constants access
+- **`@siza/forge-patterns`**: added as dev dependency (local file reference) for shared constants access
 
 ### Changed
 

@@ -1,4 +1,4 @@
-# UIForge E2E Test Coverage Report
+# Siza E2E Test Coverage Report
 
 **Date**: February 16, 2026  
 **Test Framework**: Playwright  
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-Comprehensive E2E test suite created covering all major user flows in UIForge. Tests are organized into 4 main test suites with **over 40 test cases** covering authentication, project management, component generation, and navigation.
+Comprehensive E2E test suite created covering all major user flows in Siza. Tests are organized into 4 main test suites with **over 40 test cases** covering authentication, project management, component generation, and navigation.
 
 ---
 
@@ -312,7 +312,7 @@ jobs:
 
 ## Conclusion
 
-UIForge now has **comprehensive E2E test coverage** with 46 tests covering all major user flows:
+Siza now has **comprehensive E2E test coverage** with 46 tests covering all major user flows:
 
 - ✅ **Authentication** - Complete sign in/up flows
 - ✅ **Project Management** - Full CRUD operations

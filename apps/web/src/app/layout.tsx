@@ -6,16 +6,16 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'], preload: false });
 
 export const metadata: Metadata = {
-  title: 'UIForge - AI-Driven UI Generation',
+  title: 'Siza - AI-Driven UI Generation',
   description:
     'Generate production-ready UI components with AI. Zero-cost platform for developers.',
   keywords: ['UI generation', 'AI', 'React', 'Next.js', 'Vue', 'Components'],
-  authors: [{ name: 'UIForge Team' }],
+  authors: [{ name: 'Siza Team' }],
   icons: {
     icon: '/favicon.ico',
   },
   openGraph: {
-    title: 'UIForge - AI-Driven UI Generation',
+    title: 'Siza - AI-Driven UI Generation',
     description: 'Generate production-ready UI components with AI',
     type: 'website',
   },

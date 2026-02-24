@@ -42,7 +42,7 @@ Follow [Semantic Versioning 2.0.0](https://semver.org/) strictly: `MAJOR.MINOR.P
 
 ```json
 {
-  "name": "uiforge-mcp",
+  "name": "siza-mcp",
   "version": "0.2.0",
   "engines": {
     "node": ">=18.0.0",
