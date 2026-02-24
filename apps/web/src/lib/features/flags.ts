@@ -1,6 +1,5 @@
 import type { FeatureFlagName, FeatureFlag } from './types';
 
-// Default feature flags - can be overridden by environment variables
 export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_GOOGLE_SSO: true,
   ENABLE_GITHUB_SSO: true,
@@ -16,9 +15,11 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_QUALITY_GATES: false,
   ENABLE_MULTI_LLM: false,
   ENABLE_RESEND_EMAILS: false,
+  ENABLE_CENTRALIZED_FEATURE_FLAGS: false,
+  ENABLE_STRIPE_BILLING: false,
+  ENABLE_USAGE_LIMITS: false,
 };
 
-// Feature flag metadata
 export const FEATURE_FLAGS: FeatureFlag[] = [
   {
     name: 'ENABLE_GOOGLE_SSO',
@@ -104,13 +105,27 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     description: 'Send transactional emails via Resend SDK',
     category: 'email',
   },
+  {
+    name: 'ENABLE_CENTRALIZED_FEATURE_FLAGS',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_CENTRALIZED_FEATURE_FLAGS,
+    description: 'Use database-backed feature flags instead of env vars',
+    category: 'system',
+  },
+  {
+    name: 'ENABLE_STRIPE_BILLING',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_STRIPE_BILLING,
+    description: 'Enable Stripe billing and subscription management',
+    category: 'billing',
+  },
+  {
+    name: 'ENABLE_USAGE_LIMITS',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_USAGE_LIMITS,
+    description: 'Enforce per-plan usage limits on generations and projects',
+    category: 'billing',
+  },
 ];
 
-/**
- * Get feature flag value from environment or default
- */
 export function getFeatureFlag(name: FeatureFlagName): boolean {
-  // Check environment variable first
   const envKey = `NEXT_PUBLIC_${name}`;
   const envValue = process.env[envKey];
 
@@ -118,13 +133,9 @@ export function getFeatureFlag(name: FeatureFlagName): boolean {
     return envValue === 'true';
   }
 
-  // Fall back to default
   return DEFAULT_FEATURE_FLAGS[name];
 }
 
-/**
- * Get all feature flags with current values
- */
 export function getAllFeatureFlags(): Record<FeatureFlagName, boolean> {
   const flags: Partial<Record<FeatureFlagName, boolean>> = {};
 
@@ -135,9 +146,6 @@ export function getAllFeatureFlags(): Record<FeatureFlagName, boolean> {
   return flags as Record<FeatureFlagName, boolean>;
 }
 
-/**
- * Check if a feature is enabled
- */
 export function isFeatureEnabled(name: FeatureFlagName): boolean {
   return getFeatureFlag(name);
 }
