@@ -8,7 +8,7 @@ import LivePreview from '@/components/generator/LivePreview';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Code } from 'lucide-react';
+import { ArrowLeft, Code, Github, Loader2, Check, AlertTriangle } from 'lucide-react';
 
 function GeneratePageClient() {
   const searchParams = useSearchParams();
@@ -22,6 +22,12 @@ function GeneratePageClient() {
   const [generatedCode, setGeneratedCode] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isTemplateMode, setIsTemplateMode] = useState(false);
+  const [componentName, setComponentName] = useState('');
+  const [pushState, setPushState] = useState<'idle' | 'pushing' | 'success' | 'error' | 'no-repo'>(
+    'idle'
+  );
+  const [prUrl, setPrUrl] = useState<string | null>(null);
+  const [pushError, setPushError] = useState<string | null>(null);
 
   // Handle template instantiation
   useEffect(() => {
@@ -50,10 +56,53 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
     }
   }, [template, description, framework, componentLibrary]);
 
-  const handleGenerate = async (code: string) => {
+  const handleGenerate = async (code: string, settings?: { componentName?: string }) => {
     setGeneratedCode(code);
     setIsGenerating(false);
     setIsTemplateMode(false);
+    setPushState('idle');
+    setPrUrl(null);
+    setPushError(null);
+    if (settings?.componentName) setComponentName(settings.componentName);
+  };
+
+  const handlePushToGitHub = async () => {
+    if (!generatedCode || !projectId) return;
+    setPushState('pushing');
+    setPushError(null);
+
+    try {
+      const res = await fetch('/api/github/push', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          projectId,
+          componentName: componentName || 'GeneratedComponent',
+          code: generatedCode,
+          prompt: description || '',
+          model: 'gemini-2.0-flash',
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        if (res.status === 404) {
+          setPushState('no-repo');
+          setPushError('No GitHub repo linked. Go to Settings to link one.');
+        } else {
+          setPushState('error');
+          setPushError(data.error || 'Failed to push');
+        }
+        return;
+      }
+
+      setPrUrl(data.pr.htmlUrl);
+      setPushState('success');
+    } catch {
+      setPushState('error');
+      setPushError('Network error');
+    }
   };
 
   const handleGenerating = () => {
@@ -173,6 +222,49 @@ export default function ${template.replace(/[^a-zA-Z0-9]/g, '')}Component() {
           </Card>
         </div>
       </div>
+
+      {/* Push to GitHub bar */}
+      {generatedCode && !isGenerating && (
+        <div className="mt-4 flex items-center gap-3 p-3 rounded-lg border bg-card">
+          {pushState === 'idle' && (
+            <Button onClick={handlePushToGitHub} variant="outline" size="sm">
+              <Github className="mr-2 h-4 w-4" />
+              Push to GitHub
+            </Button>
+          )}
+          {pushState === 'pushing' && (
+            <Button disabled variant="outline" size="sm">
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Creating PR...
+            </Button>
+          )}
+          {pushState === 'success' && prUrl && (
+            <div className="flex items-center gap-2 text-sm">
+              <Check className="h-4 w-4 text-green-500" />
+              <span>PR created!</span>
+              <a
+                href={prUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-primary underline"
+              >
+                View on GitHub
+              </a>
+            </div>
+          )}
+          {(pushState === 'error' || pushState === 'no-repo') && (
+            <div className="flex items-center gap-2 text-sm">
+              <AlertTriangle className="h-4 w-4 text-yellow-500" />
+              <span className="text-muted-foreground">{pushError}</span>
+              {pushState === 'error' && (
+                <Button onClick={handlePushToGitHub} variant="ghost" size="sm">
+                  Retry
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
