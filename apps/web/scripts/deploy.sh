@@ -11,8 +11,8 @@ echo "Building with OpenNext..."
 npx opennextjs-cloudflare build
 
 echo "Stubbing unused @vercel/og WASM files to reduce bundle size..."
-printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > "${WASM_DIR}/resvg.wasm"
-printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > "${WASM_DIR}/yoga.wasm"
+printf '\x00\x61\x73\x6d\x01\x00\x00\x00' >"${WASM_DIR}/resvg.wasm"
+printf '\x00\x61\x73\x6d\x01\x00\x00\x00' >"${WASM_DIR}/yoga.wasm"
 
 rm -f .open-next/assets/_redirects 2>/dev/null || true
 
