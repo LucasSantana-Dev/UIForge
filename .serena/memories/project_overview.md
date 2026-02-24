@@ -16,7 +16,7 @@ Three offset rectangles — base (widest), face (wide), horn (narrow, right-shif
 ## Architecture
 **Monorepo structure**:
 - `apps/web` — Next.js 16 frontend (@siza/web)
-- `apps/api` — Cloudflare Workers backend (@siza/api)
+- `apps/api` — API utilities and shared services (@siza/api)
 - `packages/` — Shared utilities and types
 
 ## Core Features
@@ -31,7 +31,7 @@ Three offset rectangles — base (widest), face (wide), horn (narrow, right-shif
 - **Backend**: Cloudflare Workers, Hono framework
 - **Database**: Supabase (auth + PostgreSQL + storage)
 - **AI**: Gemini 2.0 Flash (primary), BYOK for OpenAI/Anthropic
-- **Deployment**: Cloudflare Pages (web), Cloudflare Workers (API)
+- **Deployment**: Cloudflare Workers via OpenNext (unified web + API)
 - **UI Library**: shadcn/ui (57 components), Lucide React icons
 
 ## Security

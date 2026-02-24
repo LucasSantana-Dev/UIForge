@@ -38,11 +38,11 @@ npm run db:seed          # Seed database with test data
 npx supabase status      # Check Supabase connection
 ```
 
-## Deployment
+## Deployment (Cloudflare Workers via OpenNext)
 ```bash
-npx wrangler deploy      # Deploy Cloudflare Workers API
-npx vercel deploy        # Deploy frontend to Vercel
-npx vercel --prod        # Deploy to production
+NODE_ENV=production npx opennextjs-cloudflare build  # Build for Workers
+npx wrangler deploy                                   # Deploy to Cloudflare Workers
+npx wrangler pages dev                                # Local Workers preview
 ```
 
 ## Utilities
