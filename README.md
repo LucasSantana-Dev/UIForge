@@ -12,7 +12,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![Code Quality](https://img.shields.io/badge/Quality-A-brightgreen)](https://github.com/your-org/siza-webapp/actions)
 [![Security](https://img.shields.io/badge/Security-Passed-brightgreen)](https://github.com/your-org/siza-webapp/security)
-[![Deployment](https://img.shields.io/badge/Deploy-Cloudflare_Pages-orange)](https://pages.cloudflare.com/)
+[![Deployment](https://img.shields.io/badge/Deploy-Cloudflare_Workers-orange)](https://workers.cloudflare.com/)
 [![Database](https://img.shields.io/badge/Database-Supabase-3ECF8E)](https://supabase.com/)
 [![UI Framework](https://img.shields.io/badge/UI-shadcn/ui-000000)](https://ui.shadcn.com/)
 [![Styling](https://img.shields.io/badge/Styling-Tailwind_CSS-06B6D4)](https://tailwindcss.com/)
@@ -39,7 +39,7 @@
 - **Styling**: Tailwind CSS + shadcn/ui design system
 - **State**: Zustand (minimal re-renders)
 - **Editor**: Monaco Editor (VS Code engine)
-- **Hosting**: Cloudflare Pages (unlimited bandwidth)
+- **Hosting**: Cloudflare Workers via OpenNext (unlimited bandwidth)
 
 ### Backend Layer
 - **Database**: PostgreSQL 15 via Supabase
@@ -180,7 +180,7 @@ npm run clean               # Clean all build artifacts
 - 🤖 Model Context Protocol (MCP) integration
 
 **Infrastructure**:
-- 🌐 Cloudflare Pages (hosting)
+- 🌐 Cloudflare Workers via OpenNext (hosting)
 - 🐳 Docker & Docker Compose
 - 🔄 GitHub Actions (CI/CD)
 - 📊 Turborepo (monorepo management)
