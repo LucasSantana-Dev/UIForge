@@ -31,7 +31,7 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-600">Loading project...</div>
+        <div className="text-text-secondary">Loading project...</div>
       </div>
     );
   }
@@ -39,20 +39,22 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
   if (!project) {
     return (
       <div className="text-center py-12">
-        <p className="text-red-600">Project not found</p>
+        <p className="text-error">Project not found</p>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-white rounded-lg border border-gray-200 overflow-hidden">
+    <div className="flex-1 flex flex-col bg-surface-1 rounded-lg border border-surface-3 overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-purple-50">
+      <div className="px-6 py-4 border-b border-surface-3 bg-gradient-to-r from-brand/5 to-indigo/5">
         <div className="flex items-center space-x-3">
-          <SparklesIcon className="h-6 w-6 text-blue-600" />
+          <SparklesIcon className="h-6 w-6 text-brand" />
           <div>
-            <h1 className="text-xl font-bold text-gray-900">Component Generator</h1>
-            <p className="text-sm text-gray-600">Generate {project.framework} components with AI</p>
+            <h1 className="text-xl font-bold text-text-primary">Component Generator</h1>
+            <p className="text-sm text-text-secondary">
+              Generate {project.framework} components with AI
+            </p>
           </div>
         </div>
       </div>
@@ -60,7 +62,7 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Generator Form */}
-        <div className="w-96 border-r border-gray-200 flex flex-col">
+        <div className="w-96 border-r border-surface-3 flex flex-col">
           <GeneratorForm
             projectId={projectId}
             framework={project.framework}
@@ -83,7 +85,7 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
         {/* Right Panel - Split View */}
         <div className="flex-1 flex flex-col">
           {/* Code Editor */}
-          <div className="flex-1 border-b border-gray-200">
+          <div className="flex-1 border-b border-surface-3">
             <CodeEditor
               code={isEdited ? editedCode : generation.code}
               onChange={(code) => {
@@ -95,7 +97,7 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
           </div>
 
           {/* Live Preview */}
-          <div className="flex-1 border-b border-gray-200">
+          <div className="flex-1 border-b border-surface-3">
             <LivePreview
               code={isEdited ? editedCode : generation.code}
               framework={project.framework}
