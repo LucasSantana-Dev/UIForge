@@ -1,422 +1,392 @@
+'use client';
+
 export const dynamic = 'force-dynamic';
 
+import { useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
-  Zap,
-  Code,
+  Sparkles,
+  Code2,
   Palette,
-  Rocket,
-  Shield,
-  Users,
-  Star,
-  CheckCircle,
-  ArrowRight,
+  Key,
+  LayoutGrid,
+  Eye,
   Github,
   Twitter,
+  ArrowRight,
+  Terminal,
 } from 'lucide-react';
 
-export default function MarketingPage() {
+const EASE_SIZA = [0.16, 1, 0.3, 1] as const;
+
+function FadeIn({
+  children,
+  className = '',
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { once: true, margin: '-60px' });
+
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center">
-            <Badge className="mb-4 bg-white/20 text-white border-white/30">
-              🎨 AI-Powered UI Component Generation
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 20 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.4, ease: EASE_SIZA, delay }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+const capabilities = [
+  'React',
+  'Next.js',
+  'Vue',
+  'Angular',
+  'Tailwind CSS',
+  'shadcn/ui',
+  'TypeScript',
+  'Figma Integration',
+];
+
+const features = [
+  {
+    icon: Sparkles,
+    title: 'AI Generation',
+    description: 'Describe a component in natural language. Get production-ready code.',
+  },
+  {
+    icon: Code2,
+    title: 'Multi-Framework',
+    description: 'Output for React, Vue, Angular, and Svelte with consistent quality.',
+  },
+  {
+    icon: Palette,
+    title: 'Design Systems',
+    description: 'Works with Tailwind, Material-UI, Chakra UI, and shadcn/ui.',
+  },
+  {
+    icon: Key,
+    title: 'BYOK',
+    description: 'Bring your own AI keys. Complete privacy and control.',
+  },
+  {
+    icon: LayoutGrid,
+    title: 'Template Library',
+    description: 'Start from curated templates. Customize to fit your needs.',
+  },
+  {
+    icon: Eye,
+    title: 'Live Preview',
+    description: 'See your component render in real-time as the AI writes code.',
+  },
+];
+
+const steps = [
+  { number: '01', title: 'Describe', text: 'Write what you want to build in plain language.' },
+  { number: '02', title: 'Generate', text: 'AI creates clean, production-ready code instantly.' },
+  { number: '03', title: 'Deploy', text: 'Fine-tune in the editor, then ship to your project.' },
+];
+
+export default function LandingPage() {
+  return (
+    <div className="min-h-screen bg-background overflow-hidden">
+      {/* Mesh background */}
+      <div
+        className="fixed inset-0 pointer-events-none"
+        style={{
+          background: [
+            'radial-gradient(ellipse 80% 60% at 10% 20%, rgba(124, 58, 237, 0.07) 0%, transparent 60%)',
+            'radial-gradient(ellipse 60% 80% at 85% 75%, rgba(99, 102, 241, 0.05) 0%, transparent 55%)',
+            'radial-gradient(ellipse 40% 40% at 50% 10%, rgba(139, 92, 246, 0.04) 0%, transparent 50%)',
+            'hsl(var(--background))',
+          ].join(', '),
+        }}
+      />
+
+      {/* Hero */}
+      <section className="relative min-h-[85vh] flex items-center justify-center px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE_SIZA }}
+          >
+            <Badge
+              variant="outline"
+              className="mb-8 px-4 py-1.5 text-xs font-mono border-border text-muted-foreground"
+            >
+              Open Source &middot; Zero Cost
             </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">
-              Build Beautiful UI Components
-              <br />
-              <span className="text-yellow-300">10x Faster</span>
-            </h1>
-            <p className="text-xl mb-8 max-w-3xl mx-auto text-white/90">
-              Siza uses artificial intelligence to generate production-ready React, Vue, Angular,
-              and Svelte components from natural language descriptions. No more boilerplate, just
-              beautiful code.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-primary-foreground hover:bg-accent gap-2">
-                <Rocket className="w-5 h-5" />
-                Start Building Free
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-purple-600 gap-2"
-              >
-                <Github className="w-5 h-5" />
-                View on GitHub
-              </Button>
-            </div>
-          </div>
+          </motion.div>
+
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: EASE_SIZA, delay: 0.1 }}
+            className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[1.1] mb-6"
+          >
+            <span className="bg-gradient-to-r from-primary via-[#8B5CF6] to-[#6366F1] bg-clip-text text-transparent">
+              Design that thinks.
+            </span>
+            <br />
+            <span className="text-foreground">Code that lasts.</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: EASE_SIZA, delay: 0.2 }}
+            className="text-lg text-muted-foreground max-w-xl mx-auto mb-10"
+          >
+            Precision UI generation for the exacting developer.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: EASE_SIZA, delay: 0.3 }}
+          >
+            <Button size="lg" className="gap-2" asChild>
+              <a href="/signup">
+                Start Building
+                <ArrowRight className="w-4 h-4" />
+              </a>
+            </Button>
+          </motion.div>
         </div>
       </section>
 
-      {/* Social Proof */}
-      <section className="py-16 bg-gray-50 dark:bg-background">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Trusted by Developers Worldwide</h2>
-            <p className="text-lg text-muted-foreground">
-              Join thousands of developers building better UI faster
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">10K+</div>
-              <div className="text-muted-foreground">Active Developers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-green-600 mb-2">50K+</div>
-              <div className="text-muted-foreground">Components Generated</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">99.9%</div>
-              <div className="text-muted-foreground">Uptime</div>
-            </div>
-          </div>
+      {/* Capabilities marquee */}
+      <section className="py-8 border-y border-border/50 bg-[#18181B]/50 overflow-hidden">
+        <div className="relative">
+          <motion.div
+            className="flex gap-8 whitespace-nowrap"
+            animate={{ x: ['0%', '-50%'] }}
+            transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
+          >
+            {[...capabilities, ...capabilities].map((cap, i) => (
+              <span
+                key={`${cap}-${i}`}
+                className="text-sm font-mono text-muted-foreground/60 uppercase tracking-widest"
+              >
+                {cap}
+              </span>
+            ))}
+          </motion.div>
         </div>
       </section>
 
       {/* Features */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Powerful Features</h2>
-            <p className="text-lg text-muted-foreground">
-              Everything you need to build modern UI components efficiently
+      <section className="relative py-24 px-6">
+        <div className="max-w-5xl mx-auto">
+          <FadeIn className="text-center mb-14">
+            <h2 className="text-3xl font-bold tracking-tight mb-3">Built for precision</h2>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              Every feature designed with purpose. Nothing unnecessary.
             </p>
-          </div>
+          </FadeIn>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Zap className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">AI-Powered Generation</h3>
-              <p className="text-muted-foreground">
-                Describe your component in natural language and watch AI create production-ready
-                code
-              </p>
-            </Card>
-
-            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Code className="w-6 h-6 text-green-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Multi-Framework Support</h3>
-              <p className="text-muted-foreground">
-                Generate components for React, Vue, Angular, and Svelte with consistent quality
-              </p>
-            </Card>
-
-            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-purple-100 dark:bg-primary/20 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Palette className="w-6 h-6 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Design System Integration</h3>
-              <p className="text-muted-foreground">
-                Works seamlessly with Tailwind, Material-UI, Chakra UI, and shadcn/ui
-              </p>
-            </Card>
-
-            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Rocket className="w-6 h-6 text-yellow-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Template Library</h3>
-              <p className="text-muted-foreground">
-                Start with 50+ pre-built templates and customize them to fit your needs
-              </p>
-            </Card>
-
-            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-6 h-6 text-red-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Bring Your Own Key</h3>
-              <p className="text-muted-foreground">
-                Use your own AI provider keys for complete privacy and control
-              </p>
-            </Card>
-
-            <Card className="p-6 text-center hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Users className="w-6 h-6 text-indigo-600" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Team Collaboration</h3>
-              <p className="text-muted-foreground">
-                Share projects, templates, and components with your team
-              </p>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {features.map((feature, i) => (
+              <FadeIn key={feature.title} delay={i * 0.08}>
+                <Card className="p-6 h-full bg-card border-border hover:border-primary/30 transition-all duration-300 group">
+                  <feature.icon className="w-5 h-5 text-primary mb-4 group-hover:text-[#8B5CF6] transition-colors" />
+                  <h3 className="font-semibold mb-1.5">{feature.title}</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    {feature.description}
+                  </p>
+                </Card>
+              </FadeIn>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-16 bg-gray-50 dark:bg-background">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">How It Works</h2>
-            <p className="text-lg text-muted-foreground">
-              Get from idea to production in minutes, not hours
-            </p>
-          </div>
+      {/* How it works */}
+      <section className="relative py-24 px-6 border-t border-border/50">
+        <div className="max-w-4xl mx-auto">
+          <FadeIn className="text-center mb-14">
+            <h2 className="text-3xl font-bold tracking-tight mb-3">Three steps. That&apos;s it.</h2>
+          </FadeIn>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
-                1
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Describe Your Component</h3>
-              <p className="text-muted-foreground">
-                Write a simple description of what you want to build
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
-                2
-              </div>
-              <h3 className="text-xl font-semibold mb-2">AI Generates Code</h3>
-              <p className="text-muted-foreground">
-                Our AI creates clean, production-ready code instantly
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
-                3
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Customize & Deploy</h3>
-              <p className="text-muted-foreground">Fine-tune the code and deploy to your project</p>
-            </div>
+            {steps.map((step, i) => (
+              <FadeIn key={step.number} delay={i * 0.1}>
+                <div className="text-center">
+                  <div className="text-4xl font-bold text-primary/20 mb-3 font-mono">
+                    {step.number}
+                  </div>
+                  <h3 className="font-semibold mb-2">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground">{step.text}</p>
+                </div>
+              </FadeIn>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">What Developers Say</h2>
-            <p className="text-lg text-muted-foreground">Loved by developers around the world</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="p-6">
-              <div className="flex items-center mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <p className="text-muted-foreground mb-4">
-                &ldquo;Siza has completely changed how I build UI components. What used to take
-                hours now takes minutes!&rdquo;
-              </p>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-muted-foreground rounded-full mr-3"></div>
-                <div>
-                  <div className="font-medium">Sarah Chen</div>
-                  <div className="text-sm text-muted-foreground">Frontend Developer</div>
+      {/* Code showcase */}
+      <section className="relative py-24 px-6 border-t border-border/50">
+        <div className="max-w-4xl mx-auto">
+          <FadeIn>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Terminal input */}
+              <div className="rounded-lg border border-border bg-[#1E1E22] overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+                  </div>
+                  <span className="text-xs text-muted-foreground ml-2 font-mono">prompt</span>
+                </div>
+                <div className="p-5">
+                  <div className="flex items-start gap-2">
+                    <Terminal className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                    <code className="text-sm font-mono text-foreground/90 leading-relaxed">
+                      Create a responsive pricing card with Tailwind CSS, dark theme, and hover
+                      animation
+                    </code>
+                  </div>
                 </div>
               </div>
-            </Card>
 
-            <Card className="p-6">
-              <div className="flex items-center mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <p className="text-muted-foreground mb-4">
-                &ldquo;The quality of generated code is impressive. It&apos;s clean, follows best
-                practices, and works out of the box.&rdquo;
-              </p>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-muted-foreground rounded-full mr-3"></div>
-                <div>
-                  <div className="font-medium">Mike Johnson</div>
-                  <div className="text-sm text-muted-foreground">Full Stack Developer</div>
+              {/* Preview output */}
+              <div className="rounded-lg border border-border bg-[#1E1E22] overflow-hidden">
+                <div className="flex items-center gap-2 px-4 py-3 border-b border-border/50">
+                  <Eye className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground font-mono">preview</span>
+                </div>
+                <div className="p-5 flex items-center justify-center min-h-[120px]">
+                  <div className="w-full max-w-[200px] rounded-lg border border-primary/20 bg-card p-4 text-center">
+                    <div className="text-xs text-muted-foreground mb-1">Pro</div>
+                    <div className="text-2xl font-bold mb-2">$29</div>
+                    <div className="h-1.5 w-full bg-primary/20 rounded-full mb-3">
+                      <div className="h-full w-3/4 bg-primary rounded-full" />
+                    </div>
+                    <div className="text-xs text-muted-foreground">Generated in 2.3s</div>
+                  </div>
                 </div>
               </div>
-            </Card>
-
-            <Card className="p-6">
-              <div className="flex items-center mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <p className="text-muted-foreground mb-4">
-                &ldquo;The template library is a game-changer. I can start with a solid foundation
-                and customize from there.&rdquo;
-              </p>
-              <div className="flex items-center">
-                <div className="w-10 h-10 bg-muted-foreground rounded-full mr-3"></div>
-                <div>
-                  <div className="font-medium">Emily Davis</div>
-                  <div className="text-sm text-muted-foreground">UI/UX Designer</div>
-                </div>
-              </div>
-            </Card>
-          </div>
+            </div>
+          </FadeIn>
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="py-16 bg-gray-50 dark:bg-background">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Simple, Transparent Pricing</h2>
-            <p className="text-lg text-muted-foreground">Start free, scale as you grow</p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-2">Free</h3>
-              <div className="text-3xl font-bold mb-4">
-                $0<span className="text-lg text-muted-foreground">/month</span>
-              </div>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  10 components per month
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Basic templates
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Community support
-                </li>
-              </ul>
-              <Button className="w-full">Get Started</Button>
-            </Card>
-
-            <Card className="p-6 border-2 border-blue-600 relative">
-              <Badge className="absolute -top-3 left-1/2 transform -translate-x-1/2">Popular</Badge>
-              <h3 className="text-xl font-semibold mb-2">Pro</h3>
-              <div className="text-3xl font-bold mb-4">
-                $29<span className="text-lg text-muted-foreground">/month</span>
-              </div>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Unlimited components
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  All templates
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Priority support
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Team collaboration
-                </li>
-              </ul>
-              <Button className="w-full">Start Free Trial</Button>
-            </Card>
-
-            <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-2">Enterprise</h3>
-              <div className="text-3xl font-bold mb-4">Custom</div>
-              <ul className="space-y-2 mb-6">
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Everything in Pro
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Custom AI models
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  Dedicated support
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                  SLA guarantee
-                </li>
-              </ul>
-              <Button variant="outline" className="w-full">
-                Contact Sales
-              </Button>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-16 bg-gradient-to-r from-primary to-accent text-white">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to 10x Your Development Speed?</h2>
-          <p className="text-xl mb-8 text-white/90">
-            Join thousands of developers building better UI faster with Siza
+      {/* Open Source CTA */}
+      <section className="relative py-24 px-6 border-t border-border/50">
+        <FadeIn className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold tracking-tight mb-3">
+            Built in the open.
+            <br />
+            <span className="text-muted-foreground">Zero-cost forever.</span>
+          </h2>
+          <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+            Siza runs entirely on free-tier infrastructure. No surprises, no paywalls.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-primary-foreground hover:bg-accent gap-2">
-              <Rocket className="w-5 h-5" />
-              Start Building Free
+          <div className="flex justify-center gap-4">
+            <Button variant="outline" asChild>
+              <a href="https://github.com/Forge-Space/UI" target="_blank" rel="noopener noreferrer">
+                <Github className="w-4 h-4 mr-2" />
+                View on GitHub
+              </a>
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-primary text-primary hover:bg-background hover:text-primary gap-2"
-            >
-              <ArrowRight className="w-5 h-5" />
-              View Demo
+            <Button asChild>
+              <a href="/signup">
+                Start Building
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </a>
             </Button>
           </div>
-        </div>
+        </FadeIn>
       </section>
 
       {/* Footer */}
-      <footer className="py-12 bg-background text-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Siza</h3>
-              <p className="text-muted-foreground">
-                AI-powered UI component generation for modern web applications.
-              </p>
+      <footer className="relative border-t border-border/50 py-12 px-6">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="col-span-2 md:col-span-1">
+              <div className="text-lg font-bold mb-2">
+                <span className="bg-gradient-to-r from-primary to-[#6366F1] bg-clip-text text-transparent">
+                  Siza
+                </span>
+              </div>
+              <p className="text-sm text-muted-foreground">Design that thinks. Code that lasts.</p>
             </div>
             <div>
-              <h4 className="font-medium mb-4">Product</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>Features</li>
-                <li>Pricing</li>
-                <li>Templates</li>
-                <li>API</li>
+              <h4 className="text-sm font-medium mb-3">Product</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <a href="/landing" className="hover:text-foreground transition-colors">
+                    Features
+                  </a>
+                </li>
+                <li>
+                  <a href="/docs" className="hover:text-foreground transition-colors">
+                    Documentation
+                  </a>
+                </li>
+                <li>
+                  <a href="/roadmap" className="hover:text-foreground transition-colors">
+                    Roadmap
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
-              <h4 className="font-medium mb-4">Resources</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>Documentation</li>
-                <li>Blog</li>
-                <li>Community</li>
-                <li>Support</li>
+              <h4 className="text-sm font-medium mb-3">Resources</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <a href="/about" className="hover:text-foreground transition-colors">
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://github.com/Forge-Space/UI"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    GitHub
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
-              <h4 className="font-medium mb-4">Connect</h4>
-              <div className="flex gap-4">
-                <Github className="w-5 h-5" />
-                <Twitter className="w-5 h-5" />
+              <h4 className="text-sm font-medium mb-3">Connect</h4>
+              <div className="flex gap-3">
+                <a
+                  href="https://github.com/Forge-Space"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Github className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://twitter.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Twitter className="w-4 h-4" />
+                </a>
               </div>
             </div>
           </div>
-          <div className="border-t border mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2026 Siza. All rights reserved.</p>
+          <div className="border-t border-border/50 mt-8 pt-8 text-center">
+            <p className="text-xs text-muted-foreground">&copy; 2026 Siza. All rights reserved.</p>
           </div>
         </div>
       </footer>
