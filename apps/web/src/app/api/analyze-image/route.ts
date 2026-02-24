@@ -4,7 +4,6 @@ import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
 import { analyzeDesignImage } from '@/lib/services/image-analysis';
 
-export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
