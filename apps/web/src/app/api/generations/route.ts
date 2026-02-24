@@ -124,6 +124,7 @@ export async function POST(request: NextRequest) {
         typescript: body.typescript || false,
         status: 'completed',
         tokens_used: body.tokens_used || null,
+        generation_time_ms: body.generation_time_ms || null,
       })
       .select()
       .single();

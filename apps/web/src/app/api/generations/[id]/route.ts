@@ -79,7 +79,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     // Update generation with whitelist
-    const allowedFields = ['prompt', 'parameters', 'result', 'status'];
+    const allowedFields = [
+      'prompt',
+      'status',
+      'component_name',
+      'generated_code',
+      'component_library',
+      'style',
+      'typescript',
+      'generation_time_ms',
+    ];
     const updates: any = {
       updated_at: new Date().toISOString(),
     };

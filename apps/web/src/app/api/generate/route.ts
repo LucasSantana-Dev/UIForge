@@ -1,151 +1,123 @@
 import type { NextRequest } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { z } from 'zod';
+import { verifySession } from '@/lib/api/auth';
+import { checkRateLimit } from '@/lib/api/rate-limit';
+import { generateComponentStream } from '@/lib/services/gemini';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const MODEL_NAME = 'gemini-2.0-flash';
-
-function buildPrompt(options: {
-  description: string;
-  framework?: string;
-  componentLibrary?: string;
-  style?: string;
-  typescript?: boolean;
-}): string {
-  const {
-    framework = 'react',
-    componentLibrary = 'tailwind',
-    description,
-    style = 'modern',
-    typescript = true,
-  } = options;
-
-  const lang = typescript ? 'TypeScript' : 'JavaScript';
-  const ext = typescript
-    ? framework === 'react'
-      ? 'tsx'
-      : 'ts'
-    : framework === 'react'
-      ? 'jsx'
-      : 'js';
-
-  const libInstruction =
-    componentLibrary === 'tailwind'
-      ? 'Tailwind CSS classes'
-      : componentLibrary === 'shadcn'
-        ? 'shadcn/ui components with Tailwind'
-        : componentLibrary === 'none'
-          ? 'inline styles or CSS modules'
-          : `${componentLibrary} components`;
-
-  return `You are a senior React developer. Generate a ${framework} component.
-
-**Description**: ${description}
-
-**Requirements**:
-- Framework: ${framework}
-- Language: ${lang} (.${ext})
-- Styling: ${libInstruction}
-- Design: ${style}
-
-**Rules**:
-1. Output ONLY the component code inside a single markdown code block
-2. Include all necessary imports
-3. Export the component as default
-4. Make it self-contained and production-ready
-5. Use proper ${lang} types for all props
-6. Follow ${style} design principles
-7. No explanations, no extra text outside the code block`;
-}
+const generateSchema = z.object({
+  description: z.string().min(10).max(2000),
+  framework: z.enum(['react', 'vue', 'angular', 'svelte']).default('react'),
+  componentLibrary: z.enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none']).optional(),
+  style: z.enum(['modern', 'minimal', 'colorful']).optional(),
+  typescript: z.boolean().optional(),
+  userApiKey: z.string().min(1).optional(),
+});
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-
-    if (!body.description || typeof body.description !== 'string') {
-      return new Response(JSON.stringify({ error: 'Description is required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    const apiKey = body.userApiKey || process.env.GEMINI_API_KEY || '';
-
-    if (!apiKey) {
+    const rateLimitResult = await checkRateLimit(request, 15, 60000);
+    if (!rateLimitResult.allowed) {
       return new Response(
         JSON.stringify({
-          error: 'No API key. Add a Gemini key in Settings or set GEMINI_API_KEY.',
+          error: 'Rate limit exceeded. Try again shortly.',
         }),
-        { status: 401, headers: { 'Content-Type': 'application/json' } }
+        { status: 429, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-    const prompt = buildPrompt(body);
+    await verifySession();
 
-    const result = await model.generateContentStream(prompt);
+    const body = await request.json();
+    const parsed = generateSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({
+          error: parsed.error.issues[0]?.message || 'Invalid request',
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { description, framework, componentLibrary, style, typescript, userApiKey } = parsed.data;
+
     const encoder = new TextEncoder();
 
-    return new Response(
-      new ReadableStream({
-        async start(controller) {
-          try {
-            const send = (data: Record<string, unknown>) => {
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-            };
-
-            send({ type: 'start', timestamp: Date.now() });
-
-            let fullCode = '';
-
-            for await (const chunk of result.stream) {
-              const text = chunk.text();
-              if (text) {
-                fullCode += text;
-                send({
-                  type: 'chunk',
-                  content: text,
-                  timestamp: Date.now(),
-                });
-              }
-            }
-
-            const codeMatch = fullCode.match(/```(?:tsx?|jsx?|vue|svelte)?\n([\s\S]*?)\n```/);
-            const extractedCode = codeMatch ? codeMatch[1].trim() : fullCode.trim();
-
-            send({
-              type: 'complete',
-              code: extractedCode,
-              totalLength: extractedCode.length,
-              timestamp: Date.now(),
-            });
-
-            controller.close();
-          } catch (err) {
-            const msg = err instanceof Error ? err.message : 'Generation failed';
-            controller.enqueue(
-              encoder.encode(`data: ${JSON.stringify({ type: 'error', message: msg })}\n\n`)
-            );
-            controller.close();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const event of generateComponentStream({
+            prompt: description,
+            framework,
+            componentLibrary,
+            style,
+            typescript,
+            apiKey: userApiKey,
+          })) {
+            const sseData = `data: ${JSON.stringify(event)}\n\n`;
+            controller.enqueue(encoder.encode(sseData));
           }
-        },
-      }),
-      {
-        headers: {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          Connection: 'keep-alive',
-          'X-Accel-Buffering': 'no',
-        },
-      }
-    );
+        } catch (error) {
+          const errorEvent = {
+            type: 'error',
+            message: error instanceof Error ? error.message : 'Stream failed',
+            timestamp: Date.now(),
+          };
+          const errData = `data: ${JSON.stringify(errorEvent)}\n\n`;
+          controller.enqueue(encoder.encode(errData));
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+        'X-Accel-Buffering': 'no',
+      },
+    });
   } catch (error) {
-    console.error('Generation error:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    const status = message === 'Authentication required' ? 401 : 500;
+    return new Response(JSON.stringify({ error: message }), {
+      status,
       headers: { 'Content-Type': 'application/json' },
     });
   }
+}
+
+export async function GET() {
+  return new Response(
+    JSON.stringify({
+      message: 'UI Generation API',
+      version: '2.0.0',
+      status: 'active',
+      provider: 'gemini-2.0-flash',
+    }),
+    {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, max-age=3600',
+      },
+    }
+  );
+}
+
+export async function OPTIONS() {
+  return new Response(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
 }

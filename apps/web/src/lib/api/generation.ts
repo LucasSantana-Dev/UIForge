@@ -8,8 +8,6 @@ export interface GenerationOptions {
   description: string;
   style?: 'modern' | 'minimal' | 'colorful';
   typescript?: boolean;
-  aiProvider?: 'openai' | 'anthropic' | 'google' | 'auto';
-  useUserKey?: boolean;
   userApiKey?: string;
 }
 
@@ -45,7 +43,7 @@ export async function* streamGeneration(
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error || 'Generation failed');
+    throw new Error(errorData.error?.message || 'Generation failed');
   }
 
   if (!response.body) {

@@ -50,6 +50,7 @@ supabase/.temp/
 supabase/.branches/
 
 # Windsurf
+.windsurf/
 .windsurf.backup/
 
 # Planning files

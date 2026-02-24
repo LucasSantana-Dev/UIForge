@@ -49,10 +49,10 @@
 - **API**: Next.js API routes + MCP integration
 
 ### AI Integration
-- **Primary**: Bring Your Own Key (OpenAI, Anthropic, Google AI)
-- **Fallback**: Gemini API (60 requests/minute free tier)
+- **Primary**: Gemini 2.0 Flash (15 RPM free tier) via direct SDK calls
+- **BYOK**: Bring Your Own Key (Google AI) with client-side AES-256 encryption
+- **Streaming**: Server-Sent Events (SSE) for real-time generation output
 - **Protocol**: Model Context Protocol (MCP) for extensible AI tools
-- **Security**: Client-side AES-256 encryption for API keys
 
 ## 🚀 Quick Start
 
