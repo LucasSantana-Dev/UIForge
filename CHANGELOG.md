@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - **Deploy workflow** (`.github/workflows/deploy-web.yml`): rewritten for OpenNext Cloudflare Workers build and wrangler deploy
-- **Rate limiter** (`apps/web/src/lib/api/rate-limit.ts`): replaced `setInterval` with lazy cleanup for Workers compatibility
+- **Rate limiter** (`apps/web/src/lib/api/rate-limit.ts`): replaced `setInterval` with bounded lazy cleanup (max 10 per request) for Workers compatibility
 - **Middleware** (`apps/web/src/middleware.ts`): converted from proxy.ts to middleware.ts with `experimental-edge` runtime for Cloudflare Workers compatibility (proxy.ts not yet supported by OpenNext)
 - **API routes**: removed `runtime = 'nodejs'` exports (OpenNext handles runtime automatically)
 - **Gemini service** (`apps/web/src/lib/services/gemini.ts`): added `imageBase64`/`imageMimeType` to options, sends multimodal `[text, inlineData]` content when image is present

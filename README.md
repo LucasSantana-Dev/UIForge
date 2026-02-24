@@ -198,9 +198,9 @@ npm run clean               # Clean all build artifacts
 - **Image Recognition**: Upload UI screenshots for AI-powered component generation
 - **BYOK**: Bring Your Own Key with client-side AES-256 encryption
 - **Real-time Updates**: Supabase subscriptions
+- **Cloudflare Workers Deployment**: OpenNext adapter with `nodejs_compat`, automated CI/CD
 
 #### 🚧 In Progress
-- **Cloudflare Deployment**: OpenNext adapter for Cloudflare Workers
 - **Live Preview**: Iframe sandbox for components
 - **Export Features**: Download and deployment options
 
