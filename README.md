@@ -8,19 +8,21 @@
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D22.0.0-brightgreen)](https://nodejs.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-16.1.5-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7.0-blue)](https://www.typescriptlang.org/)
-[![Test Coverage](https://img.shields.io/badge/Coverage-25%25-red)](https://github.com/your-org/siza-webapp/actions)
+[![Test Coverage](https://img.shields.io/badge/Coverage-25%25-red)](https://github.com/Forge-Space/siza/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
-[![Code Quality](https://img.shields.io/badge/Quality-A-brightgreen)](https://github.com/your-org/siza-webapp/actions)
-[![Security](https://img.shields.io/badge/Security-Passed-brightgreen)](https://github.com/your-org/siza-webapp/security)
+[![Code Quality](https://img.shields.io/badge/Quality-A-brightgreen)](https://github.com/Forge-Space/siza/actions)
+[![Security](https://img.shields.io/badge/Security-Passed-brightgreen)](https://github.com/Forge-Space/siza/security)
 [![Deployment](https://img.shields.io/badge/Deploy-Cloudflare_Workers-orange)](https://workers.cloudflare.com/)
 [![Database](https://img.shields.io/badge/Database-Supabase-3ECF8E)](https://supabase.com/)
 [![UI Framework](https://img.shields.io/badge/UI-shadcn/ui-000000)](https://ui.shadcn.com/)
 [![Styling](https://img.shields.io/badge/Styling-Tailwind_CSS-06B6D4)](https://tailwindcss.com/)
 [![Monorepo](https://img.shields.io/badge/Monorepo-Turborepo-FF6B35)](https://turbo.build/)
 [![AI Integration](https://img.shields.io/badge/AI-MCP-8B5CF6)](https://modelcontextprotocol.io/)
-[![Free](https://img.shields.io/badge/Free-Forever-10B981)](https://siza.dev)
+[![Free](https://img.shields.io/badge/Free-Forever-10B981)](https://siza-web.uiforge.workers.dev)
 
-## ✨ Features
+**Live**: [siza-web.uiforge.workers.dev](https://siza-web.uiforge.workers.dev)
+
+## Features
 
 - 🎨 **AI-Powered Generation** - Natural language or screenshot to production-ready UI components
 - 🔐 **Privacy-First** - Bring Your Own Key (BYOK) with client-side encryption
@@ -68,8 +70,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/siza-webapp.git
-cd siza-webapp
+git clone https://github.com/Forge-Space/siza.git
+cd siza
 
 # Install dependencies
 npm install
@@ -110,7 +112,7 @@ NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
 ## 📁 Project Structure
 
 ```
-siza-webapp/
+siza/
 ├── apps/
 │   ├── web/                 # Next.js 16 frontend application
 │   │   ├── src/
@@ -121,12 +123,10 @@ siza-webapp/
 │   │   │   └── stores/      # Zustand state management
 │   │   ├── e2e/             # Playwright E2E tests
 │   │   └── public/          # Static assets
-│   └── api/                 # Cloudflare Workers API (future)
+│   └── api/                 # Cloudflare Workers API
 ├── packages/
-│   └── shared/              # Shared types and utilities
-├── docs/                    # Documentation
+│   └── eslint-config/       # Shared ESLint configuration
 ├── supabase/                # Database migrations & setup
-├── .windsurf/               # AI agent rules & workflows
 ├── turbo.json              # Turborepo configuration
 └── package.json            # Root package configuration
 ```
@@ -243,7 +243,7 @@ Deployment is automated via GitHub Actions (`deploy-web.yml`) on push to `dev` o
 
 Siza maintains 100% free operation through:
 
-- **Cloudflare Pages**: Unlimited hosting & bandwidth
+- **Cloudflare Workers**: Unlimited hosting & bandwidth
 - **Supabase Free Tier**: 50,000 MAU, 500MB DB, 1GB storage
 - **Gemini API**: 60 requests/minute fallback
 - **GitHub Actions**: 2,000 build minutes/month
@@ -343,8 +343,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Support
 
 - 📖 **Documentation**: Check the [docs](./docs/) folder
-- 🐛 **Issues**: [Open an issue on GitHub](https://github.com/your-org/siza-webapp/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/your-org/siza-webapp/discussions)
+- 🐛 **Issues**: [Open an issue on GitHub](https://github.com/Forge-Space/siza/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/Forge-Space/siza/discussions)
 - 📧 **Email**: support@siza.dev
 
 ---

@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-02-24
+
+First production deployment to Cloudflare Workers. Live at `siza-web.uiforge.workers.dev`.
+
 ### Added
 
 - **Health check endpoint** (`/api/health`): returns `{ status, timestamp, version }` for deployment verification
