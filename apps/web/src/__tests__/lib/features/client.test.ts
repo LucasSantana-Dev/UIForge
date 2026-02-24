@@ -14,15 +14,15 @@ describe('Feature Flags Client', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockLocalStorage = {};
-    jest.spyOn(Storage.prototype, 'getItem').mockImplementation(
-      (key: string) => mockLocalStorage[key] ?? null
-    );
-    jest.spyOn(Storage.prototype, 'setItem').mockImplementation(
-      (key: string, value: string) => { mockLocalStorage[key] = value; }
-    );
-    jest.spyOn(Storage.prototype, 'removeItem').mockImplementation(
-      (key: string) => { delete mockLocalStorage[key]; }
-    );
+    jest
+      .spyOn(Storage.prototype, 'getItem')
+      .mockImplementation((key: string) => mockLocalStorage[key] ?? null);
+    jest.spyOn(Storage.prototype, 'setItem').mockImplementation((key: string, value: string) => {
+      mockLocalStorage[key] = value;
+    });
+    jest.spyOn(Storage.prototype, 'removeItem').mockImplementation((key: string) => {
+      delete mockLocalStorage[key];
+    });
     global.fetch = jest.fn();
   });
 

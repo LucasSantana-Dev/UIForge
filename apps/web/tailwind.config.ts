@@ -73,16 +73,8 @@ const config: Config = {
       },
       fontFamily: {
         sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: [
-          'var(--font-outfit)',
-          'var(--font-inter)',
-          'sans-serif',
-        ],
-        mono: [
-          'var(--font-jetbrains-mono)',
-          'ui-monospace',
-          'monospace',
-        ],
+        display: ['var(--font-outfit)', 'var(--font-inter)', 'sans-serif'],
+        mono: ['var(--font-jetbrains-mono)', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -125,10 +117,8 @@ const config: Config = {
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'siza-fade-in':
-          'siza-fade-in 0.3s var(--ease-siza) forwards',
-        'siza-scale-in':
-          'siza-scale-in 0.2s var(--ease-siza) forwards',
+        'siza-fade-in': 'siza-fade-in 0.3s var(--ease-siza) forwards',
+        'siza-scale-in': 'siza-scale-in 0.2s var(--ease-siza) forwards',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
       },
       transitionTimingFunction: {
