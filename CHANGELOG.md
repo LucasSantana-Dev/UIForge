@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Resend Email Integration**: branded transactional emails (verification, welcome, password reset, email change) via Resend SDK with react-email templates
+- **Forgot/Reset Password Flow**: complete password recovery with branded emails and auth callback integration
+- **Centralized Feature Flags**: database-backed feature toggle system with admin CRUD API, audit log, React context provider, and env var fallback
+- **Stripe Billing Integration**: Checkout sessions, Customer Portal, webhook sync (subscription lifecycle), Free/Pro plan tiers with usage tracking
+- **Usage Quota Enforcement**: generation and project creation quotas wired into API routes, gated by `ENABLE_USAGE_LIMITS` flag
+- **Billing UI**: pricing page, subscription status, usage charts, upgrade prompts
+- **DB Migrations**: `feature_flags`, `feature_flag_changes`, `subscriptions`, `plan_limits`, `usage_tracking`, `stripe_events` tables
 - **AI Generation with Gemini**: direct Gemini 2.0 Flash integration for component generation via SSE streaming
 - **Gemini service** (`apps/web/src/lib/services/gemini.ts`): async generator wrapper around `@google/generative-ai` SDK
 - **BYOK support in GeneratorForm**: users can use their own Gemini API key (client-side encrypted) for generation

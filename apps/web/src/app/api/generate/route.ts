@@ -7,6 +7,8 @@ import { runAllGates } from '@/lib/quality/gates';
 import { enrichPromptWithContext } from '@/lib/services/context-enrichment';
 import { storeGenerationEmbedding } from '@/lib/services/embeddings';
 import { createClient } from '@/lib/supabase/server';
+import { checkGenerationQuota } from '@/lib/usage/limits';
+import { incrementGenerationCount } from '@/lib/usage/tracker';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -38,6 +40,21 @@ export async function POST(request: NextRequest) {
     }
 
     const { user } = await verifySession();
+
+    const quota = await checkGenerationQuota(user.id);
+    if (!quota.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: 'Generation quota exceeded',
+          quota: {
+            current: quota.current,
+            limit: quota.limit,
+            remaining: quota.remaining,
+          },
+        }),
+        { status: 429, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
 
     const body = await request.json();
     const parsed = generateSchema.safeParse(body);
@@ -137,6 +154,7 @@ export async function POST(request: NextRequest) {
                   .eq('id', generationId);
 
                 storeGenerationEmbedding(generationId, description, userApiKey).catch(() => {});
+                incrementGenerationCount(user.id).catch(() => {});
               }
 
               controller.enqueue(

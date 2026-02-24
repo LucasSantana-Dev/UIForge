@@ -30,6 +30,9 @@
 - ⚡ **Real-time Updates** - Live collaboration via Supabase subscriptions
 - 🎯 **Production Ready** - Monaco editor, live preview, export functionality
 - 🧪 **Well Tested** - 80%+ test coverage with Playwright E2E tests
+- 📧 **Transactional Email** - Branded emails via Resend (verification, welcome, password reset)
+- 🎛️ **Feature Flags** - Centralized DB-backed toggle system with admin CRUD and audit log
+- 💳 **Stripe Billing** - Checkout, Customer Portal, webhook sync, usage tracking (Free/Pro tiers)
 
 ## 🏗️ Architecture
 
@@ -53,6 +56,17 @@
 - **BYOK**: Bring Your Own Key (Google AI) with client-side AES-256 encryption
 - **Streaming**: Server-Sent Events (SSE) for real-time generation output
 - **Protocol**: Model Context Protocol (MCP) for extensible AI tools
+
+### Email & Billing
+- **Email**: Resend SDK with react-email branded templates (verification, welcome, password reset, email change)
+- **Billing**: Stripe Checkout + Customer Portal + Webhook sync to Supabase
+- **Plans**: Free (10 generations/mo, 2 projects) and Pro (500 generations/mo, unlimited projects)
+- **Usage Tracking**: Per-plan quota enforcement on generations and project creation
+
+### Feature Management
+- **Feature Flags**: Database-backed flags in Supabase with env var fallback
+- **Admin CRUD**: REST API for flag management with audit log
+- **Client SDK**: React context provider with polling and localStorage cache
 
 ## 🚀 Quick Start
 
@@ -102,6 +116,20 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-local-anon-key
 # Feature Flags
 NEXT_PUBLIC_ENABLE_BYOK=true
 NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
+
+# Resend (Email)
+RESEND_API_KEY=re_xxxxx
+RESEND_FROM_EMAIL=noreply@siza.dev
+RESEND_FROM_NAME=Siza
+NEXT_PUBLIC_ENABLE_RESEND_EMAILS=false
+
+# Stripe (Billing)
+STRIPE_SECRET_KEY=sk_test_xxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxx
+STRIPE_PRO_PRICE_ID=price_xxxxx
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
+NEXT_PUBLIC_ENABLE_STRIPE_BILLING=false
+NEXT_PUBLIC_ENABLE_USAGE_LIMITS=false
 ```
 
 > 💡 **Tip**: Use the credentials shown after `supabase start` to fill in the environment variables.
@@ -187,22 +215,25 @@ npm run clean               # Clean all build artifacts
 ### Key Features Implementation
 
 #### ✅ Completed Features
-- **Authentication**: Email/password + Google/GitHub OAuth
-- **Database**: Complete schema with RLS policies
+- **Authentication**: Email/password + Google/GitHub OAuth + forgot/reset password
+- **Transactional Email**: Branded Resend templates (verification, welcome, password reset)
+- **Feature Flags**: Centralized DB-backed toggles with admin CRUD and audit log
+- **Stripe Billing**: Checkout, Customer Portal, webhook sync, Free/Pro tiers
+- **Usage Tracking**: Per-plan quota enforcement on generations and projects
+- **Database**: 11-table schema with RLS policies
 - **Storage**: Secure file upload with policies
-- **UI System**: shadcn/ui components (8+ components)
-- **Project Management**: Full CRUD operations
+- **UI System**: shadcn/ui components (16+ components)
+- **Project Management**: Full CRUD operations with quota enforcement
 - **Code Editor**: Monaco integration with syntax highlighting
-- **Component Generation**: UI for AI-powered generation
+- **Component Generation**: AI-powered generation with usage limits
 - **Real-time Updates**: Supabase subscriptions
 
 #### 🚧 In Progress
-- **MCP Integration**: AI component generation
+- **MCP Integration**: AI component generation via MCP protocol
 - **Live Preview**: Iframe sandbox for components
 - **Export Features**: Download and deployment options
 
 #### ⏳ Planned Features
-- **AI Key Management**: BYOK with client-side encryption
 - **Template Library**: Pre-built component templates
 - **Collaboration**: Real-time multi-user editing
 - **Advanced Export**: GitHub, Vercel, Netlify deployment
