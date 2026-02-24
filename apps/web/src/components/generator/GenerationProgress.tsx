@@ -25,23 +25,23 @@ export default function GenerationProgress({
   });
 
   return (
-    <div className="flex flex-col space-y-4 p-4 bg-gray-50 rounded-lg">
+    <div className="flex flex-col space-y-4 p-4 bg-surface-2 rounded-lg">
       {/* Status */}
       <div className="flex items-center space-x-3">
         {isGenerating ? (
-          <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
+          <Loader2 className="h-5 w-5 text-brand animate-spin" />
         ) : error ? (
-          <AlertCircle className="h-5 w-5 text-red-600" />
+          <AlertCircle className="h-5 w-5 text-error" />
         ) : progress === 100 ? (
-          <CheckCircle2 className="h-5 w-5 text-green-600" />
+          <CheckCircle2 className="h-5 w-5 text-success" />
         ) : (
-          <div className="h-5 w-5 rounded-full bg-gray-300" />
+          <div className="h-5 w-5 rounded-full bg-surface-3" />
         )}
 
         <span
           className={cn(
             'text-sm font-medium',
-            error ? 'text-red-600' : progress === 100 ? 'text-green-600' : 'text-gray-600'
+            error ? 'text-error' : progress === 100 ? 'text-success' : 'text-text-secondary'
           )}
         >
           {statusMessage}
@@ -50,21 +50,21 @@ export default function GenerationProgress({
 
       {/* Progress Bar */}
       <div className="space-y-2">
-        <div className="flex justify-between text-xs text-gray-600">
+        <div className="flex justify-between text-xs text-text-secondary">
           <span>Progress</span>
           <span>{progress}%</span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-2">
+        <div className="w-full bg-surface-3 rounded-full h-2">
           <div
             className={cn(
               'h-2 rounded-full transition-all duration-300 ease-out',
               isGenerating
-                ? 'bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse'
+                ? 'bg-gradient-to-r from-brand to-indigo animate-pulse'
                 : error
-                  ? 'bg-red-500'
+                  ? 'bg-error'
                   : progress === 100
-                    ? 'bg-green-500'
-                    : 'bg-blue-500'
+                    ? 'bg-success'
+                    : 'bg-brand'
             )}
             style={{ width: `${progress}%` }}
           />
@@ -74,7 +74,7 @@ export default function GenerationProgress({
       {/* Event Log */}
       {events.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-gray-700">Activity Log</h4>
+          <h4 className="text-sm font-medium text-text-primary">Activity Log</h4>
           <div className="max-h-32 overflow-y-auto space-y-1">
             {events.slice(-5).map((event, index) => (
               <div
@@ -82,10 +82,10 @@ export default function GenerationProgress({
                 className={cn(
                   'flex items-center space-x-2 text-xs p-2 rounded',
                   event.type === 'error'
-                    ? 'bg-red-50 text-red-700'
+                    ? 'bg-error/10 text-error'
                     : event.type === 'complete'
-                      ? 'bg-green-50 text-green-700'
-                      : 'bg-blue-50 text-blue-700'
+                      ? 'bg-success/10 text-success'
+                      : 'bg-brand/10 text-brand-light'
                 )}
               >
                 <span>{getEventIcon(event.type)}</span>
@@ -100,7 +100,7 @@ export default function GenerationProgress({
                           ? event.message || 'Error occurred'
                           : 'Processing...'}
                 </span>
-                <span className="text-gray-500">
+                <span className="text-text-muted">
                   {new Date(event.timestamp).toLocaleTimeString()}
                 </span>
               </div>
@@ -111,7 +111,7 @@ export default function GenerationProgress({
 
       {/* Error Details */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md">
+        <div className="bg-error/10 border border-error text-error p-3 rounded-md">
           <p className="text-sm font-medium">Error Details</p>
           <p className="text-xs mt-1">{error}</p>
         </div>

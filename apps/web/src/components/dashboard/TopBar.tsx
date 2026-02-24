@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { MenuIcon, MoonIcon, SunIcon } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { MenuIcon } from 'lucide-react';
 import UserMenu from './UserMenu';
 import MobileNav from './MobileNav';
 
@@ -13,23 +12,16 @@ interface TopBarProps {
 
 export default function TopBar({ user }: TopBarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const { theme, setTheme } = useTheme();
-
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
-  }, []);
 
   return (
     <>
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-surface-0 border-b border-surface-3">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
               <button
                 type="button"
-                className="md:hidden -ml-2 mr-2 inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+                className="md:hidden -ml-2 mr-2 inline-flex items-center justify-center p-2 rounded-md text-text-secondary hover:text-text-primary hover:bg-surface-2"
                 onClick={() => setMobileMenuOpen(true)}
                 aria-label={mobileMenuOpen ? 'Close main menu' : 'Open main menu'}
                 aria-expanded={mobileMenuOpen}
@@ -37,22 +29,10 @@ export default function TopBar({ user }: TopBarProps) {
                 <MenuIcon className="h-6 w-6" />
               </button>
               <div className="flex items-center space-x-4">
-                <h2 className="text-xl font-semibold text-gray-900">Dashboard</h2>
+                <h2 className="text-xl font-semibold text-text-primary">Dashboard</h2>
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <button
-                type="button"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
-                aria-label="Toggle theme"
-              >
-                {mounted && theme === 'dark' ? (
-                  <SunIcon className="h-5 w-5" />
-                ) : (
-                  <MoonIcon className="h-5 w-5" />
-                )}
-              </button>
               <UserMenu user={user} />
             </div>
           </div>

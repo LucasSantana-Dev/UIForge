@@ -5,7 +5,7 @@
 - **Named after**: Álvaro Siza Vieira, Portuguese architect, Pritzker Prize 1992
 - **Philosophy**: Tectonic Cut — forms defined by removal, not addition
 - **Tagline**: "Design that thinks. Code that lasts."
-- **Positioning**: AI-powered UI development platform, MCP-native, open-source
+- **Positioning**: "The Open Full-Stack AI Workspace" — generate, integrate, ship. MCP-native, zero-cost, privacy-first, self-hostable. Open-source.
 
 ## The Architect Metaphor
 Siza is the architect in the room — designs the blueprint, not lays the bricks. Transforms how you build UI, not builds it for you. The forge/anvil metaphor governs the Forge Space ecosystem.
