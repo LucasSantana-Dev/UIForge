@@ -123,7 +123,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <section className="border-t bg-gradient-to-b from-surface-0 to-surface-1 dark:from-purple-950/20 dark:to-purple-900/20 py-24">
+        <section className="border-t bg-gradient-to-b from-purple-950/20 to-purple-900/20 py-24">
           <div className="container mx-auto px-4">
             <h2 className="mb-4 text-center text-sm font-medium uppercase tracking-widest text-muted-foreground">
               Why Siza

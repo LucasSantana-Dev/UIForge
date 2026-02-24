@@ -197,13 +197,11 @@ export function FigmaExportDialog({ wireframe, onClose }: FigmaExportDialogProps
 
           {/* Success Result */}
           {exportResult && (
-            <Card className="border-green-200 dark:border-green-800">
+            <Card className="border-green-800">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
                   <CheckCircle className="h-5 w-5 text-green-600" />
-                  <CardTitle className="text-base text-green-700 dark:text-green-400">
-                    Export Successful
-                  </CardTitle>
+                  <CardTitle className="text-base text-green-400">Export Successful</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">

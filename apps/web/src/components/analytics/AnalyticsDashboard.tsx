@@ -107,7 +107,7 @@ export default function AnalyticsDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex bg-surface-1 bg-surface-2 rounded-lg p-1">
+          <div className="flex bg-surface-2 rounded-lg p-1">
             {(['7d', '30d', '90d'] as const).map((range) => (
               <Button
                 key={range}
@@ -252,7 +252,7 @@ export default function AnalyticsDashboard() {
               <div key={index} className="flex items-center justify-between">
                 <span className="text-sm">{browser.browser}</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-24 bg-surface-2 dark:bg-surface-3 rounded-full h-2">
+                  <div className="w-24 bg-surface-3 rounded-full h-2">
                     <div
                       className="bg-brand h-2 rounded-full"
                       style={{ width: `${browser.percentage}%` }}
@@ -278,7 +278,7 @@ export default function AnalyticsDashboard() {
               <div key={index} className="flex items-center justify-between">
                 <span className="text-sm">{device.device}</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-24 bg-surface-2 dark:bg-surface-3 rounded-full h-2">
+                  <div className="w-24 bg-surface-3 rounded-full h-2">
                     <div
                       className="bg-green-600 h-2 rounded-full"
                       style={{ width: `${device.percentage}%` }}
