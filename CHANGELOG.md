@@ -15,10 +15,15 @@ All notable changes to this project will be documented in this file.
 - **Drag-and-drop image upload**: collapsible reference image section in GeneratorForm with preview, file validation (5MB max, PNG/JPEG/WebP), and accessible drop zone
 - **RAG context enrichment**: generation pipeline enriches prompts with relevant context from previous generations via embeddings
 
+### Fixed
+
+- **Edge middleware** (`apps/web/src/middleware.ts`): converted `proxy.ts` to standard `middleware.ts` with `runtime = 'experimental-edge'` — `proxy.ts` with `runtime = 'edge'` is illegal in Next.js 16 and breaks the build
+- **Next.js config**: wrapped `initOpenNextCloudflareForDev()` in development-only guard to prevent production build failures
+- **Deploy workflow**: added `--legacy-peer-deps` to `npm ci` for peer dependency resolution
+
 ### Changed
 
 - **Rate limiter** (`apps/web/src/lib/api/rate-limit.ts`): replaced `setInterval` with bounded lazy cleanup (max 10 per request) for Workers compatibility
-- **Proxy** (`apps/web/src/proxy.ts`): added `runtime = 'edge'` for OpenNext Cloudflare Workers compatibility
 - **API routes**: removed explicit `runtime` declarations from all routes — OpenNext handles runtime automatically
 - **`.env.example`**: added `NEXT_PUBLIC_BASE_URL` for OAuth redirects
 - **Next.js config**: added `initOpenNextCloudflareForDev()` for Cloudflare dev server compatibility
