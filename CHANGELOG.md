@@ -13,8 +13,10 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- **Cloudflare Workers deployment**: production deployment via OpenNext (`@opennextjs/cloudflare`) with `nodejs_compat` for full Node.js API support
+- **Cloudflare Workers deployment**: production deployment via OpenNext (`@opennextjs/cloudflare`) with `nodejs_compat` for full Node.js API support — live at `siza-web.uiforge.workers.dev`
 - **Deploy workflow** (`.github/workflows/deploy-web.yml`): automated build + deploy on push to dev/main using `wrangler-action@v3`
+- **WASM size optimization**: stub unused `@vercel/og` WASM files (resvg.wasm + yoga.wasm) at deploy time, reducing bundle from 3429 KiB to 2882 KiB gzipped (under 3 MiB free tier limit)
+- **Deploy script** (`apps/web/scripts/deploy.sh`): local deploy with automatic WASM stubbing and `_redirects` cleanup
 - **OpenNext config** (`apps/web/open-next.config.ts`, `apps/web/wrangler.jsonc`): Workers-native Next.js deployment
 - **Image Recognition (Gemini Vision)**: upload UI screenshots for AI-powered component generation via multimodal input
 - **Image analysis service** (`apps/web/src/lib/services/image-analysis.ts`): standalone Gemini Vision analysis returning structured `DesignAnalysis` (layout, components, colors, typography, spacing, interactions, suggestedPrompt)
