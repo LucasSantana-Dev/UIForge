@@ -70,3 +70,6 @@ POST_CLEANUP_CHECKLIST.md
 
 # Actual environment files with credentials
 .env.docker
+
+# Claude Code
+.claude/
