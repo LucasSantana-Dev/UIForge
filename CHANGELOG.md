@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Deleted broken scaffold workflows (`dev-deploy.yml`, `production.yml`, `deploy-admin.yml`) that ran builds without checkout/install
+- Rewrote `deploy-web-admin.yml` to use Cloudflare Workers deployment via OpenNext (was incorrectly using Pages)
+- Standardized Node.js 22 across all CI workflows (`release-branch.yml`, `release-automation.yml`, `supabase-setup-admin.yml`)
+- Fixed README badges and references (Next.js 16, Node.js 22, Cloudflare Workers deployment docs)
+
 ### Added
 
 - **Cloudflare Workers deployment**: production deployment via OpenNext (`@opennextjs/cloudflare`) with `nodejs_compat` for full Node.js API support
