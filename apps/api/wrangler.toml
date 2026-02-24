@@ -1,5 +1,5 @@
 # Cloudflare Workers Configuration
-# For deploying UIForge API to Cloudflare Workers
+# For deploying Siza API to Cloudflare Workers
 
 name = "api"
 main = "dist/cloudflare-worker-simple.js"
@@ -34,5 +34,5 @@ vars = { NODE_ENV = "production" }
 
 # Routes (commented out until zone is created)
 # [[routes]]
-# pattern = "api.uiforge.dev/*"
-# zone_name = "uiforge.dev"
+# pattern = "api.siza.dev/*"
+# zone_name = "siza.dev"

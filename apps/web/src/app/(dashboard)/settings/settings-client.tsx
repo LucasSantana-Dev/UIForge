@@ -36,7 +36,7 @@ export function SettingsClient() {
     // Initialize the AI key manager if encryption key exists
     const initKeyManager = async () => {
       // Check if we have an encryption key in localStorage
-      const storedKey = localStorage.getItem('uiforge-encryption-key');
+      const storedKey = localStorage.getItem('siza-encryption-key');
 
       if (storedKey) {
         // Derive the actual encryption key from the stored key
@@ -48,7 +48,7 @@ export function SettingsClient() {
         const derivedKey = deriveEncryptionKey(newKey);
 
         // Store the base key (not the derived one)
-        localStorage.setItem('uiforge-encryption-key', newKey);
+        localStorage.setItem('siza-encryption-key', newKey);
         await initialize(derivedKey);
       }
     };

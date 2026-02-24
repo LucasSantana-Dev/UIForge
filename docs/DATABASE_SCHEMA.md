@@ -1,4 +1,4 @@
-# UIForge Webapp - Database Schema Documentation
+# Siza Webapp - Database Schema Documentation
 
 > **Version**: 0.1.1  
 > **Last Updated**: 2026-02-15  
@@ -20,7 +20,7 @@
 
 ## Overview
 
-The UIForge webapp uses Supabase (PostgreSQL 15) with Row Level Security (RLS) for secure, multi-tenant data access. The schema supports:
+The Siza webapp uses Supabase (PostgreSQL 15) with Row Level Security (RLS) for secure, multi-tenant data access. The schema supports:
 
 - User profiles extending `auth.users`
 - Project management with components
@@ -479,4 +479,4 @@ supabase gen types typescript --project-id your-project-ref > src/types/database
 - [Supabase Row Level Security Docs](https://supabase.com/docs/guides/database/postgres/row-level-security)
 - [Supabase Storage Docs](https://supabase.com/docs/guides/storage)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/15/)
-- [UIForge Webapp plan.MD](../plan.MD)
+- [Siza Webapp plan.MD](../plan.MD)

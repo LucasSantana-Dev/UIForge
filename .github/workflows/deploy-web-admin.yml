@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: ${{ github.event.inputs.environment }}
-      url: ${{ github.event.inputs.environment == 'production' && 'https://uiforge.com' || 'https://preview.uiforge.com' }}
+      url: ${{ github.event.inputs.environment == 'production' && 'https://siza.com' || 'https://preview.siza.com' }}
     
     steps:
       - name: Checkout repository
@@ -113,7 +113,7 @@ jobs:
       - name: Health check
         run: |
           echo "🔍 Running health check..."
-          DEPLOY_URL="${{ github.event.inputs.environment == 'production' && 'https://uiforge.com' || 'https://preview.uiforge.com' }}"
+          DEPLOY_URL="${{ github.event.inputs.environment == 'production' && 'https://siza.com' || 'https://preview.siza.com' }}"
           
           # Wait for deployment to be ready
           sleep 30
@@ -135,6 +135,6 @@ jobs:
           echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Deployment URL:** ${{ github.event.inputs.environment == 'production' && 'https://uiforge.com' || 'https://preview.uiforge.com' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment URL:** ${{ github.event.inputs.environment == 'production' && 'https://siza.com' || 'https://preview.siza.com' }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Status:** ✅ Successfully deployed" >> $GITHUB_STEP_SUMMARY

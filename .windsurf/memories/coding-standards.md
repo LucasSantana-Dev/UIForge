@@ -1,4 +1,4 @@
-# UIForge MCP Coding Standards
+# Siza MCP Coding Standards
 
 ## Code Style
 

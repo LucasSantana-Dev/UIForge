@@ -1,5 +1,5 @@
 /**
- * Jest configuration for UIForge API backend
+ * Jest configuration for Siza API backend
  */
 
 module.exports = {

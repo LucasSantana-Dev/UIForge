@@ -33,7 +33,7 @@ export default function MarketingPage() {
               <span className="text-yellow-300">10x Faster</span>
             </h1>
             <p className="text-xl mb-8 max-w-3xl mx-auto text-white/90">
-              UIForge uses artificial intelligence to generate production-ready React, Vue, Angular,
+              Siza uses artificial intelligence to generate production-ready React, Vue, Angular,
               and Svelte components from natural language descriptions. No more boilerplate, just
               beautiful code.
             </p>
@@ -215,7 +215,7 @@ export default function MarketingPage() {
                 ))}
               </div>
               <p className="text-muted-foreground mb-4">
-                &ldquo;UIForge has completely changed how I build UI components. What used to take
+                &ldquo;Siza has completely changed how I build UI components. What used to take
                 hours now takes minutes!&rdquo;
               </p>
               <div className="flex items-center">
@@ -360,7 +360,7 @@ export default function MarketingPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to 10x Your Development Speed?</h2>
           <p className="text-xl mb-8 text-white/90">
-            Join thousands of developers building better UI faster with UIForge
+            Join thousands of developers building better UI faster with Siza
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-primary-foreground hover:bg-accent gap-2">
@@ -384,7 +384,7 @@ export default function MarketingPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
-              <h3 className="text-lg font-semibold mb-4">UIForge</h3>
+              <h3 className="text-lg font-semibold mb-4">Siza</h3>
               <p className="text-muted-foreground">
                 AI-powered UI component generation for modern web applications.
               </p>
@@ -416,7 +416,7 @@ export default function MarketingPage() {
             </div>
           </div>
           <div className="border-t border mt-8 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2026 UIForge. All rights reserved.</p>
+            <p>&copy; 2026 Siza. All rights reserved.</p>
           </div>
         </div>
       </footer>

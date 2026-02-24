@@ -48,7 +48,7 @@ export function FigmaExportDialog({ wireframe, onClose }: FigmaExportDialogProps
   const [isExporting, setIsExporting] = useState(false);
   const [exportResult, setExportResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [fileName, setFileName] = useState('UIForge Wireframe');
+  const [fileName, setFileName] = useState('Siza Wireframe');
   const [exportFormat, setExportFormat] = useState<'json' | 'figma-plugin'>('json');
 
   const handleExport = async () => {

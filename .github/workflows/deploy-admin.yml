@@ -88,7 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: 
       name: ${{ github.event.inputs.environment }}
-      url: ${{ github.event.inputs.environment == 'production' && 'https://uiforge.com' || 'https://dev.uiforge.com' }}
+      url: ${{ github.event.inputs.environment == 'production' && 'https://siza.com' || 'https://dev.siza.com' }}
     
     steps:
       - name: Checkout repository
@@ -154,12 +154,12 @@ jobs:
           
           case "${{ github.event.inputs.environment }}" in
             "dev")
-              echo "🌐 Deploying to dev.uiforge.com"
+              echo "🌐 Deploying to dev.siza.com"
               # Add actual dev deployment commands here
               echo "📦 Dev deployment files ready"
               ;;
             "production")
-              echo "🌐 Deploying to uiforge.com"
+              echo "🌐 Deploying to siza.com"
               # Add actual production deployment commands here
               echo "📦 Production deployment files ready"
               ;;
@@ -168,7 +168,7 @@ jobs:
       - name: Health check
         run: |
           echo "🔍 Running health check..."
-          DEPLOY_URL="${{ github.event.inputs.environment == 'production' && 'https://uiforge.com' || 'https://dev.uiforge.com' }}"
+          DEPLOY_URL="${{ github.event.inputs.environment == 'production' && 'https://siza.com' || 'https://dev.siza.com' }}"
           
           # Wait for deployment to be ready
           sleep 30
@@ -190,7 +190,7 @@ jobs:
           echo "**Branch:** ${{ needs.verify-branch.outputs.branch }}" >> $GITHUB_STEP_SUMMARY
           echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Deployment URL:** ${{ github.event.inputs.environment == 'production' && 'https://uiforge.com' || 'https://dev.uiforge.com' }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployment URL:** ${{ github.event.inputs.environment == 'production' && 'https://siza.com' || 'https://dev.siza.com' }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ "${{ github.event.inputs.force_deploy }}" == "true" ]; then

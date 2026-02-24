@@ -24,12 +24,12 @@ interface DNSRecord {
 export default function CustomDomain() {
   const [domains, setDomains] = useState<DomainStatus[]>([
     {
-      domain: 'uiforge.com',
+      domain: 'siza.com',
       status: 'pending',
       sslStatus: 'pending',
       dnsRecords: [
         { type: 'A', name: '@', value: '192.168.1.1', ttl: 3600 },
-        { type: 'CNAME', name: 'www', value: 'uiforge.pages.dev', ttl: 3600 },
+        { type: 'CNAME', name: 'www', value: 'siza.pages.dev', ttl: 3600 },
       ],
     },
   ]);
@@ -50,7 +50,7 @@ export default function CustomDomain() {
         sslStatus: 'pending',
         dnsRecords: [
           { type: 'A', name: '@', value: '192.168.1.1', ttl: 3600 },
-          { type: 'CNAME', name: 'www', value: 'uiforge.pages.dev', ttl: 3600 },
+          { type: 'CNAME', name: 'www', value: 'siza.pages.dev', ttl: 3600 },
         ],
       };
 

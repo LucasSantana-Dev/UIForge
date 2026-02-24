@@ -1,5 +1,5 @@
 ---
-description: Implement or modify MCP tools in uiforge-mcp. Use when adding new tools, editing tool handlers, or changing tool schemas.
+description: Implement or modify MCP tools in siza-mcp. Use when adding new tools, editing tool handlers, or changing tool schemas.
 ---
 
 # MCP Tool Development

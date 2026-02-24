@@ -152,8 +152,8 @@ test.describe('Navigation and Routing', () => {
     // Click on logo
     const logo = page
       .locator('a')
-      .filter({ has: page.locator('img[alt*="UIForge"]') })
-      .or(page.getByRole('link').filter({ hasText: /UIForge/ }));
+      .filter({ has: page.locator('img[alt*="Siza"]') })
+      .or(page.getByRole('link').filter({ hasText: /Siza/ }));
 
     if ((await logo.count()) > 0) {
       await logo.click();

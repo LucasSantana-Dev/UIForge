@@ -1,6 +1,6 @@
 /**
  * Wireframe to Figma Converter
- * Converts UIForge wireframe data structures to Figma-compatible formats
+ * Converts Siza wireframe data structures to Figma-compatible formats
  */
 
 import type { FigmaNode, FigmaFill, FigmaStroke } from './figma-client';

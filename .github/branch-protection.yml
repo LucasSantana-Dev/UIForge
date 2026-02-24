@@ -1,4 +1,4 @@
-# Branch Protection Rules for UIForge
+# Branch Protection Rules for Siza
 
 ## Main Branch Protection
 - Required reviewers: 2
@@ -11,7 +11,7 @@
 - FORCE PUSH RESTRICTION (Only maintainers can force push)
 - NO BYPASS SCRIPTS (No scripts allowed to circumvent rules)
 
-## Dev Branch Protection  
+## Dev Branch Protection
 - Required reviewers: 1
 - Require up-to-date branches
 - Require status checks to pass

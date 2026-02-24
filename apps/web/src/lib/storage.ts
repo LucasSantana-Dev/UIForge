@@ -5,7 +5,7 @@
 
 import { EncryptedApiKey, AIProvider } from './encryption';
 
-const DB_NAME = 'UIForgeKeys';
+const DB_NAME = 'SizaKeys';
 const DB_VERSION = 1;
 const STORE_NAME = 'api_keys';
 const USER_STORE_NAME = 'user_preferences';

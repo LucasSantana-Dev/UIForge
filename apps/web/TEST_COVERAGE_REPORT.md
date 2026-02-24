@@ -1,7 +1,7 @@
 # API Test Coverage Report
 
 ## Overview
-Comprehensive unit and integration tests have been implemented for the UIForge API layer to meet the 85% coverage threshold requirement.
+Comprehensive unit and integration tests have been implemented for the Siza API layer to meet the 85% coverage threshold requirement.
 
 ## Test Files Created
 

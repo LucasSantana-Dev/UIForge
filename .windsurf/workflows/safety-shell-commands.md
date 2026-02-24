@@ -18,7 +18,7 @@ description: Safety policy for executing shell commands in this repo
 - `npm run test`
 - `npm run dev`
 - `npx vitest run <specific-test>`
-- `docker build -t uiforge-mcp .`
+- `docker build -t siza-mcp .`
 
 ## Requires approval
 

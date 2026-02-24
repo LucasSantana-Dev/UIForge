@@ -336,7 +336,7 @@ export async function exportToFigma(
     },
     body: JSON.stringify({
       wireframe,
-      fileName: options.fileName || 'UIForge Wireframe',
+      fileName: options.fileName || 'Siza Wireframe',
       exportFormat: options.exportFormat || 'json',
     }),
   });

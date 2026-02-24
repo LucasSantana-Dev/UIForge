@@ -1,8 +1,8 @@
-# UIForge Dark Mode Guide
+# Siza Dark Mode Guide
 
 ## Overview
 
-UIForge is a **dark-mode only** application, optimized for extended use and reduced eye strain. The color palette has been carefully designed following dark mode best practices.
+Siza is a **dark-mode only** application, optimized for extended use and reduced eye strain. The color palette has been carefully designed following dark mode best practices.
 
 ## Design Principles
 

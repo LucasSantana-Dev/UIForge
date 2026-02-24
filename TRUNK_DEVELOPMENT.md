@@ -1,4 +1,4 @@
-# UIForge Trunk Based Development Setup
+# Siza Trunk Based Development Setup
 
 This repository uses Trunk Based Development with automated deployment workflows.
 
@@ -20,12 +20,12 @@ This repository uses Trunk Based Development with automated deployment workflows
 
 ### Development Environment
 - **Trigger**: Push to `dev` branch
-- **URL**: https://dev.uiforge.com
+- **URL**: https://dev.siza.com
 - **Features**: Latest features enabled, debug tools active
 
 ### Production Environment
 - **Trigger**: Merge `release/1.0.0` → `main`
-- **URL**: https://uiforge.com
+- **URL**: https://siza.com
 - **Features**: Stable features only, optimized for performance
 
 ## 📋 Workflow Steps

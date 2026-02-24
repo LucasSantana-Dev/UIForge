@@ -1,6 +1,6 @@
 /**
- * Self-hosted MCP Server for UIForge
- * Implements Model Context Protocol with UIForge-specific tools
+ * Self-hosted MCP Server for Siza
+ * Implements Model Context Protocol with Siza-specific tools
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
@@ -13,7 +13,7 @@ import {
 import { generateComponent, hasCodePatterns, formatCode } from '../services/gemini';
 import { logger } from '../utils/logger';
 
-// Define UIForge MCP tools
+// Define Siza MCP tools
 const UIFORGE_TOOLS: Tool[] = [
   {
     name: 'generateComponent',
@@ -95,7 +95,7 @@ const UIFORGE_TOOLS: Tool[] = [
 export function createMCPServer(): Server {
   const server = new Server(
     {
-      name: 'uiforge-mcp',
+      name: 'siza-mcp',
       version: '0.1.0',
     },
     {
@@ -232,12 +232,12 @@ export function createMCPServer(): Server {
  * Start MCP server with stdio transport
  */
 export async function startMCPServer(): Promise<void> {
-  logger.info('Starting UIForge MCP Server');
+  logger.info('Starting Siza MCP Server');
 
   const server = createMCPServer();
   const transport = new StdioServerTransport();
 
   await server.connect(transport);
 
-  logger.info('UIForge MCP Server connected via stdio');
+  logger.info('Siza MCP Server connected via stdio');
 }

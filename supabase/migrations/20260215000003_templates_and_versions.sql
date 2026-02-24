@@ -1,4 +1,4 @@
--- UIForge Webapp - Templates and File Versions
+-- Siza Webapp - Templates and File Versions
 -- Version: 0.1.1
 -- Created: 2026-02-15
 -- Description: Templates for project scaffolding and file version history
@@ -190,7 +190,7 @@ values (
     "files": [
       {
         "path": "src/App.tsx",
-        "content": "export default function App() {\n  return (\n    <div className=\"min-h-screen bg-gray-50 flex items-center justify-center\">\n      <h1 className=\"text-4xl font-bold text-gray-900\">Hello UIForge!</h1>\n    </div>\n  );\n}"
+        "content": "export default function App() {\n  return (\n    <div className=\"min-h-screen bg-gray-50 flex items-center justify-center\">\n      <h1 className=\"text-4xl font-bold text-gray-900\">Hello Siza!</h1>\n    </div>\n  );\n}"
       },
       {
         "path": "src/index.tsx",

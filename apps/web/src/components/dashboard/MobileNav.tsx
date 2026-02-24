@@ -90,7 +90,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
         aria-label="Mobile navigation"
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-blue-600">UIForge</h1>
+          <h1 className="text-2xl font-bold text-blue-600">Siza</h1>
           <button
             ref={closeButtonRef}
             type="button"

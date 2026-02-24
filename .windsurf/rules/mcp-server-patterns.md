@@ -4,7 +4,7 @@
 
 ## Server setup
 
-- Entry point: `src/index.ts` creates `McpServer` (name `uiforge`, version from `package.json`).
+- Entry point: `src/index.ts` creates `McpServer` (name `siza`, version from `package.json`).
 - Transport: `StdioServerTransport` from `@modelcontextprotocol/sdk/server/stdio.js`.
 - Register all 7 tools + 1 resource, then `await server.connect(transport)`.
 

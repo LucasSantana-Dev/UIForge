@@ -70,7 +70,7 @@ export function SignUpClient() {
           <div className="text-center">
             <Link href="/" className="inline-flex items-center gap-2">
               <Code2 className="h-8 w-8 text-primary" />
-              <span className="text-2xl font-bold">UIForge</span>
+              <span className="text-2xl font-bold">Siza</span>
             </Link>
             <h2 className="mt-6 text-3xl font-bold">Check your email</h2>
             <p className="mt-2 text-sm text-muted-foreground">
@@ -80,7 +80,7 @@ export function SignUpClient() {
 
           <div className="rounded-lg border bg-card p-8 shadow-sm">
             <p className="text-center text-sm text-muted-foreground">
-              Click the link in the email to confirm your account and start using UIForge.
+              Click the link in the email to confirm your account and start using Siza.
             </p>
             <Link
               href="/signin"
@@ -100,7 +100,7 @@ export function SignUpClient() {
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2">
             <Code2 className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold">UIForge</span>
+            <span className="text-2xl font-bold">Siza</span>
           </Link>
           <h2 className="mt-6 text-3xl font-bold">Create your account</h2>
           <p className="mt-2 text-sm text-muted-foreground">

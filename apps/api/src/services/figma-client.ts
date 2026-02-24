@@ -245,7 +245,7 @@ export class FigmaClient {
     const figmaNodes = this.createNodesFromWireframe(wireframe.elements || []);
 
     const figmaDocument = {
-      name: 'UIForge Wireframe',
+      name: 'Siza Wireframe',
       type: 'CANVAS',
       children: [
         {

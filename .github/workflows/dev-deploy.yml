@@ -31,7 +31,7 @@ jobs:
     steps:
       - name: Deploy to dev environment
         run: |
-          echo "🚀 Deploying to dev environment (dev.uiforge.com)"
+          echo "🚀 Deploying to dev environment (dev.siza.com)"
           echo "📦 Building dev assets..."
           npm run build
           echo "✅ Dev deployment completed"

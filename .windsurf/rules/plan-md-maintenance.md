@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The `plan.MD` file is the **ABSOLUTE SOURCE OF TRUTH** for the UIForge project. It must be treated as a living document that accurately reflects the current state, progress, and future direction of the project at all times.
+The `plan.MD` file is the **ABSOLUTE SOURCE OF TRUTH** for the Siza project. It must be treated as a living document that accurately reflects the current state, progress, and future direction of the project at all times.
 
 ## Core Principles
 
@@ -40,7 +40,7 @@ Update plan.MD whenever:
 ### Step 1: Read Current State
 ```bash
 # Always read plan.MD first to understand current state
-read_file /Users/lucassantana/Desenvolvimento/uiforge-webapp/plan.MD
+read_file /Users/lucassantana/Desenvolvimento/siza-webapp/plan.MD
 ```
 
 ### Step 2: Identify Changes
@@ -205,7 +205,7 @@ Consider these for future automation:
 
 ## Responsibility
 
-**All AI agents** working on UIForge must:
+**All AI agents** working on Siza must:
 1. Consult plan.MD before making decisions
 2. Update plan.MD after significant work
 3. Maintain accuracy and consistency

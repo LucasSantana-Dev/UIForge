@@ -1,4 +1,4 @@
-# UIForge Test Suite
+# Siza Test Suite
 
 ## Directory Structure
 

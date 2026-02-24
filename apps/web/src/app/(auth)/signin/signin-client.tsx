@@ -67,7 +67,7 @@ export function SignInClient() {
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2">
             <Code2 className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold">UIForge</span>
+            <span className="text-2xl font-bold">Siza</span>
           </Link>
           <h2 className="mt-6 text-3xl font-bold">Welcome back</h2>
           <p className="mt-2 text-sm text-muted-foreground">Sign in to your account to continue</p>

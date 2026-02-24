@@ -25,7 +25,7 @@ export default {
     if (url.pathname === '/api') {
       return new Response(
         JSON.stringify({
-          message: 'UIForge API is running on Cloudflare Workers',
+          message: 'Siza API is running on Cloudflare Workers',
           version: '1.0.0',
           endpoints: ['/health', '/api'],
         }),

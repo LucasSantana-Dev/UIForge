@@ -25,7 +25,7 @@ export default function Sidebar() {
         >
           <Image
             src="/anvil-logo.svg"
-            alt="UIForge"
+            alt="Siza"
             width={32}
             height={32}
             className="flex-shrink-0"

@@ -1,5 +1,5 @@
-# Cloudflare Pages configuration for UIForge Web App
-name = "uiforge-web"
+# Cloudflare Pages configuration for Siza Web App
+name = "siza-web"
 main = "src/app/page.tsx"
 compatibility_date = "2024-02-15"
 compatibility_flags = ["nodejs_compat"]
@@ -8,7 +8,7 @@ compatibility_flags = ["nodejs_compat"]
 [env.production.vars]
 NEXT_PUBLIC_SUPABASE_URL = ""
 NEXT_PUBLIC_SUPABASE_ANON_KEY = ""
-NEXT_PUBLIC_API_URL = "https://api.uiforge.workers.dev"
+NEXT_PUBLIC_API_URL = "https://api.siza.workers.dev"
 
 # Build configuration
 [build]
@@ -28,10 +28,10 @@ preview_id = ""
 # D1 database (optional)
 [[d1_databases]]
 binding = "UIFORGE_DB"
-database_name = "uiforge-db"
+database_name = "siza-db"
 database_id = ""
 
 # R2 bucket for assets (optional)
 [[r2_buckets]]
 binding = "UIFORGE_ASSETS"
-bucket_name = "uiforge-assets"
+bucket_name = "siza-assets"
