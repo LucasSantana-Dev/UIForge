@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Cloudflare Workers deployment**: production deployment via OpenNext (`@opennextjs/cloudflare`) with `nodejs_compat` for full Node.js API support
+- **Deploy workflow** (`.github/workflows/deploy-web.yml`): automated build + deploy on push to dev/main using `wrangler-action@v3`
+- **OpenNext config** (`apps/web/open-next.config.ts`, `apps/web/wrangler.jsonc`): Workers-native Next.js deployment
 - **Image Recognition (Gemini Vision)**: upload UI screenshots for AI-powered component generation via multimodal input
 - **Image analysis service** (`apps/web/src/lib/services/image-analysis.ts`): standalone Gemini Vision analysis returning structured `DesignAnalysis` (layout, components, colors, typography, spacing, interactions, suggestedPrompt)
 - **Analyze-image API endpoint** (`apps/web/src/app/api/analyze-image/route.ts`): POST endpoint with rate limiting and session auth for standalone image analysis
@@ -14,6 +17,11 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- **Rate limiter** (`apps/web/src/lib/api/rate-limit.ts`): replaced `setInterval` with bounded lazy cleanup (max 10 per request) for Workers compatibility
+- **Proxy** (`apps/web/src/proxy.ts`): added `runtime = 'edge'` for OpenNext Cloudflare Workers compatibility
+- **API routes**: removed explicit `runtime` declarations from all routes — OpenNext handles runtime automatically
+- **`.env.example`**: added `NEXT_PUBLIC_BASE_URL` for OAuth redirects
+- **Next.js config**: added `initOpenNextCloudflareForDev()` for Cloudflare dev server compatibility
 - **Gemini service** (`apps/web/src/lib/services/gemini.ts`): added `imageBase64`/`imageMimeType` to options, sends multimodal `[text, inlineData]` content when image is present
 - **Generate API route** (`apps/web/src/app/api/generate/route.ts`): extended Zod schema with image fields, bumped API version to 3.0.0, added `image-input` feature flag
 - **GeneratorForm** (`apps/web/src/components/generator/GeneratorForm.tsx`): added image upload UI with drag-and-drop, preview, and file-to-base64 conversion
