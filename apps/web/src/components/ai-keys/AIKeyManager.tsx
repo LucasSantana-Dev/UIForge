@@ -94,9 +94,9 @@ export function AIKeyManager() {
       case 'anthropic':
         return 'bg-purple-100 text-purple-800 border-purple-200';
       case 'google':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return 'bg-brand/10 text-text-brand border-brand/30';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-surface-1 text-text-primary border-surface-3';
     }
   };
 
@@ -179,7 +179,7 @@ export function AIKeyManager() {
                     </div>
                     <div className="flex items-center gap-2">
                       {isDefault && (
-                        <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                        <Badge variant="secondary" className="bg-brand/10 text-text-brand">
                           <Star className="h-3 w-3 mr-1" />
                           Default
                         </Badge>

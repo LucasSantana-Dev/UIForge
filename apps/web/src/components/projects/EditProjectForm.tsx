@@ -88,7 +88,7 @@ export default function EditProjectForm({ projectId }: EditProjectFormProps) {
           {...register('name')}
           type="text"
           id="name"
-          className="w-full px-3 py-2 border border rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border rounded-md focus:ring-brand focus:border-brand"
           placeholder="My Awesome Project"
         />
         {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
@@ -102,7 +102,7 @@ export default function EditProjectForm({ projectId }: EditProjectFormProps) {
           {...register('description')}
           id="description"
           rows={3}
-          className="w-full px-3 py-2 border border rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border rounded-md focus:ring-brand focus:border-brand"
           placeholder="A brief description of your project..."
         />
         {errors.description && (
@@ -117,7 +117,7 @@ export default function EditProjectForm({ projectId }: EditProjectFormProps) {
         <select
           {...register('framework')}
           id="framework"
-          className="w-full px-3 py-2 border border rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border rounded-md focus:ring-brand focus:border-brand"
         >
           <option value="react">React</option>
           <option value="vue">Vue</option>
@@ -140,7 +140,7 @@ export default function EditProjectForm({ projectId }: EditProjectFormProps) {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:bg-brand-light disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting ? 'Saving...' : 'Save Changes'}
         </button>

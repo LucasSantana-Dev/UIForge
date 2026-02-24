@@ -107,7 +107,7 @@ export default function AnalyticsDashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
+          <div className="flex bg-surface-1 bg-surface-2 rounded-lg p-1">
             {(['7d', '30d', '90d'] as const).map((range) => (
               <Button
                 key={range}
@@ -138,7 +138,7 @@ export default function AnalyticsDashboard() {
                 <span className="text-sm text-green-600">+12.5%</span>
               </div>
             </div>
-            <Eye className="w-8 h-8 text-blue-600" />
+            <Eye className="w-8 h-8 text-brand" />
           </div>
         </Card>
 
@@ -252,9 +252,9 @@ export default function AnalyticsDashboard() {
               <div key={index} className="flex items-center justify-between">
                 <span className="text-sm">{browser.browser}</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-24 bg-surface-2 dark:bg-surface-3 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full"
+                      className="bg-brand h-2 rounded-full"
                       style={{ width: `${browser.percentage}%` }}
                     />
                   </div>
@@ -278,7 +278,7 @@ export default function AnalyticsDashboard() {
               <div key={index} className="flex items-center justify-between">
                 <span className="text-sm">{device.device}</span>
                 <div className="flex items-center gap-2">
-                  <div className="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                  <div className="w-24 bg-surface-2 dark:bg-surface-3 rounded-full h-2">
                     <div
                       className="bg-green-600 h-2 rounded-full"
                       style={{ width: `${device.percentage}%` }}

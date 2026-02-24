@@ -83,28 +83,28 @@ export default function CreateProjectForm() {
       )}
 
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="name" className="block text-sm font-medium text-text-primary mb-2">
           Project Name *
         </label>
         <input
           {...register('name')}
           type="text"
           id="name"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
           placeholder="My Awesome Project"
         />
         {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
       </div>
 
       <div>
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="description" className="block text-sm font-medium text-text-primary mb-2">
           Description
         </label>
         <textarea
           {...register('description')}
           id="description"
           rows={3}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
           placeholder="A brief description of your project..."
         />
         {errors.description && (
@@ -113,13 +113,13 @@ export default function CreateProjectForm() {
       </div>
 
       <div>
-        <label htmlFor="framework" className="block text-sm font-medium text-gray-700 mb-2">
+        <label htmlFor="framework" className="block text-sm font-medium text-text-primary mb-2">
           Framework *
         </label>
         <select
           {...register('framework')}
           id="framework"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
         >
           <option value="react">React</option>
           <option value="vue">Vue</option>
@@ -132,7 +132,7 @@ export default function CreateProjectForm() {
       </div>
 
       <div>
-        <p className="block text-sm font-medium text-gray-700 mb-2">Thumbnail (optional)</p>
+        <p className="block text-sm font-medium text-text-primary mb-2">Thumbnail (optional)</p>
         <div className="mt-1 flex items-center space-x-4">
           {thumbnailPreview ? (
             <div className="relative w-32 h-32">
@@ -154,9 +154,9 @@ export default function CreateProjectForm() {
               </button>
             </div>
           ) : (
-            <label className="w-32 h-32 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-md cursor-pointer hover:border-blue-500">
-              <UploadIcon className="h-8 w-8 text-gray-400" />
-              <span className="mt-2 text-xs text-gray-500">Upload</span>
+            <label className="w-32 h-32 flex flex-col items-center justify-center border-2 border-dashed border-surface-3 rounded-md cursor-pointer hover:border-brand/50">
+              <UploadIcon className="h-8 w-8 text-text-muted" />
+              <span className="mt-2 text-xs text-text-secondary">Upload</span>
               <input
                 type="file"
                 accept="image/*"
@@ -172,14 +172,14 @@ export default function CreateProjectForm() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+          className="px-4 py-2 border border-surface-3 rounded-md text-sm font-medium text-text-primary hover:bg-surface-0"
         >
           Cancel
         </button>
         <button
           type="submit"
           disabled={isSubmitting || uploadingThumbnail}
-          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:bg-brand-light disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSubmitting || uploadingThumbnail ? 'Creating...' : 'Create Project'}
         </button>

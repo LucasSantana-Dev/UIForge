@@ -141,7 +141,7 @@ export function EditApiKeyDialog({ open, onOpenChange, keyId }: EditApiKeyDialog
 
             {currentKey.isDefault && (
               <div className="mt-2">
-                <div className="inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                <div className="inline-flex items-center gap-1 text-xs bg-brand/10 text-text-brand px-2 py-1 rounded">
                   <Check className="h-3 w-3" />
                   Default API Key
                 </div>

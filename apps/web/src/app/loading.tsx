@@ -6,13 +6,7 @@ export default function Loading() {
       <div className="flex flex-col items-center gap-4">
         {/* Logo with pulse animation */}
         <div className="animate-pulse">
-          <Image
-            src="/anvil-logo.svg"
-            alt="Siza"
-            width={48}
-            height={48}
-            className="flex-shrink-0"
-          />
+          <Image src="/siza-icon.png" alt="Siza" width={48} height={48} className="flex-shrink-0" />
         </div>
 
         {/* Loading spinner */}

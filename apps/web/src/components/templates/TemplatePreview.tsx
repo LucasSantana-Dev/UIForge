@@ -47,7 +47,7 @@ export function TemplatePreview({
       case 'advanced':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-surface-1 text-text-primary';
     }
   };
 

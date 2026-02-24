@@ -19,7 +19,7 @@ export default function GenerationHistory({
   const { data: generations, isLoading, error } = useGenerations(projectId);
 
   if (isLoading) {
-    return <div className="p-4 text-center text-sm text-gray-600">Loading history...</div>;
+    return <div className="p-4 text-center text-sm text-text-secondary">Loading history...</div>;
   }
 
   if (error) {
@@ -27,14 +27,14 @@ export default function GenerationHistory({
   }
 
   if (!generations || generations.length === 0) {
-    return <div className="p-4 text-center text-sm text-gray-600">No generations yet</div>;
+    return <div className="p-4 text-center text-sm text-text-secondary">No generations yet</div>;
   }
 
   return (
-    <div className="border-t border-gray-200">
+    <div className="border-t border-surface-3">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-3 flex items-center justify-between text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+        className="w-full px-4 py-3 flex items-center justify-between text-sm font-medium text-text-primary hover:bg-surface-0 transition-colors"
       >
         <div className="flex items-center space-x-2">
           <ClockIcon className="h-4 w-4" />
@@ -51,19 +51,19 @@ export default function GenerationHistory({
       </button>
 
       {expanded && (
-        <div className="max-h-64 overflow-y-auto border-t border-gray-200">
+        <div className="max-h-64 overflow-y-auto border-t border-surface-3">
           {generations.map((generation) => (
             <div
               key={generation.id}
-              className="p-3 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors"
+              className="p-3 border-b border-surface-3 last:border-b-0 hover:bg-surface-0 transition-colors"
             >
               <div className="flex items-start justify-between space-x-3">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-1">
-                    <span className="text-sm font-medium text-gray-900 truncate">
+                    <span className="text-sm font-medium text-text-primary truncate">
                       {generation.component_name}
                     </span>
-                    <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+                    <span className="text-xs px-2 py-1 bg-brand/10 text-brand rounded-full">
                       {generation.framework}
                     </span>
                     {generation.component_library && (
@@ -73,12 +73,12 @@ export default function GenerationHistory({
                     )}
                   </div>
 
-                  <p className="text-xs text-gray-600 line-clamp-2 mb-2">
+                  <p className="text-xs text-text-secondary line-clamp-2 mb-2">
                     {generation.prompt.substring(0, 100)}
                     {generation.prompt.length > 100 && '...'}
                   </p>
 
-                  <div className="flex items-center space-x-4 text-xs text-gray-500">
+                  <div className="flex items-center space-x-4 text-xs text-text-secondary">
                     <span className="flex items-center space-x-1">
                       <CodeIcon className="h-3 w-3" />
                       {generation.generated_code.length} chars
@@ -95,7 +95,7 @@ export default function GenerationHistory({
                 <div className="flex items-center space-x-1">
                   <button
                     onClick={() => onSelectGeneration?.(generation.generated_code)}
-                    className="p-1 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                    className="p-1 text-text-secondary hover:text-brand hover:bg-brand/10 rounded transition-colors"
                     title="Use this code"
                   >
                     <CodeIcon className="h-4 w-4" />
@@ -104,7 +104,7 @@ export default function GenerationHistory({
                     onClick={() => {
                       navigator.clipboard.writeText(generation.generated_code);
                     }}
-                    className="p-1 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                    className="p-1 text-text-secondary hover:text-green-600 hover:bg-green-50 rounded transition-colors"
                     title="Copy code"
                   >
                     <DownloadIcon className="h-4 w-4" />

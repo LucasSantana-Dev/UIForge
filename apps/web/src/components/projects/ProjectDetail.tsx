@@ -16,7 +16,7 @@ export default function ProjectDetail({ projectId }: ProjectDetailProps) {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-gray-600">Loading project...</div>
+        <div className="text-text-secondary">Loading project...</div>
       </div>
     );
   }
@@ -27,7 +27,7 @@ export default function ProjectDetail({ projectId }: ProjectDetailProps) {
         <p className="text-red-600">Failed to load project. Please try again.</p>
         <Link
           href="/projects"
-          className="mt-4 inline-flex items-center text-sm text-blue-600 hover:text-blue-700"
+          className="mt-4 inline-flex items-center text-sm text-brand hover:text-brand"
         >
           <ArrowLeftIcon className="h-4 w-4 mr-2" />
           Back to Projects
@@ -41,7 +41,7 @@ export default function ProjectDetail({ projectId }: ProjectDetailProps) {
       <div className="flex items-center justify-between">
         <Link
           href="/projects"
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+          className="inline-flex items-center text-sm text-text-secondary hover:text-text-primary"
         >
           <ArrowLeftIcon className="h-4 w-4 mr-2" />
           Back to Projects
@@ -58,9 +58,9 @@ export default function ProjectDetail({ projectId }: ProjectDetailProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-surface-1 rounded-lg border border-surface-3 overflow-hidden">
         {project.thumbnail_url ? (
-          <div className="aspect-video bg-gray-100">
+          <div className="aspect-video bg-surface-1">
             <img
               src={project.thumbnail_url}
               alt={project.name}
@@ -76,23 +76,23 @@ export default function ProjectDetail({ projectId }: ProjectDetailProps) {
         )}
 
         <div className="p-6">
-          <h1 className="text-3xl font-bold text-gray-900">{project.name}</h1>
-          {project.description && <p className="mt-2 text-gray-600">{project.description}</p>}
+          <h1 className="text-3xl font-bold text-text-primary">{project.name}</h1>
+          {project.description && <p className="mt-2 text-text-secondary">{project.description}</p>}
 
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div>
-              <h3 className="text-sm font-medium text-gray-500">Framework</h3>
-              <p className="mt-1 text-sm text-gray-900 capitalize">{project.framework}</p>
+              <h3 className="text-sm font-medium text-text-secondary">Framework</h3>
+              <p className="mt-1 text-sm text-text-primary capitalize">{project.framework}</p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-500">Created</h3>
-              <p className="mt-1 text-sm text-gray-900">
+              <h3 className="text-sm font-medium text-text-secondary">Created</h3>
+              <p className="mt-1 text-sm text-text-primary">
                 {formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}
               </p>
             </div>
             <div>
-              <h3 className="text-sm font-medium text-gray-500">Last Updated</h3>
-              <p className="mt-1 text-sm text-gray-900">
+              <h3 className="text-sm font-medium text-text-secondary">Last Updated</h3>
+              <p className="mt-1 text-sm text-text-primary">
                 {formatDistanceToNow(new Date(project.updated_at), { addSuffix: true })}
               </p>
             </div>
@@ -100,17 +100,17 @@ export default function ProjectDetail({ projectId }: ProjectDetailProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-surface-1 rounded-lg border border-surface-3 p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">Components</h2>
+          <h2 className="text-lg font-semibold text-text-primary">Components</h2>
           <Link
             href={`/projects/${project.id}/generate`}
-            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:bg-brand-light"
           >
             Generate Component
           </Link>
         </div>
-        <div className="text-center py-12 text-gray-500">
+        <div className="text-center py-12 text-text-secondary">
           No components yet. Start generating components for this project.
         </div>
       </div>
