@@ -88,6 +88,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       'style',
       'typescript',
       'generation_time_ms',
+      'quality_score',
+      'user_feedback',
     ];
     const updates: any = {
       updated_at: new Date().toISOString(),
