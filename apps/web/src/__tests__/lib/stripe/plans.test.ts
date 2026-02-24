@@ -2,9 +2,10 @@ import { PLANS, getPlan } from '@/lib/stripe/plans';
 
 describe('Stripe Plans', () => {
   describe('PLANS', () => {
-    it('should define free, pro, and enterprise plans', () => {
+    it('should define all four plans', () => {
       expect(PLANS.free).toBeDefined();
       expect(PLANS.pro).toBeDefined();
+      expect(PLANS.team).toBeDefined();
       expect(PLANS.enterprise).toBeDefined();
     });
 
@@ -25,6 +26,15 @@ describe('Stripe Plans', () => {
       expect(pro.limits.generationsPerMonth).toBe(500);
       expect(pro.limits.maxProjects).toBe(-1);
       expect(pro.limits.maxComponentsPerProject).toBe(-1);
+    });
+
+    it('should have correct team plan limits', () => {
+      const team = PLANS.team;
+      expect(team.id).toBe('team');
+      expect(team.priceMonthly).toBe(49);
+      expect(team.limits.generationsPerMonth).toBe(2500);
+      expect(team.limits.maxProjects).toBe(-1);
+      expect(team.limits.seats).toBe(5);
     });
 
     it('should have correct enterprise plan limits', () => {
@@ -58,6 +68,7 @@ describe('Stripe Plans', () => {
     it('should return correct plan by id', () => {
       expect(getPlan('free').id).toBe('free');
       expect(getPlan('pro').id).toBe('pro');
+      expect(getPlan('team').id).toBe('team');
       expect(getPlan('enterprise').id).toBe('enterprise');
     });
 
