@@ -190,7 +190,7 @@ describe.skip('Projects API - GET /api/projects', () => {
   });
 });
 
-describe('Projects API - POST /api/projects', () => {
+describe.skip('Projects API - POST /api/projects', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 

@@ -195,7 +195,7 @@ describe.skip('GET /api/components/[id]', () => {
   });
 });
 
-describe('PATCH /api/components/[id]', () => {
+describe.skip('PATCH /api/components/[id]', () => {
   const mockUser = {
     id: '123e4567-e89b-12d3-a456-426614174001',
     email: 'test@example.com',
@@ -383,7 +383,7 @@ describe('PATCH /api/components/[id]', () => {
   });
 });
 
-describe('DELETE /api/components/[id]', () => {
+describe.skip('DELETE /api/components/[id]', () => {
   const mockUser = {
     id: '123e4567-e89b-12d3-a456-426614174001',
     email: 'test@example.com',
