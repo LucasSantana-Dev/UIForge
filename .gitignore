@@ -76,5 +76,7 @@ POST_CLEANUP_CHECKLIST.md
 .wrangler-dry-run/
 
 # Claude Code
-.claude/
+.claude/*
+!.claude/agents/
+!.claude/skills/
 .worktrees/
