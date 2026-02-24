@@ -13,9 +13,9 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project }: ProjectCardProps) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 hover:border-blue-500 transition-colors overflow-hidden group">
+    <div className="bg-surface-1 rounded-lg border border-surface-3 hover:border-brand transition-colors overflow-hidden group">
       <Link href={`/projects/${project.id}`}>
-        <div className="aspect-video bg-gray-100 flex items-center justify-center">
+        <div className="aspect-video bg-surface-2 flex items-center justify-center">
           {project.thumbnail_url ? (
             <img
               src={project.thumbnail_url}
@@ -23,7 +23,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="text-gray-400 text-4xl font-bold">
+            <div className="text-text-muted text-4xl font-bold">
               {project.name.charAt(0).toUpperCase()}
             </div>
           )}
@@ -32,16 +32,16 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       <div className="p-4">
         <div className="flex items-start justify-between">
           <Link href={`/projects/${project.id}`} className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600">
+            <h3 className="text-lg font-semibold text-text-primary hover:text-brand-light">
               {project.name}
             </h3>
             {project.description && (
-              <p className="mt-1 text-sm text-gray-600 line-clamp-2">{project.description}</p>
+              <p className="mt-1 text-sm text-text-secondary line-clamp-2">{project.description}</p>
             )}
           </Link>
           <ProjectActions projectId={project.id} projectName={project.name} />
         </div>
-        <div className="mt-4 flex items-center justify-between text-xs text-gray-500">
+        <div className="mt-4 flex items-center justify-between text-xs text-text-muted">
           <span className="capitalize">{project.framework}</span>
           <span>
             Updated {formatDistanceToNow(new Date(project.updated_at), { addSuffix: true })}

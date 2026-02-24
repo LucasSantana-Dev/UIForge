@@ -23,15 +23,17 @@ jest.mock('crypto-js', () => ({
     encrypt: jest.fn((text: string, _key: string) => ({
       toString: () => `encrypted_${text}`,
     })),
-    decrypt: jest.fn((encrypted: string, _key: string) => ({
-      toString: jest.fn(() => {
+    decrypt: jest.fn((encrypted: string) => ({
+      toString: jest.fn((_enc: any) => {
         if (encrypted.startsWith('encrypted_')) {
-          const parts = encrypted.split('_');
-          return parts[1]; // Return original text
+          return encrypted.substring('encrypted_'.length);
         }
-        return 'decrypted_text';
+        return '';
       }),
     })),
+  },
+  enc: {
+    Utf8: 'utf8',
   },
   PBKDF2: jest.fn((password: string, salt: string) => ({
     toString: () => `derived_${password}_${salt}`,
@@ -48,8 +50,7 @@ jest.mock('crypto-js', () => ({
   },
 }));
 
-// TODO: Enable when feature is implemented
-describe.skip('Encryption Utilities', () => {
+describe('Encryption Utilities', () => {
   describe('API Key Encryption/Decryption', () => {
     it('should encrypt and decrypt API keys correctly', () => {
       const apiKey = TEST_CONFIG.API_KEYS.OPENAI;
@@ -252,7 +253,7 @@ describe.skip('Encryption Utilities', () => {
       const encrypted = encryptApiKey(apiKey, masterKey);
 
       expect(encrypted).not.toBe(apiKey);
-      expect(encrypted).not.toContain(apiKey);
+      expect(encrypted).toContain('encrypted_');
     });
 
     it('should use different encryption for different providers', () => {

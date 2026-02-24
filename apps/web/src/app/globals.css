@@ -4,56 +4,104 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 260 30% 15%;
-    --card: 0 0% 100%;
-    --card-foreground: 260 30% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 260 30% 15%;
-    --primary: 260 70% 60%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 260 20% 95%;
-    --secondary-foreground: 260 30% 15%;
-    --muted: 260 20% 95%;
-    --muted-foreground: 260 15% 45%;
-    --accent: 260 30% 90%;
-    --accent-foreground: 260 30% 15%;
-    --destructive: 0 70% 55%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 260 20% 90%;
-    --input: 260 20% 90%;
-    --ring: 260 70% 60%;
-    --radius: 0.5rem;
+    --surface-0: 18 18 20;
+    --surface-1: 28 28 31;
+    --surface-2: 39 39 42;
+    --surface-3: 63 63 70;
+    --surface-4: 82 82 91;
+
+    --brand: 124 58 237;
+    --brand-light: 139 92 246;
+    --brand-dark: 109 40 217;
+    --brand-muted: 76 29 149;
+
+    --text-primary: 250 250 250;
+    --text-secondary: 161 161 170;
+    --text-muted: 113 113 122;
+    --text-brand: 167 139 250;
+
+    --success: 16 185 129;
+    --warning: 245 158 11;
+    --error: 239 68 68;
+    --info: 59 130 246;
+
+    --background: var(--surface-0);
+    --foreground: var(--text-primary);
+    --card: var(--surface-1);
+    --card-foreground: var(--text-primary);
+    --popover: var(--surface-1);
+    --popover-foreground: var(--text-primary);
+    --primary: var(--brand);
+    --primary-foreground: 250 250 250;
+    --secondary: var(--surface-2);
+    --secondary-foreground: var(--text-primary);
+    --muted: var(--surface-2);
+    --muted-foreground: var(--text-secondary);
+    --accent: var(--surface-2);
+    --accent-foreground: var(--text-primary);
+    --destructive: var(--error);
+    --destructive-foreground: 250 250 250;
+    --border: var(--surface-3);
+    --input: var(--surface-1);
+    --ring: var(--brand);
+    --radius: 0.75rem;
+
+    --indigo: 99 102 241;
+    --indigo-light: 129 140 248;
+    --indigo-dark: 79 70 229;
+
+    --ease-siza: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-siza-sharp: cubic-bezier(0.33, 1, 0.68, 1);
+    --ease-siza-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-card-hover: 0 10px 25px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.4);
+    --shadow-glow-brand: 0 0 20px rgba(124, 58, 237, 0.3), 0 0 40px rgba(124, 58, 237, 0.1);
+    --shadow-glow-focus: 0 0 0 2px rgb(var(--surface-0)), 0 0 0 4px rgb(var(--brand));
   }
 
-  .dark {
-    --background: 240 9% 7%; /* #121214 - plain dark gray */
-    --foreground: 0 0% 95%;
-    --card: 240 9% 11%; /* Slightly lighter than background */
-    --card-foreground: 0 0% 95%;
-    --popover: 240 9% 11%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 260 75% 60%; /* Purpleish tone for primary elements */
-    --primary-foreground: 240 9% 7%;
-    --secondary: 260 25% 18%; /* Purpleish muted for secondary elements */
-    --secondary-foreground: 0 0% 95%;
-    --muted: 260 25% 18%; /* Purpleish muted background */
-    --muted-foreground: 0 0% 75%;
-    --accent: 260 20% 25%; /* Purpleish accent for small elements */
-    --accent-foreground: 0 0% 95%;
-    --destructive: 0 60% 50%;
-    --destructive-foreground: 0 0% 95%;
-    --border: 260 25% 18%; /* Purpleish border */
-    --input: 260 25% 18%; /* Purpleish input */
-    --ring: 260 75% 60%; /* Purpleish ring */
+  * {
+    border-color: rgb(var(--border));
+  }
+
+  body {
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
+@layer utilities {
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-card-hover { box-shadow: var(--shadow-card-hover); }
+  .shadow-glow-brand { box-shadow: var(--shadow-glow-brand); }
+  .shadow-glow-focus { box-shadow: var(--shadow-glow-focus); }
+}
+
+@keyframes siza-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes siza-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes siza-slide-in-right {
+  from { opacity: 0; transform: translateX(16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes siza-pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(124, 58, 237, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(124, 58, 237, 0.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
