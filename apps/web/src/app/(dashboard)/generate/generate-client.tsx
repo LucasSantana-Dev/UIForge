@@ -195,12 +195,10 @@ export default function TemplateComponent() {
         </div>
 
         {isTemplateMode && (
-          <div className="mt-4 p-3 bg-brand/10 bg-brand-muted border border-brand/30 dark:border-blue-800 rounded-lg">
+          <div className="mt-4 p-3 bg-brand-muted border border-brand/30 rounded-lg">
             <div className="flex items-center gap-2">
-              <Code className="w-4 h-4 text-brand text-text-brand" />
-              <span className="text-sm font-medium text-text-brand dark:text-text-brand">
-                Template Mode: {template}
-              </span>
+              <Code className="w-4 h-4 text-text-brand" />
+              <span className="text-sm font-medium text-text-brand">Template Mode: {template}</span>
               <Badge variant="secondary" className="text-xs">
                 {framework}
               </Badge>
@@ -208,7 +206,7 @@ export default function TemplateComponent() {
                 {componentLibrary}
               </Badge>
             </div>
-            <p className="text-xs text-brand dark:text-text-brand mt-1">
+            <p className="text-xs text-text-brand mt-1">
               This template has been pre-loaded. You can customize it further or generate new
               components.
             </p>

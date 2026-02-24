@@ -131,7 +131,7 @@ export default function CustomDomain() {
               {domain.dnsRecords && (
                 <div className="mt-4">
                   <h4 className="text-sm font-medium mb-2">DNS Records:</h4>
-                  <div className="bg-surface-0 bg-surface-2 rounded p-3">
+                  <div className="bg-surface-2 rounded p-3">
                     <div className="space-y-2 text-sm">
                       {domain.dnsRecords.map((record, recordIndex) => (
                         <div key={recordIndex} className="font-mono">
@@ -151,8 +151,8 @@ export default function CustomDomain() {
 
               {/* Instructions */}
               {domain.status === 'pending' && (
-                <div className="mt-4 p-3 bg-brand/10 bg-brand-muted border border-brand/30 dark:border-blue-800 rounded">
-                  <p className="text-sm text-text-brand dark:text-text-brand">
+                <div className="mt-4 p-3 bg-brand-muted border border-brand/30 rounded">
+                  <p className="text-sm text-text-brand">
                     <strong>Next steps:</strong> Update your DNS records and wait for propagation.
                     This can take up to 24 hours.
                   </p>
@@ -160,8 +160,8 @@ export default function CustomDomain() {
               )}
 
               {domain.status === 'error' && (
-                <div className="mt-4 p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded">
-                  <p className="text-sm text-red-800 dark:text-red-200">
+                <div className="mt-4 p-3 bg-red-950 border border-red-800 rounded">
+                  <p className="text-sm text-red-200">
                     <strong>Configuration error:</strong> Please check your DNS records and try
                     again.
                   </p>
@@ -172,9 +172,9 @@ export default function CustomDomain() {
         </div>
 
         {/* Instructions */}
-        <div className="mt-6 p-4 bg-surface-0 bg-surface-2 rounded">
+        <div className="mt-6 p-4 bg-surface-2 rounded">
           <h4 className="font-medium mb-2">Setup Instructions:</h4>
-          <ol className="text-sm text-text-secondary dark:text-text-muted space-y-1 list-decimal list-inside">
+          <ol className="text-sm text-text-secondary space-y-1 list-decimal list-inside">
             <li>Add your domain using the form above</li>
             <li>Configure the DNS records in your domain provider</li>
             <li>Wait for DNS propagation (up to 24 hours)</li>

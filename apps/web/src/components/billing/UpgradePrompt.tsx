@@ -9,14 +9,12 @@ interface UpgradePromptProps {
 
 export function UpgradePrompt({ resource }: UpgradePromptProps) {
   return (
-    <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-900/20">
+    <div className="rounded-lg border border-yellow-800 bg-yellow-900/20 p-4">
       <div className="flex items-start gap-3">
-        <Zap className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+        <Zap className="mt-0.5 h-5 w-5 text-yellow-400" />
         <div>
-          <h4 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
-            {resource} limit reached
-          </h4>
-          <p className="mt-1 text-sm text-yellow-700 dark:text-yellow-300">
+          <h4 className="text-sm font-medium text-yellow-200">{resource} limit reached</h4>
+          <p className="mt-1 text-sm text-yellow-300">
             Upgrade to Pro for more capacity and advanced features.
           </p>
           <Link

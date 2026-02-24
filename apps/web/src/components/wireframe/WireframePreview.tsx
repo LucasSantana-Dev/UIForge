@@ -187,10 +187,10 @@ export function WireframePreview({ wireframe }: WireframePreviewProps) {
       {/* Preview Area */}
       <div className="flex-1 flex gap-4">
         {/* SVG Preview */}
-        <div className="flex-1 bg-surface-1 dark:bg-surface-0 rounded-lg border border-border overflow-auto">
+        <div className="flex-1 bg-surface-0 rounded-lg border border-border overflow-auto">
           <div className="p-8 flex justify-center items-center min-h-full">
             <div
-              className="bg-surface-1 dark:bg-surface-0 border-2 border-border rounded-lg shadow-lg"
+              className="bg-surface-0 border-2 border-border rounded-lg shadow-lg"
               style={{
                 transform: `scale(${scale})`,
                 transformOrigin: 'center',

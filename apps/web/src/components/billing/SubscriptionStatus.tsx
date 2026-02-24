@@ -11,10 +11,10 @@ export function SubscriptionStatus({ plan, status, cancelAtPeriodEnd }: Subscrip
 
   const statusColor =
     status === 'active'
-      ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+      ? 'bg-green-900/30 text-green-400'
       : status === 'past_due'
-        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-        : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400';
+        ? 'bg-yellow-900/30 text-yellow-400'
+        : 'bg-red-900/30 text-red-400';
 
   return (
     <div className="flex items-center gap-2">

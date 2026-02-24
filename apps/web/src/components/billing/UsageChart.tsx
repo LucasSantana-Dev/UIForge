@@ -22,7 +22,7 @@ export function UsageChart({ label, current, limit }: UsageChartProps) {
       <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
         <div
           className={`h-full rounded-full transition-all ${
-            isNearLimit ? 'bg-yellow-500 dark:bg-yellow-400' : 'bg-primary'
+            isNearLimit ? 'bg-yellow-400' : 'bg-primary'
           }`}
           style={{ width: isUnlimited ? '0%' : `${percentage}%` }}
         />

@@ -19,7 +19,7 @@ export default function DocsPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-950 dark:to-purple-950 py-20">
+      <section className="bg-gradient-to-br from-blue-950 to-purple-950 py-20">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center">
             <Badge className="mb-4">Documentation</Badge>
@@ -95,7 +95,7 @@ export default function DocsPage() {
       </section>
 
       {/* Documentation Sections */}
-      <section className="py-16 bg-muted dark:bg-background">
+      <section className="py-16 bg-background">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-center mb-12">Documentation</h2>
 
@@ -182,7 +182,7 @@ export default function DocsPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-4">Basic Component Generation</h3>
-              <div className="bg-muted dark:bg-secondary rounded-lg p-4 font-mono text-sm">
+              <div className="bg-secondary rounded-lg p-4 font-mono text-sm">
                 <pre>{`// Generate a button component
 const response = await fetch('/api/generate', {
   method: 'POST',
@@ -198,7 +198,7 @@ const response = await fetch('/api/generate', {
 
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-4">Using Templates</h3>
-              <div className="bg-muted dark:bg-secondary rounded-lg p-4 font-mono text-sm">
+              <div className="bg-secondary rounded-lg p-4 font-mono text-sm">
                 <pre>{`// Use a pre-built template
 const template = await fetch('/api/templates/navigation-bar');
 const component = instantiateTemplate(template, {
