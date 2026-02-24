@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Visual overhaul**: Dark-only Siza brand identity across 37 files
+- **SizaBackground component**: Ambient dot grid + brand glow for marketing/auth pages
+- **Skip-to-content link**: Accessibility improvement in root layout
+
+### Changed
+
+- **UIForge → Siza rebrand**: Logo, sidebar, nav, all pages updated to Siza identity
+- **Design tokens**: All 265+ hardcoded gray/blue/white classes replaced with surface-*/brand-*/text-* tokens
+- **Logo optimization**: Replaced 1.8MB anvil-logo.svg with 2.5KB siza-icon.png
+- **Sonner toast**: Hardcoded dark theme, removed unused next-themes dependency
+- **TopBar**: Removed theme toggle (dark-only app)
+- **Sidebar**: Brand active states, billing navigation item added
+
+### Removed
+
+- `anvil-logo.svg` (1.8MB) and `text-logo.svg` (1.8MB) — replaced with Siza brand assets
+- `next-themes` imports from TopBar and Sonner (dark-only, no toggling)
+- Theme toggle button from TopBar
+
+---
+
+## [0.3.0] — 2026-02-24
+
+### Added
+
 - Strategic positioning: "The open full-stack AI workspace"
 - Team pricing tier ($49/month, 5 seats, 2,500 generations)
 - CONTRIBUTING.md with development workflow and code standards
