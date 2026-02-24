@@ -73,6 +73,7 @@ POST_CLEANUP_CHECKLIST.md
 
 # Wrangler / OpenNext
 .open-next/
+.wrangler-dry-run/
 
 # Claude Code
 .claude/

@@ -40,11 +40,13 @@ Unified deployment — single Cloudflare Workers instance serves both web and AP
 - **Encryption**: AES-256-GCM for stored API keys
 
 ## CI/CD
-- **Platform**: GitHub Actions
+- **Platform**: GitHub Actions (Node 22 across all workflows)
 - **Free Tier**: 2000 minutes/month for private repos
-- **Workflows**: Lint, test, build on PR; deploy on merge
-- **Deploy Action**: `cloudflare/wrangler-action@v3`
+- **Core workflows**: `ci.yml` (quality), `deploy-web.yml` (auto-deploy), `deploy-web-admin.yml` (manual admin deploy)
+- **Deploy Action**: `cloudflare/wrangler-action@v3` with `--keep-vars`
 - **Branch flow**: `feat/*` → PR to `dev` → PR to `main` → auto-deploy
+- **Admin deploy**: `deploy-web-admin.yml` (workflow_dispatch) — Workers via OpenNext, production requires main branch
+- **Cleanup (PR #43)**: Removed 3 broken scaffold workflows, standardized Node 22, deploy-web-admin rewritten from Pages → Workers
 
 ## Monitoring
 - **Workers**: Cloudflare Workers Analytics (free tier)

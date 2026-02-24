@@ -4,17 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Health check endpoint** (`/api/health`): returns `{ status, timestamp, version }` for deployment verification
+- **WASM stub step** in deploy workflow: stubs unused `@vercel/og` WASM files to fit Workers 3 MiB free tier
+- **Local deploy script** (`apps/web/scripts/deploy.sh`): local deploy with automatic WASM stubbing
+
 ### Fixed
 
 - Deleted broken scaffold workflows (`dev-deploy.yml`, `production.yml`, `deploy-admin.yml`) that ran builds without checkout/install
 - Rewrote `deploy-web-admin.yml` to use Cloudflare Workers deployment via OpenNext (was incorrectly using Pages)
 - Standardized Node.js 22 across all CI workflows (`release-branch.yml`, `release-automation.yml`, `supabase-setup-admin.yml`)
 - Fixed README badges and references (Next.js 16, Node.js 22, Cloudflare Workers deployment docs)
+- Fixed About page: updated tech stack versions (Next.js 16, React 19, Cloudflare Workers) and source code link
 
 ### Added
 
-- **Cloudflare Workers deployment**: production deployment via OpenNext (`@opennextjs/cloudflare`) with `nodejs_compat` for full Node.js API support
+- **Cloudflare Workers deployment**: production deployment via OpenNext (`@opennextjs/cloudflare`) with `nodejs_compat` for full Node.js API support — live at `siza-web.uiforge.workers.dev`
 - **Deploy workflow** (`.github/workflows/deploy-web.yml`): automated build + deploy on push to dev/main using `wrangler-action@v3`
+- **WASM size optimization**: stub unused `@vercel/og` WASM files (resvg.wasm + yoga.wasm) at deploy time, reducing bundle from 3429 KiB to 2882 KiB gzipped (under 3 MiB free tier limit)
+- **Deploy script** (`apps/web/scripts/deploy.sh`): local deploy with automatic WASM stubbing and `_redirects` cleanup
 - **OpenNext config** (`apps/web/open-next.config.ts`, `apps/web/wrangler.jsonc`): Workers-native Next.js deployment
 - **Image Recognition (Gemini Vision)**: upload UI screenshots for AI-powered component generation via multimodal input
 - **Image analysis service** (`apps/web/src/lib/services/image-analysis.ts`): standalone Gemini Vision analysis returning structured `DesignAnalysis` (layout, components, colors, typography, spacing, interactions, suggestedPrompt)
