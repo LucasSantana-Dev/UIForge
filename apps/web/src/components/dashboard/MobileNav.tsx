@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { XIcon, FolderIcon, FileTextIcon, SettingsIcon, PlusIcon } from 'lucide-react';
+import { XIcon, FolderIcon, FileTextIcon, SettingsIcon, PlusIcon, Github } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 interface MobileNavProps {
@@ -13,6 +13,7 @@ interface MobileNavProps {
 const navigation = [
   { name: 'Projects', href: '/projects', icon: FolderIcon },
   { name: 'Templates', href: '/templates', icon: FileTextIcon },
+  { name: 'GitHub', href: '/settings?tab=github', icon: Github },
   { name: 'Settings', href: '/settings', icon: SettingsIcon },
 ];
 

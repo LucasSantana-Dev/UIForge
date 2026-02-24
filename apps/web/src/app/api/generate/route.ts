@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
 import { generateComponentStream } from '@/lib/services/gemini';
+import { runAllGates } from '@/lib/quality/gates';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -49,6 +50,8 @@ export async function POST(request: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
+          let fullCode = '';
+
           for await (const event of generateComponentStream({
             prompt: description,
             framework,
@@ -57,6 +60,33 @@ export async function POST(request: NextRequest) {
             typescript,
             apiKey: userApiKey,
           })) {
+            if (event.type === 'chunk' && event.content) {
+              fullCode += event.content;
+            }
+
+            if (event.type === 'complete') {
+              const qualityReport = runAllGates(fullCode);
+              const qualityEvent = {
+                type: 'quality',
+                report: qualityReport,
+                timestamp: Date.now(),
+              };
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify(qualityEvent)}\n\n`)
+              );
+
+              const completeEvent = {
+                ...event,
+                code: fullCode,
+                totalLength: fullCode.length,
+                qualityPassed: qualityReport.passed,
+              };
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify(completeEvent)}\n\n`)
+              );
+              continue;
+            }
+
             const sseData = `data: ${JSON.stringify(event)}\n\n`;
             controller.enqueue(encoder.encode(sseData));
           }
