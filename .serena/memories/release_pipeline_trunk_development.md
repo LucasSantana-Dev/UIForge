@@ -34,10 +34,17 @@
    - Push tags: `git push --tags`
    - Delete feature branch
 
-## GitHub Actions CI/CD
-- **Trigger**: Push to `main`, PR opened/updated
-- **Jobs**: lint, test, build
-- **Auto-deploy**: Wrangler GitHub Action (`cloudflare/wrangler-action@v3`)
+## GitHub Actions CI/CD (after PR #43 cleanup, 2026-02-24)
+Active workflows (Node 22 across all):
+- `ci.yml` — lint, type-check, test, build on push/PR to dev/main
+- `deploy-web.yml` — automated Cloudflare Workers deploy via OpenNext on push to dev/main
+- `deploy-web-admin.yml` — manual admin deploy (workflow_dispatch), Workers via OpenNext, production requires main branch
+- `feature-branch.yml` — CI for feature branches
+- `release-branch.yml` — quality checks + staging for release/* branches
+- `release-automation.yml` — auto-detect release merges to main, trigger deploy + changelog
+- `supabase-setup-admin.yml` — manual Supabase admin actions (setup, link, migrate, generate-types)
+- `secret-scan.yml` — secret scanning
+- **Deleted**: `dev-deploy.yml`, `production.yml`, `deploy-admin.yml` (broken scaffolds)
 
 ## Branch Protection Rules
 - `main` branch requires:

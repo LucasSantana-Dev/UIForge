@@ -97,12 +97,12 @@ const ecosystem = [
 ];
 
 const techStack = [
-  'Next.js 15',
-  'React 18',
+  'Next.js 16',
+  'React 19',
   'TypeScript 5.7',
   'Supabase',
   'Tailwind CSS',
-  'Cloudflare Pages',
+  'Cloudflare Workers',
   'Turborepo',
   'shadcn/ui',
 ];
@@ -227,9 +227,13 @@ export default function AboutPage() {
               </a>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <a href="https://github.com/Forge-Space/UI" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://github.com/Forge-Space/siza"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <ExternalLink className="w-4 h-4 mr-2" />
-                Source Code
+                Source
               </a>
             </Button>
           </div>

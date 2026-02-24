@@ -4,12 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- **Health check endpoint** (`/api/health`): returns `{ status, timestamp, version }` for deployment verification
+- **WASM stub step** in deploy workflow: stubs unused `@vercel/og` WASM files to fit Workers 3 MiB free tier
+- **Local deploy script** (`apps/web/scripts/deploy.sh`): local deploy with automatic WASM stubbing
+
 ### Fixed
 
 - Deleted broken scaffold workflows (`dev-deploy.yml`, `production.yml`, `deploy-admin.yml`) that ran builds without checkout/install
 - Rewrote `deploy-web-admin.yml` to use Cloudflare Workers deployment via OpenNext (was incorrectly using Pages)
 - Standardized Node.js 22 across all CI workflows (`release-branch.yml`, `release-automation.yml`, `supabase-setup-admin.yml`)
 - Fixed README badges and references (Next.js 16, Node.js 22, Cloudflare Workers deployment docs)
+- Fixed About page: updated tech stack versions (Next.js 16, React 19, Cloudflare Workers) and source code link
 
 ### Added
 
