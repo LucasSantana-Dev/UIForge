@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Sparkles, Zap, CheckCircle } from 'lucide-react';
+import { ArrowRight, Sparkles, Zap, Shield, Puzzle, KeyRound, Server, Github } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function HomePage() {
@@ -28,7 +28,25 @@ export default async function HomePage() {
               Beta
             </span>
           </div>
-          <nav className="flex items-center gap-4">
+          <nav className="flex items-center gap-6">
+            <Link
+              href="/about"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              About
+            </Link>
+            <Link
+              href="/pricing"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/roadmap"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground"
+            >
+              Roadmap
+            </Link>
             {!user ? (
               <>
                 <Link
@@ -46,7 +64,7 @@ export default async function HomePage() {
               </>
             ) : (
               <Link
-                href="/dashboard"
+                href="/generate"
                 className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
               >
                 Dashboard
@@ -61,17 +79,17 @@ export default async function HomePage() {
           <div className="mx-auto max-w-3xl space-y-8">
             <div className="inline-flex items-center gap-2 rounded-full border bg-muted px-4 py-2 text-sm">
               <Sparkles className="h-4 w-4 text-primary" />
-              <span>AI-Powered UI Generation</span>
+              <span>The Open Full-Stack AI Workspace</span>
             </div>
 
             <h1 className="text-5xl font-bold tracking-tight sm:text-6xl">
-              Generate Production-Ready
-              <span className="text-primary"> UI Components</span>
+              Generate. Integrate.
+              <span className="text-primary"> Ship.</span>
             </h1>
 
             <p className="text-xl text-muted-foreground">
-              Transform your ideas into beautiful, functional UI components with AI. Support for
-              React, Next.js, Vue, Angular, and more. Zero cost, unlimited possibilities.
+              From idea to production with zero lock-in. AI-powered UI generation, backend wiring,
+              and deployment — all in one open-source workspace you own.
             </p>
 
             <div className="flex items-center justify-center gap-4">
@@ -85,7 +103,7 @@ export default async function HomePage() {
                 </Link>
               ) : (
                 <Link
-                  href="/dashboard"
+                  href="/generate"
                   className="inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-base font-medium text-primary-foreground hover:bg-primary/90"
                 >
                   Go to Dashboard
@@ -93,11 +111,12 @@ export default async function HomePage() {
                 </Link>
               )}
               <Link
-                href="https://github.com/yourusername/siza-mcp"
+                href="https://github.com/Forge-Space/siza"
                 className="inline-flex items-center gap-2 rounded-md border px-6 py-3 text-base font-medium hover:bg-accent"
                 target="_blank"
                 rel="noopener noreferrer"
               >
+                <Github className="h-4 w-4" />
                 View on GitHub
               </Link>
             </div>
@@ -106,44 +125,134 @@ export default async function HomePage() {
 
         <section className="border-t bg-gradient-to-b from-purple-50 to-purple-100 dark:from-purple-950/20 dark:to-purple-900/20 py-24">
           <div className="container mx-auto px-4">
-            <div className="grid gap-8 md:grid-cols-3">
+            <h2 className="mb-4 text-center text-sm font-medium uppercase tracking-widest text-muted-foreground">
+              Why Siza
+            </h2>
+            <p className="mx-auto mb-12 max-w-2xl text-center text-lg text-muted-foreground">
+              Every AI code tool generates beautiful frontends. Then you spend days wiring auth,
+              database, APIs, and deployment. Siza owns the full-stack integration layer.
+            </p>
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+              <div className="space-y-4 rounded-lg border bg-card p-6">
+                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
+                  <Puzzle className="h-6 w-6 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">MCP-Native</h3>
+                <p className="text-sm text-muted-foreground">
+                  Composable AI tools via Model Context Protocol. Swap providers, chain tools,
+                  extend with custom servers.
+                </p>
+              </div>
+
               <div className="space-y-4 rounded-lg border bg-card p-6">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                   <Zap className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold">Lightning Fast</h3>
-                <p className="text-muted-foreground">
-                  Generate components in seconds. No waiting, no setup required.
+                <h3 className="text-lg font-semibold">True Zero-Cost</h3>
+                <p className="text-sm text-muted-foreground">
+                  Not a free trial. Cloudflare Workers, Supabase, and Gemini free tiers support ~50K
+                  users at $0/month.
                 </p>
               </div>
 
               <div className="space-y-4 rounded-lg border bg-card p-6">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <CheckCircle className="h-6 w-6 text-primary" />
+                  <KeyRound className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold">Production Ready</h3>
-                <p className="text-muted-foreground">
-                  Clean, maintainable code following best practices and conventions.
+                <h3 className="text-lg font-semibold">Privacy-First BYOK</h3>
+                <p className="text-sm text-muted-foreground">
+                  Bring Your Own Key with client-side AES-256 encryption. We cannot read your keys.
+                  Your code stays yours.
                 </p>
               </div>
 
               <div className="space-y-4 rounded-lg border bg-card p-6">
                 <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                  <Sparkles className="h-6 w-6 text-primary" />
+                  <Server className="h-6 w-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold">AI-Powered</h3>
-                <p className="text-muted-foreground">
-                  Bring your own AI key or use our free tier. Your choice, your control.
+                <h3 className="text-lg font-semibold">Self-Hostable</h3>
+                <p className="text-sm text-muted-foreground">
+                  Run everything locally with Docker. Full control over your data and
+                  infrastructure. MIT licensed.
                 </p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t py-24">
+          <div className="container mx-auto px-4 text-center">
+            <h2 className="mb-4 text-sm font-medium uppercase tracking-widest text-muted-foreground">
+              The Forge Space Ecosystem
+            </h2>
+            <p className="mx-auto mb-12 max-w-2xl text-lg text-muted-foreground">
+              Five open-source repositories working together. Use one, use all &mdash; no lock-in,
+              no dependencies you don&apos;t want.
+            </p>
+            <div className="mx-auto grid max-w-4xl gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  name: 'Siza',
+                  desc: 'AI workspace — generate, preview, export',
+                },
+                {
+                  name: 'siza-mcp',
+                  desc: '12 MCP tools for UI generation',
+                },
+                {
+                  name: 'mcp-gateway',
+                  desc: 'AI-powered tool routing hub',
+                },
+                {
+                  name: 'forge-patterns',
+                  desc: 'Shared configs and standards',
+                },
+                {
+                  name: 'branding-mcp',
+                  desc: 'Brand identity generation',
+                },
+              ].map((repo) => (
+                <Link
+                  key={repo.name}
+                  href={`https://github.com/Forge-Space/${repo.name === 'Siza' ? 'siza' : repo.name === 'forge-patterns' ? 'core' : repo.name === 'siza-mcp' ? 'ui-mcp' : repo.name}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group rounded-lg border bg-card p-4 text-left transition-colors hover:border-primary/40"
+                >
+                  <div className="flex items-center gap-2">
+                    <Shield className="h-4 w-4 text-primary" />
+                    <span className="font-semibold">{repo.name}</span>
+                  </div>
+                  <p className="mt-1 text-sm text-muted-foreground">{repo.desc}</p>
+                </Link>
+              ))}
             </div>
           </div>
         </section>
       </main>
 
       <footer className="border-t py-8">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2026 Siza. Open source and free.</p>
+        <div className="container mx-auto flex items-center justify-between px-4 text-sm text-muted-foreground">
+          <p>&copy; 2026 Siza. Open source, MIT licensed.</p>
+          <div className="flex items-center gap-4">
+            <Link href="/about" className="hover:text-foreground">
+              About
+            </Link>
+            <Link href="/pricing" className="hover:text-foreground">
+              Pricing
+            </Link>
+            <Link href="/roadmap" className="hover:text-foreground">
+              Roadmap
+            </Link>
+            <Link
+              href="https://github.com/Forge-Space"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground"
+            >
+              GitHub
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
