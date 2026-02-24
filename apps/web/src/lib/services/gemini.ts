@@ -15,6 +15,8 @@ export interface GeminiGenerateOptions {
   typescript?: boolean;
   apiKey?: string;
   contextAddition?: string;
+  imageBase64?: string;
+  imageMimeType?: string;
 }
 
 const SYSTEM_PROMPT = `You are a UI component generator. Generate a single, self-contained React component.
@@ -72,7 +74,21 @@ export async function* generateComponentStream(
     });
 
     const userPrompt = buildPrompt(options);
-    const result = await model.generateContentStream(userPrompt);
+
+    const content =
+      options.imageBase64 && options.imageMimeType
+        ? [
+            { text: userPrompt },
+            {
+              inlineData: {
+                mimeType: options.imageMimeType,
+                data: options.imageBase64,
+              },
+            },
+          ]
+        : userPrompt;
+
+    const result = await model.generateContentStream(content);
 
     for await (const chunk of result.stream) {
       const text = chunk.text();

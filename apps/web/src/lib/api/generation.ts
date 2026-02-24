@@ -9,6 +9,8 @@ export interface GenerationOptions {
   style?: 'modern' | 'minimal' | 'colorful';
   typescript?: boolean;
   userApiKey?: string;
+  imageBase64?: string;
+  imageMimeType?: 'image/png' | 'image/jpeg' | 'image/webp';
 }
 
 export interface GenerationEvent {

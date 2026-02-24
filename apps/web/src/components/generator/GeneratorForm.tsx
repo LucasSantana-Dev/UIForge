@@ -1,14 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { SparklesIcon, WandIcon, KeyIcon } from 'lucide-react';
+import { SparklesIcon, WandIcon, KeyIcon, ImageIcon, XIcon, ChevronDownIcon } from 'lucide-react';
 import { useGeneration } from '@/hooks/use-generation';
 import { useApiKeyForProvider, useHasApiKey, useAIKeyStore } from '@/stores/ai-keys';
 import { decryptApiKey } from '@/lib/encryption';
 import GenerationProgress from './GenerationProgress';
+
+const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const;
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const generatorSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters').max(1000),
@@ -20,6 +23,13 @@ const generatorSchema = z.object({
 
 type GeneratorFormData = z.infer<typeof generatorSchema>;
 
+interface ImageState {
+  base64: string;
+  mimeType: 'image/png' | 'image/jpeg' | 'image/webp';
+  name: string;
+  previewUrl: string;
+}
+
 interface GeneratorFormProps {
   projectId: string;
   framework: string;
@@ -27,6 +37,18 @@ interface GeneratorFormProps {
   onGenerating: () => void;
   isGenerating: boolean;
   initialDescription?: string;
+}
+
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result.split(',')[1]);
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 export default function GeneratorForm({
@@ -47,6 +69,11 @@ export default function GeneratorForm({
     style: '',
     typescript: false,
   });
+  const [image, setImage] = useState<ImageState | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const [showImageUpload, setShowImageUpload] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -70,6 +97,56 @@ export default function GeneratorForm({
     }
   }, [initialDescription, setValue]);
 
+  const processFile = useCallback(async (file: File) => {
+    setImageError(null);
+
+    if (!ACCEPTED_TYPES.includes(file.type as any)) {
+      setImageError('Only PNG, JPEG, and WebP images are supported.');
+      return;
+    }
+    if (file.size > MAX_FILE_SIZE) {
+      setImageError('Image must be under 5MB.');
+      return;
+    }
+
+    try {
+      const base64 = await fileToBase64(file);
+      setImage({
+        base64,
+        mimeType: file.type as ImageState['mimeType'],
+        name: file.name,
+        previewUrl: URL.createObjectURL(file),
+      });
+    } catch {
+      setImageError('Failed to process image.');
+    }
+  }, []);
+
+  const handleDrop = useCallback(
+    (e: React.DragEvent) => {
+      e.preventDefault();
+      setIsDragOver(false);
+      const file = e.dataTransfer.files[0];
+      if (file) processFile(file);
+    },
+    [processFile]
+  );
+
+  const handleFileInput = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) processFile(file);
+    },
+    [processFile]
+  );
+
+  const removeImage = useCallback(() => {
+    if (image?.previewUrl) URL.revokeObjectURL(image.previewUrl);
+    setImage(null);
+    setImageError(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  }, [image]);
+
   const onSubmit = async (data: GeneratorFormData) => {
     try {
       onGenerating();
@@ -89,6 +166,10 @@ export default function GeneratorForm({
         typescript: data.typescript,
         componentName: data.componentName,
         prompt: data.prompt,
+        ...(image && {
+          imageBase64: image.base64,
+          imageMimeType: image.mimeType,
+        }),
         ...(googleKey &&
           encryptionKey && {
             userApiKey: decryptApiKey(googleKey.encryptedKey, encryptionKey),
@@ -163,6 +244,79 @@ export default function GeneratorForm({
               placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
             />
             {errors.prompt && <p className="mt-1 text-sm text-red-600">{errors.prompt.message}</p>}
+          </div>
+
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowImageUpload(!showImageUpload)}
+              className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+            >
+              <ImageIcon className="h-4 w-4" />
+              <span>Reference Image</span>
+              <ChevronDownIcon
+                className={`h-4 w-4 transition-transform ${showImageUpload ? 'rotate-180' : ''}`}
+              />
+              {image && (
+                <span className="text-xs text-green-600 font-medium ml-1">attached</span>
+              )}
+            </button>
+
+            {showImageUpload && (
+              <div className="mt-3">
+                {image ? (
+                  <div className="relative rounded-lg border border-gray-200 overflow-hidden">
+                    <img
+                      src={image.previewUrl}
+                      alt="Reference"
+                      className="w-full max-h-48 object-contain bg-gray-50"
+                    />
+                    <div className="flex items-center justify-between px-3 py-2 bg-gray-50 border-t border-gray-200">
+                      <span className="text-xs text-gray-500 truncate">{image.name}</span>
+                      <button
+                        type="button"
+                        onClick={removeImage}
+                        className="text-gray-400 hover:text-red-500"
+                      >
+                        <XIcon className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      setIsDragOver(true);
+                    }}
+                    onDragLeave={() => setIsDragOver(false)}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`flex flex-col items-center justify-center gap-2 p-6 rounded-lg border-2 border-dashed cursor-pointer transition-colors w-full ${
+                      isDragOver
+                        ? 'border-blue-400 bg-blue-50'
+                        : 'border-gray-300 hover:border-gray-400'
+                    }`}
+                  >
+                    <ImageIcon className="h-8 w-8 text-gray-400" />
+                    <p className="text-sm text-gray-500">
+                      Drop a screenshot here, or <span className="text-blue-600">browse</span>
+                    </p>
+                    <p className="text-xs text-gray-400">PNG, JPEG, or WebP up to 5MB</p>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      onChange={handleFileInput}
+                      className="hidden"
+                    />
+                  </button>
+                )}
+                {imageError && (
+                  <p className="mt-2 text-sm text-red-600">{imageError}</p>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="space-y-4">
@@ -249,7 +403,7 @@ export default function GeneratorForm({
             <li>Be specific about styling and behavior</li>
             <li>Mention any props or state needed</li>
             <li>Describe responsive behavior if needed</li>
-            <li>Choose component library for better results</li>
+            <li>Upload a screenshot to match an existing design</li>
           </ul>
         </div>
       </div>
