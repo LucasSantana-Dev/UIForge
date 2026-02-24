@@ -1,5 +1,4 @@
 import { PLANS, getPlan } from '@/lib/stripe/plans';
-import type { PlanDefinition } from '@/lib/stripe/plans';
 
 describe('Stripe Plans', () => {
   describe('PLANS', () => {
