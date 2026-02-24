@@ -22,7 +22,7 @@
 
 ## ✨ Features
 
-- 🎨 **AI-Powered Generation** - Natural language to production-ready UI components
+- 🎨 **AI-Powered Generation** - Natural language or screenshot to production-ready UI components
 - 🔐 **Privacy-First** - Bring Your Own Key (BYOK) with client-side encryption
 - 💰 **Zero-Cost** - 100% free tier architecture (up to 50,000 users)
 - 🚀 **Modern Stack** - Next.js 15, Supabase, shadcn/ui, TypeScript
@@ -50,6 +50,7 @@
 
 ### AI Integration
 - **Primary**: Gemini 2.0 Flash (15 RPM free tier) via direct SDK calls
+- **Vision**: Multimodal image input — upload UI screenshots for analysis and generation
 - **BYOK**: Bring Your Own Key (Google AI) with client-side AES-256 encryption
 - **Streaming**: Server-Sent Events (SSE) for real-time generation output
 - **Protocol**: Model Context Protocol (MCP) for extensible AI tools
@@ -193,16 +194,17 @@ npm run clean               # Clean all build artifacts
 - **UI System**: shadcn/ui components (8+ components)
 - **Project Management**: Full CRUD operations
 - **Code Editor**: Monaco integration with syntax highlighting
-- **Component Generation**: UI for AI-powered generation
+- **Component Generation**: SSE streaming with quality gates and RAG enrichment
+- **Image Recognition**: Upload UI screenshots for AI-powered component generation
+- **BYOK**: Bring Your Own Key with client-side AES-256 encryption
 - **Real-time Updates**: Supabase subscriptions
 
 #### 🚧 In Progress
-- **MCP Integration**: AI component generation
+- **Cloudflare Deployment**: OpenNext adapter for Cloudflare Workers
 - **Live Preview**: Iframe sandbox for components
 - **Export Features**: Download and deployment options
 
 #### ⏳ Planned Features
-- **AI Key Management**: BYOK with client-side encryption
 - **Template Library**: Pre-built component templates
 - **Collaboration**: Real-time multi-user editing
 - **Advanced Export**: GitHub, Vercel, Netlify deployment
