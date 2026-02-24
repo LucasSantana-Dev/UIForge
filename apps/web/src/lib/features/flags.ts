@@ -11,7 +11,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_ANALYTICS: false,
   ENABLE_MAINTENANCE_MODE: false,
   ENABLE_BETA_FEATURES: false,
-  ENABLE_GITHUB_APP: false,
+  ENABLE_GITHUB_APP: true,
   ENABLE_QUALITY_GATES: false,
   ENABLE_MULTI_LLM: false,
   ENABLE_RESEND_EMAILS: false,
