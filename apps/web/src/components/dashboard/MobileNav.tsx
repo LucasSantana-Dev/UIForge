@@ -76,7 +76,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
   return (
     <>
       <div
-        className="fixed inset-0 bg-gray-600 bg-opacity-75 z-40"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
         onClick={handleBackdropClick}
         onKeyDown={handleBackdropKeyDown}
         tabIndex={0}
@@ -85,18 +85,18 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
       />
       <div
         ref={panelRef}
-        className="fixed inset-y-0 left-0 flex flex-col w-64 bg-white z-50"
+        className="fixed inset-y-0 left-0 flex flex-col w-64 bg-surface-1 z-50"
         role="dialog"
         aria-modal="true"
         aria-label="Mobile navigation"
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-200">
-          <h1 className="text-2xl font-bold text-blue-600">Siza</h1>
+        <div className="flex items-center justify-between h-16 px-4 border-b border-surface-3">
+          <h1 className="text-2xl font-bold text-brand">Siza</h1>
           <button
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+            className="p-2 rounded-md text-text-muted hover:text-text-secondary hover:bg-surface-1"
             aria-label="Close navigation"
           >
             <XIcon className="h-6 w-6" />
@@ -106,7 +106,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
           <Link
             href="/generate"
             onClick={onClose}
-            className="group flex items-center px-3 py-2 text-sm font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 mb-4"
+            className="group flex items-center px-3 py-2 text-sm font-medium rounded-md bg-brand text-white hover:bg-brand-light mb-4"
           >
             <PlusIcon className="mr-3 h-5 w-5" />
             Generate Component
@@ -120,13 +120,15 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
                 onClick={onClose}
                 className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md ${
                   isActive
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-surface-1 text-text-primary'
+                    : 'text-text-secondary hover:bg-surface-0 hover:text-text-primary'
                 }`}
               >
                 <item.icon
                   className={`mr-3 h-5 w-5 ${
-                    isActive ? 'text-gray-900' : 'text-gray-400 group-hover:text-gray-500'
+                    isActive
+                      ? 'text-text-primary'
+                      : 'text-text-muted group-hover:text-text-secondary'
                   }`}
                 />
                 {item.name}

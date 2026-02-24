@@ -44,7 +44,7 @@ export default function NavigationBar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="bg-white shadow-lg">
+    <nav className="bg-surface-1 shadow-lg">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -52,16 +52,16 @@ export default function NavigationBar() {
           </div>
 
           <div className="hidden md:flex space-x-8">
-            <a href="#" className="text-gray-700 hover:text-blue-600">Home</a>
-            <a href="#" className="text-gray-700 hover:text-blue-600">About</a>
-            <a href="#" className="text-gray-700 hover:text-blue-600">Services</a>
-            <a href="#" className="text-gray-700 hover:text-blue-600">Contact</a>
+            <a href="#" className="text-text-primary hover:text-brand">Home</a>
+            <a href="#" className="text-text-primary hover:text-brand">About</a>
+            <a href="#" className="text-text-primary hover:text-brand">Services</a>
+            <a href="#" className="text-text-primary hover:text-brand">Contact</a>
           </div>
 
           <div className="md:hidden">
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-700 hover:text-blue-600"
+              className="text-text-primary hover:text-brand"
             >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -71,10 +71,10 @@ export default function NavigationBar() {
         {isOpen && (
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <a href="#" className="block px-3 py-2 text-gray-700 hover:text-blue-600">Home</a>
-              <a href="#" className="block px-3 py-2 text-gray-700 hover:text-blue-600">About</a>
-              <a href="#" className="block px-3 py-2 text-gray-700 hover:text-blue-600">Services</a>
-              <a href="#" className="block px-3 py-2 text-gray-700 hover:text-blue-600">Contact</a>
+              <a href="#" className="block px-3 py-2 text-text-primary hover:text-brand">Home</a>
+              <a href="#" className="block px-3 py-2 text-text-primary hover:text-brand">About</a>
+              <a href="#" className="block px-3 py-2 text-text-primary hover:text-brand">Services</a>
+              <a href="#" className="block px-3 py-2 text-text-primary hover:text-brand">Contact</a>
             </div>
           </div>
         )}
@@ -86,7 +86,7 @@ export default function NavigationBar() {
 
 export default function HeroSection() {
   return (
-    <div className="min-h-screen bg-gradient-to-r from-blue-600 to-purple-600 flex items-center">
+    <div className="min-h-screen bg-brand flex items-center">
       <div className="max-w-7xl mx-auto px-4 text-center">
         <h1 className="text-5xl font-bold text-white mb-6">
           Welcome to Your Next Project
@@ -95,10 +95,10 @@ export default function HeroSection() {
           Build beautiful, responsive web applications with modern tools and best practices.
         </p>
         <div className="space-x-4">
-          <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100">
+          <Button size="lg" className="bg-surface-1 text-brand hover:bg-surface-1">
             Get Started
           </Button>
-          <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-blue-600">
+          <Button size="lg" variant="outline" className="border-white text-white hover:bg-surface-1 hover:text-brand">
             Learn More
           </Button>
         </div>
@@ -122,7 +122,7 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-lg">
+    <div className="max-w-md mx-auto p-6 bg-surface-1 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold mb-6">Contact Us</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -133,7 +133,7 @@ export default function ContactForm() {
             required
             value={formData.name}
             onChange={(e) => setFormData({...formData, name: e.target.value})}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-surface-3 rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </div>
 
@@ -144,7 +144,7 @@ export default function ContactForm() {
             required
             value={formData.email}
             onChange={(e) => setFormData({...formData, email: e.target.value})}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-surface-3 rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </div>
 
@@ -155,7 +155,7 @@ export default function ContactForm() {
             rows={4}
             value={formData.message}
             onChange={(e) => setFormData({...formData, message: e.target.value})}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-surface-3 rounded-md focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </div>
 
@@ -199,14 +199,14 @@ export default function PricingCard() {
             key={index}
             className={\`p-8 rounded-lg border-2 \${
               plan.highlighted
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 bg-white'
+                ? 'border-blue-500 bg-brand/10'
+                : 'border-surface-3 bg-surface-1'
             }\`}
           >
             <h3 className="text-2xl font-bold text-center mb-4">{plan.name}</h3>
             <div className="text-4xl font-bold text-center mb-6">
               {plan.price}
-              <span className="text-lg text-gray-600">/month</span>
+              <span className="text-lg text-text-secondary">/month</span>
             </div>
 
             <ul className="space-y-3 mb-8">
@@ -221,8 +221,8 @@ export default function PricingCard() {
             <Button
               className={\`w-full \${
                 plan.highlighted
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                  ? 'bg-brand hover:bg-brand-light'
+                  : 'bg-surface-2 hover:bg-surface-3 text-text-primary'
               }\`}
             >
               Choose Plan
@@ -251,16 +251,16 @@ export default function ModalDialog() {
             onClick={() => setIsOpen(false)}
           />
 
-          <div className="relative bg-white rounded-lg p-6 max-w-md w-full mx-4">
+          <div className="relative bg-surface-1 rounded-lg p-6 max-w-md w-full mx-4">
             <button
               onClick={() => setIsOpen(false)}
-              className="absolute right-4 top-4 text-gray-500 hover:text-gray-700"
+              className="absolute right-4 top-4 text-text-secondary hover:text-text-primary"
             >
               <X size={20} />
             </button>
 
             <h2 className="text-xl font-bold mb-4">Modal Title</h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-text-secondary mb-6">
               This is a modal dialog with overlay, close button, and escape key support.
             </p>
 
@@ -323,10 +323,10 @@ export default function DataTable() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="overflow-x-auto">
-        <table className="w-full border-collapse border border-gray-300">
+        <table className="w-full border-collapse border border-surface-3">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="border border-gray-300 p-3">
+            <tr className="bg-surface-1">
+              <th className="border border-surface-3 p-3">
                 <input
                   type="checkbox"
                   onChange={(e) => {
@@ -339,7 +339,7 @@ export default function DataTable() {
                 />
               </th>
               <th
-                className="border border-gray-300 p-3 cursor-pointer"
+                className="border border-surface-3 p-3 cursor-pointer"
                 onClick={() => handleSort('name')}
               >
                 Name {sortField === 'name' && (
@@ -347,7 +347,7 @@ export default function DataTable() {
                 )}
               </th>
               <th
-                className="border border-gray-300 p-3 cursor-pointer"
+                className="border border-surface-3 p-3 cursor-pointer"
                 onClick={() => handleSort('email')}
               >
                 Email {sortField === 'email' && (
@@ -355,7 +355,7 @@ export default function DataTable() {
                 )}
               </th>
               <th
-                className="border border-gray-300 p-3 cursor-pointer"
+                className="border border-surface-3 p-3 cursor-pointer"
                 onClick={() => handleSort('role')}
               >
                 Role {sortField === 'role' && (
@@ -366,17 +366,17 @@ export default function DataTable() {
           </thead>
           <tbody>
             {sortedData.map(row => (
-              <tr key={row.id} className="hover:bg-gray-50">
-                <td className="border border-gray-300 p-3">
+              <tr key={row.id} className="hover:bg-surface-0">
+                <td className="border border-surface-3 p-3">
                   <input
                     type="checkbox"
                     checked={selectedRows.includes(row.id)}
                     onChange={() => handleRowSelect(row.id)}
                   />
                 </td>
-                <td className="border border-gray-300 p-3">{row.name}</td>
-                <td className="border border-gray-300 p-3">{row.email}</td>
-                <td className="border border-gray-300 p-3">{row.role}</td>
+                <td className="border border-surface-3 p-3">{row.name}</td>
+                <td className="border border-surface-3 p-3">{row.email}</td>
+                <td className="border border-surface-3 p-3">{row.role}</td>
               </tr>
             ))}
           </tbody>
@@ -384,14 +384,14 @@ export default function DataTable() {
       </div>
 
       <div className="mt-4 flex justify-between items-center">
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-text-secondary">
           {selectedRows.length} rows selected
         </div>
         <div className="flex space-x-2">
-          <button className="px-3 py-1 border border-gray-300 rounded text-sm">
+          <button className="px-3 py-1 border border-surface-3 rounded text-sm">
             Previous
           </button>
-          <button className="px-3 py-1 border border-gray-300 rounded text-sm">
+          <button className="px-3 py-1 border border-surface-3 rounded text-sm">
             Next
           </button>
         </div>
@@ -452,7 +452,7 @@ export default function SidebarMenu() {
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <div className={\`bg-gray-800 text-white transition-all duration-300 \${
+      <div className={\`bg-surface-2 text-white transition-all duration-300 \${
         isCollapsed ? 'w-16' : 'w-64'
       }\`}>
         <div className="p-4">
@@ -462,7 +462,7 @@ export default function SidebarMenu() {
             }\`}>Menu</h2>
             <button
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="text-white hover:bg-gray-700 p-1 rounded"
+              className="text-white hover:bg-surface-3 p-1 rounded"
             >
               {isCollapsed ? <ChevronRight size={20} /> : <ChevronDown size={20} />}
             </button>
@@ -474,7 +474,7 @@ export default function SidebarMenu() {
             <div key={item.id}>
               <button
                 onClick={() => toggleExpanded(item.id)}
-                className={\`w-full flex items-center px-4 py-2 hover:bg-gray-700 \${
+                className={\`w-full flex items-center px-4 py-2 hover:bg-surface-3 \${
                   isCollapsed ? 'justify-center' : 'justify-between'
                 }\`}
               >
@@ -497,7 +497,7 @@ export default function SidebarMenu() {
                   {item.children.map(child => (
                     <button
                       key={child.id}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-700"
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-surface-3"
                     >
                       {child.label}
                     </button>
@@ -512,7 +512,7 @@ export default function SidebarMenu() {
       {/* Main Content */}
       <div className="flex-1 p-8">
         <h1 className="text-2xl font-bold mb-4">Main Content</h1>
-        <p className="text-gray-600">
+        <p className="text-text-secondary">
           This is the main content area with a collapsible sidebar navigation.
         </p>
       </div>
@@ -526,17 +526,17 @@ export default function SidebarMenu() {
       <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
 
       {/* Pulse Spinner */}
-      <div className="w-8 h-8 bg-blue-600 rounded-full animate-pulse"></div>
+      <div className="w-8 h-8 bg-brand rounded-full animate-pulse"></div>
 
       {/* Bouncing Dots */}
       <div className="flex space-x-1">
-        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-        <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+        <div className="w-2 h-2 bg-brand rounded-full animate-bounce"></div>
+        <div className="w-2 h-2 bg-brand rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+        <div className="w-2 h-2 bg-brand rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
       </div>
 
       {/* Rotating Square */}
-      <div className="w-8 h-8 bg-blue-600 animate-spin" style={{ animationDuration: '2s' }}></div>
+      <div className="w-8 h-8 bg-brand animate-spin" style={{ animationDuration: '2s' }}></div>
     </div>
   );
 }`,
@@ -556,15 +556,15 @@ export default function SidebarMenu() {
         {cards.map(card => (
           <div
             key={card.id}
-            className="bg-white rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            className="bg-surface-1 rounded-lg shadow-md overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl"
           >
             <div className="h-48 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center text-6xl">
               {card.image}
             </div>
             <div className="p-6">
               <h3 className="text-xl font-semibold mb-2">{card.title}</h3>
-              <p className="text-gray-600 mb-4">{card.description}</p>
-              <button className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition-colors">
+              <p className="text-text-secondary mb-4">{card.description}</p>
+              <button className="w-full bg-brand text-white py-2 rounded-md hover:bg-brand-light transition-colors">
                 Learn More
               </button>
             </div>
@@ -618,13 +618,13 @@ export default function SearchBar() {
     <div className="max-w-2xl mx-auto p-6">
       <div className="relative">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted w-5 h-5" />
           <input
             type="text"
             value={query}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder="Search..."
-            className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-10 py-3 border border-surface-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand"
           />
           {query && (
             <button
@@ -633,7 +633,7 @@ export default function SearchBar() {
                 setSuggestions([]);
                 setIsOpen(false);
               }}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-text-muted hover:text-text-secondary"
             >
               <X size={20} />
             </button>
@@ -641,15 +641,15 @@ export default function SearchBar() {
         </div>
 
         {isOpen && suggestions.length > 0 && (
-          <div className="absolute w-full mt-2 bg-white border border-gray-300 rounded-lg shadow-lg z-10">
+          <div className="absolute w-full mt-2 bg-surface-1 border border-surface-3 rounded-lg shadow-lg z-10">
             {suggestions.map((suggestion, index) => (
               <button
                 key={index}
                 onClick={() => handleSuggestionClick(suggestion)}
-                className="w-full text-left px-4 py-3 hover:bg-gray-100 first:rounded-t-lg last:rounded-b-lg"
+                className="w-full text-left px-4 py-3 hover:bg-surface-1 first:rounded-t-lg last:rounded-b-lg"
               >
                 <div className="flex items-center">
-                  <Search className="w-4 h-4 text-gray-400 mr-3" />
+                  <Search className="w-4 h-4 text-text-muted mr-3" />
                   <span>{suggestion}</span>
                 </div>
               </button>
@@ -659,7 +659,7 @@ export default function SearchBar() {
       </div>
 
       {query && (
-        <div className="mt-4 text-sm text-gray-600">
+        <div className="mt-4 text-sm text-text-secondary">
           Searching for: <strong>{query}</strong>
         </div>
       )}
@@ -680,7 +680,7 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
       case 'advanced':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-surface-1 text-text-primary';
     }
   };
 
@@ -704,7 +704,7 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
           </div>
           {!imageError && template.preview ? (
             <div className="ml-3 flex-shrink-0">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center text-2xl">
+              <div className="w-16 h-16 bg-gradient-to-br from-brand-muted/20 to-brand/10 rounded-lg flex items-center justify-center text-2xl">
                 🎨
               </div>
             </div>

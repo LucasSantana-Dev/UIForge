@@ -38,12 +38,12 @@ export default function CodeEditor({ code, onChange, language = 'typescript' }: 
 
   return (
     <div className="h-full flex flex-col">
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-sm font-medium text-gray-700">Code Editor</h3>
+      <div className="flex items-center justify-between px-4 py-2 bg-surface-0 border-b border-surface-3">
+        <h3 className="text-sm font-medium text-text-primary">Code Editor</h3>
         <div className="flex items-center space-x-2">
           <button
             onClick={handleCopy}
-            className="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50"
+            className="inline-flex items-center px-3 py-1 text-xs font-medium text-text-primary bg-surface-1 border border-surface-3 rounded hover:bg-surface-0"
             aria-label="Copy code"
           >
             {copied ? (
@@ -60,7 +60,7 @@ export default function CodeEditor({ code, onChange, language = 'typescript' }: 
           </button>
           <button
             onClick={handleDownload}
-            className="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50"
+            className="inline-flex items-center px-3 py-1 text-xs font-medium text-text-primary bg-surface-1 border border-surface-3 rounded hover:bg-surface-0"
             aria-label="Download code"
           >
             <DownloadIcon className="h-3 w-3 mr-1" />

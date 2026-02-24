@@ -48,7 +48,7 @@ export default function DocsPage() {
           <h2 className="text-3xl font-bold text-center mb-12">Quick Links</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
-              <Rocket className="w-8 h-8 text-blue-600 mb-4" />
+              <Rocket className="w-8 h-8 text-brand mb-4" />
               <h3 className="text-lg font-semibold mb-2">Getting Started</h3>
               <p className="text-sm text-muted-foreground mb-4">
                 Learn the basics and set up your first project
@@ -212,7 +212,7 @@ const component = instantiateTemplate(template, {
       </section>
 
       {/* Community */}
-      <section className="py-16 bg-blue-50 dark:bg-blue-950">
+      <section className="py-16 bg-brand/10 bg-brand-muted">
         <div className="max-w-6xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Join the Community</h2>
           <p className="text-xl text-muted-foreground mb-8">

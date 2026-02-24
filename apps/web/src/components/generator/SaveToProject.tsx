@@ -58,9 +58,9 @@ export default function SaveToProject({
   };
 
   return (
-    <div className="border-t border-gray-200 p-4 bg-gray-50">
+    <div className="border-t border-surface-3 p-4 bg-surface-0">
       <div className="flex items-center justify-between">
-        <div className="text-sm text-gray-600">
+        <div className="text-sm text-text-secondary">
           <FolderIcon className="h-4 w-4 mr-2" />
           Save to project
         </div>
@@ -72,7 +72,7 @@ export default function SaveToProject({
             'inline-flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors',
             isSaving || savedComponentId
               ? 'bg-green-600 text-white cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-brand text-white hover:bg-brand-light'
           )}
         >
           {isSaving ? (

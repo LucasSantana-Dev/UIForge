@@ -69,7 +69,7 @@ export default function CustomDomain() {
       case 'error':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-surface-1 text-text-primary';
     }
   };
 
@@ -112,7 +112,7 @@ export default function CustomDomain() {
             <Card key={index} className="p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
-                  <Globe className="w-5 h-5 text-blue-600" />
+                  <Globe className="w-5 h-5 text-brand" />
                   <span className="font-medium">{domain.domain}</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -131,19 +131,19 @@ export default function CustomDomain() {
               {domain.dnsRecords && (
                 <div className="mt-4">
                   <h4 className="text-sm font-medium mb-2">DNS Records:</h4>
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded p-3">
+                  <div className="bg-surface-0 bg-surface-2 rounded p-3">
                     <div className="space-y-2 text-sm">
                       {domain.dnsRecords.map((record, recordIndex) => (
                         <div key={recordIndex} className="font-mono">
-                          <span className="text-blue-600">{record.type}</span>
+                          <span className="text-brand">{record.type}</span>
                           <span className="mx-2">{record.name}</span>
-                          <span className="text-gray-600">→</span>
+                          <span className="text-text-secondary">→</span>
                           <span className="ml-2">{record.value}</span>
                         </div>
                       ))}
                     </div>
                   </div>
-                  <p className="text-xs text-gray-600 mt-2">
+                  <p className="text-xs text-text-secondary mt-2">
                     Configure these DNS records in your domain provider&apos;s dashboard.
                   </p>
                 </div>
@@ -151,8 +151,8 @@ export default function CustomDomain() {
 
               {/* Instructions */}
               {domain.status === 'pending' && (
-                <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded">
-                  <p className="text-sm text-blue-800 dark:text-blue-200">
+                <div className="mt-4 p-3 bg-brand/10 bg-brand-muted border border-brand/30 dark:border-blue-800 rounded">
+                  <p className="text-sm text-text-brand dark:text-text-brand">
                     <strong>Next steps:</strong> Update your DNS records and wait for propagation.
                     This can take up to 24 hours.
                   </p>
@@ -172,9 +172,9 @@ export default function CustomDomain() {
         </div>
 
         {/* Instructions */}
-        <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded">
+        <div className="mt-6 p-4 bg-surface-0 bg-surface-2 rounded">
           <h4 className="font-medium mb-2">Setup Instructions:</h4>
-          <ol className="text-sm text-gray-600 dark:text-gray-400 space-y-1 list-decimal list-inside">
+          <ol className="text-sm text-text-secondary dark:text-text-muted space-y-1 list-decimal list-inside">
             <li>Add your domain using the form above</li>
             <li>Configure the DNS records in your domain provider</li>
             <li>Wait for DNS propagation (up to 24 hours)</li>

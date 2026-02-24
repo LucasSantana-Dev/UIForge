@@ -45,9 +45,9 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
   ];
 
   return (
-    <div className="h-full flex flex-col bg-gray-50">
-      <div className="flex items-center justify-between px-4 py-2 bg-gray-50 border-b border-gray-200">
-        <h3 className="text-sm font-medium text-gray-700">Live Preview</h3>
+    <div className="h-full flex flex-col bg-surface-0">
+      <div className="flex items-center justify-between px-4 py-2 bg-surface-0 border-b border-surface-3">
+        <h3 className="text-sm font-medium text-text-primary">Live Preview</h3>
         <div className="flex items-center space-x-1">
           {viewportButtons.map(({ key, icon: Icon, label }) => (
             <button
@@ -56,7 +56,7 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
               className={`inline-flex items-center px-2 py-1 text-xs rounded ${
                 viewport === key
                   ? 'bg-primary text-primary-foreground'
-                  : 'text-gray-500 hover:bg-gray-200'
+                  : 'text-text-secondary hover:bg-surface-2'
               }`}
               aria-label={label}
               title={label}
@@ -65,12 +65,12 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
             </button>
           ))}
 
-          <div className="w-px h-4 bg-gray-300 mx-1" />
+          <div className="w-px h-4 bg-surface-3 mx-1" />
 
           <button
             onClick={handleRefresh}
             disabled={isRefreshing || !code}
-            className="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
+            className="inline-flex items-center px-3 py-1 text-xs font-medium text-text-primary bg-surface-1 border border-surface-3 rounded hover:bg-surface-0 disabled:opacity-50"
             aria-label="Refresh preview"
           >
             <RefreshCwIcon className={`h-3 w-3 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -81,7 +81,7 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
       <div className="flex-1 relative overflow-auto">
         {!code ? (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center text-gray-500">
+            <div className="text-center text-text-secondary">
               <MaximizeIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
               <p className="text-sm">Generate a component to see preview</p>
             </div>
@@ -96,7 +96,7 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
             <iframe
               key={refreshKey}
               srcDoc={previewHTML}
-              className="h-full border-0 bg-white transition-all duration-200"
+              className="h-full border-0 bg-surface-1 transition-all duration-200"
               style={{
                 width: VIEWPORT_WIDTHS[viewport],
                 maxWidth: '100%',

@@ -30,7 +30,7 @@ export default function ProjectActions({ projectId, projectName }: ProjectAction
     <>
       <div className="relative">
         <button onClick={() => setMenuOpen(!menuOpen)} className="p-1 rounded hover:bg-accent">
-          <MoreVerticalIcon className="h-5 w-5 text-gray-400" />
+          <MoreVerticalIcon className="h-5 w-5 text-text-muted" />
         </button>
         {menuOpen && (
           <>
@@ -42,7 +42,7 @@ export default function ProjectActions({ projectId, projectName }: ProjectAction
                 if (e.key === 'Escape') setMenuOpen(false);
               }}
             />
-            <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-20">
+            <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-surface-1 ring-1 ring-surface-3 z-20">
               <div className="py-1">
                 <button
                   onClick={() => {
@@ -72,9 +72,9 @@ export default function ProjectActions({ projectId, projectName }: ProjectAction
 
       {deleteConfirmOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Delete Project</h3>
-            <p className="text-sm text-gray-600 mb-6">
+          <div className="bg-surface-1 rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-semibold text-text-primary mb-2">Delete Project</h3>
+            <p className="text-sm text-text-secondary mb-6">
               Are you sure you want to delete <strong>{projectName}</strong>? This action cannot be
               undone.
             </p>

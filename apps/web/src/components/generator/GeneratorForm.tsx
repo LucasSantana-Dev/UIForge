@@ -217,14 +217,17 @@ export default function GeneratorForm({
           </div>
 
           <div>
-            <label htmlFor="componentName" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="componentName"
+              className="block text-sm font-medium text-text-primary mb-2"
+            >
               Component Name *
             </label>
             <input
               {...register('componentName')}
               type="text"
               id="componentName"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
               placeholder="MyButton"
             />
             {errors.componentName && (
@@ -233,14 +236,14 @@ export default function GeneratorForm({
           </div>
 
           <div>
-            <label htmlFor="prompt" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="prompt" className="block text-sm font-medium text-text-primary mb-2">
               Describe Your Component *
             </label>
             <textarea
               {...register('prompt')}
               id="prompt"
               rows={6}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
               placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
             />
             {errors.prompt && <p className="mt-1 text-sm text-red-600">{errors.prompt.message}</p>}
@@ -250,7 +253,7 @@ export default function GeneratorForm({
             <button
               type="button"
               onClick={() => setShowImageUpload(!showImageUpload)}
-              className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
+              className="flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary"
             >
               <ImageIcon className="h-4 w-4" />
               <span>Reference Image</span>
@@ -263,18 +266,18 @@ export default function GeneratorForm({
             {showImageUpload && (
               <div className="mt-3">
                 {image ? (
-                  <div className="relative rounded-lg border border-gray-200 overflow-hidden">
+                  <div className="relative rounded-lg border border-surface-3 overflow-hidden">
                     <img
                       src={image.previewUrl}
                       alt="Reference"
-                      className="w-full max-h-48 object-contain bg-gray-50"
+                      className="w-full max-h-48 object-contain bg-surface-0"
                     />
-                    <div className="flex items-center justify-between px-3 py-2 bg-gray-50 border-t border-gray-200">
-                      <span className="text-xs text-gray-500 truncate">{image.name}</span>
+                    <div className="flex items-center justify-between px-3 py-2 bg-surface-0 border-t border-surface-3">
+                      <span className="text-xs text-text-secondary truncate">{image.name}</span>
                       <button
                         type="button"
                         onClick={removeImage}
-                        className="text-gray-400 hover:text-red-500"
+                        className="text-text-muted hover:text-red-500"
                       >
                         <XIcon className="h-4 w-4" />
                       </button>
@@ -292,15 +295,15 @@ export default function GeneratorForm({
                     onClick={() => fileInputRef.current?.click()}
                     className={`flex flex-col items-center justify-center gap-2 p-6 rounded-lg border-2 border-dashed cursor-pointer transition-colors w-full ${
                       isDragOver
-                        ? 'border-blue-400 bg-blue-50'
-                        : 'border-gray-300 hover:border-gray-400'
+                        ? 'border-blue-400 bg-brand/10'
+                        : 'border-surface-3 hover:border-surface-3'
                     }`}
                   >
-                    <ImageIcon className="h-8 w-8 text-gray-400" />
-                    <p className="text-sm text-gray-500">
-                      Drop a screenshot here, or <span className="text-blue-600">browse</span>
+                    <ImageIcon className="h-8 w-8 text-text-muted" />
+                    <p className="text-sm text-text-secondary">
+                      Drop a screenshot here, or <span className="text-brand">browse</span>
                     </p>
-                    <p className="text-xs text-gray-400">PNG, JPEG, or WebP up to 5MB</p>
+                    <p className="text-xs text-text-muted">PNG, JPEG, or WebP up to 5MB</p>
                     <input
                       ref={fileInputRef}
                       type="file"
@@ -319,14 +322,14 @@ export default function GeneratorForm({
             <div>
               <label
                 htmlFor="componentLibrary"
-                className="block text-sm font-medium text-gray-700 mb-2"
+                className="block text-sm font-medium text-text-primary mb-2"
               >
                 Component Library
               </label>
               <select
                 {...register('componentLibrary')}
                 id="componentLibrary"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
               >
                 <option value="tailwind">Tailwind CSS</option>
                 <option value="shadcn">shadcn/ui</option>
@@ -337,13 +340,13 @@ export default function GeneratorForm({
             </div>
 
             <div>
-              <label htmlFor="style" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="style" className="block text-sm font-medium text-text-primary mb-2">
                 Design Style
               </label>
               <select
                 {...register('style')}
                 id="style"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
               >
                 <option value="modern">Modern</option>
                 <option value="minimal">Minimal</option>
@@ -355,16 +358,16 @@ export default function GeneratorForm({
               <input
                 {...register('typescript')}
                 type="checkbox"
-                className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                className="rounded border-surface-3 text-brand focus:ring-brand"
               />
-              <span className="ml-2 text-sm text-gray-700">Use TypeScript</span>
+              <span className="ml-2 text-sm text-text-primary">Use TypeScript</span>
             </label>
           </div>
 
           <button
             type="submit"
             disabled={generation.isGenerating}
-            className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {generation.isGenerating ? (
               <>
@@ -382,7 +385,7 @@ export default function GeneratorForm({
       </div>
 
       {(generation.isGenerating || generation.progress > 0 || generation.error) && (
-        <div className="border-t border-gray-200">
+        <div className="border-t border-surface-3">
           <GenerationProgress
             isGenerating={generation.isGenerating}
             progress={generation.progress}
@@ -392,8 +395,8 @@ export default function GeneratorForm({
         </div>
       )}
 
-      <div className="border-t border-gray-200 p-4 bg-gray-50">
-        <div className="text-xs text-gray-600">
+      <div className="border-t border-surface-3 p-4 bg-surface-0">
+        <div className="text-xs text-text-secondary">
           <p className="font-medium mb-1">Tips:</p>
           <ul className="list-disc list-inside space-y-1">
             <li>Be specific about styling and behavior</li>

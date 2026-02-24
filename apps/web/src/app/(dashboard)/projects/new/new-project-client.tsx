@@ -9,15 +9,15 @@ export function NewProjectClient() {
       <div className="mb-6">
         <Link
           href="/projects"
-          className="inline-flex items-center text-sm text-gray-600 hover:text-gray-900"
+          className="inline-flex items-center text-sm text-text-secondary hover:text-text-primary"
         >
           <ArrowLeftIcon className="h-4 w-4 mr-2" />
           Back to Projects
         </Link>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Project</h1>
+      <div className="bg-surface-1 rounded-lg border border-surface-3 p-6">
+        <h1 className="text-2xl font-bold text-text-primary mb-6">Create New Project</h1>
         <p>Project form temporarily disabled for build</p>
       </div>
     </div>
