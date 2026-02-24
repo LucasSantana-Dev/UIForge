@@ -2,14 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  FolderIcon,
-  FileTextIcon,
-  SettingsIcon,
-  PlusIcon,
-  KeyIcon,
-  CreditCardIcon,
-} from 'lucide-react';
+import { FolderIcon, FileTextIcon, SettingsIcon, PlusIcon, KeyIcon, Github } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
@@ -17,8 +10,8 @@ const navigation = [
   { name: 'Projects', href: '/projects', icon: FolderIcon },
   { name: 'Templates', href: '/templates', icon: FileTextIcon },
   { name: 'AI Keys', href: '/ai-keys', icon: KeyIcon },
+  { name: 'GitHub', href: '/settings?tab=github', icon: Github },
   { name: 'Settings', href: '/settings', icon: SettingsIcon },
-  { name: 'Billing', href: '/billing', icon: CreditCardIcon },
 ];
 
 export default function Sidebar() {
@@ -26,7 +19,7 @@ export default function Sidebar() {
 
   return (
     <div className="hidden md:flex md:w-64 md:flex-col">
-      <div className="flex flex-col flex-grow pt-5 bg-surface-0 border-r border-surface-3 overflow-y-auto">
+      <div className="flex flex-col flex-grow pt-5 bg-card border-r overflow-y-auto">
         <Link
           href="/dashboard"
           className="flex items-center flex-shrink-0 px-4 gap-3 hover:opacity-80 transition-opacity"
@@ -38,7 +31,10 @@ export default function Sidebar() {
             height={32}
             className="flex-shrink-0"
           />
-          <h1 className="text-2xl font-display font-bold text-text-primary">Siza</h1>
+          <h1 className="text-2xl font-bold">
+            <span className="text-muted-foreground">UI</span>
+            <span className="text-primary">Forge</span>
+          </h1>
         </Link>
         <div className="mt-8 flex-grow flex flex-col">
           <nav className="flex-1 px-2 space-y-1">
@@ -54,12 +50,8 @@ export default function Sidebar() {
                 <Button
                   key={item.name}
                   asChild
-                  variant="ghost"
-                  className={`w-full justify-start ${
-                    isActive
-                      ? 'bg-brand/15 text-brand-light hover:bg-brand/20 hover:text-brand-light'
-                      : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'
-                  }`}
+                  variant={isActive ? 'secondary' : 'ghost'}
+                  className="w-full justify-start"
                 >
                   <Link href={item.href}>
                     <item.icon className="mr-2 h-4 w-4" />

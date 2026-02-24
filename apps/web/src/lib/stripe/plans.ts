@@ -1,4 +1,4 @@
-export type PlanId = 'free' | 'pro' | 'enterprise';
+export type PlanId = 'free' | 'pro' | 'team' | 'enterprise';
 
 export interface PlanDefinition {
   id: PlanId;
@@ -11,6 +11,7 @@ export interface PlanDefinition {
     generationsPerMonth: number;
     maxProjects: number;
     maxComponentsPerProject: number;
+    seats: number;
   };
 }
 
@@ -18,32 +19,35 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
   free: {
     id: 'free',
     name: 'Free',
-    description: 'Get started with AI-powered UI generation',
+    description: 'For individual developers and students',
     priceMonthly: 0,
     stripePriceId: null,
     features: [
       '10 AI generations per month',
       '2 projects',
       '50 components per project',
+      'BYOK unlimited (bring your own key)',
+      'Self-hostable',
       'Community support',
     ],
     limits: {
       generationsPerMonth: 10,
       maxProjects: 2,
       maxComponentsPerProject: 50,
+      seats: 1,
     },
   },
   pro: {
     id: 'pro',
     name: 'Pro',
-    description: 'For professional developers and teams',
+    description: 'For professional developers',
     priceMonthly: 19,
     stripePriceId: process.env.STRIPE_PRO_PRICE_ID ?? null,
     features: [
       '500 AI generations per month',
       'Unlimited projects',
       'Unlimited components',
-      'Multi-LLM support',
+      'Multi-LLM support (Gemini, Claude, GPT)',
       'Analytics dashboard',
       'Priority support',
     ],
@@ -51,12 +55,35 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
       generationsPerMonth: 500,
       maxProjects: -1,
       maxComponentsPerProject: -1,
+      seats: 1,
+    },
+  },
+  team: {
+    id: 'team',
+    name: 'Team',
+    description: 'For small teams and agencies',
+    priceMonthly: 49,
+    stripePriceId: process.env.STRIPE_TEAM_PRICE_ID ?? null,
+    features: [
+      '2,500 AI generations per month',
+      'Unlimited projects',
+      'Unlimited components',
+      '5 team seats included',
+      'Shared projects and templates',
+      'Usage dashboard',
+      'Priority support',
+    ],
+    limits: {
+      generationsPerMonth: 2500,
+      maxProjects: -1,
+      maxComponentsPerProject: -1,
+      seats: 5,
     },
   },
   enterprise: {
     id: 'enterprise',
     name: 'Enterprise',
-    description: 'Custom solutions for large teams',
+    description: 'For companies with custom requirements',
     priceMonthly: -1,
     stripePriceId: null,
     features: [
@@ -66,11 +93,14 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
       'Audit logging',
       'Dedicated support',
       'Custom SLAs',
+      'On-premise deployment',
+      'Custom MCP servers',
     ],
     limits: {
       generationsPerMonth: -1,
       maxProjects: -1,
       maxComponentsPerProject: -1,
+      seats: -1,
     },
   },
 };

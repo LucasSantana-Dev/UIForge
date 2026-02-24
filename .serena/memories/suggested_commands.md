@@ -38,11 +38,11 @@ npm run db:seed          # Seed database with test data
 npx supabase status      # Check Supabase connection
 ```
 
-## Deployment
+## Deployment (Cloudflare Workers via OpenNext)
 ```bash
-npx wrangler deploy      # Deploy Cloudflare Workers API
-npx vercel deploy        # Deploy frontend to Vercel
-npx vercel --prod        # Deploy to production
+NODE_ENV=production npx opennextjs-cloudflare build  # Build for Workers
+npx wrangler deploy                                   # Deploy to Cloudflare Workers
+npx wrangler pages dev                                # Local Workers preview
 ```
 
 ## Utilities
@@ -50,6 +50,13 @@ npx vercel --prod        # Deploy to production
 npm run clean            # Clean build artifacts
 npm run deps:update      # Check for dependency updates
 npm run analyze          # Analyze bundle size
+```
+
+## Production Health & Deploy
+```bash
+curl https://siza-web.uiforge.workers.dev/api/health    # Check production health
+cd apps/web && ./scripts/deploy.sh                        # Manual deploy script
+gh workflow run deploy-web.yml --ref dev -R Forge-Space/siza  # Trigger CI deploy
 ```
 
 ## Git Workflow

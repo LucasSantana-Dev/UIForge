@@ -47,21 +47,21 @@ function FadeIn({
 const principles = [
   {
     icon: Zap,
-    title: 'Precision over complexity',
+    title: 'Full-stack, not frontend-only',
     description:
-      'Every component is architectural: purposeful, refined, built to last. We strip away the unnecessary until only the essential remains.',
+      'Every AI code tool generates beautiful frontends. We own the integration layer — UI, backend, deployment — so you ship, not glue.',
   },
   {
     icon: DollarSign,
-    title: 'Zero-cost by design',
+    title: 'True zero-cost, not freemium bait',
     description:
-      'Built entirely on free-tier infrastructure. No vendor lock-in, no surprise bills. The best tools should be accessible to everyone.',
+      'Cloudflare Workers, Supabase, Gemini free tiers support ~50K users at $0/month. No VC burn rate, no surprise bills. Sustainable from day one.',
   },
   {
     icon: Unlock,
-    title: 'Open by default',
+    title: 'Open by default, private by design',
     description:
-      'Open source, transparent, community-driven. Your code stays yours. We believe the best software is built in the open.',
+      'Open source, self-hostable, BYOK with AES-256 encryption. We cannot read your keys. Your code stays yours. Trust is the moat.',
   },
 ];
 
@@ -71,38 +71,45 @@ const ecosystem = [
     name: 'Siza',
     badge: 'This App',
     description:
-      'AI-powered UI component generation platform with live preview and multi-framework support.',
+      'The open full-stack AI workspace. Generate, preview, and export production-ready components.',
+  },
+  {
+    icon: Shield,
+    name: 'siza-mcp',
+    badge: '12 Tools',
+    description:
+      'MCP server for UI generation — scaffolding, components, prototypes, accessibility audits, Figma sync.',
+  },
+  {
+    icon: Router,
+    name: 'mcp-gateway',
+    badge: '20+ Servers',
+    description:
+      'AI-powered tool routing hub. Connect any MCP server, route intelligently, manage via admin UI.',
   },
   {
     icon: Layers,
     name: 'forge-patterns',
     badge: null,
     description:
-      'Shared patterns, configurations, MCP context server, and security framework for the ecosystem.',
+      'Shared patterns, configs, security framework, and MCP context server for the ecosystem.',
   },
   {
-    icon: Router,
-    name: 'mcp-gateway',
-    badge: null,
+    icon: Paintbrush,
+    name: 'branding-mcp',
+    badge: '7 Tools',
     description:
-      'Central MCP aggregation hub for AI tool routing, authentication, and API management.',
-  },
-  {
-    icon: Shield,
-    name: 'siza-mcp',
-    badge: null,
-    description:
-      'Specialized MCP server for UI generation, template management, and design context.',
+      'AI brand identity generation — color palettes, typography, design tokens, multi-format export.',
   },
 ];
 
 const techStack = [
-  'Next.js 15',
-  'React 18',
+  'Next.js 16',
+  'React 19',
   'TypeScript 5.7',
   'Supabase',
   'Tailwind CSS',
-  'Cloudflare Pages',
+  'Cloudflare Workers',
   'Turborepo',
   'shadcn/ui',
 ];
@@ -155,8 +162,8 @@ export default function AboutPage() {
           <FadeIn className="text-center mb-10">
             <h2 className="text-3xl font-bold tracking-tight mb-3">The Forge Space Ecosystem</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Siza is part of Forge Space — a collection of open-source developer tools designed to
-              work together.
+              Siza is part of Forge Space — an open-source developer workspace. Five repositories,
+              MCP-native architecture, zero lock-in.
             </p>
           </FadeIn>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -227,9 +234,13 @@ export default function AboutPage() {
               </a>
             </Button>
             <Button variant="outline" size="sm" asChild>
-              <a href="https://github.com/Forge-Space/UI" target="_blank" rel="noopener noreferrer">
+              <a
+                href="https://github.com/Forge-Space/siza"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <ExternalLink className="w-4 h-4 mr-2" />
-                Source Code
+                Source
               </a>
             </Button>
           </div>

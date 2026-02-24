@@ -10,7 +10,6 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGenerationQuota } from '@/lib/usage/limits';
 import { incrementGenerationCount } from '@/lib/usage/tracker';
 
-export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;

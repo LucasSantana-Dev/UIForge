@@ -1,12 +1,24 @@
 'use client';
 
-import { useState } from 'react';
-import { Search, Filter } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Filter, Loader2 } from 'lucide-react';
 import { TemplateCard } from '@/components/templates/TemplateCard';
 import { TemplatePreview } from '@/components/templates/TemplatePreview';
 import { useRouter } from 'next/navigation';
 
-// Template data structure
+interface DBTemplate {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string;
+  framework: string;
+  code: { files: Array<{ path: string; content: string }> };
+  is_official: boolean;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 interface Template {
   id: string;
   name: string;
@@ -23,193 +35,94 @@ interface Template {
   code?: string;
 }
 
-// Mock template data
-const templates: Template[] = [
-  {
-    id: 'navigation-bar',
-    name: 'Navigation Bar',
-    description: 'Responsive navigation with logo, menu items, and mobile hamburger menu',
-    category: 'Navigation',
-    framework: 'react',
+function mapDBTemplate(t: DBTemplate): Template {
+  const firstFile = t.code?.files?.[0];
+  const categoryTags: Record<string, string[]> = {
+    landing: ['landing', 'marketing', 'hero'],
+    dashboard: ['dashboard', 'admin', 'analytics'],
+    auth: ['auth', 'login', 'security'],
+    ecommerce: ['e-commerce', 'shop', 'product'],
+    blog: ['blog', 'content', 'article'],
+    portfolio: ['portfolio', 'showcase', 'personal'],
+    admin: ['admin', 'management', 'panel'],
+    other: ['component', 'utility'],
+  };
+
+  return {
+    id: t.id,
+    name: t.name,
+    description: t.description || '',
+    category: t.category.charAt(0).toUpperCase() + t.category.slice(1),
+    framework: t.framework,
     componentLibrary: 'tailwind',
-    difficulty: 'beginner',
-    tags: ['responsive', 'mobile', 'navigation'],
-    preview: '/templates/preview/navigation-bar.png',
-    usage: 1250,
-    rating: 4.8,
-    createdAt: '2026-02-15',
-  },
-  {
-    id: 'hero-section',
-    name: 'Hero Section',
-    description: 'Landing page hero with call-to-action buttons and gradient background',
-    category: 'Layout',
-    framework: 'react',
-    componentLibrary: 'tailwind',
-    difficulty: 'beginner',
-    tags: ['landing', 'hero', 'cta'],
-    preview: '/templates/preview/hero-section.png',
-    usage: 980,
-    rating: 4.7,
-    createdAt: '2026-02-14',
-  },
-  {
-    id: 'contact-form',
-    name: 'Contact Form',
-    description: 'Multi-field contact form with validation and submission handling',
-    category: 'Forms',
-    framework: 'react',
-    componentLibrary: 'tailwind',
-    difficulty: 'intermediate',
-    tags: ['form', 'validation', 'contact'],
-    preview: '/templates/preview/contact-form.png',
-    usage: 750,
-    rating: 4.6,
-    createdAt: '2026-02-13',
-  },
-  {
-    id: 'pricing-card',
-    name: 'Pricing Card',
-    description: 'Tiered pricing cards with feature lists and highlight styles',
-    category: 'E-commerce',
-    framework: 'react',
-    componentLibrary: 'tailwind',
-    difficulty: 'intermediate',
-    tags: ['pricing', 'cards', 'e-commerce'],
-    preview: '/templates/preview/pricing-card.png',
-    usage: 620,
-    rating: 4.5,
-    createdAt: '2026-02-12',
-  },
-  {
-    id: 'modal-dialog',
-    name: 'Modal Dialog',
-    description: 'Accessible modal with overlay, close button, and escape key support',
-    category: 'Overlay',
-    framework: 'react',
-    componentLibrary: 'tailwind',
-    difficulty: 'intermediate',
-    tags: ['modal', 'dialog', 'overlay'],
-    preview: '/templates/preview/modal-dialog.png',
-    usage: 580,
-    rating: 4.4,
-    createdAt: '2026-02-11',
-  },
-  {
-    id: 'data-table',
-    name: 'Data Table',
-    description: 'Sortable data table with pagination and row selection',
-    category: 'Data Display',
-    framework: 'react',
-    componentLibrary: 'tailwind',
-    difficulty: 'advanced',
-    tags: ['table', 'data', 'pagination'],
-    preview: '/templates/preview/data-table.png',
-    usage: 450,
-    rating: 4.3,
-    createdAt: '2026-02-10',
-  },
-  {
-    id: 'sidebar-menu',
-    name: 'Sidebar Menu',
-    description: 'Collapsible sidebar navigation with nested menu items',
-    category: 'Navigation',
-    framework: 'react',
-    componentLibrary: 'tailwind',
-    difficulty: 'intermediate',
-    tags: ['sidebar', 'navigation', 'collapsible'],
-    preview: '/templates/preview/sidebar-menu.png',
-    usage: 520,
-    rating: 4.6,
-    createdAt: '2026-02-09',
-  },
-  {
-    id: 'loading-spinner',
-    name: 'Loading Spinner',
-    description: 'Animated loading spinner with multiple variants',
-    category: 'Feedback',
-    framework: 'react',
-    componentLibrary: 'tailwind',
-    difficulty: 'beginner',
-    tags: ['loading', 'spinner', 'animation'],
-    preview: '/templates/preview/loading-spinner.png',
-    usage: 890,
-    rating: 4.7,
-    createdAt: '2026-02-08',
-  },
-  {
-    id: 'card-grid',
-    name: 'Card Grid',
-    description: 'Responsive card grid with hover effects and animations',
-    category: 'Layout',
-    framework: 'react',
-    componentLibrary: 'tailwind',
-    difficulty: 'beginner',
-    tags: ['cards', 'grid', 'responsive'],
-    preview: '/templates/preview/card-grid.png',
-    usage: 780,
-    rating: 4.5,
-    createdAt: '2026-02-07',
-  },
-  {
-    id: 'search-bar',
-    name: 'Search Bar',
-    description: 'Search input with autocomplete and filtering capabilities',
-    category: 'Forms',
-    framework: 'react',
-    componentLibrary: 'tailwind',
-    difficulty: 'intermediate',
-    tags: ['search', 'input', 'filter'],
-    preview: '/templates/preview/search-bar.png',
-    usage: 420,
-    rating: 4.4,
-    createdAt: '2026-02-06',
-  },
-];
+    difficulty: t.is_official ? 'beginner' : 'intermediate',
+    tags: categoryTags[t.category] || ['component'],
+    preview: '',
+    usage: 0,
+    rating: t.is_official ? 4.5 : 0,
+    createdAt: t.created_at,
+    code: firstFile?.content,
+  };
+}
 
 const categories = [
   'All',
-  'Navigation',
-  'Layout',
-  'Forms',
-  'E-commerce',
-  'Overlay',
-  'Data Display',
-  'Feedback',
+  'Landing',
+  'Dashboard',
+  'Auth',
+  'Ecommerce',
+  'Blog',
+  'Portfolio',
+  'Admin',
+  'Other',
 ];
-
-const difficulties = ['All', 'beginner', 'intermediate', 'advanced'];
 
 export function TemplatesClient() {
   const router = useRouter();
+  const [templates, setTemplates] = useState<Template[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [selectedDifficulty, setSelectedDifficulty] = useState('All');
-  const [sortBy, setSortBy] = useState('usage');
+  const [sortBy, setSortBy] = useState('recent');
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
 
-  // Filter templates
+  useEffect(() => {
+    async function fetchTemplates() {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch('/api/templates?limit=100');
+        if (!res.ok) throw new Error('Failed to load templates');
+        const json = await res.json();
+        const dbTemplates: DBTemplate[] = json.data?.templates || [];
+        setTemplates(dbTemplates.map(mapDBTemplate));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load templates');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTemplates();
+  }, []);
+
   const filteredTemplates = templates.filter((template) => {
     const matchesSearch =
+      !searchTerm ||
       template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       template.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
       template.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesCategory = selectedCategory === 'All' || template.category === selectedCategory;
-    const matchesDifficulty =
-      selectedDifficulty === 'All' || template.difficulty === selectedDifficulty;
+    const matchesCategory =
+      selectedCategory === 'All' ||
+      template.category.toLowerCase() === selectedCategory.toLowerCase();
 
-    return matchesSearch && matchesCategory && matchesDifficulty;
+    return matchesSearch && matchesCategory;
   });
 
-  // Sort templates
   const sortedTemplates = [...filteredTemplates].sort((a, b) => {
     switch (sortBy) {
-      case 'usage':
-        return b.usage - a.usage;
-      case 'rating':
-        return b.rating - a.rating;
       case 'name':
         return a.name.localeCompare(b.name);
       case 'recent':
@@ -220,14 +133,12 @@ export function TemplatesClient() {
   });
 
   const handleUseTemplate = (template: Template) => {
-    // Navigate to generate page with template pre-filled
     const params = new URLSearchParams({
       template: template.id,
       framework: template.framework,
       componentLibrary: template.componentLibrary,
       description: template.description,
     });
-
     router.push(`/generate?${params.toString()}`);
   };
 
@@ -238,7 +149,6 @@ export function TemplatesClient() {
 
   return (
     <div className="h-full flex flex-col">
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Component Templates</h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -246,9 +156,7 @@ export function TemplatesClient() {
         </p>
       </div>
 
-      {/* Filters */}
       <div className="mb-6 space-y-4">
-        {/* Search Bar */}
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
           <input
@@ -260,9 +168,7 @@ export function TemplatesClient() {
           />
         </div>
 
-        {/* Filter Controls */}
         <div className="flex flex-wrap gap-4 items-center">
-          {/* Category Filter */}
           <div className="flex items-center gap-2">
             <Filter className="w-4 h-4 text-muted-foreground" />
             <select
@@ -278,60 +184,64 @@ export function TemplatesClient() {
             </select>
           </div>
 
-          {/* Difficulty Filter */}
-          <select
-            value={selectedDifficulty}
-            onChange={(e) => setSelectedDifficulty(e.target.value)}
-            className="px-3 py-1 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-          >
-            {difficulties.map((difficulty) => (
-              <option key={difficulty} value={difficulty}>
-                {difficulty}
-              </option>
-            ))}
-          </select>
-
-          {/* Sort */}
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
             className="px-3 py-1 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
           >
-            <option value="usage">Most Used</option>
-            <option value="rating">Highest Rated</option>
-            <option value="name">Name</option>
             <option value="recent">Recently Added</option>
+            <option value="name">Name</option>
           </select>
         </div>
       </div>
 
-      {/* Templates Grid */}
       <div className="flex-1 overflow-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {sortedTemplates.map((template) => (
-            <TemplateCard
-              key={template.id}
-              template={template}
-              onUseTemplate={handleUseTemplate}
-              onPreview={handlePreview}
-            />
-          ))}
-        </div>
-
-        {sortedTemplates.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center">
-            <div className="text-muted-foreground mb-4">
-              <Search className="w-12 h-12 mx-auto mb-2" />
-            </div>
-            <h3 className="text-lg font-semibold mb-2">No templates found</h3>
-            <p className="text-sm text-muted-foreground">
-              Try adjusting your search or filters to find what you&apos;re looking for.
-            </p>
+        {loading && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
+        )}
+
+        {error && !loading && (
+          <div className="flex flex-col items-center justify-center py-20 text-center">
+            <p className="text-sm text-red-600 mb-2">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="text-sm text-primary underline"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {!loading && !error && (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {sortedTemplates.map((template) => (
+                <TemplateCard
+                  key={template.id}
+                  template={template}
+                  onUseTemplate={handleUseTemplate}
+                  onPreview={handlePreview}
+                />
+              ))}
+            </div>
+
+            {sortedTemplates.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full text-center">
+                <div className="text-muted-foreground mb-4">
+                  <Search className="w-12 h-12 mx-auto mb-2" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No templates found</h3>
+                <p className="text-sm text-muted-foreground">
+                  Try adjusting your search or filters to find what you&apos;re looking for.
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {/* Template Preview Dialog */}
       <TemplatePreview
         template={selectedTemplate}
         open={previewOpen}

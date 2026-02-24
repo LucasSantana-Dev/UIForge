@@ -27,45 +27,49 @@ const phases: Phase[] = [
   {
     number: 1,
     title: 'Foundation',
-    subtitle: 'Core platform and developer experience',
+    subtitle: 'Core platform, deployment, and developer experience',
     status: 'active',
     items: [
       { label: 'Dark mode design system with Siza tokens', status: 'done' },
-      { label: 'Brand identity and rebrand', status: 'done' },
+      { label: 'Brand identity v2.0', status: 'done' },
       { label: 'Authentication (Email + OAuth)', status: 'done' },
       { label: 'Project CRUD with Row Level Security', status: 'done' },
+      { label: 'Stripe billing integration (Free/Pro/Team)', status: 'done' },
+      { label: 'Feature flags system (17 flags)', status: 'done' },
+      { label: 'Cloudflare Workers deployment', status: 'done' },
       { label: 'AI component generation with streaming', status: 'in-progress' },
-      { label: 'Monaco editor integration', status: 'in-progress' },
-      { label: 'Live component preview', status: 'planned' },
-      { label: 'Template gallery with categories', status: 'planned' },
+      { label: 'Live component preview (iframe sandbox)', status: 'in-progress' },
+      { label: 'Export to GitHub (one-click push)', status: 'planned' },
+      { label: 'Template library (20 starter templates)', status: 'planned' },
     ],
   },
   {
     number: 2,
-    title: 'Growth',
-    subtitle: 'Ecosystem integration and collaboration',
+    title: 'Community',
+    subtitle: 'Open-source growth and developer ecosystem',
     status: 'planned',
     items: [
-      { label: 'Figma integration via MCP', status: 'planned' },
-      { label: 'Component versioning and history', status: 'planned' },
-      { label: 'Multi-framework output (Vue, Angular, Svelte)', status: 'planned' },
-      { label: 'Collaborative editing', status: 'planned' },
-      { label: 'CLI tool for local generation', status: 'planned' },
-      { label: 'API access for CI/CD integration', status: 'planned' },
+      { label: 'Documentation site (docs.siza.dev)', status: 'planned' },
+      { label: 'Public roadmap (GitHub Projects)', status: 'planned' },
+      { label: 'Discord community launch', status: 'planned' },
+      { label: 'CONTRIBUTING.md in all repos', status: 'in-progress' },
+      { label: 'MCP server directory (community servers)', status: 'planned' },
+      { label: 'Template marketplace (creator submissions)', status: 'planned' },
+      { label: 'CLI tool: npx create-siza-app', status: 'planned' },
     ],
   },
   {
     number: 3,
     title: 'Scale',
-    subtitle: 'Enterprise features and extensibility',
+    subtitle: 'Enterprise features, marketplace, and partnerships',
     status: 'future',
     items: [
-      { label: 'Custom AI model fine-tuning', status: 'planned' },
-      { label: 'Design system import/export', status: 'planned' },
-      { label: 'Component marketplace', status: 'planned' },
-      { label: 'Enterprise SSO', status: 'planned' },
-      { label: 'Self-hosted deployment option', status: 'planned' },
-      { label: 'Plugin ecosystem', status: 'planned' },
+      { label: 'Managed MCP Gateway (hosted service)', status: 'planned' },
+      { label: 'Enterprise SSO and audit logs', status: 'planned' },
+      { label: 'Self-host installer (Docker Compose)', status: 'planned' },
+      { label: 'IDE plugins (VS Code, Cursor)', status: 'planned' },
+      { label: 'Framework partnerships (Next.js, Nuxt, SvelteKit)', status: 'planned' },
+      { label: 'University / bootcamp free Pro program', status: 'planned' },
     ],
   },
 ];
@@ -208,7 +212,7 @@ export default function RoadmapPage() {
         <p className="text-sm text-muted-foreground">
           This roadmap evolves with the project.{' '}
           <a
-            href="https://github.com/Forge-Space/UI/issues"
+            href="https://github.com/Forge-Space/siza/issues"
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"

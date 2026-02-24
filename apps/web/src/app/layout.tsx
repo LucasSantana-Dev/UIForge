@@ -24,49 +24,28 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Siza — The Open Full-Stack AI Workspace',
+  title: 'Siza - AI-Driven UI Generation',
   description:
-    'Generate production-ready UI components with AI. MCP-native, privacy-first, zero-cost. From idea to production with zero lock-in.',
-  keywords: [
-    'UI generation',
-    'AI',
-    'React',
-    'Next.js',
-    'MCP',
-    'Model Context Protocol',
-    'open source',
-    'BYOK',
-    'components',
-  ],
-  authors: [{ name: 'Forge Space' }],
+    'Generate production-ready UI components with AI. Zero-cost platform for developers.',
+  keywords: ['UI generation', 'AI', 'React', 'Next.js', 'Vue', 'Components'],
+  authors: [{ name: 'Siza Team' }],
   icons: {
     icon: '/favicon.ico',
   },
   openGraph: {
-    title: 'Siza — The Open Full-Stack AI Workspace',
-    description:
-      'AI-powered React component generation. MCP-native. Open source. Zero-cost forever.',
+    title: 'Siza - AI-Driven UI Generation',
+    description: 'Generate production-ready UI components with AI',
     type: 'website',
-    siteName: 'Siza',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Siza — The Open Full-Stack AI Workspace',
-    description:
-      'AI-powered React component generation. MCP-native. Open source. Zero-cost forever.',
   },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`dark ${inter.variable} ${outfit.variable} ${jetbrainsMono.variable}`}
-    >
-      <body className="font-sans antialiased">
+    <html lang="en" className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable}`}>
+      <body className="font-sans">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:rounded-lg focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white focus:shadow-glow-brand"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
         >
           Skip to content
         </a>

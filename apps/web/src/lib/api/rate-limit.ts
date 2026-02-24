@@ -1,8 +1,3 @@
-/**
- * API Rate Limiting
- * In-memory rate limiter with per-user and per-IP tracking
- */
-
 import { getSession } from './auth';
 import { RateLimitError } from './errors';
 
@@ -11,21 +6,21 @@ interface RateLimitInfo {
   resetAt: number;
 }
 
-// In-memory storage (will reset on server restart)
+// In-memory storage — resets per worker instance on Cloudflare Workers.
+// For production scale, migrate to Cloudflare KV or Supabase.
 const rateLimitMap = new Map<string, RateLimitInfo>();
 
-// Cleanup old entries every 5 minutes
-setInterval(
-  () => {
-    const now = Date.now();
-    for (const [key, value] of rateLimitMap.entries()) {
-      if (now > value.resetAt) {
-        rateLimitMap.delete(key);
-      }
+function cleanupExpired() {
+  const now = Date.now();
+  let cleaned = 0;
+  for (const [key, value] of rateLimitMap.entries()) {
+    if (cleaned >= 10) break;
+    if (now > value.resetAt) {
+      rateLimitMap.delete(key);
+      cleaned++;
     }
-  },
-  5 * 60 * 1000
-);
+  }
+}
 
 export interface RateLimitResult {
   allowed: boolean;
@@ -33,54 +28,43 @@ export interface RateLimitResult {
   resetAt: number;
 }
 
-/**
- * Check rate limit for request
- * @param request - The incoming request
- * @param limit - Maximum requests allowed in window
- * @param window - Time window in milliseconds (default: 60000 = 1 minute)
- */
 export async function checkRateLimit(
   request: Request,
   limit: number = 100,
   window: number = 60000
 ): Promise<RateLimitResult> {
-  // Get identifier (user ID or IP)
   const session = await getSession();
 
   let identifier: string;
   if (session?.user.id) {
     identifier = session.user.id;
   } else {
-    // Build higher-entropy anonymous identifier from available signals
     const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip');
     const userAgent = request.headers.get('user-agent');
     const acceptLang = request.headers.get('accept-language');
 
     if (ip) {
-      // Use IP with additional signals for better bucketing
       identifier = `anon:${ip}:${userAgent?.substring(0, 50) || 'unknown'}:${acceptLang?.substring(0, 20) || 'unknown'}`;
     } else {
-      // Fallback for truly anonymous requests
       identifier = 'anonymous:unknown';
     }
   }
 
+  cleanupExpired();
+
   const now = Date.now();
   const userLimit = rateLimitMap.get(identifier);
 
-  // No existing limit or expired
   if (!userLimit || now > userLimit.resetAt) {
     const resetAt = now + window;
     rateLimitMap.set(identifier, { count: 1, resetAt });
     return { allowed: true, remaining: limit - 1, resetAt };
   }
 
-  // Limit exceeded
   if (userLimit.count >= limit) {
     return { allowed: false, remaining: 0, resetAt: userLimit.resetAt };
   }
 
-  // Increment count
   userLimit.count++;
   return {
     allowed: true,
@@ -89,9 +73,6 @@ export async function checkRateLimit(
   };
 }
 
-/**
- * Enforce rate limit (throws error if exceeded)
- */
 export async function enforceRateLimit(
   request: Request,
   limit: number = 100,
@@ -105,9 +86,6 @@ export async function enforceRateLimit(
   }
 }
 
-/**
- * Set rate limit headers on response
- */
 export function setRateLimitHeaders(
   response: Response,
   result: RateLimitResult,

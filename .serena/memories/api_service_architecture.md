@@ -1,10 +1,12 @@
 # Siza API Service Architecture
 
 ## Deployment
-- **Platform**: Cloudflare Workers
-- **Endpoint**: api.siza.workers.dev
-- **Framework**: Hono (lightweight web framework)
+- **Platform**: Cloudflare Workers via OpenNext (`@opennextjs/cloudflare@1.17.0`)
+- **Framework**: Next.js 16 API routes (unified with web, no separate API service)
 - **Runtime**: V8 isolates (edge computing)
+- **Config**: `wrangler.jsonc` + `open-next.config.ts` in `apps/web/`
+- **Live URL**: `siza-web.uiforge.workers.dev` (v0.3.0, 2026-02-24)
+- **CRITICAL**: API routes must NOT export `runtime` at all — OpenNext handles routing automatically. `runtime = 'edge'` causes 500 errors.
 
 ## Core Routes
 
@@ -40,4 +42,6 @@
 
 ## Rate Limiting
 - Per-user rate limits based on Supabase auth
+- **Lazy cleanup pattern** (no `setInterval` — forbidden in Workers)
+- Stale entries cleaned on each request check cycle
 - Cloudflare Workers automatic DDoS protection

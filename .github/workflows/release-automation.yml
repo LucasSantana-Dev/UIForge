@@ -100,73 +100,24 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
 
       - name: Install dependencies
         run: npm ci
 
       - name: Update CHANGELOG
+        env:
+          RELEASE_VERSION: ${{ needs.detect-release.outputs.version }}
+          RELEASE_TYPE: ${{ needs.detect-release.outputs.version-type }}
         run: |
-          VERSION="${{ needs.detect-release.outputs.version }}"
           DATE=$(date +%Y-%m-%d)
-          VERSION_TYPE="${{ needs.detect-release.outputs.version-type }}"
-          
-          # Create changelog entry
-          ENTRY="## [$VERSION] - $DATE
-
-### 🚀 Automated Release
-- **Release Type**: $VERSION_TYPE
-- **Automated Pipeline**: Release triggered by merge from release/$VERSION branch
-- **Quality Gates**: All quality checks passed automatically
-- **Security**: Security scans completed successfully
-
-### 📦 Application Information
-- **Application**: Siza Web App
-- **Version**: $VERSION
-- **Type**: Private monorepo deployment
-- **Environment**: Production
-
-### ✅ Validation Results
-- All tests passed
-- Code quality checks passed
-- Security audit completed
-- Build and deployment successful
-- Health checks passed
-
-### 🔗 Deployment Information
-- **Staging**: Automatically deployed to staging environment
-- **Production**: Manual approval required for production deployment
-- **Health Checks**: All services healthy and responding
-- **Performance**: Load tests completed successfully
-
-### 📋 Changes
-- Automated release pipeline integration
-- Enhanced deployment automation
-- Improved quality gates and monitoring
-
----
-
-"
-          
-          # Insert at the beginning of CHANGELOG.md (after any header)
+          ENTRY="## [$RELEASE_VERSION] - $DATE\n\n### Automated Release\n- Release Type: $RELEASE_TYPE\n- Quality Gates: All checks passed\n\n---\n"
           if [ -f "CHANGELOG.md" ]; then
-            # Read existing content
             EXISTING=$(cat CHANGELOG.md)
-            # Find where to insert (after header section)
-            if echo "$EXISTING" | grep -q "^## "; then
-              # Insert after first ## line
-              echo "$ENTRY" > temp_changelog.md
-              echo "$EXISTING" | sed '1d' >> temp_changelog.md
-              mv temp_changelog.md CHANGELOG.md
-            else
-              # Insert at beginning
-              echo "$ENTRY" > temp_changelog.md
-              echo "$EXISTING" >> temp_changelog.md
-              mv temp_changelog.md CHANGELOG.md
-            fi
+            printf "%b\n%s" "$ENTRY" "$EXISTING" > CHANGELOG.md
           else
-            echo "$ENTRY" > CHANGELOG.md
+            printf "%b" "$ENTRY" > CHANGELOG.md
           fi
 
       - name: Commit CHANGELOG

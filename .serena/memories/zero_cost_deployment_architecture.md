@@ -1,47 +1,67 @@
 # Siza Zero-Cost Deployment Architecture
 
 ## Hosting Strategy
-All services use free tier plans - zero infrastructure cost.
+Unified deployment — single Cloudflare Workers instance serves both web and API.
 
-## Frontend Hosting
-- **Platform**: Vercel (migrated from Cloudflare Pages)
-- **Framework**: Next.js 14
-- **Deployment**: Auto-deploy from `main` branch via GitHub integration
-- **Domain**: siza.dev (planned)
-- **CDN**: Vercel Edge Network (global)
-- **Free Tier**: 100GB bandwidth/month, unlimited deployments
+## Platform: Cloudflare Workers via OpenNext
+- **Adapter**: `@opennextjs/cloudflare@1.17.0`
+- **Framework**: Next.js 16 (App Router) compiled to Workers-compatible format
+- **Runtime**: V8 isolates (edge computing, globally distributed)
+- **Config files**: `wrangler.jsonc` + `open-next.config.ts` in `apps/web/`
+- **Build command**: `NODE_ENV=production npx opennextjs-cloudflare build`
+- **Deploy**: `npx wrangler deploy` or GitHub Actions with `wrangler-action@v3`
 
-## API Hosting
-- **Platform**: Cloudflare Workers
-- **Endpoint**: api.siza.workers.dev
-- **Runtime**: V8 isolates (edge)
-- **Free Tier**: 100k requests/day, 10ms CPU time per request
-- **Deployment**: Wrangler CLI (`npx wrangler deploy`)
+## Architecture: Unified Web + API
+- Next.js serves both frontend pages and API routes from a single Worker
+- No separate API service (previous Hono-based Workers API removed)
+- API routes live in `apps/web/src/app/api/` (Next.js route handlers)
+- SSE streaming for AI generation works through Next.js API routes
+
+## Edge Runtime Workaround
+- **Problem**: Next.js 16 `proxy.ts` is Node.js-only; OpenNext doesn't support it (issue #962)
+- **Solution**: `middleware.ts` with `runtime = 'experimental-edge'`
+- Rate limiting, auth checks, and request routing handled in middleware
+- API routes must NOT export `runtime = 'nodejs'` (OpenNext handles automatically)
+
+## Rate Limiting
+- **Pattern**: Lazy cleanup (no `setInterval` — forbidden in Workers)
+- Stale entries cleaned on each request check cycle
+- In-memory Map for rate limit tracking (per-isolate)
 
 ## Database & Auth
 - **Platform**: Supabase
-- **Services**: PostgreSQL + Auth + Storage
-- **Free Tier**: 500MB database, 1GB file storage, 50k monthly active users
-- **Connection**: Direct from Cloudflare Workers via connection pooling
-- **Region**: US East (closest to Cloudflare edge)
+- **Services**: PostgreSQL + Auth + Storage + pgvector (RAG)
+- **Free Tier**: 500MB database, 1GB file storage, 50k MAU
+- **Connection**: Direct from Workers via Supabase JS client
 
 ## AI Services
-- **Model**: BYOK (bring your own keys)
-- **Providers**: OpenAI, Anthropic
-- **Cost**: User-provided API keys (no platform cost)
-- **Encryption**: AES-256-GCM for key storage
+- **Primary**: Gemini 2.0 Flash (free tier, streaming SSE)
+- **BYOK**: User-provided API keys for OpenAI/Anthropic
+- **Encryption**: AES-256-GCM for stored API keys
 
 ## CI/CD
-- **Platform**: GitHub Actions
+- **Platform**: GitHub Actions (Node 22 across all workflows)
 - **Free Tier**: 2000 minutes/month for private repos
-- **Workflows**: Lint, test, build on PR
-- **Auto-deploy**: Vercel/Cloudflare on merge to `main`
+- **Core workflows**: `ci.yml` (quality), `deploy-web.yml` (auto-deploy), `deploy-web-admin.yml` (manual admin deploy)
+- **Deploy Action**: `cloudflare/wrangler-action@v3` with `--keep-vars`
+- **Branch flow**: `feat/*` → PR to `dev` → PR to `main` → auto-deploy
+- **Admin deploy**: `deploy-web-admin.yml` (workflow_dispatch) — Workers via OpenNext, production requires main branch
+- **Cleanup (PR #43)**: Removed 3 broken scaffold workflows, standardized Node 22, deploy-web-admin rewritten from Pages → Workers
+
+## Production Deployment (v0.3.0, 2026-02-24)
+- **Live URL**: `siza-web.uiforge.workers.dev`
+- **Bundle size**: 2880 KiB gzip (under 3072 KiB free tier limit)
+- **Health check**: `GET /api/health → { status, timestamp, version }`
+- **GitHub secrets** (6): `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `CODECOV_TOKEN`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_BASE_URL`
+- **GitHub variable**: `CLOUDFLARE_DEPLOY_ENABLED=true` (safety gate on deploy workflow)
+- **Release PR**: #47 (dev → main, 28 commits, 8 feature phases)
 
 ## Monitoring
-- **Frontend**: Vercel Analytics (free tier)
-- **API**: Cloudflare Workers Analytics (free tier)
+- **Workers**: Cloudflare Workers Analytics (free tier)
 - **Database**: Supabase dashboard metrics
+- **Errors**: Console logging in Workers (Cloudflare dashboard)
 
 ## Cost Summary
 - Total monthly cost: $0 (within free tier limits)
-- Scales to ~50k MAU before paid tier required
+- Scales to ~100k requests/day before paid tier required
+- No separate API hosting cost (unified Worker)

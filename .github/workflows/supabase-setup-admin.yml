@@ -31,7 +31,7 @@ permissions:
   actions: read
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
 
 jobs:
   supabase-setup:
@@ -81,22 +81,18 @@ jobs:
           fi
           
           # Create .env.local file
-          cat > apps/web/.env.local << EOF
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY
-
-# API Configuration
-NEXT_PUBLIC_API_URL=http://localhost:3000
-
-# Feature Flags
-NEXT_PUBLIC_ENABLE_BYOK=true
-NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
-
-# Testing (Optional)
-TEST_USER_EMAIL=test@example.com
-TEST_USER_PASSWORD=testpassword123
-EOF
+          {
+            echo "# Supabase Configuration"
+            echo "NEXT_PUBLIC_SUPABASE_URL=$SUPABASE_URL"
+            echo "NEXT_PUBLIC_SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY"
+            echo ""
+            echo "# API Configuration"
+            echo "NEXT_PUBLIC_API_URL=http://localhost:3000"
+            echo ""
+            echo "# Feature Flags"
+            echo "NEXT_PUBLIC_ENABLE_BYOK=true"
+            echo "NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true"
+          } > apps/web/.env.local
           
           echo "✅ Environment file created successfully!"
 

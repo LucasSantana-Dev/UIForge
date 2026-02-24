@@ -22,119 +22,83 @@ permissions:
   deployments: write
   actions: read
 
-env:
-  NODE_VERSION: '20'
-
 jobs:
   deploy-web:
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: ${{ github.event.inputs.environment }}
       url: ${{ github.event.inputs.environment == 'production' && 'https://siza.com' || 'https://preview.siza.com' }}
-    
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version: '22'
           cache: 'npm'
 
       - name: Verify admin access
+        env:
+          CURRENT_USER: ${{ github.actor }}
         run: |
-          echo "🔐 Verifying admin access for deployment..."
           AUTHORIZED_ADMINS="LucasSantana-Dev"
-          CURRENT_USER="${{ github.actor }}"
-          
           if [[ "$AUTHORIZED_ADMINS" == *"$CURRENT_USER"* ]]; then
-            echo "✅ User $CURRENT_USER is authorized for deployment"
+            echo "User $CURRENT_USER is authorized for deployment"
           else
-            echo "❌ User $CURRENT_USER is not authorized to deploy"
-            echo "🚨 This workflow requires admin privileges"
+            echo "User $CURRENT_USER is not authorized to deploy"
             exit 1
           fi
 
-      - name: Install dependencies
-        working-directory: ./apps/web
-        run: npm ci
-
-      - name: Run tests (unless forced)
-        if: github.event.inputs.force_deploy != 'true'
-        working-directory: ./apps/web
+      - name: Verify branch for production
+        if: github.event.inputs.environment == 'production'
         run: |
-          echo "🧪 Running tests..."
-          npm run test
+          CURRENT_BRANCH=$(git branch --show-current)
+          if [ "$CURRENT_BRANCH" != "main" ]; then
+            echo "Production deployments must be from the main branch (current: $CURRENT_BRANCH)"
+            exit 1
+          fi
 
-      - name: Run linting (unless forced)
+      - run: npm ci --legacy-peer-deps
+
+      - name: Run quality checks
         if: github.event.inputs.force_deploy != 'true'
-        working-directory: ./apps/web
         run: |
-          echo "🔍 Running linting..."
           npm run lint
-
-      - name: Run type checking (unless forced)
-        if: github.event.inputs.force_deploy != 'true'
-        working-directory: ./apps/web
-        run: |
-          echo "📝 Running type checking..."
           npm run type-check
+          npm test
 
-      - name: Build application
-        working-directory: ./apps/web
-        run: |
-          echo "📦 Building application..."
-          npm run build
-
-      - name: Install Wrangler
-        run: |
-          echo "🔧 Installing Wrangler CLI..."
-          npm install -g wrangler
-
-      - name: Deploy to Cloudflare Pages
-        working-directory: ./apps/web
+      - name: Build with OpenNext
+        working-directory: apps/web
+        run: npx opennextjs-cloudflare build
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          echo "🌐 Deploying to ${{ github.event.inputs.environment }}..."
-          
-          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
-            echo "🚀 Deploying to production..."
-            wrangler pages deploy .next --env production
-          else
-            echo "👀 Deploying to preview..."
-            wrangler pages deploy .next --env preview
-          fi
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
 
-      - name: Health check
-        run: |
-          echo "🔍 Running health check..."
-          DEPLOY_URL="${{ github.event.inputs.environment == 'production' && 'https://siza.com' || 'https://preview.siza.com' }}"
-          
-          # Wait for deployment to be ready
-          sleep 30
-          
-          # Check if the site is accessible
-          if curl -f "$DEPLOY_URL/health" > /dev/null 2>&1; then
-            echo "✅ Health check passed for $DEPLOY_URL"
-          else
-            echo "⚠️ Health check failed, but deployment may still be processing"
-            echo "🔗 Check the deployment at: $DEPLOY_URL"
-          fi
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/web
+          command: deploy --keep-vars
 
       - name: Deployment summary
+        env:
+          DEPLOY_ENV: ${{ github.event.inputs.environment }}
+          DEPLOY_USER: ${{ github.actor }}
+          DEPLOY_BRANCH: ${{ github.ref_name }}
+          DEPLOY_SHA: ${{ github.sha }}
+          FORCE_DEPLOY: ${{ github.event.inputs.force_deploy }}
         run: |
-          echo "## 🚀 Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "## Deployment Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Environment:** ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Deployed by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Deployment URL:** ${{ github.event.inputs.environment == 'production' && 'https://siza.com' || 'https://preview.siza.com' }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Status:** ✅ Successfully deployed" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** $DEPLOY_ENV" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed by:** $DEPLOY_USER" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** $DEPLOY_BRANCH" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** $DEPLOY_SHA" >> $GITHUB_STEP_SUMMARY
+          if [ "$FORCE_DEPLOY" == "true" ]; then
+            echo "**Force Deploy:** Yes (checks bypassed)" >> $GITHUB_STEP_SUMMARY
+          fi
