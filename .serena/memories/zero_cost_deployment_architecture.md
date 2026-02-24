@@ -48,6 +48,14 @@ Unified deployment — single Cloudflare Workers instance serves both web and AP
 - **Admin deploy**: `deploy-web-admin.yml` (workflow_dispatch) — Workers via OpenNext, production requires main branch
 - **Cleanup (PR #43)**: Removed 3 broken scaffold workflows, standardized Node 22, deploy-web-admin rewritten from Pages → Workers
 
+## Production Deployment (v0.3.0, 2026-02-24)
+- **Live URL**: `siza-web.uiforge.workers.dev`
+- **Bundle size**: 2880 KiB gzip (under 3072 KiB free tier limit)
+- **Health check**: `GET /api/health → { status, timestamp, version }`
+- **GitHub secrets** (6): `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `CODECOV_TOKEN`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_BASE_URL`
+- **GitHub variable**: `CLOUDFLARE_DEPLOY_ENABLED=true` (safety gate on deploy workflow)
+- **Release PR**: #47 (dev → main, 28 commits, 8 feature phases)
+
 ## Monitoring
 - **Workers**: Cloudflare Workers Analytics (free tier)
 - **Database**: Supabase dashboard metrics

@@ -52,6 +52,13 @@ npm run deps:update      # Check for dependency updates
 npm run analyze          # Analyze bundle size
 ```
 
+## Production Health & Deploy
+```bash
+curl https://siza-web.uiforge.workers.dev/api/health    # Check production health
+cd apps/web && ./scripts/deploy.sh                        # Manual deploy script
+gh workflow run deploy-web.yml --ref dev -R Forge-Space/siza  # Trigger CI deploy
+```
+
 ## Git Workflow
 ```bash
 git checkout -b feat/feature-name    # Create feature branch

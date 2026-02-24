@@ -5,6 +5,8 @@
 - **Framework**: Next.js 16 API routes (unified with web, no separate API service)
 - **Runtime**: V8 isolates (edge computing)
 - **Config**: `wrangler.jsonc` + `open-next.config.ts` in `apps/web/`
+- **Live URL**: `siza-web.uiforge.workers.dev` (v0.3.0, 2026-02-24)
+- **CRITICAL**: API routes must NOT export `runtime` at all — OpenNext handles routing automatically. `runtime = 'edge'` causes 500 errors.
 
 ## Core Routes
 

@@ -54,6 +54,11 @@ Active workflows (Node 22 across all):
 - No force pushes
 - No deletions
 
+## Release PR Example
+- **PR #47**: v0.3.0 release (dev → main, 28 commits, 8 feature phases)
+  - Includes: Cloudflare deployment, CI cleanup, middleware fixes, WASM stubs, edge runtime fix
+  - shfmt added to Shell Lint CI job for shell script formatting
+
 ## CHANGELOG Format
 ```markdown
 ## [1.2.3] - 2026-02-23
