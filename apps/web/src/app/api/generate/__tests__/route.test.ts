@@ -25,6 +25,48 @@ jest.mock('@/lib/services/gemini', () => ({
   generateComponentStream: (...args: any[]) => mockGenerateComponentStream(...args),
 }));
 
+jest.mock('@/lib/usage/limits', () => ({
+  checkGenerationQuota: jest.fn().mockResolvedValue({
+    allowed: true,
+    current: 0,
+    limit: -1,
+    remaining: -1,
+  }),
+}));
+
+jest.mock('@/lib/usage/tracker', () => ({
+  incrementGenerationCount: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/supabase/server', () => ({
+  createClient: jest.fn().mockResolvedValue({
+    from: jest.fn().mockReturnValue({
+      insert: jest.fn().mockReturnValue({
+        select: jest.fn().mockReturnValue({
+          single: jest.fn().mockResolvedValue({ data: { id: 'gen-1' } }),
+        }),
+      }),
+      update: jest.fn().mockReturnValue({
+        eq: jest.fn().mockResolvedValue({ data: null }),
+      }),
+    }),
+  }),
+}));
+
+jest.mock('@/lib/services/context-enrichment', () => ({
+  enrichPromptWithContext: jest.fn().mockResolvedValue({
+    systemPromptAddition: '',
+  }),
+}));
+
+jest.mock('@/lib/services/embeddings', () => ({
+  storeGenerationEmbedding: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock('@/lib/quality/gates', () => ({
+  runAllGates: jest.fn().mockReturnValue({ passed: true, gates: [] }),
+}));
+
 function createRequest(body: any): NextRequest {
   return new NextRequest('http://localhost/api/generate', {
     method: 'POST',
@@ -96,7 +138,8 @@ describe('POST /api/generate', () => {
       })()
     );
 
-    await POST(createRequest(validBody));
+    const response = await POST(createRequest(validBody));
+    await response.text();
 
     expect(mockGenerateComponentStream).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -115,12 +158,13 @@ describe('POST /api/generate', () => {
       })()
     );
 
-    await POST(
+    const response = await POST(
       createRequest({
         ...validBody,
         userApiKey: 'user-key-123',
       })
     );
+    await response.text();
 
     expect(mockGenerateComponentStream).toHaveBeenCalledWith(
       expect.objectContaining({ apiKey: 'user-key-123' })
@@ -134,7 +178,7 @@ describe('GET /api/generate', () => {
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(data.version).toBe('2.0.0');
+    expect(data.version).toBe('3.0.0');
     expect(data.provider).toBe('gemini-2.0-flash');
   });
 });

@@ -4,6 +4,7 @@ import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
 import { analyzeDesignImage } from '@/lib/services/image-analysis';
 
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
@@ -18,10 +19,10 @@ export async function POST(request: NextRequest) {
   try {
     const rateLimitResult = await checkRateLimit(request, 10, 60000);
     if (!rateLimitResult.allowed) {
-      return new Response(
-        JSON.stringify({ error: 'Rate limit exceeded. Try again shortly.' }),
-        { status: 429, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Try again shortly.' }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     await verifySession();
