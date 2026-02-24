@@ -1,7 +1,5 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Button } from '@/components/ui/button';
