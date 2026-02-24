@@ -12,9 +12,12 @@ const rateLimitMap = new Map<string, RateLimitInfo>();
 
 function cleanupExpired() {
   const now = Date.now();
+  let cleaned = 0;
   for (const [key, value] of rateLimitMap.entries()) {
+    if (cleaned >= 10) break;
     if (now > value.resetAt) {
       rateLimitMap.delete(key);
+      cleaned++;
     }
   }
 }
