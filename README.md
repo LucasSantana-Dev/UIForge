@@ -2,17 +2,17 @@
 
 > **Zero-cost AI-powered UI generation platform**
 >
-> Transform ideas into production-ready code with AI. Built with Next.js 15, Supabase, and modern web technologies. 100% free.
+> Transform ideas into production-ready code with AI. Built with Next.js 16, Supabase, and Cloudflare Workers. 100% free.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
-[![Next.js](https://img.shields.io/badge/Next.js-15.1.0-black)](https://nextjs.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7.0-blue)](https://www.typescriptlang.org/)
 [![Test Coverage](https://img.shields.io/badge/Coverage-25%25-red)](https://github.com/your-org/siza-webapp/actions)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![Code Quality](https://img.shields.io/badge/Quality-A-brightgreen)](https://github.com/your-org/siza-webapp/actions)
 [![Security](https://img.shields.io/badge/Security-Passed-brightgreen)](https://github.com/your-org/siza-webapp/security)
-[![Deployment](https://img.shields.io/badge/Deploy-Cloudflare_Pages-orange)](https://pages.cloudflare.com/)
+[![Deployment](https://img.shields.io/badge/Deploy-Cloudflare_Workers-orange)](https://workers.cloudflare.com/)
 [![Database](https://img.shields.io/badge/Database-Supabase-3ECF8E)](https://supabase.com/)
 [![UI Framework](https://img.shields.io/badge/UI-shadcn/ui-000000)](https://ui.shadcn.com/)
 [![Styling](https://img.shields.io/badge/Styling-Tailwind_CSS-06B6D4)](https://tailwindcss.com/)
@@ -213,30 +213,15 @@ npm run clean               # Clean all build artifacts
 
 ### Production Deployment
 
-#### Frontend (Cloudflare Pages)
+#### Frontend (Cloudflare Workers via OpenNext)
 
-1. **Connect Repository**:
-   - Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
-   - Pages > Create a project
-   - Connect your Git repository
+Deployed automatically via GitHub Actions on push to `main` or `dev`.
 
-2. **Build Configuration**:
-   ```
-   Framework preset: Next.js
-   Build command: cd apps/web && npm install && npm run build
-   Build output directory: apps/web/.next
-   Root directory: /
-   Node version: 20
-   ```
+1. **Set GitHub Secrets**: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`
+2. **Set Cloudflare env vars**: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_BASE_URL`
+3. **Local preview**: `cd apps/web && npm run preview`
 
-3. **Environment Variables**:
-   ```env
-   NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-production-anon-key
-   NEXT_PUBLIC_API_URL=https://your-app.pages.dev
-   NEXT_PUBLIC_ENABLE_BYOK=true
-   NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
-   ```
+Uses `@opennextjs/cloudflare` to build Next.js 16 for Cloudflare Workers with `nodejs_compat`.
 
 #### Backend (Supabase Cloud)
 
@@ -249,7 +234,7 @@ npm run clean               # Clean all build artifacts
 
 Siza maintains 100% free operation through:
 
-- **Cloudflare Pages**: Unlimited hosting & bandwidth
+- **Cloudflare Workers**: Unlimited hosting & bandwidth
 - **Supabase Free Tier**: 50,000 MAU, 500MB DB, 1GB storage
 - **Gemini API**: 60 requests/minute fallback
 - **GitHub Actions**: 2,000 build minutes/month

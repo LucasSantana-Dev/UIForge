@@ -1,8 +1,3 @@
-/**
- * API Rate Limiting
- * In-memory rate limiter with per-user and per-IP tracking
- */
-
 import { getSession } from './auth';
 import { RateLimitError } from './errors';
 
@@ -11,21 +6,18 @@ interface RateLimitInfo {
   resetAt: number;
 }
 
-// In-memory storage (will reset on server restart)
+// In-memory storage — resets per worker isolate on Cloudflare Workers.
+// For production scale, migrate to Cloudflare KV or Supabase.
 const rateLimitMap = new Map<string, RateLimitInfo>();
 
-// Cleanup old entries every 5 minutes
-setInterval(
-  () => {
-    const now = Date.now();
-    for (const [key, value] of rateLimitMap.entries()) {
-      if (now > value.resetAt) {
-        rateLimitMap.delete(key);
-      }
+function cleanupExpired() {
+  const now = Date.now();
+  for (const [key, value] of rateLimitMap.entries()) {
+    if (now > value.resetAt) {
+      rateLimitMap.delete(key);
     }
-  },
-  5 * 60 * 1000
-);
+  }
+}
 
 export interface RateLimitResult {
   allowed: boolean;
@@ -65,10 +57,10 @@ export async function checkRateLimit(
     }
   }
 
+  cleanupExpired();
+
   const now = Date.now();
   const userLimit = rateLimitMap.get(identifier);
-
-  // No existing limit or expired
   if (!userLimit || now > userLimit.resetAt) {
     const resetAt = now + window;
     rateLimitMap.set(identifier, { count: 1, resetAt });

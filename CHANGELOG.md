@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- **Cloudflare Workers deployment**: @opennextjs/cloudflare adapter for Next.js 16 on Cloudflare Workers
+- **OpenNext config**: `open-next.config.ts` and `wrangler.jsonc` for Workers build pipeline
+- **Deploy scripts**: `preview` and `deploy` npm scripts for Cloudflare Workers
 - **Image Recognition (Gemini Vision)**: upload UI screenshots for AI-powered component generation via multimodal input
 - **Image analysis service** (`apps/web/src/lib/services/image-analysis.ts`): standalone Gemini Vision analysis returning structured `DesignAnalysis` (layout, components, colors, typography, spacing, interactions, suggestedPrompt)
 - **Analyze-image API endpoint** (`apps/web/src/app/api/analyze-image/route.ts`): POST endpoint with rate limiting and session auth for standalone image analysis
@@ -14,6 +17,10 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- **Deploy workflow** (`.github/workflows/deploy-web.yml`): rewritten for OpenNext Cloudflare Workers build and wrangler deploy
+- **Rate limiter** (`apps/web/src/lib/api/rate-limit.ts`): replaced `setInterval` with lazy cleanup for Workers compatibility
+- **Middleware** (`apps/web/src/middleware.ts`): converted from proxy.ts to middleware.ts with `experimental-edge` runtime for Cloudflare Workers compatibility (proxy.ts not yet supported by OpenNext)
+- **API routes**: removed `runtime = 'nodejs'` exports (OpenNext handles runtime automatically)
 - **Gemini service** (`apps/web/src/lib/services/gemini.ts`): added `imageBase64`/`imageMimeType` to options, sends multimodal `[text, inlineData]` content when image is present
 - **Generate API route** (`apps/web/src/app/api/generate/route.ts`): extended Zod schema with image fields, bumped API version to 3.0.0, added `image-input` feature flag
 - **GeneratorForm** (`apps/web/src/components/generator/GeneratorForm.tsx`): added image upload UI with drag-and-drop, preview, and file-to-base64 conversion

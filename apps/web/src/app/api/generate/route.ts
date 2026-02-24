@@ -8,7 +8,6 @@ import { enrichPromptWithContext } from '@/lib/services/context-enrichment';
 import { storeGenerationEmbedding } from '@/lib/services/embeddings';
 import { createClient } from '@/lib/supabase/server';
 
-export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;

@@ -1,3 +1,5 @@
+const { initOpenNextCloudflareForDev } = require('@opennextjs/cloudflare');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -10,5 +12,9 @@ const nextConfig = {
     ],
   },
 };
+
+if (process.env.NODE_ENV === 'development') {
+  initOpenNextCloudflareForDev();
+}
 
 module.exports = nextConfig;
