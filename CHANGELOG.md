@@ -2,75 +2,45 @@
 
 All notable changes to this project will be documented in this file.
 
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
 ## [Unreleased]
+
+### Added
+
+- Strategic positioning: "The open full-stack AI workspace"
+- Team pricing tier ($49/month, 5 seats, 2,500 generations)
+- CONTRIBUTING.md with development workflow and code standards
+- CHANGELOG.md for tracking changes
+- Landing page rewrite with ecosystem identity and differentiation
+- Ecosystem section on landing page linking all 5 Forge Space repos
+- Navigation links to About, Pricing, and Roadmap in header/footer
+
+### Changed
+
+- Landing page tagline: "Generate. Integrate. Ship."
+- Pricing page: 4-tier grid (Free, Pro, Team, Enterprise)
+- Pricing headline: "Free for individuals, paid for scale"
+- About page: updated principles to match strategic positioning
+- About page: added branding-mcp to ecosystem section
+- Roadmap: updated phases to reflect strategic plan (Foundation, Community, Scale)
+- Roadmap: fixed feedback link (Forge-Space/UI -> Forge-Space/siza)
+- README.md: complete rewrite with differentiation table, ecosystem map, pricing
+- Plans config: added seats field to plan limits, added Team tier
 
 ## [0.3.0] - 2026-02-24
 
-First production deployment to Cloudflare Workers. Live at `siza-web.uiforge.workers.dev`.
-
 ### Added
 
-- **Health check endpoint** (`/api/health`): returns `{ status, timestamp, version }` for deployment verification
-- **WASM stub step** in deploy workflow: stubs unused `@vercel/og` WASM files to fit Workers 3 MiB free tier
-- **Local deploy script** (`apps/web/scripts/deploy.sh`): local deploy with automatic WASM stubbing
-
-### Fixed
-
-- Deleted broken scaffold workflows (`dev-deploy.yml`, `production.yml`, `deploy-admin.yml`) that ran builds without checkout/install
-- Rewrote `deploy-web-admin.yml` to use Cloudflare Workers deployment via OpenNext (was incorrectly using Pages)
-- Standardized Node.js 22 across all CI workflows (`release-branch.yml`, `release-automation.yml`, `supabase-setup-admin.yml`)
-- Fixed README badges and references (Next.js 16, Node.js 22, Cloudflare Workers deployment docs)
-- Fixed About page: updated tech stack versions (Next.js 16, React 19, Cloudflare Workers) and source code link
-
-### Added
-
-- **Cloudflare Workers deployment**: production deployment via OpenNext (`@opennextjs/cloudflare`) with `nodejs_compat` for full Node.js API support — live at `siza-web.uiforge.workers.dev`
-- **Deploy workflow** (`.github/workflows/deploy-web.yml`): automated build + deploy on push to dev/main using `wrangler-action@v3`
-- **WASM size optimization**: stub unused `@vercel/og` WASM files (resvg.wasm + yoga.wasm) at deploy time, reducing bundle from 3429 KiB to 2882 KiB gzipped (under 3 MiB free tier limit)
-- **Deploy script** (`apps/web/scripts/deploy.sh`): local deploy with automatic WASM stubbing and `_redirects` cleanup
-- **OpenNext config** (`apps/web/open-next.config.ts`, `apps/web/wrangler.jsonc`): Workers-native Next.js deployment
-- **Image Recognition (Gemini Vision)**: upload UI screenshots for AI-powered component generation via multimodal input
-- **Image analysis service** (`apps/web/src/lib/services/image-analysis.ts`): standalone Gemini Vision analysis returning structured `DesignAnalysis` (layout, components, colors, typography, spacing, interactions, suggestedPrompt)
-- **Analyze-image API endpoint** (`apps/web/src/app/api/analyze-image/route.ts`): POST endpoint with rate limiting and session auth for standalone image analysis
-- **Drag-and-drop image upload**: collapsible reference image section in GeneratorForm with preview, file validation (5MB max, PNG/JPEG/WebP), and accessible drop zone
-- **RAG context enrichment**: generation pipeline enriches prompts with relevant context from previous generations via embeddings
-
-### Fixed
-
-- **Edge middleware** (`apps/web/src/middleware.ts`): converted `proxy.ts` to standard `middleware.ts` with `runtime = 'experimental-edge'` — `proxy.ts` with `runtime = 'edge'` is illegal in Next.js 16 and breaks the build
-- **Next.js config**: wrapped `initOpenNextCloudflareForDev()` in development-only guard to prevent production build failures
-- **Deploy workflow**: added `--legacy-peer-deps` to `npm ci` for peer dependency resolution
+- Cloudflare Workers deployment via OpenNext
+- Stripe billing integration (Free/Pro/Enterprise tiers)
+- Feature flags system (17 flags, admin API, audit log)
+- Resend auth emails (verification, welcome, password reset)
+- Usage tracking and quota enforcement
+- Health check endpoint (GET /api/health)
 
 ### Changed
 
-- **Rate limiter** (`apps/web/src/lib/api/rate-limit.ts`): replaced `setInterval` with bounded lazy cleanup (max 10 per request) for Workers compatibility
-- **API routes**: removed explicit `runtime` declarations from all routes — OpenNext handles runtime automatically
-- **`.env.example`**: added `NEXT_PUBLIC_BASE_URL` for OAuth redirects
-- **Next.js config**: added `initOpenNextCloudflareForDev()` for Cloudflare dev server compatibility
-- **Gemini service** (`apps/web/src/lib/services/gemini.ts`): added `imageBase64`/`imageMimeType` to options, sends multimodal `[text, inlineData]` content when image is present
-- **Generate API route** (`apps/web/src/app/api/generate/route.ts`): extended Zod schema with image fields, bumped API version to 3.0.0, added `image-input` feature flag
-- **GeneratorForm** (`apps/web/src/components/generator/GeneratorForm.tsx`): added image upload UI with drag-and-drop, preview, and file-to-base64 conversion
-- **Generation client API** (`apps/web/src/lib/api/generation.ts`): added `imageBase64`/`imageMimeType` to `GenerationOptions` interface
-
-## [0.2.0] - Phase 1 & 2
-
-### Added
-
-- **AI Generation with Gemini**: direct Gemini 2.0 Flash integration for component generation via SSE streaming
-- **Gemini service** (`apps/web/src/lib/services/gemini.ts`): async generator wrapper around `@google/generative-ai` SDK
-- **BYOK support in GeneratorForm**: users can use their own Gemini API key (client-side encrypted) for generation
-- **DB migration**: added `component_name`, `generated_code`, `component_library`, `style`, `typescript` columns to `generations` table
-- **Tests**: Gemini service tests (6) and generate route tests (7), all passing
-- **Dependencies**: `@google/generative-ai`, `react-hook-form`, `@hookform/resolvers`
-- **`@uiforge/forge-patterns`**: added as dev dependency (local file reference) for shared constants access
-
-### Changed
-
-- **Generate API route** (`apps/web/src/app/api/generate/route.ts`): replaced dead Cloudflare Workers proxy with direct Gemini SDK calls
-- **Generations CRUD routes**: updated PATCH whitelist and POST insert to support new fields
-- **`use-generation` hook**: tracks `generation_time_ms` for performance metrics
-- **`.env.example`**: replaced Workers URL with `GEMINI_API_KEY`
-- **`packages/eslint-config/index.js`**: added forge-patterns rules — `no-floating-promises` (error), `prefer-template` (warn), `no-duplicate-imports` (error), `require-await` (error)
-- **`engines.node`**: `>=20` to `>=22` (aligning with forge ecosystem standard)
-- **CI `node-version`**: `'20'` to `'24'` across all jobs in `ci.yml`
-- **`.husky/pre-commit`**: upgraded from bare `npx lint-staged` to forge gate pattern
+- CI workflows cleanup: deleted 3 broken scaffolds, standardized Node 22
+- README updated for Next.js 16, React 19, Workers deployment

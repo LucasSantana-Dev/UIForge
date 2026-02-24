@@ -42,13 +42,14 @@ export function PricingPageClient() {
             <Code2 className="h-8 w-8 text-primary" />
             <span className="text-2xl font-bold">Siza</span>
           </Link>
-          <h1 className="mt-8 text-4xl font-bold">Simple, transparent pricing</h1>
+          <h1 className="mt-8 text-4xl font-bold">Free for individuals, paid for scale</h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Start free. Upgrade when you need more.
+            Start free forever. BYOK unlocks unlimited generations at no cost. Upgrade when you need
+            team features.
           </p>
         </div>
 
-        <div className="mt-12 grid gap-6 md:grid-cols-3">
+        <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <PricingCard
             plan={PLANS.free}
             currentPlan={subscription?.plan}
@@ -59,6 +60,11 @@ export function PricingPageClient() {
             currentPlan={subscription?.plan}
             onSelect={handleSelectPlan}
             highlighted
+          />
+          <PricingCard
+            plan={PLANS.team}
+            currentPlan={subscription?.plan}
+            onSelect={handleSelectPlan}
           />
           <PricingCard
             plan={PLANS.enterprise}
