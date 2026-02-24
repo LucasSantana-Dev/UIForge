@@ -1,15 +1,68 @@
 import type { NextRequest } from 'next/server';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Next.js App Router exports for SSE streaming
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+const MODEL_NAME = 'gemini-2.0-flash';
+
+function buildPrompt(options: {
+  description: string;
+  framework?: string;
+  componentLibrary?: string;
+  style?: string;
+  typescript?: boolean;
+}): string {
+  const {
+    framework = 'react',
+    componentLibrary = 'tailwind',
+    description,
+    style = 'modern',
+    typescript = true,
+  } = options;
+
+  const lang = typescript ? 'TypeScript' : 'JavaScript';
+  const ext = typescript
+    ? framework === 'react'
+      ? 'tsx'
+      : 'ts'
+    : framework === 'react'
+      ? 'jsx'
+      : 'js';
+
+  const libInstruction =
+    componentLibrary === 'tailwind'
+      ? 'Tailwind CSS classes'
+      : componentLibrary === 'shadcn'
+        ? 'shadcn/ui components with Tailwind'
+        : componentLibrary === 'none'
+          ? 'inline styles or CSS modules'
+          : `${componentLibrary} components`;
+
+  return `You are a senior React developer. Generate a ${framework} component.
+
+**Description**: ${description}
+
+**Requirements**:
+- Framework: ${framework}
+- Language: ${lang} (.${ext})
+- Styling: ${libInstruction}
+- Design: ${style}
+
+**Rules**:
+1. Output ONLY the component code inside a single markdown code block
+2. Include all necessary imports
+3. Export the component as default
+4. Make it self-contained and production-ready
+5. Use proper ${lang} types for all props
+6. Follow ${style} design principles
+7. No explanations, no extra text outside the code block`;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    // Parse request body
     const body = await request.json();
 
-    // Validate basic structure
     if (!body.description || typeof body.description !== 'string') {
       return new Response(JSON.stringify({ error: 'Description is required' }), {
         status: 400,
@@ -17,71 +70,65 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Forward to Cloudflare Workers API with SSE
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.siza.workers.dev';
+    const apiKey = body.userApiKey || process.env.GEMINI_API_KEY || '';
 
-    const response = await fetch(`${apiUrl}/api/generate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Forward auth header if present
-        ...(request.headers.get('authorization') && {
-          Authorization: request.headers.get('authorization')!,
+    if (!apiKey) {
+      return new Response(
+        JSON.stringify({
+          error: 'No API key. Add a Gemini key in Settings or set GEMINI_API_KEY.',
         }),
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      let errorData;
-      let contentType = 'application/json';
-
-      try {
-        errorData = await response.json();
-      } catch {
-        // Fallback to text if JSON parsing fails
-        errorData = await response.text();
-        contentType = 'text/plain';
-      }
-
-      return new Response(typeof errorData === 'string' ? errorData : JSON.stringify(errorData), {
-        status: response.status,
-        headers: { 'Content-Type': contentType },
-      });
+        { status: 401, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Stream the SSE response
-    const reader = response.body?.getReader();
-    if (!reader) {
-      return new Response(JSON.stringify({ error: 'No response body' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+    const prompt = buildPrompt(body);
 
+    const result = await model.generateContentStream(prompt);
     const encoder = new TextEncoder();
-    const decoder = new TextDecoder();
 
     return new Response(
       new ReadableStream({
         async start(controller) {
           try {
-            while (true) {
-              const { done, value } = await reader.read();
+            const send = (data: Record<string, unknown>) => {
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
+            };
 
-              if (done) {
-                controller.close();
-                break;
+            send({ type: 'start', timestamp: Date.now() });
+
+            let fullCode = '';
+
+            for await (const chunk of result.stream) {
+              const text = chunk.text();
+              if (text) {
+                fullCode += text;
+                send({
+                  type: 'chunk',
+                  content: text,
+                  timestamp: Date.now(),
+                });
               }
-
-              const chunk = decoder.decode(value);
-              controller.enqueue(encoder.encode(chunk));
             }
-          } catch (error) {
-            console.error('Streaming error:', error);
-            controller.error(error);
-          } finally {
-            reader.releaseLock();
+
+            const codeMatch = fullCode.match(/```(?:tsx?|jsx?|vue|svelte)?\n([\s\S]*?)\n```/);
+            const extractedCode = codeMatch ? codeMatch[1].trim() : fullCode.trim();
+
+            send({
+              type: 'complete',
+              code: extractedCode,
+              totalLength: extractedCode.length,
+              timestamp: Date.now(),
+            });
+
+            controller.close();
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : 'Generation failed';
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({ type: 'error', message: msg })}\n\n`)
+            );
+            controller.close();
           }
         },
       }),
@@ -101,71 +148,4 @@ export async function POST(request: NextRequest) {
       headers: { 'Content-Type': 'application/json' },
     });
   }
-}
-
-export async function GET() {
-  return new Response(
-    JSON.stringify({
-      message: 'UI Generation API',
-      version: '1.0.0',
-      status: 'active',
-      endpoints: {
-        'POST /api/generate': {
-          description: 'Generate UI components with AI',
-          method: 'POST',
-          contentType: 'application/json',
-          parameters: {
-            description: 'string (required) - Description of the component to generate',
-            framework: 'string (optional) - Target framework (react, vue, angular, svelte)',
-            componentLibrary:
-              'string (optional) - Component library (tailwind, mui, chakra, shadcn, none)',
-            style: 'string (optional) - Style preference (modern, minimal, colorful)',
-            typescript: 'boolean (optional) - Generate TypeScript code',
-          },
-          example: {
-            description: 'A responsive navigation bar with logo and menu items',
-            framework: 'react',
-            componentLibrary: 'tailwind',
-            typescript: true,
-          },
-        },
-        'POST /api/generate/validate': {
-          description: 'Validate generated code',
-          method: 'POST',
-          contentType: 'application/json',
-          parameters: {
-            code: 'string (required) - Code to validate',
-            language: 'string (required) - Programming language',
-          },
-        },
-      },
-      notes: [
-        'This API provides Server-Sent Events (SSE) streaming for real-time generation',
-        'Authentication is required via Authorization header',
-        'Rate limits may apply based on subscription tier',
-      ],
-    }),
-    {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, max-age=3600',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    }
-  );
-}
-
-export async function OPTIONS() {
-  return new Response(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Access-Control-Max-Age': '86400',
-    },
-  });
 }
