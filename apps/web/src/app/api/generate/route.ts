@@ -11,6 +11,8 @@ import { createClient } from '@/lib/supabase/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+
 const generateSchema = z.object({
   description: z.string().min(10).max(2000),
   framework: z.enum(['react', 'vue', 'angular', 'svelte']).default('react'),
@@ -19,6 +21,8 @@ const generateSchema = z.object({
   typescript: z.boolean().optional(),
   userApiKey: z.string().min(1).optional(),
   useRag: z.boolean().optional(),
+  imageBase64: z.string().max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)').optional(),
+  imageMimeType: z.enum(['image/png', 'image/jpeg', 'image/webp']).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -47,8 +51,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { description, framework, componentLibrary, style, typescript, userApiKey, useRag } =
-      parsed.data;
+    const {
+      description,
+      framework,
+      componentLibrary,
+      style,
+      typescript,
+      userApiKey,
+      useRag,
+      imageBase64,
+      imageMimeType,
+    } = parsed.data;
 
     let contextAddition = '';
     if (useRag !== false) {
@@ -95,6 +108,8 @@ export async function POST(request: NextRequest) {
             typescript,
             apiKey: userApiKey,
             contextAddition,
+            imageBase64,
+            imageMimeType,
           })) {
             if (event.type === 'chunk' && event.content) {
               fullCode += event.content;
@@ -189,10 +204,10 @@ export async function GET() {
   return new Response(
     JSON.stringify({
       message: 'UI Generation API',
-      version: '2.1.0',
+      version: '3.0.0',
       status: 'active',
       provider: 'gemini-2.0-flash',
-      features: ['rag', 'quality-gates', 'streaming'],
+      features: ['rag', 'quality-gates', 'streaming', 'image-input'],
     }),
     {
       status: 200,
