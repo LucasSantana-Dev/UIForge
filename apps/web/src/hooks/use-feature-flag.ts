@@ -3,37 +3,38 @@
 import { useMemo } from 'react';
 import type { FeatureFlagName } from '@/lib/features/types';
 import { getFeatureFlag } from '@/lib/features/flags';
+import { useFeatureFlagContext } from '@/lib/features/provider';
 
-/**
- * Hook to check if a feature flag is enabled
- * @param name - The feature flag name
- * @returns boolean indicating if the feature is enabled
- */
 export function useFeatureFlag(name: FeatureFlagName): boolean {
-  return useMemo(() => getFeatureFlag(name), [name]);
+  const { flags } = useFeatureFlagContext();
+  const centralizedEnabled = getFeatureFlag('ENABLE_CENTRALIZED_FEATURE_FLAGS');
+
+  return useMemo(() => {
+    if (centralizedEnabled && name in flags) {
+      return flags[name];
+    }
+    return getFeatureFlag(name);
+  }, [centralizedEnabled, flags, name]);
 }
 
-/**
- * Hook to get multiple feature flags at once
- * @param names - Array of feature flag names
- * @returns Object with feature flag values
- */
 export function useFeatureFlags(
   names: FeatureFlagName[]
 ): Partial<Record<FeatureFlagName, boolean>> {
-  // Create a stable key for memoization to handle inline arrays
+  const { flags } = useFeatureFlagContext();
+  const centralizedEnabled = getFeatureFlag('ENABLE_CENTRALIZED_FEATURE_FLAGS');
   const serializedKey = names.slice().sort().join('|');
 
   return useMemo(() => {
-    // Handle empty array
-    if (names.length === 0 || serializedKey === '') {
-      return {};
-    }
+    if (names.length === 0 || serializedKey === '') return {};
 
-    const flags: Partial<Record<FeatureFlagName, boolean>> = {};
+    const result: Partial<Record<FeatureFlagName, boolean>> = {};
     for (const name of names) {
-      flags[name] = getFeatureFlag(name);
+      if (centralizedEnabled && name in flags) {
+        result[name] = flags[name];
+      } else {
+        result[name] = getFeatureFlag(name);
+      }
     }
-    return flags;
-  }, [serializedKey, names]);
+    return result;
+  }, [centralizedEnabled, flags, serializedKey, names]);
 }

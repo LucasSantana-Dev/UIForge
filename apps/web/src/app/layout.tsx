@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { QueryProvider } from '@/components/providers/query-provider';
+import { FeatureFlagProvider } from '@/lib/features/provider';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], preload: false });
@@ -25,7 +26,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.className} dark`}>
       <body>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <FeatureFlagProvider>{children}</FeatureFlagProvider>
+        </QueryProvider>
       </body>
     </html>
   );
