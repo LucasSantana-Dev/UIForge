@@ -42,6 +42,7 @@ export function useGeneration(projectId?: string) {
 
         abortControllerRef.current = new AbortController();
 
+        const startTime = Date.now();
         let chunkCount = 0;
         let code = '';
         let tokensUsed = 0;
@@ -85,6 +86,7 @@ export function useGeneration(projectId?: string) {
                     style: options.style,
                     typescript: options.typescript || false,
                     tokens_used: tokensUsed,
+                    generation_time_ms: Date.now() - startTime,
                   });
                 } catch (saveError) {
                   console.error('Failed to save generation:', saveError);

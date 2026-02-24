@@ -1,103 +1,92 @@
 import type { NextRequest } from 'next/server';
+import { z } from 'zod';
+import { verifySession } from '@/lib/api/auth';
+import { checkRateLimit } from '@/lib/api/rate-limit';
+import { generateComponentStream } from '@/lib/services/gemini';
 
-// Next.js App Router exports for SSE streaming
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
+const generateSchema = z.object({
+  description: z.string().min(10).max(2000),
+  framework: z.enum(['react', 'vue', 'angular', 'svelte']).default('react'),
+  componentLibrary: z.enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none']).optional(),
+  style: z.enum(['modern', 'minimal', 'colorful']).optional(),
+  typescript: z.boolean().optional(),
+  userApiKey: z.string().min(1).optional(),
+});
+
 export async function POST(request: NextRequest) {
   try {
-    // Parse request body
-    const body = await request.json();
-
-    // Validate basic structure
-    if (!body.description || typeof body.description !== 'string') {
-      return new Response(JSON.stringify({ error: 'Description is required' }), {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Forward to Cloudflare Workers API with SSE
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.siza.workers.dev';
-
-    const response = await fetch(`${apiUrl}/api/generate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // Forward auth header if present
-        ...(request.headers.get('authorization') && {
-          Authorization: request.headers.get('authorization')!,
+    const rateLimitResult = await checkRateLimit(request, 15, 60000);
+    if (!rateLimitResult.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: 'Rate limit exceeded. Try again shortly.',
         }),
-      },
-      body: JSON.stringify(body),
-    });
-
-    if (!response.ok) {
-      let errorData;
-      let contentType = 'application/json';
-
-      try {
-        errorData = await response.json();
-      } catch {
-        // Fallback to text if JSON parsing fails
-        errorData = await response.text();
-        contentType = 'text/plain';
-      }
-
-      return new Response(typeof errorData === 'string' ? errorData : JSON.stringify(errorData), {
-        status: response.status,
-        headers: { 'Content-Type': contentType },
-      });
+        { status: 429, headers: { 'Content-Type': 'application/json' } }
+      );
     }
 
-    // Stream the SSE response
-    const reader = response.body?.getReader();
-    if (!reader) {
-      return new Response(JSON.stringify({ error: 'No response body' }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      });
+    await verifySession();
+
+    const body = await request.json();
+    const parsed = generateSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({
+          error: parsed.error.issues[0]?.message || 'Invalid request',
+        }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      );
     }
+
+    const { description, framework, componentLibrary, style, typescript, userApiKey } = parsed.data;
 
     const encoder = new TextEncoder();
-    const decoder = new TextDecoder();
 
-    return new Response(
-      new ReadableStream({
-        async start(controller) {
-          try {
-            while (true) {
-              const { done, value } = await reader.read();
-
-              if (done) {
-                controller.close();
-                break;
-              }
-
-              const chunk = decoder.decode(value);
-              controller.enqueue(encoder.encode(chunk));
-            }
-          } catch (error) {
-            console.error('Streaming error:', error);
-            controller.error(error);
-          } finally {
-            reader.releaseLock();
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          for await (const event of generateComponentStream({
+            prompt: description,
+            framework,
+            componentLibrary,
+            style,
+            typescript,
+            apiKey: userApiKey,
+          })) {
+            const sseData = `data: ${JSON.stringify(event)}\n\n`;
+            controller.enqueue(encoder.encode(sseData));
           }
-        },
-      }),
-      {
-        headers: {
-          'Content-Type': 'text/event-stream',
-          'Cache-Control': 'no-cache',
-          Connection: 'keep-alive',
-          'X-Accel-Buffering': 'no',
-        },
-      }
-    );
+        } catch (error) {
+          const errorEvent = {
+            type: 'error',
+            message: error instanceof Error ? error.message : 'Stream failed',
+            timestamp: Date.now(),
+          };
+          const errData = `data: ${JSON.stringify(errorEvent)}\n\n`;
+          controller.enqueue(encoder.encode(errData));
+        } finally {
+          controller.close();
+        }
+      },
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        Connection: 'keep-alive',
+        'X-Accel-Buffering': 'no',
+      },
+    });
   } catch (error) {
-    console.error('Generation error:', error);
-    return new Response(JSON.stringify({ error: 'Internal server error' }), {
-      status: 500,
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    const status = message === 'Authentication required' ? 401 : 500;
+    return new Response(JSON.stringify({ error: message }), {
+      status,
       headers: { 'Content-Type': 'application/json' },
     });
   }
@@ -107,52 +96,15 @@ export async function GET() {
   return new Response(
     JSON.stringify({
       message: 'UI Generation API',
-      version: '1.0.0',
+      version: '2.0.0',
       status: 'active',
-      endpoints: {
-        'POST /api/generate': {
-          description: 'Generate UI components with AI',
-          method: 'POST',
-          contentType: 'application/json',
-          parameters: {
-            description: 'string (required) - Description of the component to generate',
-            framework: 'string (optional) - Target framework (react, vue, angular, svelte)',
-            componentLibrary:
-              'string (optional) - Component library (tailwind, mui, chakra, shadcn, none)',
-            style: 'string (optional) - Style preference (modern, minimal, colorful)',
-            typescript: 'boolean (optional) - Generate TypeScript code',
-          },
-          example: {
-            description: 'A responsive navigation bar with logo and menu items',
-            framework: 'react',
-            componentLibrary: 'tailwind',
-            typescript: true,
-          },
-        },
-        'POST /api/generate/validate': {
-          description: 'Validate generated code',
-          method: 'POST',
-          contentType: 'application/json',
-          parameters: {
-            code: 'string (required) - Code to validate',
-            language: 'string (required) - Programming language',
-          },
-        },
-      },
-      notes: [
-        'This API provides Server-Sent Events (SSE) streaming for real-time generation',
-        'Authentication is required via Authorization header',
-        'Rate limits may apply based on subscription tier',
-      ],
+      provider: 'gemini-2.0-flash',
     }),
     {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'public, max-age=3600',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       },
     }
   );

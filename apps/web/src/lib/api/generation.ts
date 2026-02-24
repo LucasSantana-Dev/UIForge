@@ -8,8 +8,7 @@ export interface GenerationOptions {
   description: string;
   style?: 'modern' | 'minimal' | 'colorful';
   typescript?: boolean;
-  aiProvider?: 'openai' | 'anthropic' | 'google' | 'auto';
-  useUserKey?: boolean;
+  userApiKey?: string;
 }
 
 export interface GenerationEvent {

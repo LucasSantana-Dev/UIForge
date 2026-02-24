@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { SparklesIcon, WandIcon } from 'lucide-react';
+import { SparklesIcon, WandIcon, KeyIcon } from 'lucide-react';
 import { useGeneration } from '@/hooks/use-generation';
+import { useApiKeyForProvider, useHasApiKey, useAIKeyStore } from '@/stores/ai-keys';
+import { decryptApiKey } from '@/lib/encryption';
 import GenerationProgress from './GenerationProgress';
 
 const generatorSchema = z.object({
@@ -28,14 +30,17 @@ interface GeneratorFormProps {
 }
 
 export default function GeneratorForm({
-  projectId: _projectId,
+  projectId,
   framework,
   onGenerate,
   onGenerating,
   isGenerating,
   initialDescription,
 }: GeneratorFormProps) {
-  const generation = useGeneration();
+  const generation = useGeneration(projectId);
+  const googleKey = useApiKeyForProvider('google');
+  const hasGoogleKey = useHasApiKey('google');
+  const encryptionKey = useAIKeyStore((s) => s.encryptionKey);
   const [currentSettings, setCurrentSettings] = useState({
     componentName: '',
     componentLibrary: '',
@@ -59,7 +64,6 @@ export default function GeneratorForm({
     },
   });
 
-  // Set initial description if provided
   useEffect(() => {
     if (initialDescription) {
       setValue('prompt', initialDescription);
@@ -70,7 +74,6 @@ export default function GeneratorForm({
     try {
       onGenerating();
 
-      // Update current settings
       setCurrentSettings({
         componentName: data.componentName,
         componentLibrary: data.componentLibrary || 'none',
@@ -78,7 +81,6 @@ export default function GeneratorForm({
         typescript: data.typescript,
       });
 
-      // Start streaming generation
       await generation.startGeneration({
         framework: framework as 'react' | 'vue' | 'angular' | 'svelte',
         componentLibrary: data.componentLibrary || 'none',
@@ -87,22 +89,22 @@ export default function GeneratorForm({
         typescript: data.typescript,
         componentName: data.componentName,
         prompt: data.prompt,
+        ...(googleKey &&
+          encryptionKey && {
+            userApiKey: decryptApiKey(googleKey.encryptedKey, encryptionKey),
+          }),
       });
-
-      // The hook will handle the streaming and update state
     } catch (err) {
       console.error('Generation failed:', err);
     }
   };
 
-  // Notify parent when generation completes
   useEffect(() => {
     if (generation.code && !generation.isGenerating && !generation.error) {
       onGenerate(generation.code, currentSettings);
     }
   }, [generation.code, generation.isGenerating, generation.error, onGenerate, currentSettings]);
 
-  // Notify parent when generation starts
   useEffect(() => {
     if (generation.isGenerating && !isGenerating) {
       onGenerating();
@@ -118,6 +120,20 @@ export default function GeneratorForm({
               {generation.error}
             </div>
           )}
+
+          <div className="flex items-center gap-2 text-xs px-3 py-2 rounded-md border">
+            <KeyIcon className="h-3.5 w-3.5" />
+            {hasGoogleKey ? (
+              <span className="text-green-700">Using your Gemini API key</span>
+            ) : (
+              <span className="text-amber-700">
+                Using server API key &mdash;{' '}
+                <a href="/ai-keys" className="underline">
+                  add your own
+                </a>
+              </span>
+            )}
+          </div>
 
           <div>
             <label htmlFor="componentName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -215,7 +231,6 @@ export default function GeneratorForm({
         </form>
       </div>
 
-      {/* Generation Progress */}
       {(generation.isGenerating || generation.progress > 0 || generation.error) && (
         <div className="border-t border-gray-200">
           <GenerationProgress
