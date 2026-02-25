@@ -12,22 +12,14 @@ interface AnalyticsEvent {
 
 declare global {
   interface Window {
-    gtag: (
-      command: string,
-      targetId: string,
-      config?: Record<string, any>
-    ) => void;
+    gtag: (command: string, targetId: string, config?: Record<string, any>) => void;
     dataLayer: any[];
   }
 }
 
 const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID;
 
-export default function AnalyticsProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
@@ -36,8 +28,7 @@ export default function AnalyticsProvider({
 
     const script1 = document.createElement('script');
     script1.async = true;
-    script1.src =
-      `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
+    script1.src = `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
     document.head.appendChild(script1);
 
     const script2 = document.createElement('script');
@@ -60,9 +51,7 @@ export default function AnalyticsProvider({
 
   useEffect(() => {
     if (!GA_TRACKING_ID || typeof window.gtag !== 'function') return;
-    const url =
-      pathname +
-      (searchParams.toString() ? '?' + searchParams.toString() : '');
+    const url = pathname + (searchParams.toString() ? '?' + searchParams.toString() : '');
     window.gtag('config', GA_TRACKING_ID, {
       page_location: url,
     });
@@ -71,12 +60,7 @@ export default function AnalyticsProvider({
   return <>{children}</>;
 }
 
-export const trackEvent = ({
-  action,
-  category,
-  label,
-  value,
-}: AnalyticsEvent) => {
+export const trackEvent = ({ action, category, label, value }: AnalyticsEvent) => {
   if (typeof window.gtag === 'function') {
     window.gtag('event', action, {
       event_category: category,
@@ -101,10 +85,7 @@ export const trackUserInteraction = (element: string, action: string) => {
   });
 };
 
-export const trackTemplateUsage = (
-  templateId: string,
-  templateName: string
-) => {
+export const trackTemplateUsage = (templateId: string, templateName: string) => {
   trackEvent({
     action: 'template_used',
     category: 'Templates',
@@ -112,10 +93,7 @@ export const trackTemplateUsage = (
   });
 };
 
-export const trackComponentGeneration = (
-  framework: string,
-  componentLibrary: string
-) => {
+export const trackComponentGeneration = (framework: string, componentLibrary: string) => {
   trackEvent({
     action: 'component_generated',
     category: 'Generation',
