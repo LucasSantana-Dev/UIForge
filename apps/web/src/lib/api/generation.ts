@@ -9,6 +9,8 @@ export interface GenerationOptions {
   style?: 'modern' | 'minimal' | 'colorful';
   typescript?: boolean;
   userApiKey?: string;
+  provider?: 'openai' | 'anthropic' | 'google';
+  model?: string;
   imageBase64?: string;
   imageMimeType?: 'image/png' | 'image/jpeg' | 'image/webp';
 }

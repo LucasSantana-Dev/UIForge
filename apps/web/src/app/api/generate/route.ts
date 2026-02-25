@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
-import { generateComponentStream } from '@/lib/services/gemini';
+import { generateWithProvider } from '@/lib/services/generation';
 import { runAllGates } from '@/lib/quality/gates';
 import { enrichPromptWithContext } from '@/lib/services/context-enrichment';
 import { storeGenerationEmbedding } from '@/lib/services/embeddings';
@@ -10,6 +10,7 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGenerationQuota } from '@/lib/usage/limits';
 import { incrementGenerationCount } from '@/lib/usage/tracker';
 import { captureServerError } from '@/lib/sentry/server';
+import type { AIProvider } from '@/lib/encryption';
 
 export const dynamic = 'force-dynamic';
 
@@ -22,19 +23,23 @@ const generateSchema = z.object({
   style: z.enum(['modern', 'minimal', 'colorful']).optional(),
   typescript: z.boolean().optional(),
   userApiKey: z.string().min(1).optional(),
+  provider: z.enum(['openai', 'anthropic', 'google']).optional(),
+  model: z.string().min(1).optional(),
   useRag: z.boolean().optional(),
   imageBase64: z.string().max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)').optional(),
   imageMimeType: z.enum(['image/png', 'image/jpeg', 'image/webp']).optional(),
 });
+
+function createSseEvent(data: object): string {
+  return `data: ${JSON.stringify(data)}\n\n`;
+}
 
 export async function POST(request: NextRequest) {
   try {
     const rateLimitResult = await checkRateLimit(request, 15, 60000);
     if (!rateLimitResult.allowed) {
       return new Response(
-        JSON.stringify({
-          error: 'Rate limit exceeded. Try again shortly.',
-        }),
+        JSON.stringify({ error: 'Rate limit exceeded. Try again shortly.' }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -46,11 +51,7 @@ export async function POST(request: NextRequest) {
       return new Response(
         JSON.stringify({
           error: 'Generation quota exceeded',
-          quota: {
-            current: quota.current,
-            limit: quota.limit,
-            remaining: quota.remaining,
-          },
+          quota: { current: quota.current, limit: quota.limit, remaining: quota.remaining },
         }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
       );
@@ -61,9 +62,7 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return new Response(
-        JSON.stringify({
-          error: parsed.error.issues[0]?.message || 'Invalid request',
-        }),
+        JSON.stringify({ error: parsed.error.issues[0]?.message || 'Invalid request' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -75,10 +74,15 @@ export async function POST(request: NextRequest) {
       style,
       typescript,
       userApiKey,
+      provider,
+      model,
       useRag,
       imageBase64,
       imageMimeType,
     } = parsed.data;
+
+    const activeProvider: AIProvider = provider || 'google';
+    const activeModel = model || (activeProvider === 'google' ? 'gemini-2.0-flash' : '');
 
     let contextAddition = '';
     if (useRag !== false) {
@@ -108,8 +112,8 @@ export async function POST(request: NextRequest) {
               prompt: description,
               framework,
               status: 'processing',
-              ai_provider: 'google' as const,
-              model_used: 'gemini-2.0-flash',
+              ai_provider: activeProvider,
+              model_used: activeModel,
             })
             .select('id')
             .single();
@@ -117,7 +121,9 @@ export async function POST(request: NextRequest) {
 
           let fullCode = '';
 
-          for await (const event of generateComponentStream({
+          for await (const event of generateWithProvider({
+            provider: activeProvider,
+            model: activeModel,
             prompt: description,
             framework,
             componentLibrary,
@@ -133,47 +139,45 @@ export async function POST(request: NextRequest) {
             }
 
             if (event.type === 'complete') {
-              const qualityReport = runAllGates(fullCode);
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({
-                    type: 'quality',
-                    report: qualityReport,
-                    timestamp: Date.now(),
-                  })}\n\n`
-                )
-              );
-
-              if (generationId) {
-                await supabase
-                  .from('generations')
-                  .update({
-                    status: 'completed',
-                    generated_code: fullCode,
-                  })
-                  .eq('id', generationId);
-
-                storeGenerationEmbedding(generationId, description, userApiKey).catch(() => {});
-                incrementGenerationCount(user.id).catch(() => {});
-              }
-
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({
-                    ...event,
-                    code: fullCode,
-                    generationId,
-                    totalLength: fullCode.length,
-                    qualityPassed: qualityReport.passed,
-                    ragEnriched: contextAddition.length > 0,
-                  })}\n\n`
-                )
-              );
-              continue;
+              break;
             }
 
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+            controller.enqueue(encoder.encode(createSseEvent(event)));
           }
+
+          const qualityReport = runAllGates(fullCode);
+          controller.enqueue(
+            encoder.encode(
+              createSseEvent({ type: 'quality', report: qualityReport, timestamp: Date.now() })
+            )
+          );
+
+          if (generationId) {
+            const supabase2 = await createClient();
+            await supabase2
+              .from('generations')
+              .update({ status: 'completed', generated_code: fullCode })
+              .eq('id', generationId);
+
+            storeGenerationEmbedding(generationId, description, userApiKey).catch(() => {});
+            incrementGenerationCount(user.id).catch(() => {});
+          }
+
+          controller.enqueue(
+            encoder.encode(
+              createSseEvent({
+                type: 'complete',
+                code: fullCode,
+                generationId,
+                totalLength: fullCode.length,
+                qualityPassed: qualityReport.passed,
+                ragEnriched: contextAddition.length > 0,
+                provider: activeProvider,
+                model: activeModel,
+                timestamp: Date.now(),
+              })
+            )
+          );
         } catch (error) {
           if (generationId) {
             const supabase = await createClient();
@@ -188,11 +192,11 @@ export async function POST(request: NextRequest) {
           captureServerError(error, { route: '/api/generate', userId: user.id });
           controller.enqueue(
             encoder.encode(
-              `data: ${JSON.stringify({
+              createSseEvent({
                 type: 'error',
                 message: error instanceof Error ? error.message : 'Stream failed',
                 timestamp: Date.now(),
-              })}\n\n`
+              })
             )
           );
         } finally {
@@ -224,10 +228,10 @@ export async function GET() {
   return new Response(
     JSON.stringify({
       message: 'UI Generation API',
-      version: '3.0.0',
+      version: '3.1.0',
       status: 'active',
-      provider: 'gemini-2.0-flash',
-      features: ['rag', 'quality-gates', 'streaming', 'image-input'],
+      providers: ['google', 'openai', 'anthropic'],
+      features: ['rag', 'quality-gates', 'streaming', 'image-input', 'multi-llm'],
     }),
     {
       status: 200,
