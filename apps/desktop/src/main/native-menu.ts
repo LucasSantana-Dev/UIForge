@@ -28,8 +28,7 @@ export function createNativeMenu(mainWindow: BrowserWindow) {
         {
           label: 'Open Project',
           accelerator: 'CmdOrCtrl+O',
-          click: () =>
-            mainWindow.webContents.send('menu:open-project'),
+          click: () => mainWindow.webContents.send('menu:open-project'),
         },
         { type: 'separator' },
         isMac ? { role: 'close' } : { role: 'quit' },
@@ -53,14 +52,12 @@ export function createNativeMenu(mainWindow: BrowserWindow) {
         {
           label: 'Component',
           accelerator: 'CmdOrCtrl+G',
-          click: () =>
-            mainWindow.webContents.send('menu:generate', 'component'),
+          click: () => mainWindow.webContents.send('menu:generate', 'component'),
         },
         {
           label: 'Page Template',
           accelerator: 'CmdOrCtrl+Shift+G',
-          click: () =>
-            mainWindow.webContents.send('menu:generate', 'page'),
+          click: () => mainWindow.webContents.send('menu:generate', 'page'),
         },
       ],
     },

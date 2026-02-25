@@ -36,9 +36,7 @@ describe('MCP Server Manager', () => {
   });
 
   it('should export start and stop functions', async () => {
-    const { startMcpServer, stopMcpServer } = await import(
-      '../main/mcp-server'
-    );
+    const { startMcpServer, stopMcpServer } = await import('../main/mcp-server');
     expect(startMcpServer).toBeDefined();
     expect(stopMcpServer).toBeDefined();
   });

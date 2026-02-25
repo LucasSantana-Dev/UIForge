@@ -1,7 +1,5 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import {
-  StdioClientTransport,
-} from '@modelcontextprotocol/sdk/client/stdio.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { resolve } from 'path';
 import { app } from 'electron';
 
@@ -10,12 +8,7 @@ let transport: StdioClientTransport | null = null;
 
 function getMcpServerPath(): string {
   if (app.isPackaged) {
-    return resolve(
-      process.resourcesPath,
-      'mcp-server',
-      'dist',
-      'index.js'
-    );
+    return resolve(process.resourcesPath, 'mcp-server', 'dist', 'index.js');
   }
   return resolve(
     __dirname,
@@ -35,10 +28,7 @@ export async function startMcpServer(): Promise<Client> {
 
   const serverPath = getMcpServerPath();
 
-  client = new Client(
-    { name: 'siza-desktop', version: app.getVersion() },
-    { capabilities: {} }
-  );
+  client = new Client({ name: 'siza-desktop', version: app.getVersion() }, { capabilities: {} });
 
   transport = new StdioClientTransport({
     command: 'node',

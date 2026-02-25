@@ -26,14 +26,11 @@ function validateFilePath(filePath: string): string {
 const OLLAMA_BASE = 'http://localhost:11434';
 
 export function registerIpcHandlers(mainWindow: BrowserWindow) {
-  ipcMain.handle(
-    IPC.MCP_CALL_TOOL,
-    async (_e, name: string, args: Record<string, unknown>) => {
-      const client = await getMcpClient();
-      if (!client) throw new Error('MCP server not connected');
-      return client.callTool({ name, arguments: args });
-    }
-  );
+  ipcMain.handle(IPC.MCP_CALL_TOOL, async (_e, name: string, args: Record<string, unknown>) => {
+    const client = await getMcpClient();
+    if (!client) throw new Error('MCP server not connected');
+    return client.callTool({ name, arguments: args });
+  });
 
   ipcMain.handle(IPC.MCP_LIST_TOOLS, async () => {
     const client = await getMcpClient();
@@ -77,47 +74,35 @@ export function registerIpcHandlers(mainWindow: BrowserWindow) {
     }
   });
 
-  ipcMain.handle(
-    IPC.OLLAMA_LIST_MODELS,
-    async (): Promise<OllamaModel[]> => {
-      try {
-        const res = await fetch(`${OLLAMA_BASE}/api/tags`);
-        const data = await res.json();
-        return (data.models || []).map((m: any) => ({
-          name: m.name,
-          size: m.size,
-          modifiedAt: m.modified_at,
-        }));
-      } catch {
-        return [];
-      }
+  ipcMain.handle(IPC.OLLAMA_LIST_MODELS, async (): Promise<OllamaModel[]> => {
+    try {
+      const res = await fetch(`${OLLAMA_BASE}/api/tags`);
+      const data = await res.json();
+      return (data.models || []).map((m: any) => ({
+        name: m.name,
+        size: m.size,
+        modifiedAt: m.modified_at,
+      }));
+    } catch {
+      return [];
     }
-  );
+  });
 
   ipcMain.handle(IPC.FS_SELECT_DIRECTORY, async () => {
     return selectDirectory(mainWindow);
   });
 
-  ipcMain.handle(
-    IPC.FS_READ_FILE,
-    async (_e, filePath: string) => {
-      return readProjectFile(validateFilePath(filePath));
-    }
-  );
+  ipcMain.handle(IPC.FS_READ_FILE, async (_e, filePath: string) => {
+    return readProjectFile(validateFilePath(filePath));
+  });
 
-  ipcMain.handle(
-    IPC.FS_WRITE_FILE,
-    async (_e, filePath: string, content: string) => {
-      return writeProjectFile(validateFilePath(filePath), content);
-    }
-  );
+  ipcMain.handle(IPC.FS_WRITE_FILE, async (_e, filePath: string, content: string) => {
+    return writeProjectFile(validateFilePath(filePath), content);
+  });
 
-  ipcMain.handle(
-    IPC.FS_LIST_DIRECTORY,
-    async (_e, dirPath: string) => {
-      return listDirectoryRecursive(validateFilePath(dirPath));
-    }
-  );
+  ipcMain.handle(IPC.FS_LIST_DIRECTORY, async (_e, dirPath: string) => {
+    return listDirectoryRecursive(validateFilePath(dirPath));
+  });
 
   ipcMain.handle(IPC.APP_GET_VERSION, () => {
     return app.getVersion();
@@ -132,19 +117,13 @@ export function registerIpcHandlers(mainWindow: BrowserWindow) {
     return storeInstance;
   }
 
-  ipcMain.handle(
-    IPC.STORE_GET,
-    async (_e, key: string) => {
-      const s = await getStore();
-      return s.get(key);
-    }
-  );
+  ipcMain.handle(IPC.STORE_GET, async (_e, key: string) => {
+    const s = await getStore();
+    return s.get(key);
+  });
 
-  ipcMain.handle(
-    IPC.STORE_SET,
-    async (_e, key: string, value: unknown) => {
-      const s = await getStore();
-      s.set(key, value);
-    }
-  );
+  ipcMain.handle(IPC.STORE_SET, async (_e, key: string, value: unknown) => {
+    const s = await getStore();
+    s.set(key, value);
+  });
 }

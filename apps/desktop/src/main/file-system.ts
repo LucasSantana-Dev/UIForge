@@ -3,9 +3,7 @@ import { readFile, writeFile, readdir } from 'fs/promises';
 import { join } from 'path';
 import type { FileEntry } from '../shared/types';
 
-export async function selectDirectory(
-  parent: BrowserWindow
-): Promise<string | null> {
+export async function selectDirectory(parent: BrowserWindow): Promise<string | null> {
   const result = await dialog.showOpenDialog(parent, {
     properties: ['openDirectory', 'createDirectory'],
     title: 'Select Project Directory',
@@ -16,23 +14,15 @@ export async function selectDirectory(
   return result.filePaths[0];
 }
 
-export async function readProjectFile(
-  filePath: string
-): Promise<string> {
+export async function readProjectFile(filePath: string): Promise<string> {
   return readFile(filePath, 'utf-8');
 }
 
-export async function writeProjectFile(
-  filePath: string,
-  content: string
-): Promise<void> {
+export async function writeProjectFile(filePath: string, content: string): Promise<void> {
   await writeFile(filePath, content, 'utf-8');
 }
 
-export async function listDirectoryRecursive(
-  dirPath: string,
-  depth = 3
-): Promise<FileEntry[]> {
+export async function listDirectoryRecursive(dirPath: string, depth = 3): Promise<FileEntry[]> {
   if (depth <= 0) return [];
 
   const entries = await readdir(dirPath, { withFileTypes: true });
@@ -51,10 +41,7 @@ export async function listDirectoryRecursive(
     };
 
     if (entry.isDirectory()) {
-      fileEntry.children = await listDirectoryRecursive(
-        fullPath,
-        depth - 1
-      );
+      fileEntry.children = await listDirectoryRecursive(fullPath, depth - 1);
     }
 
     result.push(fileEntry);

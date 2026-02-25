@@ -30,9 +30,7 @@ describe('File System Operations', () => {
   });
 
   it('should write files to disk', async () => {
-    const { writeProjectFile, readProjectFile } = await import(
-      '../main/file-system'
-    );
+    const { writeProjectFile, readProjectFile } = await import('../main/file-system');
     const filePath = join(testDir, 'NewComponent.tsx');
     await writeProjectFile(filePath, 'export function New() {}');
     const content = await readProjectFile(filePath);
@@ -40,9 +38,7 @@ describe('File System Operations', () => {
   });
 
   it('should list directory recursively', async () => {
-    const { listDirectoryRecursive } = await import(
-      '../main/file-system'
-    );
+    const { listDirectoryRecursive } = await import('../main/file-system');
     const entries = await listDirectoryRecursive(testDir);
     expect(entries.length).toBeGreaterThan(0);
     const names = entries.map((e) => e.name);

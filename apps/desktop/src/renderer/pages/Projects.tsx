@@ -81,9 +81,7 @@ export function Projects() {
         </div>
         {recentProjects.length > 0 && (
           <div className="p-4 border-b border-surface-3">
-            <h3 className="text-xs font-medium text-text-muted uppercase mb-2">
-              Recent
-            </h3>
+            <h3 className="text-xs font-medium text-text-muted uppercase mb-2">Recent</h3>
             {recentProjects.map((path) => (
               <button
                 key={path}
@@ -110,16 +108,12 @@ export function Projects() {
           <div className="text-center text-text-secondary">
             <FolderOpenIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p className="text-sm">{projectPath}</p>
-            <p className="text-xs text-text-muted mt-1">
-              {files.length} items
-            </p>
+            <p className="text-xs text-text-muted mt-1">{files.length} items</p>
           </div>
         ) : (
           <div className="text-center text-text-secondary">
             <FolderIcon className="w-12 h-12 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">
-              Open a project to browse files
-            </p>
+            <p className="text-sm">Open a project to browse files</p>
           </div>
         )}
       </div>

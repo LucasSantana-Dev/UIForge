@@ -2,10 +2,7 @@ import { useState, useCallback } from 'react';
 import type { McpToolResult } from '../../shared/types';
 
 interface UseMcpResult {
-  callTool: (
-    name: string,
-    args: Record<string, unknown>
-  ) => Promise<McpToolResult>;
+  callTool: (name: string, args: Record<string, unknown>) => Promise<McpToolResult>;
   isLoading: boolean;
   error: string | null;
   lastResult: McpToolResult | null;
@@ -14,14 +11,10 @@ interface UseMcpResult {
 export function useMcp(): UseMcpResult {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastResult, setLastResult] =
-    useState<McpToolResult | null>(null);
+  const [lastResult, setLastResult] = useState<McpToolResult | null>(null);
 
   const callTool = useCallback(
-    async (
-      name: string,
-      args: Record<string, unknown>
-    ): Promise<McpToolResult> => {
+    async (name: string, args: Record<string, unknown>): Promise<McpToolResult> => {
       setIsLoading(true);
       setError(null);
       try {
@@ -29,8 +22,7 @@ export function useMcp(): UseMcpResult {
         setLastResult(result);
         return result;
       } catch (err) {
-        const message =
-          err instanceof Error ? err.message : 'Tool call failed';
+        const message = err instanceof Error ? err.message : 'Tool call failed';
         setError(message);
         throw err;
       } finally {

@@ -1,17 +1,6 @@
 import { useState, useMemo } from 'react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Button,
-} from '@siza/ui';
-import {
-  CheckCircleIcon,
-  XCircleIcon,
-  DownloadIcon,
-  ArrowRightIcon,
-} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, Button } from '@siza/ui';
+import { CheckCircleIcon, XCircleIcon, DownloadIcon, ArrowRightIcon } from 'lucide-react';
 import { useOllama } from '../hooks/use-ollama';
 
 const RECOMMENDED_MODELS = [
@@ -60,9 +49,7 @@ export function Setup({ onComplete }: SetupProps) {
                 <div>
                   <p className="font-medium">Ollama</p>
                   <p className="text-sm text-text-secondary">
-                    {running
-                      ? 'Detected and running'
-                      : 'Not detected — install from ollama.com'}
+                    {running ? 'Detected and running' : 'Not detected — install from ollama.com'}
                   </p>
                 </div>
               </div>
@@ -70,7 +57,7 @@ export function Setup({ onComplete }: SetupProps) {
                 <Button variant="outline" onClick={refresh}>
                   Re-check
                 </Button>
-                <Button onClick={() => running ? setManualStep('models') : onComplete()}>
+                <Button onClick={() => (running ? setManualStep('models') : onComplete())}>
                   {running ? 'Next' : 'Skip for now'}
                   <ArrowRightIcon className="w-4 h-4 ml-1" />
                 </Button>
@@ -106,10 +93,7 @@ export function Setup({ onComplete }: SetupProps) {
               {models.length > 0 && (
                 <ul className="space-y-1">
                   {models.map((m) => (
-                    <li
-                      key={m.name}
-                      className="text-sm flex items-center gap-2"
-                    >
+                    <li key={m.name} className="text-sm flex items-center gap-2">
                       <CheckCircleIcon className="w-4 h-4 text-success" />
                       {m.name}
                     </li>

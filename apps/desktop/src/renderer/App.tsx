@@ -4,11 +4,7 @@ import { Generate } from './pages/Generate';
 import { Projects } from './pages/Projects';
 import { Settings } from './pages/Settings';
 import { OllamaStatus } from './components/OllamaStatus';
-import {
-  CodeIcon,
-  FolderOpenIcon,
-  SettingsIcon,
-} from 'lucide-react';
+import { CodeIcon, FolderOpenIcon, SettingsIcon } from 'lucide-react';
 
 type Page = 'generate' | 'projects' | 'settings';
 

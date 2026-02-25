@@ -50,7 +50,10 @@ export interface SizaApi {
 
   getVersion: () => Promise<string>;
   getPreference: <K extends keyof AppPreferences>(key: K) => Promise<AppPreferences[K]>;
-  setPreference: <K extends keyof AppPreferences>(key: K, value: AppPreferences[K]) => Promise<void>;
+  setPreference: <K extends keyof AppPreferences>(
+    key: K,
+    value: AppPreferences[K]
+  ) => Promise<void>;
 }
 
 declare global {

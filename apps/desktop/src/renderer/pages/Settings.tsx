@@ -44,21 +44,9 @@ export function Settings() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center gap-3">
-            <div
-              className={`w-2.5 h-2.5 rounded-full ${
-                running ? 'bg-success' : 'bg-error'
-              }`}
-            />
-            <span className="text-sm">
-              {running
-                ? `Connected (v${version})`
-                : 'Not running'}
-            </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={refresh}
-            >
+            <div className={`w-2.5 h-2.5 rounded-full ${running ? 'bg-success' : 'bg-error'}`} />
+            <span className="text-sm">{running ? `Connected (v${version})` : 'Not running'}</span>
+            <Button variant="ghost" size="sm" onClick={refresh}>
               <RefreshCwIcon className="w-4 h-4" />
             </Button>
           </div>
@@ -94,9 +82,8 @@ export function Settings() {
 
           {!running && (
             <p className="text-xs text-text-muted">
-              Install Ollama from{' '}
-              <span className="text-brand">ollama.com</span>{' '}
-              to enable local AI generation.
+              Install Ollama from <span className="text-brand">ollama.com</span> to enable local AI
+              generation.
             </p>
           )}
         </CardContent>
@@ -119,9 +106,7 @@ export function Settings() {
       </div>
 
       <Separator />
-      <p className="text-xs text-text-muted">
-        Siza Desktop v{appVersion}
-      </p>
+      <p className="text-xs text-text-muted">Siza Desktop v{appVersion}</p>
     </div>
   );
 }
@@ -140,15 +125,9 @@ function McpStatusDisplay() {
 
   return (
     <div className="flex items-center gap-3">
-      <div
-        className={`w-2.5 h-2.5 rounded-full ${
-          status.connected ? 'bg-success' : 'bg-error'
-        }`}
-      />
+      <div className={`w-2.5 h-2.5 rounded-full ${status.connected ? 'bg-success' : 'bg-error'}`} />
       <span className="text-sm">
-        {status.connected
-          ? `Connected (${status.toolCount} tools)`
-          : 'Disconnected'}
+        {status.connected ? `Connected (${status.toolCount} tools)` : 'Disconnected'}
       </span>
     </div>
   );

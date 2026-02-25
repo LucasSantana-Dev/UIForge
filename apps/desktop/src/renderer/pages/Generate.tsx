@@ -32,9 +32,7 @@ export function Generate() {
         typescript: true,
       });
 
-      const text = result.content?.find(
-        (c) => c.type === 'text'
-      )?.text;
+      const text = result.content?.find((c) => c.type === 'text')?.text;
       if (text) setGeneratedCode(text);
     } catch {
       // error is set in useMcp hook
@@ -96,9 +94,7 @@ export function Generate() {
               Vue
             </Button>
           </div>
-          {error && (
-            <p className="text-sm text-error">{error}</p>
-          )}
+          {error && <p className="text-sm text-error">{error}</p>}
           <Button
             onClick={handleGenerate}
             disabled={isLoading || !prompt.trim()}
@@ -125,17 +121,10 @@ export function Generate() {
             )}
           </div>
           <TabsContent value="code" className="flex-1 m-0">
-            <CodeEditor
-              code={generatedCode}
-              onChange={setGeneratedCode}
-              language="typescript"
-            />
+            <CodeEditor code={generatedCode} onChange={setGeneratedCode} language="typescript" />
           </TabsContent>
           <TabsContent value="preview" className="flex-1 m-0">
-            <LivePreview
-              code={generatedCode}
-              framework={framework}
-            />
+            <LivePreview code={generatedCode} framework={framework} />
           </TabsContent>
         </Tabs>
       </div>

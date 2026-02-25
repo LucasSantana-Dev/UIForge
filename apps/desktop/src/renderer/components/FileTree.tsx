@@ -11,9 +11,12 @@ import {
 import type { FileEntry } from '../../shared/types';
 
 function FileEntryIcon({ name }: { name: string }) {
-  if (/\.(tsx?|jsx?)$/.test(name)) return <FileCodeIcon className="w-4 h-4 text-text-muted shrink-0" />;
-  if (/\.(md|txt|json)$/.test(name)) return <FileTextIcon className="w-4 h-4 text-text-muted shrink-0" />;
-  if (/\.(png|jpg|svg|webp)$/.test(name)) return <ImageIcon className="w-4 h-4 text-text-muted shrink-0" />;
+  if (/\.(tsx?|jsx?)$/.test(name))
+    return <FileCodeIcon className="w-4 h-4 text-text-muted shrink-0" />;
+  if (/\.(md|txt|json)$/.test(name))
+    return <FileTextIcon className="w-4 h-4 text-text-muted shrink-0" />;
+  if (/\.(png|jpg|svg|webp)$/.test(name))
+    return <ImageIcon className="w-4 h-4 text-text-muted shrink-0" />;
   return <FileIcon className="w-4 h-4 text-text-muted shrink-0" />;
 }
 
@@ -23,11 +26,7 @@ interface FileTreeNodeProps {
   onSelect?: (entry: FileEntry) => void;
 }
 
-function FileTreeNode({
-  entry,
-  depth = 0,
-  onSelect,
-}: FileTreeNodeProps) {
+function FileTreeNode({ entry, depth = 0, onSelect }: FileTreeNodeProps) {
   const [expanded, setExpanded] = useState(depth < 1);
   if (!entry.isDirectory) {
     return (
@@ -60,12 +59,7 @@ function FileTreeNode({
       {expanded && entry.children && (
         <div>
           {entry.children.map((child) => (
-            <FileTreeNode
-              key={child.path}
-              entry={child}
-              depth={depth + 1}
-              onSelect={onSelect}
-            />
+            <FileTreeNode key={child.path} entry={child} depth={depth + 1} onSelect={onSelect} />
           ))}
         </div>
       )}
@@ -82,11 +76,7 @@ export function FileTree({ files, onSelect }: FileTreeProps) {
   return (
     <div className="text-sm">
       {files.map((entry) => (
-        <FileTreeNode
-          key={entry.path}
-          entry={entry}
-          onSelect={onSelect}
-        />
+        <FileTreeNode key={entry.path} entry={entry} onSelect={onSelect} />
       ))}
     </div>
   );
