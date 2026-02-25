@@ -6,8 +6,8 @@ test.describe('Authentication', () => {
   });
 
   test('should display landing page', async ({ page }) => {
-    await expect(page.locator('text=Siza')).toBeVisible();
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.getByText(/an ecosystem that enables/i)).toBeVisible();
   });
 
   test('should navigate to sign in page', async ({ page }) => {
@@ -26,7 +26,6 @@ test.describe('Authentication', () => {
     await page.goto('/signin');
     await page.click('button[type="submit"]');
 
-    // HTML5 validation should prevent submission
     const emailInput = page.locator('input[type="email"]');
     await expect(emailInput).toHaveAttribute('required', '');
   });
@@ -35,7 +34,6 @@ test.describe('Authentication', () => {
     await page.goto('/signup');
     await page.click('button[type="submit"]');
 
-    // HTML5 validation should prevent submission
     const emailInput = page.locator('input[type="email"]');
     const passwordInput = page.locator('input[type="password"]');
     await expect(emailInput).toHaveAttribute('required', '');
@@ -52,7 +50,6 @@ test.describe('Authentication', () => {
   });
 
   test('should redirect to dashboard when authenticated', async ({ page, context: _context }) => {
-    // This test requires a test user - skip in CI without test credentials
     test.skip(!process.env.TEST_USER_EMAIL, 'Test user credentials not configured');
 
     await page.goto('/signin');
@@ -60,7 +57,6 @@ test.describe('Authentication', () => {
     await page.fill('input[type="password"]', process.env.TEST_USER_PASSWORD!);
     await page.click('button[type="submit"]');
 
-    // Should redirect to dashboard
     await expect(page).toHaveURL('/dashboard', { timeout: 10000 });
   });
 });
