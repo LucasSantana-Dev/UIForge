@@ -7,26 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.7.0] — 2026-02-25
+
 ### Added
 
+- **Sentry server-side**: Lightweight Envelope API reporter for Cloudflare Workers (zero deps, ~100 lines)
+- **Sentry middleware integration**: `captureServerError` in all 4 API middleware handlers (`withAuth`, `withRateLimit`, `withValidation`, `withErrorHandling`)
+- **Sentry critical routes**: `/api/generate` (stream + outer catch) and `/api/components` error paths
+- **Generation quota UI**: UpgradePrompt shown proactively when quota exceeded + on 429 error
+- **Usage counter**: "X / Y generations this month" display in GeneratorForm with "Nearing limit" warning at 80%
+- **E2E settings tests**: 7 tests covering tabs, AI Keys, GitHub, security info, preference toggles
+- **E2E password reset tests**: 5 tests for forgot-password form, validation, navigation
+- **E2E marketing tests**: 5 tests for about page, roadmap phases, pricing plans
+- **IndexedDB storage tests**: 19 tests using fake-indexeddb (was manual mock, 26 tests skipped)
+- **AI keys store tests**: 13 tests with corrected API expectations
+- **AIKeyManager component tests**: 8 tests matching actual component behavior
+- **ComponentGenerator tests**: 8 tests for sub-component delegation pattern
+- **Quota handling tests**: 2 tests for 429 response and rate limit error in useGeneration hook
 - Docs: Rose Pine Moon syntax highlighting for all code blocks
 - Docs: Redesigned homepage with quick links, tech stack, ecosystem diagram
 - Docs: Components showcase page with categorized UI patterns
 - Docs: layout.config.tsx with Siza nav branding and external links
 - Homepage: 3 missing CSS keyframes (mesh-rotate, particle-drift, cursor-blink)
 - Roadmap: Interactive phase cards with progress bars, filters, expand/collapse
-- Roadmap: Phase navigator dots and status filter with counts
 - FadeIn: prefers-reduced-motion support
+
+### Fixed
+
+- **IndexedDB storage bug**: `setUserPreferences` used out-of-line key with keyPath store — fixed to include id in object
+- **Generation error parsing**: API returns `{ error: string }` but client expected `{ error: { message } }` — quota errors now properly displayed
+- **Generate button**: Disabled when quota exhausted (was only disabled during generation)
 
 ### Changed
 
+- **Test count**: 299 tests passing (was 245), 25 suites (was 21), 4 skipped (was 11)
+- **E2E specs**: 9 spec files (was 6), ~45% route coverage (was 28%)
 - Social links: Twitter to LinkedIn across LandingFooter, landing page, docs page
-- Homepage: Reduced particle count 20 to 8 for better performance
-- Homepage: Throttled scroll listener with requestAnimationFrame + passive
+- Homepage: Reduced particle count 20 to 8, throttled scroll listener
 - Homepage: Removed force-dynamic (Next.js auto-detects dynamic via cookie access)
 
 ### Removed
 
+- 3 redundant test files: `byok-storage.test.ts`, `ai-keys.test.ts` (placeholder), `auth-callback.test.ts` (placeholder)
 - `export const dynamic = 'force-dynamic'` from homepage
 
 ---
