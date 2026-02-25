@@ -30,7 +30,7 @@
     "@vitejs/plugin-react": "^4.3.0",
     "@vitest/coverage-v8": "^2.1.9",
     "autoprefixer": "^10.4.20",
-    "electron": "^40.6.1",
+    "electron": "40.6.1",
     "electron-builder": "^25.0.0",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
@@ -40,5 +40,7 @@
     "vite-plugin-electron": "^0.28.0",
     "vite-plugin-electron-renderer": "^0.14.0",
     "vitest": "^2.0.0"
-  }
+  },
+  "description": "Siza desktop app - AI-powered UI generation with local MCP support",
+  "author": "Forge Space"
 }

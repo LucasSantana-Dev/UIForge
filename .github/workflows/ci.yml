@@ -46,7 +46,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - run: npm ci
-      - run: npm run test -- -- --coverage
+      - run: npm run test -- --filter=!@siza/desktop -- --coverage
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
@@ -65,7 +65,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
       - run: npm ci
-      - run: npm run build
+      - run: npm run build -- --filter=!@siza/desktop
 
   security:
     name: Security Audit

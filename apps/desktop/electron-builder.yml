@@ -1,5 +1,6 @@
 appId: com.siza.desktop
 productName: Siza
+electronVersion: "40.6.1"
 directories:
   buildResources: resources
   output: release
