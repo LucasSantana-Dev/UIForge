@@ -24,7 +24,7 @@ export function Generate() {
   const handleGenerate = useCallback(async () => {
     if (!prompt.trim() || !componentName.trim()) return;
     try {
-      const result = await callTool('generate-ui-component', {
+      const result = await callTool('generate_ui_component', {
         description: prompt,
         framework,
         componentName,

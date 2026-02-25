@@ -46,7 +46,7 @@ export async function startMcpServer(): Promise<Client> {
     env: {
       ...process.env,
       NODE_ENV: 'production',
-      LOG_LEVEL: 'silent',
+      LOG_LEVEL: 'error',
     },
     stderr: 'pipe',
   });
