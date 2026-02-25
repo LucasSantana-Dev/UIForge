@@ -129,7 +129,10 @@ export const useThemeStore = create<ThemeState & ThemeActions>()(
           .getThemes()
           .find((t) => t.id === id);
         if (!theme) return null;
-        const { id: _id, builtIn: _bi, createdAt: _ca, updatedAt: _ua, ...exportable } = theme;
+        const excludeKeys = new Set(['id', 'builtIn', 'createdAt', 'updatedAt']);
+        const exportable = Object.fromEntries(
+          Object.entries(theme).filter(([k]) => !excludeKeys.has(k))
+        );
         return JSON.stringify(exportable, null, 2);
       },
 
