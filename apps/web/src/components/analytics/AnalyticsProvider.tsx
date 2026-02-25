@@ -12,20 +12,32 @@ interface AnalyticsEvent {
 
 declare global {
   interface Window {
-    gtag: (command: string, targetId: string, config?: Record<string, any>) => void;
+    gtag: (
+      command: string,
+      targetId: string,
+      config?: Record<string, any>
+    ) => void;
     dataLayer: any[];
   }
 }
 
-export default function AnalyticsProvider({ children }: { children: React.ReactNode }) {
+const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID;
+
+export default function AnalyticsProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Load Google Analytics
+    if (!GA_TRACKING_ID) return;
+
     const script1 = document.createElement('script');
     script1.async = true;
-    script1.src = 'https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX';
+    script1.src =
+      `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
     document.head.appendChild(script1);
 
     const script2 = document.createElement('script');
@@ -33,35 +45,38 @@ export default function AnalyticsProvider({ children }: { children: React.ReactN
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX', {
+      gtag('config', '${GA_TRACKING_ID}', {
         page_location: window.location.href,
-        debug_mode: process.env.NODE_ENV === 'development'
+        debug_mode: ${process.env.NODE_ENV === 'development'}
       });
     `;
     document.head.appendChild(script2);
 
     return () => {
-      // Cleanup scripts if needed
       document.head.removeChild(script1);
       document.head.removeChild(script2);
     };
   }, []);
 
-  // Track page views
   useEffect(() => {
-    if (typeof window.gtag === 'function') {
-      const url = pathname + (searchParams.toString() ? '?' + searchParams.toString() : '');
-      window.gtag('config', 'G-XXXXXXXXXX', {
-        page_location: url,
-      });
-    }
+    if (!GA_TRACKING_ID || typeof window.gtag !== 'function') return;
+    const url =
+      pathname +
+      (searchParams.toString() ? '?' + searchParams.toString() : '');
+    window.gtag('config', GA_TRACKING_ID, {
+      page_location: url,
+    });
   }, [pathname, searchParams]);
 
   return <>{children}</>;
 }
 
-// Analytics helper functions
-export const trackEvent = ({ action, category, label, value }: AnalyticsEvent) => {
+export const trackEvent = ({
+  action,
+  category,
+  label,
+  value,
+}: AnalyticsEvent) => {
   if (typeof window.gtag === 'function') {
     window.gtag('event', action, {
       event_category: category,
@@ -72,11 +87,10 @@ export const trackEvent = ({ action, category, label, value }: AnalyticsEvent) =
 };
 
 export const trackPageView = (url: string) => {
-  if (typeof window.gtag === 'function') {
-    window.gtag('config', 'G-XXXXXXXXXX', {
-      page_location: url,
-    });
-  }
+  if (!GA_TRACKING_ID || typeof window.gtag !== 'function') return;
+  window.gtag('config', GA_TRACKING_ID, {
+    page_location: url,
+  });
 };
 
 export const trackUserInteraction = (element: string, action: string) => {
@@ -87,7 +101,10 @@ export const trackUserInteraction = (element: string, action: string) => {
   });
 };
 
-export const trackTemplateUsage = (templateId: string, templateName: string) => {
+export const trackTemplateUsage = (
+  templateId: string,
+  templateName: string
+) => {
   trackEvent({
     action: 'template_used',
     category: 'Templates',
@@ -95,7 +112,10 @@ export const trackTemplateUsage = (templateId: string, templateName: string) => 
   });
 };
 
-export const trackComponentGeneration = (framework: string, componentLibrary: string) => {
+export const trackComponentGeneration = (
+  framework: string,
+  componentLibrary: string
+) => {
   trackEvent({
     action: 'component_generated',
     category: 'Generation',
