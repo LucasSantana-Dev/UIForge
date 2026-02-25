@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Docs: layout.config.tsx with Siza nav branding and external links
 - Homepage: 3 missing CSS keyframes (mesh-rotate, particle-drift, cursor-blink)
 - Roadmap: Interactive phase cards with progress bars, filters, expand/collapse
+- Roadmap: Phase navigator dots and status filter with counts
 - FadeIn: prefers-reduced-motion support
 
 ### Fixed
