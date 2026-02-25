@@ -16,7 +16,7 @@ export function HeroSection({ user }: HeroSectionProps) {
       const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
       return x - Math.floor(x);
     };
-    return Array.from({ length: 20 }, (_, i) => ({
+    return Array.from({ length: 8 }, (_, i) => ({
       id: i,
       top: `${seed(i * 7) * 100}%`,
       left: `${seed(i * 13) * 100}%`,
@@ -52,15 +52,20 @@ export function HeroSection({ user }: HeroSectionProps) {
         <div
           key={p.id}
           className="absolute rounded-full bg-[#7C3AED]"
-          style={{
-            width: `${p.size}px`,
-            height: `${p.size}px`,
-            top: p.top,
-            left: p.left,
-            opacity: p.opacity,
-            animation: `particle-drift ${p.duration}s ease-in-out infinite`,
-            animationDelay: `${p.delay}s`,
-          }}
+          style={
+            {
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              top: p.top,
+              left: p.left,
+              opacity: p.opacity,
+              animation: `particle-drift ${p.duration}s ease-in-out infinite`,
+              animationDelay: `${p.delay}s`,
+              '--drift-x': `${(p.id % 2 === 0 ? 1 : -1) * 20}px`,
+              '--drift-y': `${(p.id % 3 === 0 ? 1 : -1) * 15}px`,
+              '--particle-opacity': `${p.opacity}`,
+            } as React.CSSProperties
+          }
         />
       ))}
 

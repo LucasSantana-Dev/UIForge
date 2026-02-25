@@ -1,0 +1,63 @@
+import type { Phase } from './types';
+
+export const phases: Phase[] = [
+  {
+    number: 1,
+    title: 'Foundation',
+    subtitle: 'Core platform, deployment, and developer experience',
+    status: 'active',
+    estimatedDate: 'Q1 2026',
+    items: [
+      { label: 'Dark mode design system with Siza tokens', status: 'done' },
+      { label: 'Brand identity v2.0', status: 'done' },
+      { label: 'Authentication (Email + OAuth)', status: 'done' },
+      { label: 'Project CRUD with Row Level Security', status: 'done' },
+      { label: 'Stripe billing integration (Free/Pro/Team)', status: 'done' },
+      { label: 'Feature flags system (17 flags)', status: 'done' },
+      { label: 'Cloudflare Workers deployment', status: 'done' },
+      { label: 'AI component generation with streaming', status: 'in-progress' },
+      { label: 'Live component preview (iframe sandbox)', status: 'in-progress' },
+      {
+        label: 'Export to GitHub (one-click push)',
+        status: 'planned',
+        githubUrl: 'https://github.com/Forge-Space/siza/issues',
+      },
+      {
+        label: 'Template library (20 starter templates)',
+        status: 'planned',
+        githubUrl: 'https://github.com/Forge-Space/siza/issues',
+      },
+    ],
+  },
+  {
+    number: 2,
+    title: 'Community',
+    subtitle: 'Open-source growth and developer ecosystem',
+    status: 'planned',
+    estimatedDate: 'Q2 2026',
+    items: [
+      { label: 'Documentation site (docs.siza.dev)', status: 'planned' },
+      { label: 'Public roadmap (GitHub Projects)', status: 'planned' },
+      { label: 'Discord community launch', status: 'planned' },
+      { label: 'CONTRIBUTING.md in all repos', status: 'in-progress' },
+      { label: 'MCP server directory (community servers)', status: 'planned' },
+      { label: 'Template marketplace (creator submissions)', status: 'planned' },
+      { label: 'CLI tool: npx create-siza-app', status: 'planned' },
+    ],
+  },
+  {
+    number: 3,
+    title: 'Scale',
+    subtitle: 'Enterprise features, marketplace, and partnerships',
+    status: 'future',
+    estimatedDate: 'Q3 2026',
+    items: [
+      { label: 'Managed MCP Gateway (hosted service)', status: 'planned' },
+      { label: 'Enterprise SSO and audit logs', status: 'planned' },
+      { label: 'Self-host installer (Docker Compose)', status: 'planned' },
+      { label: 'IDE plugins (VS Code, Cursor)', status: 'planned' },
+      { label: 'Framework partnerships (Next.js, Nuxt, SvelteKit)', status: 'planned' },
+      { label: 'University / bootcamp free Pro program', status: 'planned' },
+    ],
+  },
+];

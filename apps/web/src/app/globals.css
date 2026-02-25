@@ -125,6 +125,35 @@
   }
 }
 
+@keyframes mesh-rotate {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+@keyframes particle-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+    opacity: var(--particle-opacity, 0.2);
+  }
+  50% {
+    transform: translate(var(--drift-x, 20px), var(--drift-y, -15px));
+    opacity: calc(var(--particle-opacity, 0.2) * 1.5);
+  }
+}
+@keyframes cursor-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

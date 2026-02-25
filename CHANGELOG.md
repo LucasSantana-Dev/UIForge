@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Docs: Rose Pine Moon syntax highlighting for all code blocks
+- Docs: Redesigned homepage with quick links, tech stack, ecosystem diagram
+- Docs: Components showcase page with categorized UI patterns
+- Docs: layout.config.tsx with Siza nav branding and external links
+- Homepage: 3 missing CSS keyframes (mesh-rotate, particle-drift, cursor-blink)
+- Roadmap: Interactive phase cards with progress bars, filters, expand/collapse
+- Roadmap: Phase navigator dots and status filter with counts
+- FadeIn: prefers-reduced-motion support
+
+### Changed
+
+- Social links: Twitter to LinkedIn across LandingFooter, landing page, docs page
+- Homepage: Reduced particle count 20 to 8 for better performance
+- Homepage: Throttled scroll listener with requestAnimationFrame + passive
+- Homepage: Removed force-dynamic (Next.js auto-detects dynamic via cookie access)
+
+### Removed
+
+- `export const dynamic = 'force-dynamic'` from homepage
+
+---
+
 ## [0.6.0] — 2026-02-25
 
 ### Added
