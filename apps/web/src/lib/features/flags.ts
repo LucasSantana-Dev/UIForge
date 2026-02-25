@@ -19,6 +19,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_STRIPE_BILLING: false,
   ENABLE_USAGE_LIMITS: false,
   ENABLE_MCP_GATEWAY: false,
+  ENABLE_DESIGN_CONTEXT: true,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -128,6 +129,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     name: 'ENABLE_MCP_GATEWAY',
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_MCP_GATEWAY,
     description: 'Route AI generation through MCP gateway instead of direct Gemini',
+    category: 'generation',
+  },
+  {
+    name: 'ENABLE_DESIGN_CONTEXT',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_DESIGN_CONTEXT,
+    description: 'Show structured design context inputs below the prompt textarea',
     category: 'generation',
   },
 ];

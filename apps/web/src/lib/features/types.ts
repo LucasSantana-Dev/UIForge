@@ -16,7 +16,8 @@ export type FeatureFlagName =
   | 'ENABLE_CENTRALIZED_FEATURE_FLAGS'
   | 'ENABLE_STRIPE_BILLING'
   | 'ENABLE_USAGE_LIMITS'
-  | 'ENABLE_MCP_GATEWAY';
+  | 'ENABLE_MCP_GATEWAY'
+  | 'ENABLE_DESIGN_CONTEXT';
 
 export type FeatureFlagCategory =
   | 'auth'
