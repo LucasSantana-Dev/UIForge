@@ -43,6 +43,8 @@ export const phases: Phase[] = [
       { label: 'MCP server directory (community servers)', status: 'planned' },
       { label: 'Template marketplace (creator submissions)', status: 'planned' },
       { label: 'CLI tool: npx create-siza-app', status: 'planned' },
+      { label: 'Prompt autocomplete (history + templates)', status: 'planned' },
+      { label: 'Code editor IntelliSense (framework-aware snippets)', status: 'planned' },
     ],
   },
   {
