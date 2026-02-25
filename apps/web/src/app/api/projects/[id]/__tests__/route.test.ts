@@ -5,22 +5,21 @@
 import { NextRequest } from 'next/server';
 import { GET, PATCH, DELETE } from '../route';
 import { createClient } from '@/lib/supabase/server';
-import * as auth from '@/lib/api/auth';
-import * as rateLimit from '@/lib/api/rate-limit';
+import { verifySession } from '@/lib/api/auth';
+import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 
-// Mock dependencies
 jest.mock('@/lib/supabase/server');
 jest.mock('@/lib/api/auth');
 jest.mock('@/lib/api/rate-limit');
 
 const mockCreateClient = createClient as jest.MockedFunction<typeof createClient>;
-const mockVerifySession = auth.verifySession as jest.MockedFunction<typeof auth.verifySession>;
-const mockCheckRateLimit = rateLimit.checkRateLimit as jest.MockedFunction<
-  typeof rateLimit.checkRateLimit
+const mockVerifySession = verifySession as jest.MockedFunction<typeof verifySession>;
+const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRateLimit>;
+const mockSetRateLimitHeaders = setRateLimitHeaders as jest.MockedFunction<
+  typeof setRateLimitHeaders
 >;
 
-// TODO: Enable when mock paths are fixed to match actual imports
-describe.skip('Projects API - GET /api/projects/[id]', () => {
+describe('Projects API - GET /api/projects/[id]', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -29,6 +28,8 @@ describe.skip('Projects API - GET /api/projects/[id]', () => {
       remaining: 100,
       resetAt: Date.now() + 60000,
     });
+
+    mockSetRateLimitHeaders.mockImplementation((res) => res);
 
     mockVerifySession.mockResolvedValue({
       user: { id: 'user-123', email: 'test@example.com' } as any,
@@ -147,7 +148,7 @@ describe.skip('Projects API - GET /api/projects/[id]', () => {
   });
 });
 
-describe.skip('Projects API - PATCH /api/projects/[id]', () => {
+describe('Projects API - PATCH /api/projects/[id]', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -156,6 +157,8 @@ describe.skip('Projects API - PATCH /api/projects/[id]', () => {
       remaining: 100,
       resetAt: Date.now() + 60000,
     });
+
+    mockSetRateLimitHeaders.mockImplementation((res) => res);
 
     mockVerifySession.mockResolvedValue({
       user: { id: 'user-123', email: 'test@example.com' } as any,
@@ -279,7 +282,7 @@ describe.skip('Projects API - PATCH /api/projects/[id]', () => {
   });
 });
 
-describe.skip('Projects API - DELETE /api/projects/[id]', () => {
+describe('Projects API - DELETE /api/projects/[id]', () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -288,6 +291,8 @@ describe.skip('Projects API - DELETE /api/projects/[id]', () => {
       remaining: 100,
       resetAt: Date.now() + 60000,
     });
+
+    mockSetRateLimitHeaders.mockImplementation((res) => res);
 
     mockVerifySession.mockResolvedValue({
       user: { id: 'user-123', email: 'test@example.com' } as any,

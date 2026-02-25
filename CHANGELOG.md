@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Projects API query parsing**: Fixed null-vs-undefined bug where missing query params caused Zod validation errors
+
+### Changed
+
+- **API route test coverage**: Unskipped 4 API route test suites (components, components/[id], projects, projects/[id]) with corrected mocks (+57 tests, 322 to 379)
+
 ---
 
 ## [0.7.0] — 2026-02-25

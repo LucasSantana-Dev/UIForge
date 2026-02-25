@@ -15,7 +15,6 @@ import {
   validateFileSize,
 } from '@/lib/api/storage';
 
-// Mock dependencies
 jest.mock('@/lib/supabase/server');
 jest.mock('@/lib/api/auth');
 jest.mock('@/lib/api/rate-limit');
@@ -31,8 +30,7 @@ const mockDownloadFromStorage = downloadFromStorage as jest.MockedFunction<
 const mockDeleteFromStorage = deleteFromStorage as jest.MockedFunction<typeof deleteFromStorage>;
 const mockValidateFileSize = validateFileSize as jest.MockedFunction<typeof validateFileSize>;
 
-// TODO: Enable when mock paths are fixed to match actual imports
-describe.skip('GET /api/components/[id]', () => {
+describe('GET /api/components/[id]', () => {
   const mockUser = {
     id: '123e4567-e89b-12d3-a456-426614174001',
     email: 'test@example.com',
@@ -107,19 +105,17 @@ describe.skip('GET /api/components/[id]', () => {
   it('should return 404 for non-existent component', async () => {
     mockVerifySession.mockResolvedValue({ user: mockUser });
 
-    const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-    };
-
-    mockSupabase.single.mockResolvedValueOnce({
+    const mockChain: any = {};
+    mockChain.select = jest.fn(() => mockChain);
+    mockChain.eq = jest.fn(() => mockChain);
+    mockChain.single = jest.fn().mockResolvedValueOnce({
       data: null,
       error: { message: 'Not found' },
     });
 
-    mockCreateClient.mockResolvedValue(mockSupabase as any);
+    mockCreateClient.mockResolvedValue({
+      from: jest.fn(() => mockChain),
+    } as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/invalid');
     const response = await GET(request, { params: Promise.resolve({ id: 'invalid' }) });
@@ -131,19 +127,17 @@ describe.skip('GET /api/components/[id]', () => {
   it('should retrieve code from storage correctly', async () => {
     mockVerifySession.mockResolvedValue({ user: mockUser });
 
-    const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-    };
-
-    mockSupabase.single.mockResolvedValueOnce({
+    const mockChain: any = {};
+    mockChain.select = jest.fn(() => mockChain);
+    mockChain.eq = jest.fn(() => mockChain);
+    mockChain.single = jest.fn().mockResolvedValueOnce({
       data: mockComponent,
       error: null,
     });
 
-    mockCreateClient.mockResolvedValue(mockSupabase as any);
+    mockCreateClient.mockResolvedValue({
+      from: jest.fn(() => mockChain),
+    } as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123');
     await GET(request, { params: Promise.resolve({ id: 'comp-123' }) });
@@ -172,19 +166,17 @@ describe.skip('GET /api/components/[id]', () => {
       projects: { user_id: 'user-123', is_public: true },
     };
 
-    const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-    };
-
-    mockSupabase.single.mockResolvedValueOnce({
+    const mockChain: any = {};
+    mockChain.select = jest.fn(() => mockChain);
+    mockChain.eq = jest.fn(() => mockChain);
+    mockChain.single = jest.fn().mockResolvedValueOnce({
       data: publicComponent,
       error: null,
     });
 
-    mockCreateClient.mockResolvedValue(mockSupabase as any);
+    mockCreateClient.mockResolvedValue({
+      from: jest.fn(() => mockChain),
+    } as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123');
     const response = await GET(request, {
@@ -195,7 +187,7 @@ describe.skip('GET /api/components/[id]', () => {
   });
 });
 
-describe.skip('PATCH /api/components/[id]', () => {
+describe('PATCH /api/components/[id]', () => {
   const mockUser = {
     id: '123e4567-e89b-12d3-a456-426614174001',
     email: 'test@example.com',
@@ -242,19 +234,18 @@ describe.skip('PATCH /api/components/[id]', () => {
       name: 'UpdatedButton',
     };
 
-    const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-    };
-
-    mockSupabase.single
+    const mockChain: any = {};
+    mockChain.select = jest.fn(() => mockChain);
+    mockChain.update = jest.fn(() => mockChain);
+    mockChain.eq = jest.fn(() => mockChain);
+    mockChain.single = jest
+      .fn()
       .mockResolvedValueOnce({ data: mockComponent, error: null })
       .mockResolvedValueOnce({ data: updatedComponent, error: null });
 
-    mockCreateClient.mockResolvedValue(mockSupabase as any);
+    mockCreateClient.mockResolvedValue({
+      from: jest.fn(() => mockChain),
+    } as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123', {
       method: 'PATCH',
@@ -283,19 +274,17 @@ describe.skip('PATCH /api/components/[id]', () => {
       } as any,
     });
 
-    const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-    };
-
-    mockSupabase.single.mockResolvedValueOnce({
+    const mockChain: any = {};
+    mockChain.select = jest.fn(() => mockChain);
+    mockChain.eq = jest.fn(() => mockChain);
+    mockChain.single = jest.fn().mockResolvedValueOnce({
       data: mockComponent,
       error: null,
     });
 
-    mockCreateClient.mockResolvedValue(mockSupabase as any);
+    mockCreateClient.mockResolvedValue({
+      from: jest.fn(() => mockChain),
+    } as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123', {
       method: 'PATCH',
@@ -317,19 +306,18 @@ describe.skip('PATCH /api/components/[id]', () => {
 
     const newCode = 'export default function NewButton() { return <button>New</button>; }';
 
-    const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      update: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-    };
-
-    mockSupabase.single
+    const mockChain: any = {};
+    mockChain.select = jest.fn(() => mockChain);
+    mockChain.update = jest.fn(() => mockChain);
+    mockChain.eq = jest.fn(() => mockChain);
+    mockChain.single = jest
+      .fn()
       .mockResolvedValueOnce({ data: mockComponent, error: null })
       .mockResolvedValueOnce({ data: mockComponent, error: null });
 
-    mockCreateClient.mockResolvedValue(mockSupabase as any);
+    mockCreateClient.mockResolvedValue({
+      from: jest.fn(() => mockChain),
+    } as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123', {
       method: 'PATCH',
@@ -350,19 +338,17 @@ describe.skip('PATCH /api/components/[id]', () => {
   it('should validate framework compatibility', async () => {
     mockVerifySession.mockResolvedValue({ user: mockUser });
 
-    const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-    };
-
-    mockSupabase.single.mockResolvedValueOnce({
+    const mockChain: any = {};
+    mockChain.select = jest.fn(() => mockChain);
+    mockChain.eq = jest.fn(() => mockChain);
+    mockChain.single = jest.fn().mockResolvedValueOnce({
       data: mockComponent,
       error: null,
     });
 
-    mockCreateClient.mockResolvedValue(mockSupabase as any);
+    mockCreateClient.mockResolvedValue({
+      from: jest.fn(() => mockChain),
+    } as any);
 
     const request = new NextRequest(
       'http://localhost:3000/api/components/123e4567-e89b-12d3-a456-426614174002',
@@ -383,7 +369,7 @@ describe.skip('PATCH /api/components/[id]', () => {
   });
 });
 
-describe.skip('DELETE /api/components/[id]', () => {
+describe('DELETE /api/components/[id]', () => {
   const mockUser = {
     id: '123e4567-e89b-12d3-a456-426614174001',
     email: 'test@example.com',
@@ -415,36 +401,41 @@ describe.skip('DELETE /api/components/[id]', () => {
     });
 
     mockDeleteFromStorage.mockResolvedValue(undefined);
-
     mockValidateFileSize.mockReturnValue(true);
   });
 
   it('should delete component and storage file for owner', async () => {
     mockVerifySession.mockResolvedValue({ user: mockUser });
 
-    const mockChain: any = {};
-    mockChain.select = jest.fn(() => mockChain);
-    mockChain.delete = jest.fn(() => mockChain);
-    mockChain.eq = jest.fn(() => mockChain);
-    mockChain.single = jest.fn().mockResolvedValueOnce({
+    let fromCallCount = 0;
+    const mockComponentChain: any = {};
+    mockComponentChain.select = jest.fn(() => mockComponentChain);
+    mockComponentChain.eq = jest.fn(() => mockComponentChain);
+    mockComponentChain.single = jest.fn().mockResolvedValue({
       data: mockComponent,
       error: null,
     });
 
-    let eqCallCount = 0;
-    mockChain.eq = jest.fn(() => {
-      eqCallCount++;
-      if (eqCallCount === 2) {
-        return Promise.resolve({ error: null });
-      }
-      return mockChain;
+    const mockProjectChain: any = {};
+    mockProjectChain.select = jest.fn(() => mockProjectChain);
+    mockProjectChain.eq = jest.fn(() => mockProjectChain);
+    mockProjectChain.single = jest.fn().mockResolvedValue({
+      data: { id: mockComponent.project_id },
+      error: null,
     });
 
-    const mockSupabase = {
-      from: jest.fn(() => mockChain),
-    };
+    const mockDeleteChain: any = {};
+    mockDeleteChain.delete = jest.fn(() => mockDeleteChain);
+    mockDeleteChain.eq = jest.fn().mockResolvedValue({ error: null });
 
-    mockCreateClient.mockResolvedValue(mockSupabase as any);
+    mockCreateClient.mockResolvedValue({
+      from: jest.fn((_table: string) => {
+        fromCallCount++;
+        if (fromCallCount === 1) return mockComponentChain;
+        if (fromCallCount === 2) return mockProjectChain;
+        return mockDeleteChain;
+      }),
+    } as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123');
     const response = await DELETE(request, {
@@ -470,19 +461,30 @@ describe.skip('DELETE /api/components/[id]', () => {
       } as any,
     });
 
-    const mockSupabase = {
-      from: jest.fn().mockReturnThis(),
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-    };
-
-    mockSupabase.single.mockResolvedValueOnce({
+    let fromCallCount = 0;
+    const mockComponentChain: any = {};
+    mockComponentChain.select = jest.fn(() => mockComponentChain);
+    mockComponentChain.eq = jest.fn(() => mockComponentChain);
+    mockComponentChain.single = jest.fn().mockResolvedValue({
       data: mockComponent,
       error: null,
     });
 
-    mockCreateClient.mockResolvedValue(mockSupabase as any);
+    const mockProjectChain: any = {};
+    mockProjectChain.select = jest.fn(() => mockProjectChain);
+    mockProjectChain.eq = jest.fn(() => mockProjectChain);
+    mockProjectChain.single = jest.fn().mockResolvedValue({
+      data: null,
+      error: null,
+    });
+
+    mockCreateClient.mockResolvedValue({
+      from: jest.fn((_table: string) => {
+        fromCallCount++;
+        if (fromCallCount === 1) return mockComponentChain;
+        return mockProjectChain;
+      }),
+    } as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123');
     const response = await DELETE(request, {
@@ -496,39 +498,43 @@ describe.skip('DELETE /api/components/[id]', () => {
 
   it('should handle missing storage file gracefully', async () => {
     mockVerifySession.mockResolvedValue({ user: mockUser });
-
     mockDeleteFromStorage.mockRejectedValueOnce(new Error('File not found'));
 
-    const mockChain: any = {};
-    mockChain.select = jest.fn(() => mockChain);
-    mockChain.delete = jest.fn(() => mockChain);
-    mockChain.eq = jest.fn(() => mockChain);
-    mockChain.single = jest.fn().mockResolvedValueOnce({
+    let fromCallCount = 0;
+    const mockComponentChain: any = {};
+    mockComponentChain.select = jest.fn(() => mockComponentChain);
+    mockComponentChain.eq = jest.fn(() => mockComponentChain);
+    mockComponentChain.single = jest.fn().mockResolvedValue({
       data: mockComponent,
       error: null,
     });
 
-    let eqCallCount = 0;
-    mockChain.eq = jest.fn(() => {
-      eqCallCount++;
-      if (eqCallCount === 2) {
-        return Promise.resolve({ error: null });
-      }
-      return mockChain;
+    const mockProjectChain: any = {};
+    mockProjectChain.select = jest.fn(() => mockProjectChain);
+    mockProjectChain.eq = jest.fn(() => mockProjectChain);
+    mockProjectChain.single = jest.fn().mockResolvedValue({
+      data: { id: mockComponent.project_id },
+      error: null,
     });
 
-    const mockSupabase = {
-      from: jest.fn(() => mockChain),
-    };
+    const mockDeleteChain: any = {};
+    mockDeleteChain.delete = jest.fn(() => mockDeleteChain);
+    mockDeleteChain.eq = jest.fn().mockResolvedValue({ error: null });
 
-    mockCreateClient.mockResolvedValue(mockSupabase as any);
+    mockCreateClient.mockResolvedValue({
+      from: jest.fn((_table: string) => {
+        fromCallCount++;
+        if (fromCallCount === 1) return mockComponentChain;
+        if (fromCallCount === 2) return mockProjectChain;
+        return mockDeleteChain;
+      }),
+    } as any);
 
     const request = new NextRequest('http://localhost:3000/api/components/comp-123');
     const response = await DELETE(request, {
       params: Promise.resolve({ id: '123e4567-e89b-12d3-a456-426614174002' }),
     });
 
-    // Should still succeed even if storage deletion fails
     expect(response.status).toBe(204);
   });
 });
