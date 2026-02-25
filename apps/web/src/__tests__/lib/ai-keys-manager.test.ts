@@ -5,7 +5,7 @@
 
 import { aiKeyManager } from '@/lib/ai-keys';
 import { storage } from '@/lib/storage';
-import { validateApiKey, AIProvider } from '@/lib/encryption';
+import { validateApiKey, createEncryptedApiKey, AIProvider } from '@/lib/encryption';
 import { TEST_CONFIG } from '../../../test-config';
 
 // Mock storage and validation
@@ -14,9 +14,10 @@ jest.mock('@/lib/encryption');
 
 const mockStorage = storage as jest.Mocked<typeof storage>;
 const mockValidateApiKey = validateApiKey as jest.MockedFunction<typeof validateApiKey>;
+const mockCreateEncryptedApiKey = createEncryptedApiKey as jest.MockedFunction<typeof createEncryptedApiKey>;
 
 // TODO: Enable when feature is implemented
-describe.skip('AI Keys Manager', () => {
+describe('AI Keys Manager', () => {
   const testApiKey = TEST_CONFIG.API_KEYS.OPENAI;
   const testProvider: AIProvider = 'openai';
   const testEncryptionKey = TEST_CONFIG.ENCRYPTION.TEST_KEY;
@@ -60,6 +61,14 @@ describe.skip('AI Keys Manager', () => {
 
     // Reset validation mock
     mockValidateApiKey.mockReturnValue(true);
+    mockCreateEncryptedApiKey.mockReturnValue({
+      provider: testProvider,
+      encryptedKey: 'encrypted_test_key',
+      keyId: 'key_generated_123',
+      createdAt: '2026-02-17T00:00:00.000Z',
+      lastUsed: '2026-02-17T12:00:00.000Z',
+      isDefault: false,
+    });
   });
 
   describe('initialize', () => {
