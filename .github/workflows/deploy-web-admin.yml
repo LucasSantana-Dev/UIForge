@@ -76,6 +76,15 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          NEXT_PUBLIC_ENABLE_STRIPE_BILLING: ${{ vars.NEXT_PUBLIC_ENABLE_STRIPE_BILLING }}
+          NEXT_PUBLIC_ENABLE_USAGE_LIMITS: ${{ vars.NEXT_PUBLIC_ENABLE_USAGE_LIMITS }}
+
+      - name: Stub unused WASM and remove _redirects
+        run: |
+          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > node_modules/next/dist/compiled/@vercel/og/resvg.wasm
+          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > node_modules/next/dist/compiled/@vercel/og/yoga.wasm
+          rm -f apps/web/.open-next/assets/_redirects 2>/dev/null || true
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
