@@ -17,7 +17,7 @@ import {
   ArrowRight,
   Terminal,
 } from 'lucide-react';
-import { EASE_SIZA } from './constants';
+import { EASE_SIZA } from '@/components/landing/constants';
 
 function FadeIn({
   children,

@@ -12,10 +12,11 @@ interface LandingNavProps {
 }
 
 export function LandingNav({ user }: LandingNavProps) {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(
+    () => typeof window !== 'undefined' && window.scrollY > 0
+  );
 
   useEffect(() => {
-    setIsScrolled(window.scrollY > 0);
     let rafId = 0;
     const handleScroll = () => {
       if (!rafId) {
