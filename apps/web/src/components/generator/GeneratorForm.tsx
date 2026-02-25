@@ -1,13 +1,23 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { SparklesIcon, WandIcon, KeyIcon, ImageIcon, XIcon, ChevronDownIcon } from 'lucide-react';
+import {
+  SparklesIcon,
+  WandIcon,
+  KeyIcon,
+  ImageIcon,
+  XIcon,
+  ChevronDownIcon,
+  CpuIcon,
+} from 'lucide-react';
 import { useGeneration } from '@/hooks/use-generation';
 import { useApiKeyForProvider, useHasApiKey, useAIKeyStore } from '@/stores/ai-keys';
-import { decryptApiKey } from '@/lib/encryption';
+import { decryptApiKey, type AIProvider } from '@/lib/encryption';
+import { PROVIDER_MODELS } from '@/lib/services/generation';
+import { isFeatureEnabled } from '@/lib/features/flags';
 import GenerationProgress from './GenerationProgress';
 import { UpgradePrompt } from '@/components/billing/UpgradePrompt';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -41,6 +51,12 @@ interface GeneratorFormProps {
   initialDescription?: string;
 }
 
+const PROVIDER_LABELS: Record<AIProvider, string> = {
+  google: 'Google Gemini',
+  openai: 'OpenAI',
+  anthropic: 'Anthropic',
+};
+
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -62,14 +78,29 @@ export default function GeneratorForm({
   initialDescription,
 }: GeneratorFormProps) {
   const generation = useGeneration(projectId);
-  const googleKey = useApiKeyForProvider('google');
-  const hasGoogleKey = useHasApiKey('google');
   const encryptionKey = useAIKeyStore((s) => s.encryptionKey);
   const { usage } = useSubscription();
   const isQuotaExceeded =
     usage != null &&
     usage.generations_limit !== -1 &&
     usage.generations_count >= usage.generations_limit;
+
+  const multiLlmEnabled = isFeatureEnabled('ENABLE_MULTI_LLM');
+  const [selectedProvider, setSelectedProvider] = useState<AIProvider>('google');
+  const [selectedModel, setSelectedModel] = useState('gemini-2.0-flash');
+
+  const providerKey = useApiKeyForProvider(selectedProvider);
+  const hasProviderKey = useHasApiKey(selectedProvider);
+
+  const models = useMemo(() => PROVIDER_MODELS[selectedProvider] || [], [selectedProvider]);
+
+  const handleProviderChange = (provider: AIProvider) => {
+    setSelectedProvider(provider);
+    const firstModel = PROVIDER_MODELS[provider]?.[0];
+    if (firstModel) {
+      setSelectedModel(firstModel.id);
+    }
+  };
 
   const [currentSettings, setCurrentSettings] = useState({
     componentName: '',
@@ -166,6 +197,11 @@ export default function GeneratorForm({
         typescript: data.typescript,
       });
 
+      let apiKey: string | undefined;
+      if (providerKey && encryptionKey) {
+        apiKey = decryptApiKey(providerKey.encryptedKey, encryptionKey);
+      }
+
       await generation.startGeneration({
         framework: framework as 'react' | 'vue' | 'angular' | 'svelte',
         componentLibrary: data.componentLibrary || 'none',
@@ -174,14 +210,13 @@ export default function GeneratorForm({
         typescript: data.typescript,
         componentName: data.componentName,
         prompt: data.prompt,
+        provider: selectedProvider,
+        model: selectedModel,
         ...(image && {
           imageBase64: image.base64,
           imageMimeType: image.mimeType,
         }),
-        ...(googleKey &&
-          encryptionKey && {
-            userApiKey: decryptApiKey(googleKey.encryptedKey, encryptionKey),
-          }),
+        ...(apiKey && { userApiKey: apiKey }),
       });
     } catch (err) {
       console.error('Generation failed:', err);
@@ -200,6 +235,8 @@ export default function GeneratorForm({
     }
   }, [generation.isGenerating, isGenerating, onGenerating]);
 
+  const needsApiKey = selectedProvider !== 'google' && !hasProviderKey;
+
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-6">
@@ -216,15 +253,60 @@ export default function GeneratorForm({
 
           {isQuotaExceeded && !generation.error && <UpgradePrompt resource="Generation" />}
 
+          {multiLlmEnabled && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
+                <CpuIcon className="h-4 w-4" />
+                AI Provider
+              </div>
+              <div className="grid grid-cols-3 gap-2">
+                {(Object.keys(PROVIDER_LABELS) as AIProvider[]).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => handleProviderChange(p)}
+                    className={`px-3 py-2 text-sm rounded-md border transition-colors ${
+                      selectedProvider === p
+                        ? 'border-brand bg-brand/10 text-brand-light'
+                        : 'border-surface-3 text-text-secondary hover:border-surface-3 hover:text-text-primary'
+                    }`}
+                  >
+                    {PROVIDER_LABELS[p]}
+                  </button>
+                ))}
+              </div>
+              <select
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value)}
+                className="w-full px-3 py-2 border border-surface-3 rounded-md text-sm focus:ring-brand focus:border-brand"
+              >
+                {models.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
           <div className="flex items-center gap-2 text-xs px-3 py-2 rounded-md border">
             <KeyIcon className="h-3.5 w-3.5" />
-            {hasGoogleKey ? (
-              <span className="text-green-700">Using your Gemini API key</span>
-            ) : (
+            {hasProviderKey ? (
+              <span className="text-green-700">
+                Using your {PROVIDER_LABELS[selectedProvider]} API key
+              </span>
+            ) : selectedProvider === 'google' ? (
               <span className="text-amber-700">
                 Using server API key &mdash;{' '}
                 <a href="/ai-keys" className="underline">
                   add your own
+                </a>
+              </span>
+            ) : (
+              <span className="text-red-700">
+                API key required &mdash;{' '}
+                <a href="/ai-keys" className="underline">
+                  add your {PROVIDER_LABELS[selectedProvider]} key
                 </a>
               </span>
             )}
@@ -392,7 +474,7 @@ export default function GeneratorForm({
 
           <button
             type="submit"
-            disabled={generation.isGenerating || isQuotaExceeded}
+            disabled={generation.isGenerating || isQuotaExceeded || needsApiKey}
             className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {generation.isGenerating ? (

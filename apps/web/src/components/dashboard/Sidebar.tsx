@@ -9,6 +9,7 @@ import {
   PlusIcon,
   KeyIcon,
   CreditCardIcon,
+  ClockIcon,
 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ import { Button } from '@/components/ui/button';
 const navigation = [
   { name: 'Projects', href: '/projects', icon: FolderIcon },
   { name: 'Templates', href: '/templates', icon: FileTextIcon },
+  { name: 'History', href: '/history', icon: ClockIcon },
   { name: 'AI Keys', href: '/ai-keys', icon: KeyIcon },
   { name: 'Billing', href: '/billing', icon: CreditCardIcon },
   { name: 'Settings', href: '/settings', icon: SettingsIcon },
