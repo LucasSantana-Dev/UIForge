@@ -17,20 +17,4 @@ const nextConfig = {
   turbopack: {},
 };
 
-let finalConfig = nextConfig;
-
-if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
-  try {
-    const { withSentryConfig } = require('@sentry/nextjs');
-    finalConfig = withSentryConfig(nextConfig, {
-      silent: !process.env.CI,
-      widenClientFileUpload: true,
-      disableServerWebpackPlugin: true,
-      disableClientWebpackPlugin: !process.env.NEXT_PUBLIC_SENTRY_DSN,
-    });
-  } catch {
-    // @sentry/nextjs not available
-  }
-}
-
-module.exports = finalConfig;
+module.exports = nextConfig;

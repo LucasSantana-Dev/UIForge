@@ -12,9 +12,7 @@ export default function GlobalError({
 }) {
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
-      import('@sentry/nextjs').then((Sentry) => {
-        Sentry.captureException(error);
-      });
+      console.error('Global error:', error);
     }
   }, [error]);
 

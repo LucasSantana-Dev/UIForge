@@ -10,9 +10,31 @@ import { Card, CardContent } from '@/components/ui/card';
 function AppError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
-      import('@sentry/nextjs').then((Sentry) => {
-        Sentry.captureException(error);
-      });
+      // Lightweight error reporting via Sentry Envelope API
+      const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+      try {
+        const url = new URL(dsn);
+        const projectId = url.pathname.replace('/', '');
+        const host = url.hostname;
+        const publicKey = url.username;
+        const eventId = crypto.randomUUID().replace(/-/g, '');
+        const envelope = [
+          JSON.stringify({ event_id: eventId, sent_at: new Date().toISOString(), dsn }),
+          JSON.stringify({ type: 'event' }),
+          JSON.stringify({
+            event_id: eventId,
+            timestamp: Date.now() / 1000,
+            platform: 'javascript',
+            level: 'error',
+            environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT || 'production',
+            exception: { values: [{ type: error.name, value: error.message }] },
+          }),
+        ].join('\n');
+        fetch(\`https://\${host}/api/\${projectId}/envelope/\`, {
+          method: 'POST',
+          body: envelope,
+        }).catch(() => {});
+      } catch {}
     }
     if (process.env.NODE_ENV === 'development') {
       console.error('Error boundary caught:', error);
