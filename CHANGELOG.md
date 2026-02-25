@@ -5,22 +5,6 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [0.8.0] - 2026-02-25
-
-### Added
-- **Multi-LLM Generation**: Select between Google Gemini, OpenAI, and Anthropic for component generation via BYOK keys
-- **Generation History Browser**: Browse, filter, and reuse past generations across all projects with pagination
-- **Template Library Polish**: Debounced search, chip-style category filters, client-side pagination, loading skeletons
-
-### Changed
-- ENABLE_MULTI_LLM feature flag enabled by default
-- GeneratorForm now shows provider/model selector with API key status per provider
-- Template page uses memoized filtering and pagination (12 per page)
-- /api/generate route supports provider and model parameters
-
-### Infrastructure
-- MCP Gateway client (`lib/mcp/client.ts`) for AI generation routing (behind `ENABLE_MCP_GATEWAY` flag, disabled by default)
-
 ## [0.8.2] - 2026-02-25
 
 ### Added
@@ -74,6 +58,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI Build/Test exclude desktop app (`--filter=!@siza/desktop`) — Rollup native binaries fail on Linux (#98)
 
 ---
+
+## [0.8.0] - 2026-02-25
+
+### Added
+- **Multi-LLM Generation**: Select between Google Gemini, OpenAI, and Anthropic for component generation via BYOK keys
+- **Generation History Browser**: Browse, filter, and reuse past generations across all projects with pagination
+- **Template Library Polish**: Debounced search, chip-style category filters, client-side pagination, loading skeletons
+
+### Changed
+- ENABLE_MULTI_LLM feature flag enabled by default
+- GeneratorForm now shows provider/model selector with API key status per provider
+- Template page uses memoized filtering and pagination (12 per page)
+- /api/generate route supports provider and model parameters
+
+### Infrastructure
+- MCP Gateway client (`lib/mcp/client.ts`) for AI generation routing (behind `ENABLE_MCP_GATEWAY` flag, disabled by default)
 
 ## [0.7.0] — 2026-02-25
 
