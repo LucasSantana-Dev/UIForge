@@ -35,10 +35,7 @@ async function rpc(
   };
 
   const controller = new AbortController();
-  const timeout = setTimeout(
-    () => controller.abort(),
-    config.timeoutMs
-  );
+  const timeout = setTimeout(() => controller.abort(), config.timeoutMs);
 
   try {
     const response = await fetch(`${config.baseUrl}/rpc`, {
@@ -52,9 +49,7 @@ async function rpc(
     });
 
     if (!response.ok) {
-      throw new Error(
-        `MCP gateway returned ${response.status}: ${response.statusText}`
-      );
+      throw new Error(`MCP gateway returned ${response.status}: ${response.statusText}`);
     }
 
     return (await response.json()) as McpJsonRpcResponse;
@@ -69,19 +64,16 @@ export function isMcpConfigured(): boolean {
 
 export async function listTools(): Promise<McpToolDefinition[]> {
   const config = getConfig();
-  const response = await fetch(
-    `${config.baseUrl}/tools?limit=0&include_pagination=false`,
-    {
-      headers: { Authorization: `Bearer ${config.jwt}` },
-    }
-  );
+  const response = await fetch(`${config.baseUrl}/tools?limit=0&include_pagination=false`, {
+    headers: { Authorization: `Bearer ${config.jwt}` },
+  });
 
   if (!response.ok) {
     throw new Error(`Failed to list tools: ${response.status}`);
   }
 
   const data = await response.json();
-  return Array.isArray(data) ? data : data.tools ?? [];
+  return Array.isArray(data) ? data : (data.tools ?? []);
 }
 
 export async function callTool(
@@ -92,9 +84,7 @@ export async function callTool(
   const result = await rpc(config, 'tools/call', { name, arguments: args });
 
   if (result.error) {
-    throw new Error(
-      `MCP tool error (${result.error.code}): ${result.error.message}`
-    );
+    throw new Error(`MCP tool error (${result.error.code}): ${result.error.message}`);
   }
 
   if (!result.result) {
@@ -104,17 +94,14 @@ export async function callTool(
   return result.result;
 }
 
-export async function generateComponent(
-  options: McpGenerateOptions
-): Promise<string> {
+export async function generateComponent(options: McpGenerateOptions): Promise<string> {
   const preferences = {
     cost_preference: 'balanced',
     responsive: true,
     dark_mode: true,
     framework: options.framework === 'react' ? 'react' : options.framework,
     design_system:
-      options.componentLibrary === 'tailwind' ||
-      options.componentLibrary === 'shadcn'
+      options.componentLibrary === 'tailwind' || options.componentLibrary === 'shadcn'
         ? 'tailwind_ui'
         : options.componentLibrary === 'mui'
           ? 'material_design'

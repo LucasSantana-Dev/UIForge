@@ -175,8 +175,7 @@ export function HistoryClient() {
         <div className="flex items-center justify-between border-t border-surface-3 pt-4 mt-4">
           <p className="text-sm text-text-secondary">
             Showing {(pagination.page - 1) * pagination.limit + 1}-
-            {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-            {pagination.total}
+            {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
           </p>
           <div className="flex items-center gap-2">
             <button

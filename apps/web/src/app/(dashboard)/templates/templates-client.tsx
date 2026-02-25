@@ -131,9 +131,7 @@ export function TemplatesClient() {
         !debouncedSearch ||
         template.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
         template.description.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        template.tags.some((tag) =>
-          tag.toLowerCase().includes(debouncedSearch.toLowerCase())
-        );
+        template.tags.some((tag) => tag.toLowerCase().includes(debouncedSearch.toLowerCase()));
 
       const matchesCategory =
         selectedCategory === 'All' ||
@@ -281,9 +279,7 @@ export function TemplatesClient() {
             {sortedTemplates.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <Search className="w-12 h-12 text-text-muted mb-4" />
-                <h3 className="text-lg font-semibold text-text-primary mb-2">
-                  No templates found
-                </h3>
+                <h3 className="text-lg font-semibold text-text-primary mb-2">No templates found</h3>
                 <p className="text-sm text-text-secondary">
                   Try adjusting your search or filters to find what you&apos;re looking for.
                 </p>

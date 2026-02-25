@@ -97,9 +97,7 @@ export async function* generateWithProvider(
   }
 }
 
-async function* generateWithOpenAI(
-  options: MultiProviderOptions
-): AsyncGenerator<GenerationEvent> {
+async function* generateWithOpenAI(options: MultiProviderOptions): AsyncGenerator<GenerationEvent> {
   if (!options.apiKey) {
     yield {
       type: 'error',

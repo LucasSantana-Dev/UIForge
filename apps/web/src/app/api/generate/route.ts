@@ -22,22 +22,15 @@ const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const generateSchema = z.object({
   description: z.string().min(10).max(2000),
   framework: z.enum(['react', 'vue', 'angular', 'svelte']).default('react'),
-  componentLibrary: z
-    .enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none'])
-    .optional(),
+  componentLibrary: z.enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none']).optional(),
   style: z.enum(['modern', 'minimal', 'colorful']).optional(),
   typescript: z.boolean().optional(),
   userApiKey: z.string().min(1).optional(),
   provider: z.enum(['google', 'openai', 'anthropic']).default('google'),
   model: z.string().min(1).optional(),
   useRag: z.boolean().optional(),
-  imageBase64: z
-    .string()
-    .max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)')
-    .optional(),
-  imageMimeType: z
-    .enum(['image/png', 'image/jpeg', 'image/webp'])
-    .optional(),
+  imageBase64: z.string().max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)').optional(),
+  imageMimeType: z.enum(['image/png', 'image/jpeg', 'image/webp']).optional(),
 });
 
 function shouldUseMcpGateway(): boolean {
@@ -123,9 +116,7 @@ export async function POST(request: NextRequest) {
       async start(controller) {
         let generationId: string | null = null;
         const activeProvider = mcpEnabled ? 'mcp-gateway' : requestedProvider;
-        const activeModel = mcpEnabled
-          ? 'mcp-specialist'
-          : (requestedModel || 'gemini-2.0-flash');
+        const activeModel = mcpEnabled ? 'mcp-specialist' : requestedModel || 'gemini-2.0-flash';
 
         try {
           const supabase = await createClient();
@@ -147,9 +138,7 @@ export async function POST(request: NextRequest) {
 
           if (mcpEnabled) {
             controller.enqueue(
-              encoder.encode(
-                createSseEvent({ type: 'start', timestamp: Date.now() })
-              )
+              encoder.encode(createSseEvent({ type: 'start', timestamp: Date.now() }))
             );
 
             try {
@@ -187,9 +176,7 @@ export async function POST(request: NextRequest) {
                   fullCode += event.content;
                 }
                 if (event.type !== 'complete') {
-                  controller.enqueue(
-                    encoder.encode(createSseEvent(event))
-                  );
+                  controller.enqueue(encoder.encode(createSseEvent(event)));
                 }
               }
             } else {
@@ -228,9 +215,7 @@ export async function POST(request: NextRequest) {
                 break;
               }
 
-              controller.enqueue(
-                encoder.encode(`data: ${JSON.stringify(event)}\n\n`)
-              );
+              controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
             }
           }
 
@@ -256,11 +241,7 @@ export async function POST(request: NextRequest) {
               })
               .eq('id', generationId);
 
-            storeGenerationEmbedding(
-              generationId,
-              description,
-              userApiKey
-            ).catch(() => {});
+            storeGenerationEmbedding(generationId, description, userApiKey).catch(() => {});
             incrementGenerationCount(user.id).catch(() => {});
           }
 
@@ -285,10 +266,7 @@ export async function POST(request: NextRequest) {
               .from('generations')
               .update({
                 status: 'failed',
-                error_message:
-                  error instanceof Error
-                    ? error.message
-                    : 'Generation failed',
+                error_message: error instanceof Error ? error.message : 'Generation failed',
               })
               .eq('id', generationId);
           }
@@ -300,10 +278,7 @@ export async function POST(request: NextRequest) {
             encoder.encode(
               createSseEvent({
                 type: 'error',
-                message:
-                  error instanceof Error
-                    ? error.message
-                    : 'Stream failed',
+                message: error instanceof Error ? error.message : 'Stream failed',
                 timestamp: Date.now(),
               })
             )
@@ -324,8 +299,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     captureServerError(error, { route: '/api/generate' });
-    const message =
-      error instanceof Error ? error.message : 'Internal server error';
+    const message = error instanceof Error ? error.message : 'Internal server error';
     const status = message === 'Authentication required' ? 401 : 500;
     return new Response(JSON.stringify({ error: message }), {
       status,

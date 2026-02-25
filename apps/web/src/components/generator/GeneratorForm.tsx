@@ -92,10 +92,7 @@ export default function GeneratorForm({
   const providerKey = useApiKeyForProvider(selectedProvider);
   const hasProviderKey = useHasApiKey(selectedProvider);
 
-  const models = useMemo(
-    () => PROVIDER_MODELS[selectedProvider] || [],
-    [selectedProvider]
-  );
+  const models = useMemo(() => PROVIDER_MODELS[selectedProvider] || [], [selectedProvider]);
 
   const handleProviderChange = (provider: AIProvider) => {
     setSelectedProvider(provider);

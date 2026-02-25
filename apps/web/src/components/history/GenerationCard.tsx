@@ -35,11 +35,7 @@ const PROVIDER_LABELS: Record<string, string> = {
   anthropic: 'Claude',
 };
 
-export function GenerationCard({
-  generation,
-  onReusePrompt,
-  onCopyCode,
-}: GenerationCardProps) {
+export function GenerationCard({ generation, onReusePrompt, onCopyCode }: GenerationCardProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -59,16 +55,15 @@ export function GenerationCard({
         </h3>
         <div
           className={`px-2 py-0.5 text-xs rounded-full border ${
-            FRAMEWORK_COLORS[generation.framework] || 'bg-surface-2 text-text-secondary border-surface-3'
+            FRAMEWORK_COLORS[generation.framework] ||
+            'bg-surface-2 text-text-secondary border-surface-3'
           }`}
         >
           {generation.framework}
         </div>
       </div>
 
-      <p className="text-xs text-text-secondary line-clamp-2">
-        {generation.prompt}
-      </p>
+      <p className="text-xs text-text-secondary line-clamp-2">{generation.prompt}</p>
 
       {codePreview && (
         <div className="bg-surface-0 rounded-md p-2 text-xs font-mono text-text-muted overflow-hidden">
