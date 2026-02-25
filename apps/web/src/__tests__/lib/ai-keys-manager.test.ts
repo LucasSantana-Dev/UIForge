@@ -14,7 +14,9 @@ jest.mock('@/lib/encryption');
 
 const mockStorage = storage as jest.Mocked<typeof storage>;
 const mockValidateApiKey = validateApiKey as jest.MockedFunction<typeof validateApiKey>;
-const mockCreateEncryptedApiKey = createEncryptedApiKey as jest.MockedFunction<typeof createEncryptedApiKey>;
+const mockCreateEncryptedApiKey = createEncryptedApiKey as jest.MockedFunction<
+  typeof createEncryptedApiKey
+>;
 
 // TODO: Enable when feature is implemented
 describe('AI Keys Manager', () => {
