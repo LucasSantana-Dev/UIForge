@@ -10,6 +10,8 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGenerationQuota } from '@/lib/usage/limits';
 import { incrementGenerationCount } from '@/lib/usage/tracker';
 import { captureServerError } from '@/lib/sentry/server';
+import { getFeatureFlag } from '@/lib/features/flags';
+import { isMcpConfigured, generateComponent } from '@/lib/mcp/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,14 +20,29 @@ const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const generateSchema = z.object({
   description: z.string().min(10).max(2000),
   framework: z.enum(['react', 'vue', 'angular', 'svelte']).default('react'),
-  componentLibrary: z.enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none']).optional(),
+  componentLibrary: z
+    .enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none'])
+    .optional(),
   style: z.enum(['modern', 'minimal', 'colorful']).optional(),
   typescript: z.boolean().optional(),
   userApiKey: z.string().min(1).optional(),
   useRag: z.boolean().optional(),
-  imageBase64: z.string().max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)').optional(),
-  imageMimeType: z.enum(['image/png', 'image/jpeg', 'image/webp']).optional(),
+  imageBase64: z
+    .string()
+    .max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)')
+    .optional(),
+  imageMimeType: z
+    .enum(['image/png', 'image/jpeg', 'image/webp'])
+    .optional(),
 });
+
+function shouldUseMcpGateway(): boolean {
+  return getFeatureFlag('ENABLE_MCP_GATEWAY') && isMcpConfigured();
+}
+
+function createSseEvent(data: object): string {
+  return `data: ${JSON.stringify(data)}\n\n`;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -94,10 +111,12 @@ export async function POST(request: NextRequest) {
     }
 
     const encoder = new TextEncoder();
+    const mcpEnabled = shouldUseMcpGateway();
 
     const stream = new ReadableStream({
       async start(controller) {
         let generationId: string | null = null;
+        const provider = mcpEnabled ? 'mcp-gateway' : 'google';
 
         try {
           const supabase = await createClient();
@@ -108,8 +127,10 @@ export async function POST(request: NextRequest) {
               prompt: description,
               framework,
               status: 'processing',
-              ai_provider: 'google' as const,
-              model_used: 'gemini-2.0-flash',
+              ai_provider: provider,
+              model_used: mcpEnabled
+                ? 'mcp-specialist'
+                : 'gemini-2.0-flash',
             })
             .select('id')
             .single();
@@ -117,63 +138,137 @@ export async function POST(request: NextRequest) {
 
           let fullCode = '';
 
-          for await (const event of generateComponentStream({
-            prompt: description,
-            framework,
-            componentLibrary,
-            style,
-            typescript,
-            apiKey: userApiKey,
-            contextAddition,
-            imageBase64,
-            imageMimeType,
-          })) {
-            if (event.type === 'chunk' && event.content) {
-              fullCode += event.content;
+          if (mcpEnabled) {
+            controller.enqueue(
+              encoder.encode(
+                createSseEvent({ type: 'start', timestamp: Date.now() })
+              )
+            );
+
+            try {
+              fullCode = await generateComponent({
+                prompt: description,
+                framework,
+                componentLibrary,
+                style,
+                typescript,
+                imageBase64,
+                imageMimeType,
+                contextAddition,
+              });
+            } catch (mcpError) {
+              captureServerError(mcpError, {
+                route: '/api/generate',
+                extra: { fallback: 'mcp-to-gemini' },
+              });
+              fullCode = '';
             }
 
-            if (event.type === 'complete') {
-              const qualityReport = runAllGates(fullCode);
-              controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({
-                    type: 'quality',
-                    report: qualityReport,
-                    timestamp: Date.now(),
-                  })}\n\n`
-                )
-              );
+            if (!fullCode) {
+              for await (const event of generateComponentStream({
+                prompt: description,
+                framework,
+                componentLibrary,
+                style,
+                typescript,
+                apiKey: userApiKey,
+                contextAddition,
+                imageBase64,
+                imageMimeType,
+              })) {
+                if (event.type === 'chunk' && event.content) {
+                  fullCode += event.content;
+                }
+                if (event.type !== 'complete') {
+                  controller.enqueue(
+                    encoder.encode(createSseEvent(event))
+                  );
+                }
+              }
+            } else {
+              const chunkSize = 200;
+              for (let i = 0; i < fullCode.length; i += chunkSize) {
+                controller.enqueue(
+                  encoder.encode(
+                    createSseEvent({
+                      type: 'chunk',
+                      content: fullCode.slice(i, i + chunkSize),
+                      timestamp: Date.now(),
+                    })
+                  )
+                );
+              }
+            }
+          } else {
+            for await (const event of generateComponentStream({
+              prompt: description,
+              framework,
+              componentLibrary,
+              style,
+              typescript,
+              apiKey: userApiKey,
+              contextAddition,
+              imageBase64,
+              imageMimeType,
+            })) {
+              if (event.type === 'chunk' && event.content) {
+                fullCode += event.content;
+              }
 
-              if (generationId) {
-                await supabase
-                  .from('generations')
-                  .update({
-                    status: 'completed',
-                    generated_code: fullCode,
-                  })
-                  .eq('id', generationId);
-
-                storeGenerationEmbedding(generationId, description, userApiKey).catch(() => {});
-                incrementGenerationCount(user.id).catch(() => {});
+              if (event.type === 'complete') {
+                break;
               }
 
               controller.enqueue(
-                encoder.encode(
-                  `data: ${JSON.stringify({
-                    ...event,
-                    code: fullCode,
-                    generationId,
-                    totalLength: fullCode.length,
-                    qualityPassed: qualityReport.passed,
-                    ragEnriched: contextAddition.length > 0,
-                  })}\n\n`
-                )
+                encoder.encode(`data: ${JSON.stringify(event)}\n\n`)
               );
-              continue;
             }
-
-            controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
           }
+
+          const qualityReport = runAllGates(fullCode);
+          controller.enqueue(
+            encoder.encode(
+              createSseEvent({
+                type: 'quality',
+                report: qualityReport,
+                timestamp: Date.now(),
+              })
+            )
+          );
+
+          if (generationId) {
+            const supabase2 = await createClient();
+            await supabase2
+              .from('generations')
+              .update({
+                status: 'completed',
+                generated_code: fullCode,
+                ai_provider: fullCode ? provider : 'google',
+              })
+              .eq('id', generationId);
+
+            storeGenerationEmbedding(
+              generationId,
+              description,
+              userApiKey
+            ).catch(() => {});
+            incrementGenerationCount(user.id).catch(() => {});
+          }
+
+          controller.enqueue(
+            encoder.encode(
+              createSseEvent({
+                type: 'complete',
+                code: fullCode,
+                generationId,
+                totalLength: fullCode.length,
+                qualityPassed: qualityReport.passed,
+                ragEnriched: contextAddition.length > 0,
+                provider,
+                timestamp: Date.now(),
+              })
+            )
+          );
         } catch (error) {
           if (generationId) {
             const supabase = await createClient();
@@ -181,18 +276,27 @@ export async function POST(request: NextRequest) {
               .from('generations')
               .update({
                 status: 'failed',
-                error_message: error instanceof Error ? error.message : 'Generation failed',
+                error_message:
+                  error instanceof Error
+                    ? error.message
+                    : 'Generation failed',
               })
               .eq('id', generationId);
           }
-          captureServerError(error, { route: '/api/generate', userId: user.id });
+          captureServerError(error, {
+            route: '/api/generate',
+            userId: user.id,
+          });
           controller.enqueue(
             encoder.encode(
-              `data: ${JSON.stringify({
+              createSseEvent({
                 type: 'error',
-                message: error instanceof Error ? error.message : 'Stream failed',
+                message:
+                  error instanceof Error
+                    ? error.message
+                    : 'Stream failed',
                 timestamp: Date.now(),
-              })}\n\n`
+              })
             )
           );
         } finally {
@@ -211,7 +315,8 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     captureServerError(error, { route: '/api/generate' });
-    const message = error instanceof Error ? error.message : 'Internal server error';
+    const message =
+      error instanceof Error ? error.message : 'Internal server error';
     const status = message === 'Authentication required' ? 401 : 500;
     return new Response(JSON.stringify({ error: message }), {
       status,
@@ -221,13 +326,20 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
+  const mcpEnabled = shouldUseMcpGateway();
   return new Response(
     JSON.stringify({
       message: 'UI Generation API',
-      version: '3.0.0',
+      version: '3.1.0',
       status: 'active',
-      provider: 'gemini-2.0-flash',
-      features: ['rag', 'quality-gates', 'streaming', 'image-input'],
+      provider: mcpEnabled ? 'mcp-gateway' : 'gemini-2.0-flash',
+      features: [
+        'rag',
+        'quality-gates',
+        'streaming',
+        'image-input',
+        ...(mcpEnabled ? ['mcp-gateway'] : []),
+      ],
     }),
     {
       status: 200,

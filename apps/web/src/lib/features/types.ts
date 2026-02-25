@@ -15,7 +15,8 @@ export type FeatureFlagName =
   | 'ENABLE_RESEND_EMAILS'
   | 'ENABLE_CENTRALIZED_FEATURE_FLAGS'
   | 'ENABLE_STRIPE_BILLING'
-  | 'ENABLE_USAGE_LIMITS';
+  | 'ENABLE_USAGE_LIMITS'
+  | 'ENABLE_MCP_GATEWAY';
 
 export type FeatureFlagCategory =
   | 'auth'
