@@ -178,7 +178,7 @@ describe('GET /api/generate', () => {
     const data = await response.json();
 
     expect(response.status).toBe(200);
-    expect(data.version).toBe('3.0.0');
+    expect(data.version).toBe('3.1.0');
     expect(data.provider).toBe('gemini-2.0-flash');
   });
 });
