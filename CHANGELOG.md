@@ -23,13 +23,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
+### Added
 
-- **Projects API query parsing**: Fixed null-vs-undefined bug where missing query params caused Zod validation errors
+- **Shared UI package** (`packages/ui`): Extracted 19 shadcn components, CodeEditor, LivePreview, toast system, and `cn()` utility into `@siza/ui` workspace package
+- **Desktop app** (`apps/desktop`): Electron + Vite + React skeleton with MCP client integration
+  - Main process: BrowserWindow, contextBridge preload, type-safe IPC handlers
+  - MCP server spawn via `StdioClientTransport` connecting to siza-mcp
+  - Renderer: Generate, Projects, Settings pages reusing `@siza/ui` components
+  - Ollama integration: connection check, model listing, setup wizard
+  - Native menu bar with Generate shortcuts (Cmd+G, Cmd+Shift+G)
+  - System tray with minimize/restore and quick-generate actions
+  - FileTree component with file-type icons and expandable directories
+  - RecentProjects with persisted history via electron-store
+  - Auto-updater checking GitHub Releases every 4 hours
+  - 4 Vitest test suites: MCP server, IPC channels, file system, types
+- **Desktop CI** (`.github/workflows/desktop-release.yml`): Cross-platform matrix build (macOS, Windows, Linux) triggered by `desktop-v*` tags
 
 ### Changed
 
-- **API route test coverage**: Unskipped 4 API route test suites (components, components/[id], projects, projects/[id]) with corrected mocks (+57 tests, 322 to 379)
+- `apps/web` UI components now re-export from `@siza/ui` (zero breaking changes, all tests pass)
+- `apps/web/tailwind.config.ts` includes `packages/ui` in content paths
+
+### Fixed
+
+- ESLint configs for `@siza/ui` and `@siza/desktop` (flat config with React/TS rules)
+- 18 lint errors: unused imports, React hooks violations, unescaped entities
+- Vite build: set `root: src/renderer` with absolute electron entry paths
+- Path traversal: `relative()` check instead of `startsWith()` in file IPC handlers
+- Component name sanitization in file save (allowlist: `[a-zA-Z0-9_-]`)
+- Navigation security: `setWindowOpenHandler` + `will-navigate` guards
+- Auto-updater initialized in packaged builds
+- `electron-store` singleton pattern (avoid race conditions)
 
 ---
 

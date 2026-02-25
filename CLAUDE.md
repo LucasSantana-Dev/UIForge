@@ -21,16 +21,21 @@ apps/
   web/                  # Next.js frontend (@siza/web)
     src/
       app/              # Next.js App Router pages
-      components/       # UI components
+      components/       # UI components (re-exports from @siza/ui)
       hooks/            # Custom React hooks
       lib/              # Utilities
       stores/           # State management
     e2e/                # Playwright E2E tests
+  desktop/              # Electron desktop app (@siza/desktop)
+    src/main/           # Main process (MCP client, IPC, file system)
+    src/renderer/       # React UI (pages, hooks, components)
+    src/shared/         # Type-safe IPC channels and types
   api/                  # API service (@siza/api)
   docs/                 # Fumadocs documentation site (@siza/docs)
     content/docs/       # MDX content files
     src/                # Next.js app (no Tailwind — uses Fumadocs UI CSS)
 packages/
+  ui/                   # @siza/ui shared component library
   eslint-config/        # Shared ESLint config
 supabase/
   migrations/           # Database migrations

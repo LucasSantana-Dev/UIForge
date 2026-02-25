@@ -1,0 +1,29 @@
+appId: com.siza.desktop
+productName: Siza
+directories:
+  buildResources: resources
+  output: release
+files:
+  - dist/**/*
+  - resources/**/*
+asarUnpack:
+  - "**/*.node"
+mac:
+  target:
+    - dmg
+    - zip
+  artifactName: "siza-desktop-${version}-mac.${ext}"
+  category: public.app-category.developer-tools
+win:
+  target:
+    - nsis
+  artifactName: "siza-desktop-${version}-win.${ext}"
+linux:
+  target:
+    - AppImage
+    - deb
+  artifactName: "siza-desktop-${version}-linux.${ext}"
+  category: Development
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true

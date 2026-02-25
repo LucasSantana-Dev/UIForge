@@ -70,8 +70,9 @@ mcp-gateway (AI tool routing) --> siza-mcp (12 UI tools)
     |                              branding-mcp (7 brand tools)
     v
 siza (this repo)
-├── apps/web    — Next.js 16 frontend (Cloudflare Workers)
-└── apps/api    — Backend API service
+├── apps/web      — Next.js 16 frontend (Cloudflare Workers)
+├── apps/desktop  — Electron desktop app (local Ollama + MCP)
+└── apps/api      — Backend API service
 ```
 
 ### Stack
@@ -99,8 +100,10 @@ siza/
 │   │   ├── src/lib/          # Auth, Stripe, usage, features
 │   │   └── e2e/              # Playwright E2E tests
 │   ├── docs/                 # Fumadocs documentation site
+│   ├── desktop/              # Electron desktop app
 │   └── api/                  # Backend API service
 ├── packages/
+│   ├── ui/                   # @siza/ui shared component library
 │   └── eslint-config/        # Shared ESLint config
 ├── supabase/                 # Migrations (10), seed data
 └── turbo.json                # Turborepo config
