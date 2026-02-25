@@ -21,6 +21,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Infrastructure
 - MCP Gateway client (`lib/mcp/client.ts`) for AI generation routing (behind `ENABLE_MCP_GATEWAY` flag, disabled by default)
 
+## [0.8.3] - 2026-02-25
+
+### Added
+
+- **Design Context Inputs**: Collapsible panel with color mode, primary/secondary/accent color pickers, animation, spacing, border radius, and typography selectors — context is appended to AI generation prompts (#113)
+- **Theme System**: Zustand-backed persistent store with CRUD, duplicate, export/import. 5 built-in starter themes (Siza Default, Clean Light, Bold Contrast, Nature, Cyberpunk). Per-project active theme tracking (#113)
+- **ColorPicker Component**: Hex input with 8 preset color swatches (#113)
+- **ThemeSelector Component**: Dropdown with color dot previews, inline save flow, theme management actions (#113)
+- `ENABLE_DESIGN_CONTEXT` feature flag (default: true) (#113)
+
+### Fixed
+
+- React Compiler lint: `setIsDragOver` added to `handleDrop` useCallback dependency array (#113)
+
 ## [0.8.2] - 2026-02-25
 
 ### Added
