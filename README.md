@@ -13,7 +13,8 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![Discussions](https://img.shields.io/github/discussions/Forge-Space/siza)](https://github.com/Forge-Space/siza/discussions)
 
-**Live**: [siza-web.uiforge.workers.dev](https://siza-web.uiforge.workers.dev)
+**Live**: [siza-web.uiforge.workers.dev](https://siza-web.uiforge.workers.dev)\
+**Dev**: [siza-web-dev.uiforge.workers.dev](https://siza-web-dev.uiforge.workers.dev)
 
 ## Why Siza
 
@@ -23,14 +24,14 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 | Full-stack (UI + backend + deploy) | Frontend-only generator |
 | MCP-native (composable AI tools) | Monolithic AI black box |
 | Privacy-first (BYOK, zero telemetry) | Data-harvesting freemium |
-| Zero-cost by default | Free trial with paywall |
+| Generous free tier by default | Free trial with paywall |
 
 ## Features
 
 - **AI-Powered Generation** — Natural language or screenshot to production-ready UI components
 - **MCP-Native** — 12 UI tools, 7 branding tools, 20+ gateway servers, all composable via Model Context Protocol
 - **Privacy-First BYOK** — Bring Your Own Key with client-side AES-256 encryption
-- **True Zero-Cost** — Cloudflare Workers + Supabase + Gemini free tiers support ~50K users at $0/month
+- **Generous Free Tier** — Cloudflare Workers + Supabase + Gemini free tiers give you a generous starting point at $0/month
 - **Self-Hostable** — Run everything locally with Docker, MIT licensed
 - **Multi-LLM** — Swap between Gemini, Claude, GPT without code changes
 - **Production Ready** — Monaco editor, live preview, Stripe billing, feature flags
@@ -143,13 +144,13 @@ Siza is part of [Forge Space](https://github.com/Forge-Space) — five open-sour
 
 ### Cloudflare Workers (Production)
 
-Automated via GitHub Actions on push to `main`:
+Automated via GitHub Actions on push to `main` (production) or `dev` (preview):
 
 1. Set GitHub Secrets: `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_BASE_URL`
 2. Set GitHub Variable: `CLOUDFLARE_DEPLOY_ENABLED=true`
 3. Deployment runs automatically via `deploy-web.yml`
 
-### Zero-Cost Architecture
+### Free Tier Architecture
 
 | Service | Free Tier |
 |---------|-----------|

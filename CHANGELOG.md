@@ -13,6 +13,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Encryption tests**: 26 BYOK security tests unskipped and passing (AES-256, key validation, expiration)
 - **Auth page tests**: 18 new tests for SignIn/SignUp pages matching current Supabase auth UI
 - **Google Analytics env var**: `NEXT_PUBLIC_GA_TRACKING_ID` in `.env.example`
+- **Dev environment**: Cloudflare Workers `siza-web-dev` auto-deploys on `dev` branch push
+- **CI workflow consolidation**: Merged `feature-branch.yml` into `ci.yml` with `feat/*` and `feature/*` triggers
+- **Production Supabase config**: Real project_id, OAuth redirect URIs for prod and dev environments
+
+### Changed
+
+- **Email auth URLs**: `NEXT_PUBLIC_APP_URL` → `NEXT_PUBLIC_BASE_URL` for consistency with deploy secrets
+- **Messaging**: "zero-cost" → "generous free tier" across landing, about, and pricing pages
+- **Meta descriptions**: Updated to "The open full-stack AI workspace" branding
+- **Deploy workflow**: Dev branch deploys with `--env dev` to separate `siza-web-dev` worker
+
+### Fixed
+
+- **Prettier violations**: Fixed formatting in `SignInPage.test.tsx` and `SignUpPage.test.tsx` that were blocking main CI
+
+### Removed
+
+- **`feature-branch.yml`**: Redundant workflow (triggered on `feature/*` but repo uses `feat/*`), consolidated into `ci.yml`
+- **PR #65**: Closed stale `feat/v0.5.0-production` PR with merge conflicts
 
 ### Changed
 

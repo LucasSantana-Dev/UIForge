@@ -96,7 +96,11 @@ describe('SignUpPage', () => {
 
   it('should show loading state during submission', async () => {
     let resolveSignUp: (value: any) => void;
-    mockSignUp.mockReturnValue(new Promise((resolve) => { resolveSignUp = resolve; }));
+    mockSignUp.mockReturnValue(
+      new Promise((resolve) => {
+        resolveSignUp = resolve;
+      })
+    );
     const user = userEvent.setup();
     render(<SignUpPage />);
     await user.type(screen.getByLabelText(/email/i), 'new@example.com');

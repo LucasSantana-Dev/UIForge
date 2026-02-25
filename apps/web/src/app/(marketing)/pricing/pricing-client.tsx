@@ -44,8 +44,8 @@ export function PricingPageClient() {
           </Link>
           <h1 className="mt-8 text-4xl font-bold">Free for individuals, paid for scale</h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Start free forever. BYOK unlocks unlimited generations at no cost. Upgrade when you need
-            team features.
+            Start free with generous limits. BYOK unlocks unlimited generations. Upgrade when you
+            need team features.
           </p>
         </div>
 

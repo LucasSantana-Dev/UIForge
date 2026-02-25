@@ -1,6 +1,6 @@
 # siza
 
-Zero-cost web application for AI-driven UI generation. Turborepo monorepo.
+The open full-stack AI workspace — generate, integrate, ship. Turborepo monorepo.
 
 ## Quick Reference
 
@@ -96,7 +96,7 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 
 ## CI/CD
 
-- GitHub Actions: ci.yml, deploy-web.yml, deploy-docs.yml, deploy-web-admin.yml, feature-branch.yml, release-branch.yml, release-automation.yml, supabase-setup-admin.yml, secret-scan.yml
+- GitHub Actions: ci.yml, deploy-web.yml, deploy-docs.yml, deploy-web-admin.yml, release-branch.yml, release-automation.yml, supabase-setup-admin.yml, secret-scan.yml
 - Cloudflare Workers deployment via OpenNext + wrangler
 - Pre-commit: lint-staged (ESLint + Prettier) + type-check via Husky
 - Supabase migrations, npm audit security, shellcheck + shfmt
@@ -119,6 +119,7 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 - **Turbopack is default** in Next.js 16 — add `turbopack: {}` to next.config.js if using webpack config
 - **Build command**: `cd apps/web && npx opennextjs-cloudflare build`
 - **Deploy command**: `cd apps/web && ./scripts/deploy.sh`
+- **Dev deploy**: Push to `dev` branch → auto-deploys to `siza-web-dev.uiforge.workers.dev` via `--env dev`
 
 ## Documentation Governance
 - NEVER create task-specific docs in repo root or docs/ (e.g., *_COMPLETE.md, *_SUMMARY.md, STATUS_*.md, PHASE*.md, *_REPORT.md, *_CHECKLIST.md)

@@ -26,7 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: 'Siza - AI-Driven UI Generation',
   description:
-    'Generate production-ready UI components with AI. Zero-cost platform for developers.',
+    'The open full-stack AI workspace. Generate, integrate, and ship production-ready UI.',
   keywords: ['UI generation', 'AI', 'React', 'Next.js', 'Vue', 'Components'],
   authors: [{ name: 'Siza Team' }],
   icons: {
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: 'Siza - AI-Driven UI Generation',
-    description: 'Generate production-ready UI components with AI',
+    description: 'The open full-stack AI workspace — generate, integrate, ship',
     type: 'website',
   },
 };
