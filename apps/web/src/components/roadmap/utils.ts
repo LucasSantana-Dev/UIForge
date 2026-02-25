@@ -6,7 +6,7 @@ export function calculatePhaseProgress(phase: Phase): number {
 }
 
 export function filterItemsByStatus(phase: Phase, status: ItemStatus | 'all') {
-  if (status === 'all') return phase.items;
+  if (status === 'all') return [...phase.items];
   return phase.items.filter((i) => i.status === status);
 }
 

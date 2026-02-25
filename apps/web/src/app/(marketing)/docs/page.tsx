@@ -227,11 +227,10 @@ const component = instantiateTemplate(template, {
               href="https://www.linkedin.com/in/devlucassantana/"
               target="_blank"
               rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8"
             >
-              <Button size="lg" variant="outline" className="gap-2">
-                <Linkedin className="w-5 h-5" />
-                Connect on LinkedIn
-              </Button>
+              <Linkedin className="w-5 h-5" />
+              Connect on LinkedIn
             </a>
           </div>
         </div>
