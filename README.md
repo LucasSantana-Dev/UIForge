@@ -97,6 +97,7 @@ siza/
 │   │   ├── src/components/   # shadcn/ui components
 │   │   ├── src/lib/          # Auth, Stripe, usage, features
 │   │   └── e2e/              # Playwright E2E tests
+│   ├── docs/                 # Fumadocs documentation site
 │   └── api/                  # Backend API service
 ├── packages/
 │   └── eslint-config/        # Shared ESLint config
@@ -172,21 +173,6 @@ Covers: quick start, self-hosting, configuration, MCP integration, API reference
 - [**GitHub Discussions**](https://github.com/Forge-Space/siza/discussions) — questions, ideas, show & tell
 - [**Issue Templates**](https://github.com/Forge-Space/siza/issues/new/choose) — bug reports, feature requests, security reports
 - [**Contributing Guide**](CONTRIBUTING.md) — how to contribute code and docs
-
-## Documentation
-
-Full documentation at [siza-docs.uiforge.workers.dev](https://siza-docs.uiforge.workers.dev) (or run `npm run dev` in `apps/docs/`).
-
-- [Quick Start](https://siza-docs.uiforge.workers.dev/docs/getting-started/quick-start)
-- [Configuration](https://siza-docs.uiforge.workers.dev/docs/getting-started/configuration)
-- [MCP Integration](https://siza-docs.uiforge.workers.dev/docs/guides/mcp-integration)
-- [API Reference](https://siza-docs.uiforge.workers.dev/docs/api-reference/mcp-tools)
-
-## Community
-
-- [GitHub Discussions](https://github.com/Forge-Space/siza/discussions) — Questions, ideas, show & tell
-- [Issues](https://github.com/Forge-Space/siza/issues) — Bug reports and feature requests
-- [Contributing Guide](CONTRIBUTING.md) — How to contribute
 
 ## Contributing
 
