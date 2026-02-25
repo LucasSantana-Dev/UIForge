@@ -14,16 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.26.0",
-    "@siza/ui": "*",
-    "electron-store": "^10.0.0",
-    "electron-updater": "^6.0.0",
-    "lucide-react": "^0.400.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^7.0.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
@@ -39,7 +30,15 @@
     "vite": "^6.0.0",
     "vite-plugin-electron": "^0.28.0",
     "vite-plugin-electron-renderer": "^0.14.0",
-    "vitest": "^2.0.0"
+    "vitest": "^2.0.0",
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@siza/ui": "*",
+    "electron-store": "^10.0.0",
+    "electron-updater": "^6.0.0",
+    "lucide-react": "^0.400.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.0.0"
   },
   "description": "Siza desktop app - AI-powered UI generation with local MCP support",
   "author": "Forge Space"
