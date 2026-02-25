@@ -6,17 +6,19 @@ import { useGeneration } from '@/hooks/use-generation';
 
 jest.mock('@/hooks/use-projects');
 jest.mock('@/hooks/use-generation');
-jest.mock('@/components/generator/GeneratorForm', () => (props: any) =>
-  <div data-testid="generator-form" data-pid={props.projectId} />);
-jest.mock('@/components/generator/CodeEditor', () => (props: any) =>
-  <div data-testid="code-editor">{props.code}</div>);
-jest.mock('@/components/generator/LivePreview', () => (props: any) =>
-  <div data-testid="live-preview" data-fw={props.framework} />);
-jest.mock('@/components/generator/GenerationHistory', () => () =>
-  <div data-testid="gen-history" />);
-jest.mock('@/components/generator/SaveToProject', () => (props: any) =>
-  <div data-testid="save-project" />);
-jest.mock('lucide-react', () => ({ SparklesIcon: () => <span /> }));
+
+function MockGeneratorForm(props: any) { return <div data-testid="generator-form" data-pid={props.projectId} />; }
+function MockCodeEditor(props: any) { return <div data-testid="code-editor">{props.code}</div>; }
+function MockLivePreview(props: any) { return <div data-testid="live-preview" data-fw={props.framework} />; }
+function MockGenHistory() { return <div data-testid="gen-history" />; }
+function MockSaveToProject() { return <div data-testid="save-project" />; }
+
+jest.mock('@/components/generator/GeneratorForm', () => MockGeneratorForm);
+jest.mock('@/components/generator/CodeEditor', () => MockCodeEditor);
+jest.mock('@/components/generator/LivePreview', () => MockLivePreview);
+jest.mock('@/components/generator/GenerationHistory', () => MockGenHistory);
+jest.mock('@/components/generator/SaveToProject', () => MockSaveToProject);
+jest.mock('lucide-react', () => ({ SparklesIcon: function SparklesIcon() { return <span />; } }));
 
 const mockProject = useProject as jest.MockedFunction<typeof useProject>;
 const mockGen = useGeneration as jest.MockedFunction<typeof useGeneration>;
