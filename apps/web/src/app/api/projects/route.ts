@@ -40,15 +40,9 @@ export async function GET(request: NextRequest) {
 
     // Parse query params
     const { searchParams } = new URL(request.url);
-    const query = projectQuerySchema.parse({
-      page: searchParams.get('page'),
-      limit: searchParams.get('limit'),
-      sort: searchParams.get('sort'),
-      order: searchParams.get('order'),
-      search: searchParams.get('search'),
-      framework: searchParams.get('framework'),
-      is_public: searchParams.get('is_public'),
-    });
+    const query = projectQuerySchema.parse(
+      Object.fromEntries(searchParams.entries())
+    );
 
     const supabase = await createClient();
 
