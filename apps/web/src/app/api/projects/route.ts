@@ -40,9 +40,7 @@ export async function GET(request: NextRequest) {
 
     // Parse query params
     const { searchParams } = new URL(request.url);
-    const query = projectQuerySchema.parse(
-      Object.fromEntries(searchParams.entries())
-    );
+    const query = projectQuerySchema.parse(Object.fromEntries(searchParams.entries()));
 
     const supabase = await createClient();
 

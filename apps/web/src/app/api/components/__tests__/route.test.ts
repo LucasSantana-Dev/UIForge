@@ -10,8 +10,6 @@ import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { UnauthorizedError } from '@/lib/api/errors';
 
-
-
 jest.mock('@/lib/supabase/server');
 jest.mock('@/lib/api/auth');
 jest.mock('@/lib/api/rate-limit');
@@ -24,7 +22,6 @@ const mockCheckRateLimit = checkRateLimit as jest.MockedFunction<typeof checkRat
 const mockSetRateLimitHeaders = setRateLimitHeaders as jest.MockedFunction<
   typeof setRateLimitHeaders
 >;
-
 
 describe('GET /api/components', () => {
   const mockUser = {
@@ -73,9 +70,7 @@ describe('GET /api/components', () => {
       from: jest.fn(() => mockChain),
     } as any);
 
-    const request = new NextRequest(
-      `http://localhost:3000/api/components?project_id=${projectId}`
-    );
+    const request = new NextRequest(`http://localhost:3000/api/components?project_id=${projectId}`);
     const response = await GET(request);
 
     expect(response.status).toBe(200);
@@ -87,9 +82,7 @@ describe('GET /api/components', () => {
   it('should return 401 for unauthenticated request', async () => {
     mockVerifySession.mockRejectedValue(new UnauthorizedError('Not authenticated'));
 
-    const request = new NextRequest(
-      `http://localhost:3000/api/components?project_id=${projectId}`
-    );
+    const request = new NextRequest(`http://localhost:3000/api/components?project_id=${projectId}`);
     const response = await GET(request);
 
     expect(response.status).toBe(401);
@@ -114,9 +107,7 @@ describe('GET /api/components', () => {
       from: jest.fn(() => mockChain),
     } as any);
 
-    const request = new NextRequest(
-      `http://localhost:3000/api/components?project_id=${projectId}`
-    );
+    const request = new NextRequest(`http://localhost:3000/api/components?project_id=${projectId}`);
     const response = await GET(request);
 
     expect(response.status).toBe(500);
@@ -129,9 +120,7 @@ describe('GET /api/components', () => {
       resetAt: Date.now() + 30000,
     });
 
-    const request = new NextRequest(
-      `http://localhost:3000/api/components?project_id=${projectId}`
-    );
+    const request = new NextRequest(`http://localhost:3000/api/components?project_id=${projectId}`);
     const response = await GET(request);
 
     expect(response.status).toBe(429);
@@ -152,9 +141,7 @@ describe('GET /api/components', () => {
       from: jest.fn(() => mockChain),
     } as any);
 
-    const request = new NextRequest(
-      `http://localhost:3000/api/components?project_id=${projectId}`
-    );
+    const request = new NextRequest(`http://localhost:3000/api/components?project_id=${projectId}`);
     const response = await GET(request);
 
     expect(response.status).toBe(404);
@@ -175,9 +162,7 @@ describe('GET /api/components', () => {
       from: jest.fn(() => mockChain),
     } as any);
 
-    const request = new NextRequest(
-      `http://localhost:3000/api/components?project_id=${projectId}`
-    );
+    const request = new NextRequest(`http://localhost:3000/api/components?project_id=${projectId}`);
     const response = await GET(request);
 
     expect(response.status).toBe(403);

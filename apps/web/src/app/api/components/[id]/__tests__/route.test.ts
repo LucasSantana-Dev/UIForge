@@ -238,7 +238,8 @@ describe('PATCH /api/components/[id]', () => {
     mockChain.select = jest.fn(() => mockChain);
     mockChain.update = jest.fn(() => mockChain);
     mockChain.eq = jest.fn(() => mockChain);
-    mockChain.single = jest.fn()
+    mockChain.single = jest
+      .fn()
       .mockResolvedValueOnce({ data: mockComponent, error: null })
       .mockResolvedValueOnce({ data: updatedComponent, error: null });
 
@@ -309,7 +310,8 @@ describe('PATCH /api/components/[id]', () => {
     mockChain.select = jest.fn(() => mockChain);
     mockChain.update = jest.fn(() => mockChain);
     mockChain.eq = jest.fn(() => mockChain);
-    mockChain.single = jest.fn()
+    mockChain.single = jest
+      .fn()
       .mockResolvedValueOnce({ data: mockComponent, error: null })
       .mockResolvedValueOnce({ data: mockComponent, error: null });
 
