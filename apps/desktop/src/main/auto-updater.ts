@@ -1,6 +1,5 @@
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater, UpdateInfo } from 'electron-updater';
 import { BrowserWindow, dialog } from 'electron';
-import { logger } from './mcp-server';
 
 const UPDATE_CHECK_INTERVAL = 4 * 60 * 60 * 1000; // 4 hours
 
@@ -8,7 +7,7 @@ export function initAutoUpdater(mainWindow: BrowserWindow) {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = true;
 
-  autoUpdater.on('update-available', (info) => {
+  autoUpdater.on('update-available', (info: UpdateInfo) => {
     dialog
       .showMessageBox(mainWindow, {
         type: 'info',
@@ -38,7 +37,7 @@ export function initAutoUpdater(mainWindow: BrowserWindow) {
       });
   });
 
-  autoUpdater.on('error', (err) => {
+  autoUpdater.on('error', (err: Error) => {
     console.error('Auto-update error:', err);
   });
 

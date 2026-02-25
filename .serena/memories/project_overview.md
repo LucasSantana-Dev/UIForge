@@ -43,6 +43,10 @@ Three offset rectangles — base (widest), face (wide), horn (narrow, right-shif
 Precise, confident, technical, dry, architectural. Write for engineers. No emoji in product copy. No marketing speak.
 
 ## Domain
-- **Live**: `siza-web.uiforge.workers.dev` (v0.3.0, deployed 2026-02-24)
-- Production: siza.dev (planned custom domain)
+- **Live**: `siza-web.uiforge.workers.dev` (v0.8.0, deployed 2026-02-25)
+- **Dev**: `siza-web-dev.uiforge.workers.dev`
+- Production: siza.dev (planned custom domain, Issue #64)
 - Health: `GET /api/health → { status, timestamp, version }`
+- **Tags**: v0.2.1, v0.3.0, v0.4.0, v0.5.0, v0.6.0, v0.7.0, v0.7.1, v0.8.0
+- **Open PRs**: #94 (desktop app), #87 (docs overhaul)
+- **Open Issues**: #61 (Stripe E2E), #64 (custom domain)
