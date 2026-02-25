@@ -8,7 +8,7 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "electron:dev": "vite build && electron .",
-    "electron:build": "vite build && electron-builder",
+    "electron:build": "vite build && electron-builder --publish never",
     "type-check": "tsc --noEmit",
     "lint": "eslint src/",
     "test": "vitest run",
