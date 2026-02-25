@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0] — 2026-02-25
+
+### Added
+
+- **Sentry error tracking**: Client-side + edge middleware integration via `@sentry/nextjs` (server-side disabled for Cloudflare Workers compatibility)
+- **Sentry error boundaries**: `error.tsx` and `global-error.tsx` now capture exceptions to Sentry
+- **Sentry configuration files**: `instrumentation-client.ts`, `sentry.edge.config.ts`, `instrumentation.ts`
+- **E2E billing tests**: 19 Playwright tests covering pricing page, checkout redirect, webhook API, subscribed user billing, and auth guards
+- **Stripe test fixtures**: `e2e/helpers/stripe.ts` with `seedSubscription`, `seedUsageTracking`, `cleanupTestBilling`, `generateStripeWebhookSignature`
+- **AI keys manager tests**: 29 tests unskipped for BYOK key management service
+- **Generation hook tests**: 13 tests unskipped for component generation React hook
+- **IndexedDB polyfill**: `fake-indexeddb` for Jest test environment
+- **Sentry env vars**: `NEXT_PUBLIC_SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_ENVIRONMENT`, `NEXT_PUBLIC_SENTRY_RELEASE` in `.env.example`
+
+### Changed
+
+- **Feature flags**: `ENABLE_CENTRALIZED_FEATURE_FLAGS` set to `true` by default (DB-backed dynamic flags with 30s polling)
+- **Test count**: 245 tests passing (was 203), 21 suites (was 19)
+- **next.config.js**: Wrapped with `withSentryConfig()` (conditional on DSN availability)
+- **MULTI_LLM and QUALITY_GATES**: Documented as deferred (no code paths gated)
+
+### Removed
+
+- **Stale env vars**: Removed `VITE_ENABLE_BYOK` and `VITE_ENABLE_GEMINI_FALLBACK` from `.env.example` (Vite leftovers)
+
+---
+
+
 ## [0.5.0] — 2026-02-25
 
 ### Added
