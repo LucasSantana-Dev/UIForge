@@ -127,7 +127,7 @@ class IndexedDBStorage {
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([USER_STORE_NAME], 'readwrite');
       const store = transaction.objectStore(USER_STORE_NAME);
-      const request = store.put(preferences, 'user_prefs');
+      const request = store.put({ ...preferences, id: 'user_prefs' });
       request.onsuccess = () => resolve();
       request.onerror = () => reject(new Error('Failed to store user preferences'));
     });

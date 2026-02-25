@@ -3,187 +3,209 @@
  * Tests for AI key management UI component
  */
 
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AIKeyManager } from '@/components/ai-keys/AIKeyManager';
 import { useAIKeyStore } from '@/stores/ai-keys';
-import { AIProvider } from '@/lib/encryption';
-import { TEST_CONFIG } from '../../../../../../test-config';
 
-// Mock the store
 jest.mock('@/stores/ai-keys');
+jest.mock('@/components/ai-keys/AddApiKeyDialog', () => ({
+  AddApiKeyDialog: () => <div data-testid="add-dialog">Add Dialog</div>,
+}));
+jest.mock('@/components/ai-keys/EditApiKeyDialog', () => ({
+  EditApiKeyDialog: () => <div data-testid="edit-dialog">Edit Dialog</div>,
+}));
+jest.mock('@/components/ai-keys/UsageStats', () => ({
+  UsageStats: () => <div data-testid="usage-stats">Usage Stats</div>,
+}));
 
 const mockUseAIKeyStore = useAIKeyStore as jest.MockedFunction<typeof useAIKeyStore>;
 
-// TODO: Enable when feature is implemented
-describe.skip('AIKeyManager', () => {
-  const mockStore = {
-    apiKeys: [
-      {
-        provider: 'openai' as AIProvider,
-        keyName: 'OpenAI Key',
-        encryptedKey: 'encrypted-key-1',
-        isActive: true,
-        createdAt: new Date().toISOString(),
-      },
-      {
-        provider: 'anthropic' as AIProvider,
-        keyName: 'Anthropic Key',
-        encryptedKey: 'encrypted-key-2',
-        isActive: false,
-        createdAt: new Date().toISOString(),
-      },
-    ],
-    loading: false,
-    error: null,
-    addApiKey: jest.fn(),
-    removeApiKey: jest.fn(),
-    updateApiKey: jest.fn(),
-    toggleApiKey: jest.fn(),
+describe('AIKeyManager', () => {
+  const baseMock = {
+    apiKeys: [],
+    error: undefined,
+    showAddKeyDialog: false,
+    selectedProvider: undefined,
+    editingKeyId: undefined,
+    usageStats: undefined,
+    setShowAddKeyDialog: jest.fn(),
+    setSelectedProvider: jest.fn(),
+    setEditingKeyId: jest.fn(),
+    deleteApiKey: jest.fn(),
+    setDefaultApiKey: jest.fn(),
+    loadUsageStats: jest.fn(),
+    clearError: jest.fn(),
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseAIKeyStore.mockReturnValue(mockStore);
+    mockUseAIKeyStore.mockReturnValue(baseMock as any);
+    jest.spyOn(window, 'confirm').mockReturnValue(true);
   });
 
-  it('should render AI key manager', () => {
-    const { getByText } = render(<AIKeyManager />);
-
-    expect(getByText('AI API Keys')).toBeInTheDocument();
-    expect(getByText('OpenAI Key')).toBeInTheDocument();
-    expect(getByText('Anthropic Key')).toBeInTheDocument();
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
-  it('should show loading state', () => {
+  it('should render empty state when no keys', () => {
+    render(<AIKeyManager />);
+    expect(screen.getByText('No API Keys Yet')).toBeInTheDocument();
+    expect(screen.getByText(/Add your first API key/)).toBeInTheDocument();
+  });
+
+  it('should render API keys heading', () => {
+    render(<AIKeyManager />);
+    expect(screen.getByText('API Keys')).toBeInTheDocument();
+  });
+
+  it('should render Add API Key button', () => {
+    render(<AIKeyManager />);
+    expect(screen.getByRole('button', { name: /Add API Key/i })).toBeInTheDocument();
+  });
+
+  it('should render key cards when keys exist', () => {
     mockUseAIKeyStore.mockReturnValue({
-      ...mockStore,
-      loading: true,
-    });
+      ...baseMock,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_test_123',
+          encryptedKey: 'encrypted-key-1',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          lastUsed: '2026-02-17T12:00:00.000Z',
+          isDefault: true,
+        },
+      ],
+    } as any);
 
-    const { getByText } = render(<AIKeyManager />);
-
-    expect(getByText('Loading API keys...')).toBeInTheDocument();
+    render(<AIKeyManager />);
+    expect(screen.getByText('key_test_123')).toBeInTheDocument();
+    expect(screen.getByText('Default')).toBeInTheDocument();
+    expect(screen.getByText('OPENAI')).toBeInTheDocument();
   });
 
-  it('should show error state', () => {
+  it('should render error state', () => {
     mockUseAIKeyStore.mockReturnValue({
-      ...mockStore,
+      ...baseMock,
       error: 'Failed to load API keys',
-    });
+    } as any);
 
-    const { getByText } = render(<AIKeyManager />);
-
-    expect(getByText('Failed to load API keys')).toBeInTheDocument();
+    render(<AIKeyManager />);
+    expect(screen.getByText('Failed to load API keys')).toBeInTheDocument();
   });
 
-  it('should add new API key', async () => {
-    const { getByText, getByLabelText, getByRole } = render(<AIKeyManager />);
+  it('should call setShowAddKeyDialog when Add button clicked', async () => {
+    const user = userEvent.setup();
+    render(<AIKeyManager />);
 
-    // Click add button
-    const addButton = getByText('Add API Key');
-    await userEvent.click(addButton);
+    await user.click(screen.getByRole('button', { name: /Add API Key/i }));
 
-    // Fill form
-    const providerSelect = getByLabelText(/provider/i);
-    const keyNameInput = getByLabelText(/key name/i);
-    const apiKeyInput = getByLabelText(/api key/i);
-
-    await userEvent.selectOptions(providerSelect, 'openai');
-    await userEvent.type(keyNameInput, 'Test Key');
-    await userEvent.type(apiKeyInput, TEST_CONFIG.API_KEYS.OPENAI);
-
-    // Submit form
-    const submitButton = getByRole('button', { name: /add key/i });
-    await userEvent.click(submitButton);
-
-    expect(mockStore.addApiKey).toHaveBeenCalledWith({
-      provider: 'openai' as AIProvider,
-      keyName: 'Test Key',
-      apiKey: TEST_CONFIG.API_KEYS.OPENAI,
-    });
+    expect(baseMock.setSelectedProvider).toHaveBeenCalledWith('openai');
+    expect(baseMock.setShowAddKeyDialog).toHaveBeenCalledWith(true);
   });
 
-  it('should toggle API key active status', async () => {
-    const { getByLabelText } = render(<AIKeyManager />);
-
-    // Find toggle for OpenAI key
-    const openaiToggle = getByLabelText(/toggle openai key/i);
-    await userEvent.click(openaiToggle);
-
-    expect(mockStore.toggleApiKey).toHaveBeenCalledWith('openai');
-  });
-
-  it('should remove API key', async () => {
-    const { getByLabelText, getByRole } = render(<AIKeyManager />);
-
-    // Find delete button for OpenAI key
-    const deleteButton = getByLabelText(/delete openai key/i);
-    await userEvent.click(deleteButton);
-
-    // Confirm deletion
-    const confirmButton = getByRole('button', { name: /delete/i });
-    await userEvent.click(confirmButton);
-
-    expect(mockStore.removeApiKey).toHaveBeenCalledWith('openai');
-  });
-
-  it('should validate API key format', async () => {
-    const { getByText, getByLabelText, getByRole } = render(<AIKeyManager />);
-
-    // Click add button
-    const addButton = getByText('Add API Key');
-    await userEvent.click(addButton);
-
-    // Fill form with invalid key
-    const providerSelect = getByLabelText(/provider/i);
-    const keyNameInput = getByLabelText(/key name/i);
-    const apiKeyInput = getByLabelText(/api key/i);
-
-    await userEvent.selectOptions(providerSelect, 'openai');
-    await userEvent.type(keyNameInput, 'Test Key');
-    await userEvent.type(apiKeyInput, 'invalid-key');
-
-    // Submit form
-    const submitButton = getByRole('button', { name: /add key/i });
-    await userEvent.click(submitButton);
-
-    // Should show validation error
-    expect(getByText(/invalid api key format/i)).toBeInTheDocument();
-  });
-
-  it('should handle empty API keys list', () => {
+  it('should call deleteApiKey when Delete button clicked', async () => {
+    const user = userEvent.setup();
     mockUseAIKeyStore.mockReturnValue({
-      ...mockStore,
-      apiKeys: [],
-    });
+      ...baseMock,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_test_123',
+          encryptedKey: 'encrypted-key-1',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: false,
+        },
+      ],
+    } as any);
 
-    const { getByText } = render(<AIKeyManager />);
+    render(<AIKeyManager />);
+    await user.click(screen.getByRole('button', { name: /Delete/i }));
 
-    expect(getByText('No API keys configured')).toBeInTheDocument();
-    expect(getByText('Add your first API key to get started')).toBeInTheDocument();
+    expect(baseMock.deleteApiKey).toHaveBeenCalledWith('key_test_123');
   });
 
-  it('should sort API keys by provider', () => {
-    const { getAllByTestId } = render(<AIKeyManager />);
+  it('should call setEditingKeyId when Edit button clicked', async () => {
+    const user = userEvent.setup();
+    mockUseAIKeyStore.mockReturnValue({
+      ...baseMock,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_test_123',
+          encryptedKey: 'encrypted-key-1',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: false,
+        },
+      ],
+    } as any);
 
-    const keys = getAllByTestId(/api-key-/);
-    expect(keys).toHaveLength(2);
+    render(<AIKeyManager />);
+    await user.click(screen.getByRole('button', { name: /Edit/i }));
 
-    // Should be sorted by provider name
-    expect(keys[0]).toHaveTextContent('Anthropic Key');
-    expect(keys[1]).toHaveTextContent('OpenAI Key');
+    expect(baseMock.setEditingKeyId).toHaveBeenCalledWith('key_test_123');
   });
 
-  it('should show API key status indicators', () => {
-    const { getByTestId } = render(<AIKeyManager />);
+  it('should show Set Default button for non-default keys', () => {
+    mockUseAIKeyStore.mockReturnValue({
+      ...baseMock,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_test_123',
+          encryptedKey: 'encrypted-key-1',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: false,
+        },
+      ],
+    } as any);
 
-    // Active key should show green indicator
-    const activeIndicator = getByTestId(/openai-active-indicator/);
-    expect(activeIndicator).toHaveClass('bg-green-500');
+    render(<AIKeyManager />);
+    expect(screen.getByRole('button', { name: /Set Default/i })).toBeInTheDocument();
+  });
 
-    // Inactive key should show gray indicator
-    const inactiveIndicator = getByTestId(/anthropic-active-indicator/);
-    expect(inactiveIndicator).toHaveClass('bg-gray-500');
+  it('should not show Set Default button for default keys', () => {
+    mockUseAIKeyStore.mockReturnValue({
+      ...baseMock,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_test_123',
+          encryptedKey: 'encrypted-key-1',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: true,
+        },
+      ],
+    } as any);
+
+    render(<AIKeyManager />);
+    expect(screen.queryByRole('button', { name: /Set Default/i })).not.toBeInTheDocument();
+  });
+
+  it('should show expired badge for old keys', () => {
+    const oldDate = new Date();
+    oldDate.setDate(oldDate.getDate() - 100);
+
+    mockUseAIKeyStore.mockReturnValue({
+      ...baseMock,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_expired',
+          encryptedKey: 'encrypted-key-1',
+          createdAt: oldDate.toISOString(),
+          isDefault: false,
+        },
+      ],
+    } as any);
+
+    render(<AIKeyManager />);
+    expect(screen.getByText('Expired')).toBeInTheDocument();
+  });
+
+  it('should load usage stats on mount', () => {
+    render(<AIKeyManager />);
+    expect(baseMock.loadUsageStats).toHaveBeenCalled();
   });
 });
