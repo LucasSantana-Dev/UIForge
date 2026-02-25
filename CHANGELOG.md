@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0] - 2026-02-25
+
+### Added
+
+- **Design Context System** (#113): Structured design inputs for AI generation
+  - ColorPicker component with hex input and 8 preset swatches
+  - DesignContext collapsible panel: color mode, colors, animation, spacing, border radius, typography
+  - Design context values wired into generation API request as structured prompt block
+  - Gated behind `ENABLE_DESIGN_CONTEXT` feature flag (enabled by default)
+- **Theme System** (#113): Reusable design themes with persist store
+  - `SizaTheme` data model with all design context fields
+  - Zustand store with localStorage persistence (CRUD, duplicate, export/import)
+  - 5 built-in read-only themes: Siza Default, Clean Light, Bold Contrast, Nature, Monochrome
+  - Per-project active theme tracking
+  - ThemeSelector dropdown with color dot previews and create/duplicate/export/import actions
+
+
 ## [0.8.0] - 2026-02-25
 
 ### Added
