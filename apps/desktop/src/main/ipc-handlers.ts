@@ -7,13 +7,17 @@ import {
   writeProjectFile,
   listDirectoryRecursive,
 } from './file-system';
-import { resolve, normalize } from 'path';
+import { resolve, normalize, relative } from 'path';
 import type { OllamaStatus, OllamaModel } from '../shared/types';
 
 function validateFilePath(filePath: string): string {
   const normalized = normalize(resolve(filePath));
   const home = process.env.HOME || process.env.USERPROFILE || '';
-  if (!normalized.startsWith(home)) {
+  if (!home) {
+    throw new Error('Unable to determine home directory');
+  }
+  const rel = relative(home, normalized);
+  if (rel.startsWith('..') || resolve(rel) === rel) {
     throw new Error('Access denied: path outside home directory');
   }
   return normalized;
@@ -119,21 +123,28 @@ export function registerIpcHandlers(mainWindow: BrowserWindow) {
     return app.getVersion();
   });
 
+  let storeInstance: InstanceType<typeof import('electron-store').default> | null = null;
+  async function getStore() {
+    if (!storeInstance) {
+      const Store = (await import('electron-store')).default;
+      storeInstance = new Store();
+    }
+    return storeInstance;
+  }
+
   ipcMain.handle(
     IPC.STORE_GET,
     async (_e, key: string) => {
-      const Store = (await import('electron-store')).default;
-      const store = new Store();
-      return store.get(key);
+      const s = await getStore();
+      return s.get(key);
     }
   );
 
   ipcMain.handle(
     IPC.STORE_SET,
     async (_e, key: string, value: unknown) => {
-      const Store = (await import('electron-store')).default;
-      const store = new Store();
-      store.set(key, value);
+      const s = await getStore();
+      s.set(key, value);
     }
   );
 }

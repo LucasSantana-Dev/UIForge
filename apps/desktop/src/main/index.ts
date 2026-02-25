@@ -1,9 +1,10 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import { join } from 'path';
 import { startMcpServer, stopMcpServer } from './mcp-server';
 import { registerIpcHandlers } from './ipc-handlers';
 import { createNativeMenu } from './native-menu';
 import { createTray, destroyTray } from './tray';
+import { initAutoUpdater } from './auto-updater';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -33,6 +34,18 @@ function createWindow() {
     );
   }
 
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
+  });
+
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    const devUrl = process.env.VITE_DEV_SERVER_URL || '';
+    if (devUrl && url.startsWith(devUrl)) return;
+    if (url.startsWith('file://')) return;
+    event.preventDefault();
+  });
+
   mainWindow.on('closed', () => {
     mainWindow = null;
   });
@@ -47,9 +60,12 @@ app.whenReady().then(async () => {
 
   try {
     await startMcpServer();
-    console.log('MCP server started');
   } catch (err) {
     console.error('Failed to start MCP server:', err);
+  }
+
+  if (mainWindow && app.isPackaged) {
+    initAutoUpdater(mainWindow);
   }
 
   app.on('activate', () => {

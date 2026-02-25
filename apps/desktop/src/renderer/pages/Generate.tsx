@@ -45,8 +45,10 @@ export function Generate() {
     if (!generatedCode) return;
     const dir = await window.siza.selectDirectory();
     if (!dir) return;
+    const safeName = componentName.replace(/[^a-zA-Z0-9_-]/g, '_').trim();
+    if (!safeName) return;
     const ext = framework === 'react' ? 'tsx' : 'vue';
-    const fileName = `${componentName}.${ext}`;
+    const fileName = `${safeName}.${ext}`;
     await window.siza.writeFile(`${dir}/${fileName}`, generatedCode);
   }, [generatedCode, componentName, framework]);
 
