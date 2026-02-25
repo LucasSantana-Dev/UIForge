@@ -125,24 +125,9 @@ create policy "Service role manages training runs"
 create index ml_training_runs_adapter_idx on public.ml_training_runs (adapter);
 create index ml_training_runs_status_idx on public.ml_training_runs (status);
 
--- ============================================================
--- 4. HNSW indexes on existing vector columns (production only)
--- ============================================================
-
-create index if not exists generations_embedding_hnsw_idx
-  on public.generations
-  using hnsw (prompt_embedding vector_cosine_ops)
-  with (m = 16, ef_construction = 64);
-
-create index if not exists components_embedding_hnsw_idx
-  on public.components
-  using hnsw (embedding vector_cosine_ops)
-  with (m = 16, ef_construction = 64);
-
-create index if not exists patterns_embedding_hnsw_idx
-  on public.component_patterns
-  using hnsw (embedding vector_cosine_ops)
-  with (m = 16, ef_construction = 64);
+-- Note: HNSW indexes on existing 3072-dim columns (generations, components,
+-- component_patterns) omitted — pgvector HNSW limit is 2000 dimensions.
+-- Use IVFFlat or reduce dimensions before indexing.
 
 -- ============================================================
 -- 5. Similarity search on ml_embeddings
