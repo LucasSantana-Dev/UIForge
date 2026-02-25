@@ -1,6 +1,3 @@
-'use client';
-
-import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,12 +11,11 @@ import {
   Monitor,
   Cloud,
   ArrowRight,
-  Copy,
-  Check,
   Github,
   ExternalLink,
 } from 'lucide-react';
 import { FadeIn } from '@/components/landing/FadeIn';
+import { CopyButton } from '@/components/docs/CopyButton';
 
 const DOCS_BASE = 'https://docs.siza.dev/docs';
 
@@ -127,23 +123,6 @@ const concepts = [
     text: 'Cloudflare Workers, Vercel, or self-hosted.',
   },
 ];
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-  return (
-    <button
-      onClick={() => {
-        navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      }}
-      className="text-muted-foreground hover:text-foreground transition-colors"
-      aria-label="Copy to clipboard"
-    >
-      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-    </button>
-  );
-}
 
 export default function DocsPage() {
   return (
