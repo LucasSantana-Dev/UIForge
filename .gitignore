@@ -80,3 +80,5 @@ POST_CLEANUP_CHECKLIST.md
 !.claude/agents/
 !.claude/skills/
 .worktrees/
+.windsurf/plans/
+.claude/plans/
