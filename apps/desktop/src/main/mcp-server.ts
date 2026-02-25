@@ -33,7 +33,9 @@ export async function startMcpServer(): Promise<Client> {
 
   if (!existsSync(serverPath)) {
     console.error('[mcp] Server not found at:', serverPath);
-    throw new Error(`MCP server not found at ${serverPath}. Run "npm run build" in siza-mcp first.`);
+    throw new Error(
+      `MCP server not found at ${serverPath}. Run "npm run build" in siza-mcp first.`
+    );
   }
 
   client = new Client({ name: 'siza-desktop', version: app.getVersion() }, { capabilities: {} });
