@@ -10,13 +10,11 @@ import { Card, CardContent } from '@/components/ui/card';
 function AppError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
-      // Lightweight error reporting via Sentry Envelope API
-      const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
       try {
+        const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
         const url = new URL(dsn);
         const projectId = url.pathname.replace('/', '');
         const host = url.hostname;
-        const publicKey = url.username;
         const eventId = crypto.randomUUID().replace(/-/g, '');
         const envelope = [
           JSON.stringify({ event_id: eventId, sent_at: new Date().toISOString(), dsn }),
@@ -34,7 +32,9 @@ function AppError({ error, reset }: { error: Error & { digest?: string }; reset:
           method: 'POST',
           body: envelope,
         }).catch(() => {});
-      } catch {}
+      } catch {
+        // Sentry reporting is best-effort
+      }
     }
     if (process.env.NODE_ENV === 'development') {
       console.error('Error boundary caught:', error);
