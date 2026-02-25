@@ -18,8 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Template page uses memoized filtering and pagination (12 per page)
 - /api/generate route supports provider and model parameters
 
-### Removed
-- Dead ENABLE_MCP_GATEWAY feature flag (MCP integration deferred to v0.9.0)
+### Infrastructure
+- MCP Gateway client (`lib/mcp/client.ts`) for AI generation routing (behind `ENABLE_MCP_GATEWAY` flag, disabled by default)
 
 ## [Unreleased]
 

@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
 import { generateComponentStream } from '@/lib/services/gemini';
+import { generateWithProvider } from '@/lib/services/generation';
+import type { AIProvider } from '@/lib/encryption';
 import { runAllGates } from '@/lib/quality/gates';
 import { enrichPromptWithContext } from '@/lib/services/context-enrichment';
 import { storeGenerationEmbedding } from '@/lib/services/embeddings';
@@ -26,6 +28,8 @@ const generateSchema = z.object({
   style: z.enum(['modern', 'minimal', 'colorful']).optional(),
   typescript: z.boolean().optional(),
   userApiKey: z.string().min(1).optional(),
+  provider: z.enum(['google', 'openai', 'anthropic']).default('google'),
+  model: z.string().min(1).optional(),
   useRag: z.boolean().optional(),
   imageBase64: z
     .string()
@@ -92,6 +96,8 @@ export async function POST(request: NextRequest) {
       style,
       typescript,
       userApiKey,
+      provider: requestedProvider,
+      model: requestedModel,
       useRag,
       imageBase64,
       imageMimeType,
@@ -116,7 +122,8 @@ export async function POST(request: NextRequest) {
     const stream = new ReadableStream({
       async start(controller) {
         let generationId: string | null = null;
-        const provider = mcpEnabled ? 'mcp-gateway' : 'google';
+        const activeProvider = mcpEnabled ? 'mcp-gateway' : requestedProvider;
+        const activeModel = mcpEnabled ? 'mcp-specialist' : (requestedModel || 'gemini-2.0-flash');
 
         try {
           const supabase = await createClient();
@@ -127,10 +134,8 @@ export async function POST(request: NextRequest) {
               prompt: description,
               framework,
               status: 'processing',
-              ai_provider: provider,
-              model_used: mcpEnabled
-                ? 'mcp-specialist'
-                : 'gemini-2.0-flash',
+              ai_provider: activeProvider,
+              model_used: activeModel,
             })
             .select('id')
             .single();
@@ -200,7 +205,9 @@ export async function POST(request: NextRequest) {
               }
             }
           } else {
-            for await (const event of generateComponentStream({
+            for await (const event of generateWithProvider({
+              provider: requestedProvider as AIProvider,
+              model: requestedModel || 'gemini-2.0-flash',
               prompt: description,
               framework,
               componentLibrary,
@@ -243,7 +250,7 @@ export async function POST(request: NextRequest) {
               .update({
                 status: 'completed',
                 generated_code: fullCode,
-                ai_provider: fullCode ? provider : 'google',
+                ai_provider: fullCode ? activeProvider : 'google',
               })
               .eq('id', generationId);
 
@@ -264,7 +271,7 @@ export async function POST(request: NextRequest) {
                 totalLength: fullCode.length,
                 qualityPassed: qualityReport.passed,
                 ragEnriched: contextAddition.length > 0,
-                provider,
+                provider: activeProvider,
                 timestamp: Date.now(),
               })
             )
@@ -332,7 +339,7 @@ export async function GET() {
       message: 'UI Generation API',
       version: '3.1.0',
       status: 'active',
-      provider: mcpEnabled ? 'mcp-gateway' : 'gemini-2.0-flash',
+      provider: 'gemini-2.0-flash',
       features: [
         'rag',
         'quality-gates',
