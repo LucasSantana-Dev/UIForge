@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] — 2026-02-25
+
+### Added
+
+- **GitHub Releases**: v0.3.0 and v0.4.0 releases published with full notes
+- **Encryption tests**: 26 BYOK security tests unskipped and passing (AES-256, key validation, expiration)
+- **Auth page tests**: 18 new tests for SignIn/SignUp pages matching current Supabase auth UI
+- **Google Analytics env var**: `NEXT_PUBLIC_GA_TRACKING_ID` in `.env.example`
+
+### Changed
+
+- **Coverage thresholds raised**: branches 30→60%, functions 30→65%, lines 40→75%, statements 40→75%
+- **Actual coverage**: statements 81%, branches 74%, functions 84%, lines 83%
+- **Test count**: 203 tests passing (was 159), 19 suites (was 16)
+
+### Fixed
+
+- **Analytics provider**: Replace 4 hardcoded `G-XXXXXXXXXX` placeholders with `NEXT_PUBLIC_GA_TRACKING_ID` env var
+- **Analytics guard**: Skip GA script injection when tracking ID is not configured (no dead code in production)
+
+### Removed
+
+- 3 stale remote branches: `fix/stripe-bugs`, `fix/supabase-migrations`, `chore/docs-cleanup`
+- Issue #8 (Label Templates) closed — all labels already created
+
+---
+
 ## [0.4.0] — 2026-02-25
 
 ### Added
