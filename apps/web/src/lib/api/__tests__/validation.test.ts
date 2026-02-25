@@ -13,8 +13,7 @@ import {
   componentQuerySchema,
 } from '../validation/components';
 
-// TODO: Enable when feature is implemented
-describe.skip('Project Validation Schemas', () => {
+describe('Project Validation Schemas', () => {
   describe('createProjectSchema', () => {
     it('should validate valid project data', () => {
       const validData = {
@@ -32,7 +31,7 @@ describe.skip('Project Validation Schemas', () => {
     it('should apply defaults for optional fields', () => {
       const minimalData = {
         name: 'Test Project',
-        framework: 'nextjs',
+        framework: 'react',
       };
 
       const result = createProjectSchema.safeParse(minimalData);
