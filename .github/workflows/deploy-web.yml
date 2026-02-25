@@ -34,7 +34,7 @@ jobs:
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
+          NEXT_PUBLIC_BASE_URL: ${{ github.ref == 'refs/heads/dev' && 'https://siza-web-dev.uiforge.workers.dev' || secrets.NEXT_PUBLIC_BASE_URL }}
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_ENABLE_STRIPE_BILLING: ${{ vars.NEXT_PUBLIC_ENABLE_STRIPE_BILLING }}
           NEXT_PUBLIC_ENABLE_USAGE_LIMITS: ${{ vars.NEXT_PUBLIC_ENABLE_USAGE_LIMITS }}
@@ -51,4 +51,4 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/web
-          command: deploy --keep-vars
+          command: deploy --keep-vars ${{ github.ref == 'refs/heads/dev' && '--env dev' || '' }}

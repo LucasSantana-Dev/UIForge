@@ -123,7 +123,7 @@ export default function LandingPage() {
               variant="outline"
               className="mb-8 px-4 py-1.5 text-xs font-mono border-border text-muted-foreground"
             >
-              Open Source &middot; Zero Cost
+              Open Source &middot; Generous Free Tier
             </Badge>
           </motion.div>
 
@@ -287,10 +287,11 @@ export default function LandingPage() {
           <h2 className="text-3xl font-bold tracking-tight mb-3">
             Built in the open.
             <br />
-            <span className="text-muted-foreground">Zero-cost forever.</span>
+            <span className="text-muted-foreground">Generous free tier.</span>
           </h2>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Siza runs entirely on free-tier infrastructure. No surprises, no paywalls.
+            Siza starts free with generous limits. No surprises, no paywalls. Scale when you need
+            to.
           </p>
           <div className="flex justify-center gap-4">
             <Button variant="outline" asChild>

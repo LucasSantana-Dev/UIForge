@@ -3,7 +3,7 @@
   "version": "0.5.0",
   "private": true,
   "license": "MIT",
-  "description": "Zero-cost web application for AI-driven UI generation",
+  "description": "The open full-stack AI workspace — generate, integrate, ship",
   "workspaces": [
     "apps/*",
     "packages/*"

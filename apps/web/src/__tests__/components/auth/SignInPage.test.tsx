@@ -57,7 +57,10 @@ describe('SignInPage', () => {
 
   it('should show forgot password link', () => {
     render(<SignInPage />);
-    expect(screen.getByRole('link', { name: /forgot password/i })).toHaveAttribute('href', '/forgot-password');
+    expect(screen.getByRole('link', { name: /forgot password/i })).toHaveAttribute(
+      'href',
+      '/forgot-password'
+    );
   });
 
   it('should submit form with email and password', async () => {
@@ -68,7 +71,8 @@ describe('SignInPage', () => {
     await user.click(screen.getByRole('button', { name: /sign in/i }));
     await waitFor(() => {
       expect(mockSignInWithPassword).toHaveBeenCalledWith({
-        email: 'test@example.com', password: 'password123',
+        email: 'test@example.com',
+        password: 'password123',
       });
     });
   });
@@ -79,7 +83,9 @@ describe('SignInPage', () => {
     await user.type(screen.getByLabelText(/email/i), 'test@example.com');
     await user.type(screen.getByLabelText(/password/i), 'password123');
     await user.click(screen.getByRole('button', { name: /sign in/i }));
-    await waitFor(() => { expect(mockPush).toHaveBeenCalledWith('/dashboard'); });
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith('/dashboard');
+    });
   });
 
   it('should show error on sign in failure', async () => {
@@ -96,7 +102,11 @@ describe('SignInPage', () => {
 
   it('should show loading state during submission', async () => {
     let resolveSignIn: (value: any) => void;
-    mockSignInWithPassword.mockReturnValue(new Promise((resolve) => { resolveSignIn = resolve; }));
+    mockSignInWithPassword.mockReturnValue(
+      new Promise((resolve) => {
+        resolveSignIn = resolve;
+      })
+    );
     const user = userEvent.setup();
     render(<SignInPage />);
     await user.type(screen.getByLabelText(/email/i), 'test@example.com');
