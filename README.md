@@ -4,12 +4,14 @@
 
 Every AI code tool generates beautiful frontends. Then you spend days wiring auth, database, APIs, and deployment. Siza owns the full-stack integration layer — from idea to production, zero lock-in.
 
+[![CI](https://github.com/Forge-Space/siza/actions/workflows/ci.yml/badge.svg)](https://github.com/Forge-Space/siza/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D22-brightgreen)](https://nodejs.org/)
 [![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue)](https://www.typescriptlang.org/)
 [![Deploy](https://img.shields.io/badge/Deploy-Cloudflare_Workers-orange)](https://workers.cloudflare.com/)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
+[![Discussions](https://img.shields.io/github/discussions/Forge-Space/siza)](https://github.com/Forge-Space/siza/discussions)
 
 **Live**: [siza-web.uiforge.workers.dev](https://siza-web.uiforge.workers.dev)
 
@@ -160,9 +162,9 @@ Automated via GitHub Actions on push to `main`:
 We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 1. Fork the repo
-2. Create a feature branch from `dev`
+2. Create a feature branch from `main`
 3. Make changes, run `npm run lint && npm test && npm run build`
-4. Open a PR against `dev`
+4. Open a PR against `main`
 
 ## License
 

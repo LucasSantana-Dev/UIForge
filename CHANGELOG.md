@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Visual overhaul**: Dark-only Siza brand identity across 37 files
 - **SizaBackground component**: Ambient dot grid + brand glow for marketing/auth pages
 - **Skip-to-content link**: Accessibility improvement in root layout
+- **Stripe production activation**: Webhook endpoint, test-mode products (Pro $19/mo, Team $49/mo), 12 Cloudflare Workers secrets
+- **CI status badge**: README now shows CI workflow status
+- **GitHub Discussions**: Enabled on siza repository for community engagement
 
 ### Changed
 
@@ -21,6 +24,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Sonner toast**: Hardcoded dark theme, removed unused next-themes dependency
 - **TopBar**: Removed theme toggle (dark-only app)
 - **Sidebar**: Brand active states, billing navigation item added
+- **Ecosystem repo descriptions**: All 5 repos updated with consistent Siza-aligned descriptions
+- **Repo topics**: 18 relevant tags including mcp, model-context-protocol, ai-workspace, byok
+
+### Fixed
+
+- **Supabase migration**: Fixed gin_trgm_ops_ops typo in shared_logging migration
+- **pgvector indexes**: Removed IVFFlat indexes exceeding 2000-dim limit in rag_embeddings migration
+- **Jest coverage**: Updated collectCoverageFrom scope and thresholds, excluded integration tests
 
 ### Removed
 
