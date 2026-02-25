@@ -107,6 +107,7 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 3 variables: `CLOUDFLARE_DEPLOY_ENABLED=true`, `NEXT_PUBLIC_ENABLE_STRIPE_BILLING=true`, `NEXT_PUBLIC_ENABLE_USAGE_LIMITS=true`
 
 ## Deployment Gotchas
+- **PostToolUse hooks**: Edit/Write tools get reverted AND branches get switched — use python3 via Bash for file writes
 - **apps/docs type errors**: Fumadocs `.source/server` not generated until build — blocks all pre-commit hooks. Use `HUSKY=0` for non-code commits
 - **apps/docs NODE_ENV**: Must use `NODE_ENV=production next build` — shell `NODE_ENV=development` causes `useMemo`/`useContext` null errors during SSR prerendering
 
@@ -127,6 +128,13 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 - Session plans stay in .claude/plans/ (ephemeral, not committed)
 - Allowed root .md: README, CHANGELOG, CONTRIBUTING, CLAUDE, ARCHITECTURE
 - docs/ is for living operational/architectural guides only
+
+## Testing
+- Run Jest from `apps/web/` (`cd apps/web && npx jest`), NOT from repo root (babel parsing errors at root)
+- Use `--forceExit` flag — Supabase client mocks leave async handles open
+- Coverage thresholds: branches 60%, functions 65%, lines 75%, statements 75% (actual ~80%+)
+- Auth test mocking: `createClient().auth.signInWithPassword()` pattern, NOT direct `signIn()` imports
+- 203 tests passing across 19 suites; 13 suites still skipped (BYOK storage, generators, hooks, API routes)
 
 ## Conventions
 
