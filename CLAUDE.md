@@ -96,6 +96,7 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 - Supabase migrations, npm audit security, shellcheck + shfmt
 
 ## Deployment Gotchas
+- **apps/docs type errors**: Fumadocs `.source/server` not generated until build — blocks all pre-commit hooks. Use `HUSKY=0` for non-code commits
 
 - **Workers free tier**: 3 MiB (3072 KiB) gzipped limit. Current bundle: ~2882 KiB
 - **WASM stub required**: `@vercel/og` WASM (~1.4 MiB) bundled by Next.js via `next/dist/compiled/` even when unused — stub at deploy time (automated in CI and `scripts/deploy.sh`)
