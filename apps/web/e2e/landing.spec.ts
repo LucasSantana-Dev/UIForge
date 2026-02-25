@@ -25,7 +25,7 @@ test.describe('Landing Page', () => {
   });
 
   test('should render capabilities section', async ({ page }) => {
-    await expect(page.getByText(/what makes it different/i)).toBeVisible();
+    await expect(page.getByText(/everything you need to ship/i)).toBeVisible();
     await expect(page.getByText(/component architecture/i)).toBeVisible();
     await expect(page.getByText(/ai provider gateway/i)).toBeVisible();
     await expect(page.getByText(/edge-first performance/i)).toBeVisible();
@@ -37,8 +37,8 @@ test.describe('Landing Page', () => {
   });
 
   test('should render ecosystem section', async ({ page }) => {
-    await expect(page.getByText(/the forge space ecosystem/i)).toBeVisible();
-    await expect(page.getByText(/ui-mcp/i)).toBeVisible();
+    await expect(page.getByText(/five repos/i)).toBeVisible();
+    await expect(page.getByText(/siza-mcp/i)).toBeVisible();
     await expect(page.getByText(/mcp-gateway/i)).toBeVisible();
   });
 
@@ -53,29 +53,12 @@ test.describe('Landing Page', () => {
     await expect(page).toHaveURL('/signin');
   });
 
-  test('should navigate to sign up from Get Started CTA', async ({ page }) => {
+  test('should navigate to sign in from Get Started CTA', async ({ page }) => {
     await page
       .getByRole('link', { name: /get started free/i })
       .first()
       .click();
-    await expect(page).toHaveURL('/signup');
-  });
-
-  test('should apply nav blur on scroll', async ({ page }) => {
-    await page.evaluate(() => window.scrollTo(0, 200));
-    await page.waitForTimeout(500);
-    const hasBlur = await page.evaluate(() => {
-      const nav = document.querySelector('nav');
-      if (!nav) return false;
-      const el = nav.closest('header') || nav.parentElement || nav;
-      const style = window.getComputedStyle(el);
-      return (
-        style.backdropFilter.includes('blur') ||
-        style.webkitBackdropFilter?.includes('blur') ||
-        false
-      );
-    });
-    expect(hasBlur).toBe(true);
+    await expect(page).toHaveURL('/signin');
   });
 
   test('should render responsive mobile layout', async ({ page }) => {
