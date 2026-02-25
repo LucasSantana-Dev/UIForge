@@ -1,144 +1,211 @@
-import React from 'react';
+/**
+ * AI Key Manager Component Tests
+ * Tests for AI key management UI component
+ */
+
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { AIKeyManager } from '@/components/ai-keys/AIKeyManager';
 import { useAIKeyStore } from '@/stores/ai-keys';
 
 jest.mock('@/stores/ai-keys');
 jest.mock('@/components/ai-keys/AddApiKeyDialog', () => ({
-  AddApiKeyDialog: () => <div data-testid="add-dialog" />,
+  AddApiKeyDialog: () => <div data-testid="add-dialog">Add Dialog</div>,
 }));
 jest.mock('@/components/ai-keys/EditApiKeyDialog', () => ({
-  EditApiKeyDialog: () => <div data-testid="edit-dialog" />,
+  EditApiKeyDialog: () => <div data-testid="edit-dialog">Edit Dialog</div>,
 }));
 jest.mock('@/components/ai-keys/UsageStats', () => ({
-  UsageStats: () => <div data-testid="usage-stats" />,
-}));
-jest.mock('@/lib/encryption', () => ({
-  AIProvider: {},
-  AI_PROVIDERS: {
-    openai: {
-      name: 'OpenAI',
-      models: ['gpt-4'],
-      rateLimitPerMinute: 60,
-      maxTokens: 128000,
-      requiresOrganization: false,
-    },
-    anthropic: {
-      name: 'Anthropic',
-      models: ['claude-3'],
-      rateLimitPerMinute: 50,
-      maxTokens: 200000,
-      requiresOrganization: false,
-    },
-    google: {
-      name: 'Google',
-      models: ['gemini'],
-      rateLimitPerMinute: 60,
-      maxTokens: 30000,
-      requiresOrganization: false,
-    },
-  },
-}));
-jest.mock('lucide-react', () => ({
-  Plus: () => <span>+</span>,
-  Key: () => <span>K</span>,
-  Settings: () => <span>S</span>,
-  Trash2: () => <span>T</span>,
-  XCircle: () => <span>X</span>,
-  AlertCircle: () => <span>!</span>,
-  Star: () => <span>*</span>,
-  Shield: () => <span>SH</span>,
-  Edit: () => <span>E</span>,
+  UsageStats: () => <div data-testid="usage-stats">Usage Stats</div>,
 }));
 
-const mock = useAIKeyStore as jest.MockedFunction<typeof useAIKeyStore>;
-const base = {
-  apiKeys: [],
-  error: undefined,
-  showAddKeyDialog: false,
-  selectedProvider: undefined,
-  editingKeyId: undefined,
-  usageStats: undefined,
-  setShowAddKeyDialog: jest.fn(),
-  setSelectedProvider: jest.fn(),
-  setEditingKeyId: jest.fn(),
-  deleteApiKey: jest.fn(),
-  setDefaultApiKey: jest.fn(),
-  loadUsageStats: jest.fn(),
-  clearError: jest.fn(),
-};
+const mockUseAIKeyStore = useAIKeyStore as jest.MockedFunction<typeof useAIKeyStore>;
 
 describe('AIKeyManager', () => {
+  const baseMock = {
+    apiKeys: [],
+    error: undefined,
+    showAddKeyDialog: false,
+    selectedProvider: undefined,
+    editingKeyId: undefined,
+    usageStats: undefined,
+    setShowAddKeyDialog: jest.fn(),
+    setSelectedProvider: jest.fn(),
+    setEditingKeyId: jest.fn(),
+    deleteApiKey: jest.fn(),
+    setDefaultApiKey: jest.fn(),
+    loadUsageStats: jest.fn(),
+    clearError: jest.fn(),
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    mock.mockReturnValue(base as any);
+    mockUseAIKeyStore.mockReturnValue(baseMock as any);
+    jest.spyOn(window, 'confirm').mockReturnValue(true);
   });
 
-  it('should render header', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+  });
+
+  it('should render empty state when no keys', () => {
+    render(<AIKeyManager />);
+    expect(screen.getByText('No API Keys Yet')).toBeInTheDocument();
+    expect(screen.getByText(/Add your first API key/)).toBeInTheDocument();
+  });
+
+  it('should render API keys heading', () => {
     render(<AIKeyManager />);
     expect(screen.getByText('API Keys')).toBeInTheDocument();
   });
 
-  it('should render empty state', () => {
+  it('should render Add API Key button', () => {
     render(<AIKeyManager />);
-    expect(screen.getByText('No API Keys Yet')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Add API Key/i })).toBeInTheDocument();
   });
 
-  it('should render error state', () => {
-    mock.mockReturnValue({ ...base, error: 'Load failed' } as any);
-    render(<AIKeyManager />);
-    expect(screen.getByText('Load failed')).toBeInTheDocument();
-  });
-
-  it('should render key cards', () => {
-    mock.mockReturnValue({
-      ...base,
+  it('should render key cards when keys exist', () => {
+    mockUseAIKeyStore.mockReturnValue({
+      ...baseMock,
       apiKeys: [
         {
           provider: 'openai',
-          keyId: 'k1',
-          encryptedKey: 'e',
+          keyId: 'key_test_123',
+          encryptedKey: 'encrypted-key-1',
           createdAt: '2026-02-17T00:00:00.000Z',
+          lastUsed: '2026-02-17T12:00:00.000Z',
           isDefault: true,
         },
       ],
     } as any);
+
     render(<AIKeyManager />);
-    expect(screen.getByText('OpenAI')).toBeInTheDocument();
+    expect(screen.getByText('key_test_123')).toBeInTheDocument();
     expect(screen.getByText('Default')).toBeInTheDocument();
+    expect(screen.getByText('OPENAI')).toBeInTheDocument();
   });
 
-  it('should show Set Default for non-default', () => {
-    mock.mockReturnValue({
-      ...base,
+  it('should render error state', () => {
+    mockUseAIKeyStore.mockReturnValue({
+      ...baseMock,
+      error: 'Failed to load API keys',
+    } as any);
+
+    render(<AIKeyManager />);
+    expect(screen.getByText('Failed to load API keys')).toBeInTheDocument();
+  });
+
+  it('should call setShowAddKeyDialog when Add button clicked', async () => {
+    const user = userEvent.setup();
+    render(<AIKeyManager />);
+
+    await user.click(screen.getByRole('button', { name: /Add API Key/i }));
+
+    expect(baseMock.setSelectedProvider).toHaveBeenCalledWith('openai');
+    expect(baseMock.setShowAddKeyDialog).toHaveBeenCalledWith(true);
+  });
+
+  it('should call deleteApiKey when Delete button clicked', async () => {
+    const user = userEvent.setup();
+    mockUseAIKeyStore.mockReturnValue({
+      ...baseMock,
       apiKeys: [
         {
           provider: 'openai',
-          keyId: 'k1',
-          encryptedKey: 'e',
+          keyId: 'key_test_123',
+          encryptedKey: 'encrypted-key-1',
           createdAt: '2026-02-17T00:00:00.000Z',
           isDefault: false,
         },
       ],
     } as any);
+
     render(<AIKeyManager />);
-    expect(screen.getByText('Set Default')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /Delete/i }));
+
+    expect(baseMock.deleteApiKey).toHaveBeenCalledWith('key_test_123');
   });
 
-  it('should call loadUsageStats on mount', () => {
+  it('should call setEditingKeyId when Edit button clicked', async () => {
+    const user = userEvent.setup();
+    mockUseAIKeyStore.mockReturnValue({
+      ...baseMock,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_test_123',
+          encryptedKey: 'encrypted-key-1',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: false,
+        },
+      ],
+    } as any);
+
     render(<AIKeyManager />);
-    expect(base.loadUsageStats).toHaveBeenCalled();
+    await user.click(screen.getByRole('button', { name: /Edit/i }));
+
+    expect(baseMock.setEditingKeyId).toHaveBeenCalledWith('key_test_123');
   });
 
-  it('should show add dialog', () => {
-    mock.mockReturnValue({ ...base, showAddKeyDialog: true } as any);
+  it('should show Set Default button for non-default keys', () => {
+    mockUseAIKeyStore.mockReturnValue({
+      ...baseMock,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_test_123',
+          encryptedKey: 'encrypted-key-1',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: false,
+        },
+      ],
+    } as any);
+
     render(<AIKeyManager />);
-    expect(screen.getByTestId('add-dialog')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Set Default/i })).toBeInTheDocument();
   });
 
-  it('should show edit dialog', () => {
-    mock.mockReturnValue({ ...base, editingKeyId: 'k1' } as any);
+  it('should not show Set Default button for default keys', () => {
+    mockUseAIKeyStore.mockReturnValue({
+      ...baseMock,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_test_123',
+          encryptedKey: 'encrypted-key-1',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: true,
+        },
+      ],
+    } as any);
+
     render(<AIKeyManager />);
-    expect(screen.getByTestId('edit-dialog')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Set Default/i })).not.toBeInTheDocument();
+  });
+
+  it('should show expired badge for old keys', () => {
+    const oldDate = new Date();
+    oldDate.setDate(oldDate.getDate() - 100);
+
+    mockUseAIKeyStore.mockReturnValue({
+      ...baseMock,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_expired',
+          encryptedKey: 'encrypted-key-1',
+          createdAt: oldDate.toISOString(),
+          isDefault: false,
+        },
+      ],
+    } as any);
+
+    render(<AIKeyManager />);
+    expect(screen.getByText('Expired')).toBeInTheDocument();
+  });
+
+  it('should load usage stats on mount', () => {
+    render(<AIKeyManager />);
+    expect(baseMock.loadUsageStats).toHaveBeenCalled();
   });
 });
