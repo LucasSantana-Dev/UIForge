@@ -1,0 +1,111 @@
+---
+title: Desktop App
+description: Run Siza locally with Electron, MCP, and Ollama
+---
+
+Siza Desktop brings AI component generation to your local machine — no cloud dependency required.
+
+## Features
+
+- **Local project management** — create, edit, and organize projects on your filesystem
+- **MCP client** — connects to siza-mcp via StdioClientTransport for tool access
+- **Ollama integration** — generate components with local LLMs (Llama, Mistral, CodeLlama)
+- **Offline-capable** — generate UI without an internet connection using local models
+- **Shared component library** — reuses `@siza/ui` (shadcn/ui + Radix + Tailwind)
+
+## Install
+
+### From releases
+
+Download the latest release for your platform from [GitHub Releases](https://github.com/Forge-Space/siza/releases).
+
+### From source
+
+```bash
+git clone https://github.com/Forge-Space/siza.git
+cd siza
+npm install
+npm run dev --filter=@siza/desktop
+```
+
+The desktop app starts in development mode with hot reload.
+
+### Build for distribution
+
+```bash
+cd apps/desktop
+npm run build
+npm run package
+```
+
+This creates platform-specific installers in `apps/desktop/dist/`.
+
+## Architecture
+
+```
+apps/desktop/
+  src/
+    main/          # Electron main process
+      mcp-client/  # MCP StdioClientTransport connection
+      ipc/         # Type-safe IPC handlers
+      file-system/ # Local project storage
+      ollama/      # Local LLM integration
+    renderer/      # React UI (pages, hooks, components)
+    shared/        # IPC channel types shared between processes
+```
+
+The main process handles file system operations and MCP communication. The renderer process is a React app that communicates with main via type-safe IPC channels defined in `src/shared/`.
+
+## MCP Server Connection
+
+The desktop app connects to siza-mcp as a child process:
+
+```typescript
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+
+const transport = new StdioClientTransport({
+  command: "npx",
+  args: ["@forgespace/ui-mcp"],
+});
+```
+
+All 17 MCP tools are available through the desktop client — same generation capabilities as the web app and IDE integrations.
+
+## Ollama (Local LLMs)
+
+To use local models instead of cloud APIs:
+
+1. Install [Ollama](https://ollama.ai)
+2. Pull a model: `ollama pull llama3.2` or `ollama pull codellama`
+3. The desktop app auto-detects running Ollama instances
+4. Select your local model in the generation settings
+
+Supported models include any Ollama-compatible model. Recommended:
+
+| Model       | Best for                 | Size   |
+| ----------- | ------------------------ | ------ |
+| `llama3.2`  | General generation       | 4.7 GB |
+| `codellama` | Code-focused generation  | 3.8 GB |
+| `mistral`   | Balanced quality/speed   | 4.1 GB |
+
+## Project Sync
+
+Desktop projects are stored locally in your filesystem. To sync with the web app:
+
+1. **Export to GitHub** — push your project to a GitHub repository
+2. **Import in web app** — connect the same repository in the Siza web app
+
+## Keyboard Shortcuts
+
+| Shortcut        | Action                |
+| --------------- | --------------------- |
+| `Cmd/Ctrl + N`  | New project           |
+| `Cmd/Ctrl + G`  | Generate component    |
+| `Cmd/Ctrl + P`  | Open project switcher |
+| `Cmd/Ctrl + ,`  | Settings              |
+
+## Next steps
+
+- [MCP Integration](/docs/guides/mcp-integration) — connect additional MCP servers
+- [Configuration](/docs/getting-started/configuration) — environment variables
+- [GitHub Export](/docs/guides/github-export) — push projects to repositories

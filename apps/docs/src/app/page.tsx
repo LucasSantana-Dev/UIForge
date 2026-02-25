@@ -16,7 +16,7 @@ const quickLinks = [
   {
     title: 'Self-Hosting',
     description: 'Deploy your own Siza instance with Cloudflare Workers.',
-    href: '/docs/deployment/self-hosting',
+    href: '/docs/getting-started/self-hosting',
     icon: '☁',
   },
   {

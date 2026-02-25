@@ -21,6 +21,13 @@ Generate individual UI components with RAG-based design references.
 | `visual_style`      | string | no       | Visual style                                      |
 | `component_library` | string | no       | UI library (shadcn, radix, etc.)                  |
 
+**Example prompt:**
+
+```
+Generate a notification bell button with a red badge count,
+using React + shadcn/ui, premium mood, SaaS industry
+```
+
 ### `generate_page_template`
 
 Generate complete page templates with ML composition and quality scoring.
@@ -58,6 +65,13 @@ Generate a multi-page application from a template pack.
 
 Generate interactive prototypes with component library integration.
 
+| Parameter      | Type     | Required | Description                                    |
+| -------------- | -------- | -------- | ---------------------------------------------- |
+| `description`  | string   | yes      | Prototype description                          |
+| `framework`    | string   | yes      | Target framework                               |
+| `pages`        | string[] | no       | Pages to include in the prototype              |
+| `interactions` | string   | no       | Interaction descriptions (hover, click, etc.)  |
+
 ### `refine_component`
 
 Iteratively improve components based on natural language feedback.
@@ -72,19 +86,42 @@ Iteratively improve components based on natural language feedback.
 
 ### `generate_design_image`
 
-Generate design mockups and visual references.
+Generate design mockups and visual references using AI image generation.
+
+| Parameter     | Type   | Required | Description                          |
+| ------------- | ------ | -------- | ------------------------------------ |
+| `description` | string | yes      | Design description                   |
+| `style`       | string | no       | Image style (mockup, wireframe, ui)  |
+| `dimensions`  | string | no       | Image dimensions                     |
 
 ### `fetch_design_inspiration`
 
-Fetch design inspiration from external sources.
+Fetch design inspiration from curated sources.
+
+| Parameter  | Type   | Required | Description                                |
+| ---------- | ------ | -------- | ------------------------------------------ |
+| `query`    | string | yes      | Search query                               |
+| `category` | string | no       | Category filter (web, mobile, dashboard)   |
+| `limit`    | number | no       | Number of results (default: 10)            |
 
 ### `analyze_design_references`
 
-Analyze design reference images and extract patterns.
+Analyze design reference images and extract patterns, colors, and layout information.
+
+| Parameter   | Type     | Required | Description                                              |
+| ----------- | -------- | -------- | -------------------------------------------------------- |
+| `image_url` | string   | yes      | URL or base64 of the image                               |
+| `extract`   | string[] | no       | What to extract (colors, layout, typography, components) |
 
 ### `image_to_component`
 
 Convert screenshots, mockups, or wireframes into framework-specific component code.
+
+| Parameter   | Type   | Required | Description                       |
+| ----------- | ------ | -------- | --------------------------------- |
+| `image`     | string | yes      | URL or base64 of the design image |
+| `framework` | string | yes      | Target framework                  |
+| `fidelity`  | string | no       | `pixel-perfect` or `structural`   |
 
 ## Figma Integration
 
@@ -92,15 +129,32 @@ Convert screenshots, mockups, or wireframes into framework-specific component co
 
 Parse Figma design files and extract component metadata.
 
+| Parameter      | Type     | Required | Description                 |
+| -------------- | -------- | -------- | --------------------------- |
+| `file_key`     | string   | yes      | Figma file key from URL     |
+| `node_ids`     | string[] | no       | Specific node IDs to parse  |
+| `access_token` | string   | yes      | Figma personal access token |
+
 ### `figma_push_variables`
 
 Push design tokens and variables to Figma.
+
+| Parameter      | Type   | Required | Description                    |
+| -------------- | ------ | -------- | ------------------------------ |
+| `file_key`     | string | yes      | Figma file key                 |
+| `variables`    | object | yes      | Design token variables to push |
+| `access_token` | string | yes      | Figma personal access token    |
 
 ## Quality and Feedback
 
 ### `audit_accessibility`
 
 Audit components for WCAG 2.1 accessibility violations.
+
+| Parameter | Type   | Required | Description                             |
+| --------- | ------ | -------- | --------------------------------------- |
+| `code`    | string | yes      | Component code to audit                 |
+| `level`   | string | no       | WCAG level: `A`, `AA` (default), `AAA` |
 
 Returns a detailed report with:
 
@@ -111,11 +165,23 @@ Returns a detailed report with:
 
 ### `submit_feedback`
 
-Submit feedback on generated components for ML self-learning. Accepted feedback improves future generation quality.
+Submit feedback on generated components for ML self-learning.
+
+| Parameter       | Type    | Required | Description                     |
+| --------------- | ------- | -------- | ------------------------------- |
+| `generation_id` | string  | yes      | ID of the generation to rate    |
+| `rating`        | number  | yes      | Quality rating (1-5)            |
+| `feedback`      | string  | no       | Written feedback                |
+| `accepted`      | boolean | no       | Whether the output was accepted |
 
 ### `analyze_component_library`
 
 Analyze existing component libraries for pattern extraction.
+
+| Parameter    | Type     | Required | Description                      |
+| ------------ | -------- | -------- | -------------------------------- |
+| `library`    | string   | yes      | Library name or URL              |
+| `components` | string[] | no       | Specific components to analyze   |
 
 ## ML and Training
 
@@ -123,9 +189,19 @@ Analyze existing component libraries for pattern extraction.
 
 Analyze design images for ML training data extraction.
 
+| Parameter | Type     | Required | Description          |
+| --------- | -------- | -------- | -------------------- |
+| `image`   | string   | yes      | Image URL or base64  |
+| `labels`  | string[] | no       | Expected labels/tags |
+
 ### `manage_training`
 
 Manage ML training pipelines and datasets.
+
+| Parameter | Type   | Required | Description                              |
+| --------- | ------ | -------- | ---------------------------------------- |
+| `action`  | string | yes      | `start`, `stop`, `status`, `export-data` |
+| `dataset` | string | no       | Dataset name                             |
 
 ## Common Parameters
 

@@ -5,23 +5,88 @@ description: REST endpoints for templates and generation
 
 Siza exposes REST endpoints via the Next.js App Router at `/api/*`. All endpoints require authentication via Supabase session cookies unless noted.
 
+## Authentication
+
+All requests must include a valid Supabase session cookie (set automatically by the web app) or a Bearer token:
+
+```bash
+curl -H "Authorization: Bearer YOUR_SUPABASE_TOKEN" \\
+  https://siza-web.uiforge.workers.dev/api/projects
+```
+
+### Error responses
+
+All endpoints return errors in this format:
+
+```json
+{
+  "error": "Human-readable error message"
+}
+```
+
+| Status | Meaning                                  |
+| ------ | ---------------------------------------- |
+| `400`  | Invalid request body or parameters       |
+| `401`  | Missing or invalid authentication        |
+| `403`  | Insufficient permissions (RLS policy)    |
+| `404`  | Resource not found                       |
+| `429`  | Rate limit exceeded                      |
+| `500`  | Internal server error                    |
+
 ## Generation
 
 ### `POST /api/generate`
 
-Generate UI components via AI.
+Generate UI components via AI. Streams the response using Server-Sent Events (SSE).
+
+**Request:**
 
 ```json
 {
   "prompt": "A responsive navbar with logo and mobile menu",
   "framework": "react",
-  "projectId": "uuid"
+  "projectId": "uuid",
+  "provider": "gemini",
+  "model": "gemini-2.0-flash"
 }
+```
+
+| Field       | Type   | Required | Description                                       |
+| ----------- | ------ | -------- | ------------------------------------------------- |
+| `prompt`    | string | yes      | Natural language description                      |
+| `framework` | string | yes      | `react`, `vue`, `svelte`, `angular`, `html`       |
+| `projectId` | string | yes      | UUID of the project                               |
+| `provider`  | string | no       | `gemini` (default), `anthropic`, `openai`         |
+| `model`     | string | no       | Provider-specific model ID                        |
+
+**Response:** SSE stream with events:
+
+```
+data: {"type":"progress","message":"Generating...","progress":25}
+data: {"type":"code","content":"import React from 'react';..."}
+data: {"type":"complete","generationId":"uuid"}
 ```
 
 ### `POST /api/generate/format`
 
 Format generated code with Prettier.
+
+**Request:**
+
+```json
+{
+  "code": "const Foo=()=><div>hello</div>",
+  "framework": "react"
+}
+```
+
+**Response:**
+
+```json
+{
+  "formatted": "const Foo = () => <div>hello</div>;\\n"
+}
+```
 
 ### `POST /api/generate/validate`
 
@@ -35,33 +100,77 @@ Generate a wireframe from a text description.
 
 ### `GET /api/projects`
 
-List all projects for the authenticated user.
+List all projects for the authenticated user. Results are filtered by Row Level Security.
+
+**Response:**
+
+```json
+[
+  {
+    "id": "uuid",
+    "name": "My Project",
+    "description": "Optional description",
+    "framework": "react",
+    "created_at": "2026-01-15T10:00:00Z",
+    "updated_at": "2026-01-15T10:00:00Z",
+    "component_count": 5
+  }
+]
+```
 
 ### `POST /api/projects`
 
-Create a new project.
+Create a new project. Subject to plan limits (3 free, 25 Pro, unlimited Team).
+
+**Request:**
+
+```json
+{
+  "name": "My Project",
+  "description": "Optional description",
+  "framework": "react"
+}
+```
 
 ### `GET /api/projects/[id]`
 
-Get project details.
+Get project details including components.
 
 ### `PATCH /api/projects/[id]`
 
-Update a project.
+Update a project name, description, or settings.
 
 ### `DELETE /api/projects/[id]`
 
-Delete a project.
+Delete a project and all its components.
 
 ## Components
 
 ### `GET /api/components`
 
-List components (filtered by project).
+List components filtered by project.
+
+**Query params:** `?projectId=uuid`
+
+**Response:**
+
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Navbar",
+    "code": "<nav>...</nav>",
+    "framework": "react",
+    "prompt": "Original generation prompt",
+    "project_id": "uuid",
+    "created_at": "2026-01-15T10:00:00Z"
+  }
+]
+```
 
 ### `POST /api/components`
 
-Create a component.
+Create a component within a project.
 
 ### `GET /api/components/[id]`
 
@@ -69,7 +178,7 @@ Get component details.
 
 ### `PATCH /api/components/[id]`
 
-Update a component.
+Update component code or metadata.
 
 ### `DELETE /api/components/[id]`
 
@@ -79,7 +188,25 @@ Delete a component.
 
 ### `GET /api/templates`
 
-List available templates. Returns 20 seeded templates across categories.
+List available templates. Includes 20 seeded templates across categories (dashboards, landing pages, auth forms, ecommerce).
+
+**Query params:** `?category=dashboard&search=admin`
+
+**Response:**
+
+```json
+[
+  {
+    "id": "uuid",
+    "name": "SaaS Dashboard",
+    "description": "Admin dashboard with sidebar, stats, and data table",
+    "category": "dashboard",
+    "framework": "react",
+    "thumbnail_url": "/templates/saas-dashboard.png",
+    "is_official": true
+  }
+]
+```
 
 ### `POST /api/templates`
 
@@ -87,7 +214,7 @@ Create a custom template.
 
 ### `GET /api/templates/[id]`
 
-Get template details.
+Get template details including full code.
 
 ## Generations History
 
@@ -95,31 +222,60 @@ Get template details.
 
 List generation history for the authenticated user.
 
+**Response:**
+
+```json
+[
+  {
+    "id": "uuid",
+    "prompt": "A pricing card with...",
+    "framework": "react",
+    "provider": "gemini",
+    "model": "gemini-2.0-flash",
+    "status": "completed",
+    "quality_score": 0.87,
+    "created_at": "2026-01-15T10:00:00Z"
+  }
+]
+```
+
 ### `POST /api/generations`
 
 Record a generation event.
 
 ### `GET /api/generations/[id]`
 
-Get generation details.
+Get generation details including code output.
 
 ## GitHub Integration
 
 ### `GET /api/github/repos`
 
-List repositories accessible via the GitHub App.
+List repositories accessible via the GitHub App installation.
 
 ### `POST /api/github/push`
 
 Push generated code to a GitHub repository.
 
+**Request:**
+
+```json
+{
+  "repositoryId": 12345,
+  "branch": "main",
+  "path": "src/components/Navbar.tsx",
+  "code": "import React from 'react';...",
+  "commitMessage": "Add generated Navbar component"
+}
+```
+
 ### `GET /api/github/callback`
 
-GitHub OAuth callback handler.
+GitHub OAuth callback handler (internal).
 
 ### `POST /api/github/webhook`
 
-GitHub webhook handler for installation and push events.
+GitHub webhook handler for installation and push events (internal).
 
 ## Billing (Stripe)
 
@@ -127,13 +283,31 @@ GitHub webhook handler for installation and push events.
 
 Create a Stripe Checkout session for plan upgrade.
 
+**Request:**
+
+```json
+{
+  "priceId": "price_xxx",
+  "successUrl": "https://...",
+  "cancelUrl": "https://..."
+}
+```
+
+**Response:**
+
+```json
+{
+  "url": "https://checkout.stripe.com/..."
+}
+```
+
 ### `POST /api/stripe/create-portal-session`
 
 Create a Stripe Customer Portal session for subscription management.
 
 ### `POST /api/stripe/webhook`
 
-Stripe webhook handler. Processes `checkout.session.completed` and `customer.subscription.*` events.
+Stripe webhook handler. Processes `checkout.session.completed`, `customer.subscription.updated`, and `customer.subscription.deleted` events.
 
 ## Feature Flags
 
@@ -153,7 +327,17 @@ Resolve feature flag values for the current user context.
 
 ### `GET /api/usage/current`
 
-Get current usage stats (generations count, projects count) against plan limits.
+Get current usage stats against plan limits.
+
+**Response:**
+
+```json
+{
+  "generations": { "used": 42, "limit": 100, "remaining": 58 },
+  "projects": { "used": 2, "limit": 3, "remaining": 1 },
+  "plan": "free"
+}
+```
 
 ## Auth
 
@@ -171,7 +355,9 @@ Trigger welcome email after signup.
 
 Health check endpoint. No authentication required.
 
-Returns `{ "status": "ok" }`.
+```json
+{ "status": "ok" }
+```
 
 ## Image Analysis
 

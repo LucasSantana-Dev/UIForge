@@ -1,0 +1,167 @@
+---
+title: Troubleshooting
+description: Common issues and solutions
+---
+
+## Build Errors
+
+### `Cannot find module '.source/server'`
+
+Fumadocs generates the `.source/` directory during build. Run the MDX generator first:
+
+```bash
+cd apps/docs
+npx fumadocs-mdx
+```
+
+Or run the full build which includes it:
+
+```bash
+NODE_ENV=production npx next build
+```
+
+### `useMemo`/`useContext` null errors during SSR
+
+The docs app requires `NODE_ENV=production` for building:
+
+```bash
+# Wrong — causes SSR null errors
+npx next build
+
+# Correct
+NODE_ENV=production npx next build
+```
+
+### Bundle size exceeds 3 MiB
+
+Cloudflare Workers free tier has a 3 MiB gzipped limit. If you exceed it:
+
+1. Check for large dependencies: `npx wrangler deploy --dry-run`
+2. Verify WASM stub is applied: `scripts/deploy.sh` handles this
+3. Remove unused API routes or heavy imports
+4. Consider code splitting for large features
+
+### Pre-commit hook fails on type-check
+
+The monorepo pre-commit runs `type-check` across all apps. If `apps/docs` has Fumadocs-related TS errors:
+
+```bash
+# Skip hooks for non-code commits (docs, config)
+HUSKY=0 git commit -m "docs: Update content"
+```
+
+## Authentication
+
+### "Unauthorized" from Supabase CLI
+
+```bash
+# Login first — CLI gives unhelpful error without it
+npx supabase login
+npx supabase db push --project-ref YOUR_REF
+```
+
+### OAuth callback errors
+
+Ensure your OAuth redirect URLs match exactly:
+
+- **Google**: `https://YOUR_SUPABASE_URL/auth/v1/callback`
+- **GitHub**: `https://YOUR_SUPABASE_URL/auth/v1/callback`
+
+Add both `http://localhost:3000` (dev) and your production URL to allowed redirect URLs in Supabase Dashboard > Authentication > URL Configuration.
+
+### Email verification not sending
+
+Check that `RESEND_API_KEY` is set and the sending domain is verified in [Resend](https://resend.com). Without it, Siza falls back to Supabase built-in email (rate-limited).
+
+## Generation
+
+### AI generation returns empty or errors
+
+1. **Check API key**: Verify `GEMINI_API_KEY` (or your BYOK key) is valid
+2. **Check rate limits**: Free tier APIs have request limits
+3. **Check feature flags**: Ensure `ENABLE_AI_GENERATION` is not disabled
+4. **Check logs**: API route errors appear in terminal (dev) or Cloudflare dashboard (production)
+
+### MCP server not connecting
+
+```bash
+# Test the server directly
+npx @forgespace/ui-mcp
+
+# Check it responds to MCP protocol
+echo '{"jsonrpc":"2.0","method":"initialize","params":{"capabilities":{}},"id":1}' | npx @forgespace/ui-mcp
+```
+
+If using the desktop app, ensure no other process is using the MCP server port.
+
+## Stripe Billing
+
+### Webhook signature verification fails
+
+The webhook secret must match between Stripe Dashboard and your environment:
+
+```bash
+# Local testing with Stripe CLI
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+# Use the webhook signing secret from the CLI output
+```
+
+For production, set `STRIPE_WEBHOOK_SECRET` via `npx wrangler secret put`.
+
+### Subscription state out of sync
+
+Stripe webhooks sync subscription state to Supabase. If state is stale:
+
+1. Check Stripe Dashboard > Webhooks for failed deliveries
+2. Verify the webhook endpoint URL is correct
+3. Check Supabase `stripe_events` table for processed events
+
+## GitHub Export
+
+### "Installation not found" error
+
+The GitHub App must be installed on the target organization or user account:
+
+1. Go to your [GitHub App settings](https://github.com/settings/apps)
+2. Verify the Siza app is installed
+3. Check it has repository access for your target repos
+
+### Push fails with permission error
+
+Ensure the GitHub App has `Contents: Write` permission on the target repository.
+
+## Performance
+
+### Slow generation responses
+
+Generation speed depends on your AI provider:
+
+| Provider          | Typical latency           |
+| ----------------- | ------------------------- |
+| Gemini Flash      | 2-5s                      |
+| Claude Sonnet     | 3-8s                      |
+| GPT-4o            | 3-7s                      |
+| Ollama (local)    | 5-30s (depends on hardware)|
+
+For faster responses, use Gemini Flash or ensure your local Ollama has GPU acceleration.
+
+### High memory usage in development
+
+The Turborepo dev server runs all apps simultaneously. To run only what you need:
+
+```bash
+# Only web app
+npm run dev --filter=@siza/web
+
+# Only docs
+npm run dev --filter=@siza/docs
+
+# Only desktop
+npm run dev --filter=@siza/desktop
+```
+
+## Getting Help
+
+- [GitHub Issues](https://github.com/Forge-Space/siza/issues) — bug reports and feature requests
+- [Contributing Guide](/docs/ecosystem/contributing) — how to contribute
+- [Architecture](/docs/ecosystem/architecture) — understand the codebase

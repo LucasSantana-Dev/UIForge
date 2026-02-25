@@ -1,4 +1,11 @@
 {
   "title": "Guides",
-  "pages": ["mcp-integration", "first-component", "github-export", "components"]
+  "pages": [
+    "mcp-integration",
+    "first-component",
+    "github-export",
+    "components",
+    "desktop-app",
+    "troubleshooting"
+  ]
 }

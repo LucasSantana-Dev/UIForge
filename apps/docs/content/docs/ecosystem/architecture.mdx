@@ -1,42 +1,59 @@
 ---
 title: Architecture
-description: The 5-repository Forge Space ecosystem
+description: The 6-repository Forge Space ecosystem
 ---
 
-Siza is built as a distributed ecosystem of five repositories, each with a clear responsibility.
+Siza is built as a distributed ecosystem of six repositories, each with a clear responsibility.
 
 ## Repository Map
 
 ```mermaid
 graph TB
     FP[forge-patterns<br/>Shared configs & types] --> MG[mcp-gateway<br/>AI routing & scoring]
-    FP --> SM[siza-mcp<br/>MCP server & tools]
+    FP --> SG[siza-gen<br/>AI generation core]
+    FP --> SM[siza-mcp<br/>MCP protocol adapter]
     FP --> SZ[siza<br/>Web app & API]
     FP --> BM[branding-mcp<br/>Brand generation]
+    SG --> SM
     MG --> SZ
     SM --> SZ
 ```
 
 ## Repositories
 
-### siza (Web App)
+### siza (Web App + Desktop)
 
 **GitHub:** [Forge-Space/siza](https://github.com/Forge-Space/siza)
 
-The main web application. A Next.js monorepo deployed to Cloudflare Workers.
+The main application. A Turborepo monorepo with web, desktop, docs, and shared UI.
 
-| App        | Purpose                                                |
-| ---------- | ------------------------------------------------------ |
-| `apps/web` | Next.js frontend (dashboard, editor, preview, billing) |
-| `apps/api` | Cloudflare Workers API with AI provider integrations   |
+| App            | Purpose                                                |
+| -------------- | ------------------------------------------------------ |
+| `apps/web`     | Next.js frontend (dashboard, editor, preview, billing) |
+| `apps/desktop` | Electron desktop app with local MCP + Ollama           |
+| `apps/docs`    | Fumadocs documentation site                            |
+| `apps/api`     | Cloudflare Workers API with AI provider integrations   |
+| `packages/ui`  | Shared `@siza/ui` component library (shadcn/ui + Radix)|
 
-**Stack:** Next.js 16, React 19, Supabase, Stripe, Tailwind CSS, shadcn/ui, Monaco Editor
+**Stack:** Next.js 16, React 19, Electron, Supabase, Stripe, Tailwind CSS, shadcn/ui, Monaco Editor
+
+### siza-gen (AI Generation Core)
+
+**GitHub:** [Forge-Space/siza-gen](https://github.com/Forge-Space/siza-gen)
+
+The extracted AI brain — contains all generation logic, ML composition, quality scoring, and the 500+ snippet registry. Published as `@forgespace/siza-gen` on npm.
+
+**Key modules:**
+
+- AI layer — prompt engineering, multi-provider routing, quality scoring
+- Generators — component, page, application, prototype generators
+- Registry — 500+ curated UI snippets (components, animations, backend patterns)
 
 ### siza-mcp (MCP Server)
 
 **GitHub:** [Forge-Space/ui-mcp](https://github.com/Forge-Space/ui-mcp)
 
-Model Context Protocol server with 17 tools for AI-powered UI generation. Runs as a standalone process that any MCP-compatible IDE can connect to.
+Thin MCP protocol adapter (~355 KB) that exposes 17 tools to any MCP-compatible IDE. Delegates all generation logic to `@forgespace/siza-gen`.
 
 **Key features:**
 
@@ -52,60 +69,53 @@ Model Context Protocol server with 17 tools for AI-powered UI generation. Runs a
 
 Python service that routes AI requests across multiple providers (Gemini, Claude, GPT) with intelligent selection, scoring, and caching.
 
-**Key features:**
-
-- Multi-provider AI routing with cost optimization
-- Pattern matching and scoring algorithms
-- Training pipeline for model improvement
-- Redis caching layer
-
 ### forge-patterns (Core Library)
 
 **GitHub:** [Forge-Space/core](https://github.com/Forge-Space/core)
 
 Shared configurations, TypeScript types, security framework, and ecosystem standards. Every other repository depends on this.
 
-**Provides:**
-
-- Shared TypeScript types and interfaces
-- ESLint and Prettier configurations
-- Security scanning utilities
-- MCP context server for ecosystem-wide knowledge
-
 ### branding-mcp (Brand Generation)
 
 **GitHub:** [Forge-Space/branding-mcp](https://github.com/Forge-Space/branding-mcp)
 
-MCP server specialized in brand identity generation — logos, color palettes, typography, and brand guidelines.
+MCP server specialized in brand identity generation — logos, color palettes, typography, brand guidelines, and AI-powered brand interpretation.
 
 ## Data Flow
 
 ### Component Generation (Web App)
 
 ```
-User prompt → Web App → AI Provider (Gemini) → Generated code → Preview → Export
+User prompt -> Web App -> AI Provider (Gemini/Claude/OpenAI) -> Generated code -> Preview -> Export
 ```
 
 ### Component Generation (MCP)
 
 ```
-IDE prompt → siza-mcp → RAG lookup → ML composition → Quality scoring → Generated code
+IDE prompt -> siza-mcp -> siza-gen -> RAG lookup -> ML composition -> Quality scoring -> Generated code
+```
+
+### Component Generation (Desktop)
+
+```
+Desktop app -> Local Ollama / Cloud API -> siza-mcp -> siza-gen -> Generated code -> Local filesystem
 ```
 
 ### Subscription Flow
 
 ```
-User → Stripe Checkout → Webhook → Supabase sync → Plan limits enforced
+User -> Stripe Checkout -> Webhook -> Supabase sync -> Plan limits enforced
 ```
 
 ## Technology Stack
 
 | Layer    | Technology                                               |
 | -------- | -------------------------------------------------------- |
-| Frontend | Next.js 16, React 19, Tailwind CSS, shadcn/ui            |
+| Frontend | Next.js 16, React 19, Electron, Tailwind CSS, shadcn/ui |
 | Backend  | Cloudflare Workers, Supabase (Postgres + Auth + Storage) |
-| AI       | Google Gemini, Anthropic Claude, OpenAI GPT              |
+| AI       | Google Gemini, Anthropic Claude, OpenAI GPT, Ollama      |
 | MCP      | TypeScript MCP server, SQLite (RAG), vector search       |
+| Gen Core | @forgespace/siza-gen (AI, generators, registry)          |
 | Gateway  | Python, Redis, FastAPI                                   |
 | Deploy   | Cloudflare Workers (OpenNext), GitHub Actions CI/CD      |
 | Shared   | forge-patterns (TypeScript, ESLint, security)            |
