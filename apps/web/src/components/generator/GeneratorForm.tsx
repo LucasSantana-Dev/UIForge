@@ -91,19 +91,19 @@ export default function GeneratorForm({
 
   const providerKey = useApiKeyForProvider(selectedProvider);
   const hasProviderKey = useHasApiKey(selectedProvider);
-  const hasGoogleKey = useHasApiKey('google');
 
   const models = useMemo(
     () => PROVIDER_MODELS[selectedProvider] || [],
     [selectedProvider]
   );
 
-  useEffect(() => {
-    const firstModel = PROVIDER_MODELS[selectedProvider]?.[0];
+  const handleProviderChange = (provider: AIProvider) => {
+    setSelectedProvider(provider);
+    const firstModel = PROVIDER_MODELS[provider]?.[0];
     if (firstModel) {
       setSelectedModel(firstModel.id);
     }
-  }, [selectedProvider]);
+  };
 
   const [currentSettings, setCurrentSettings] = useState({
     componentName: '',
@@ -267,7 +267,7 @@ export default function GeneratorForm({
                   <button
                     key={p}
                     type="button"
-                    onClick={() => setSelectedProvider(p)}
+                    onClick={() => handleProviderChange(p)}
                     className={`px-3 py-2 text-sm rounded-md border transition-colors ${
                       selectedProvider === p
                         ? 'border-brand bg-brand/10 text-brand-light'

@@ -3,13 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Search,
-  Filter,
   Loader2,
   Clock,
-  Copy,
   ArrowRight,
-  CheckIcon,
   Code2Icon,
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -75,7 +71,7 @@ export function HistoryClient() {
         if (!res.ok) throw new Error('Failed to load history');
         const json = await res.json();
         setGenerations(json.data?.generations || []);
-        setPagination(json.data?.pagination || pagination);
+        setPagination((prev) => json.data?.pagination || prev);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load history');
       } finally {

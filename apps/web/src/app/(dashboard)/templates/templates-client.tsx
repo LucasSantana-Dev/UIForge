@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Search, Loader2, ChevronLeftIcon, ChevronRightIcon, SortAscIcon } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Search, ChevronLeftIcon, ChevronRightIcon, SortAscIcon } from 'lucide-react';
 import { TemplateCard } from '@/components/templates/TemplateCard';
 import { TemplatePreview } from '@/components/templates/TemplatePreview';
 import { useRouter } from 'next/navigation';
