@@ -21,6 +21,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Infrastructure
 - MCP Gateway client (`lib/mcp/client.ts`) for AI generation routing (behind `ENABLE_MCP_GATEWAY` flag, disabled by default)
 
+## [0.8.2] - 2026-02-25
+
+### Added
+
+- **create-siza-app CLI** (`packages/create-siza-app`): `npx create-siza-app` scaffolding tool (#105)
+- **Docs page redesign**: Redesigned documentation page with consistent design system, consolidated /landing route (#108)
+
+### Fixed
+
+- **Desktop MCP connection** (#111): LOG_LEVEL `silent` → `error` (siza-gen Zod rejects silent), tool name kebab→snake_case, callTool schema args matched to MCP server
+- **Desktop packaging**: All deps moved to devDependencies for electron-builder (#103), node_modules excluded (#101), auto-publish disabled (#106), 512x512 app icon (#107), package metadata added (#109, #110)
+- **Admin deploy workflow**: Missing WASM stub and _redirects removal (#104)
+
 ## [0.8.1] - 2026-02-25
 
 ### Added
@@ -41,10 +54,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Stripe E2E tests**: Checkout flow, webhook processing, DB sync validation (#95)
 - **Roadmap Phase 1 completion**: All 11 features marked as done in roadmap UI (#97)
-
-### Fixed
-
-- **Desktop MCP connection**: LOG_LEVEL `silent` → `error` (siza-gen Zod rejects silent), tool name kebab→snake_case, callTool schema args matched to MCP server
 
 ### Changed
 
