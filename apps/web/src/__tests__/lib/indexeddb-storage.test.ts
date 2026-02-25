@@ -138,9 +138,7 @@ describe('IndexedDB Storage', () => {
 
   it('should handle concurrent writes', async () => {
     await Promise.all(
-      Array.from({ length: 5 }, (_, i) =>
-        storage.storeApiKey({ ...testKey, keyId: `k_${i}` })
-      )
+      Array.from({ length: 5 }, (_, i) => storage.storeApiKey({ ...testKey, keyId: `k_${i}` }))
     );
     expect(await storage.getApiKeys()).toHaveLength(5);
   });

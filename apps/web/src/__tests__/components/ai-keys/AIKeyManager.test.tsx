@@ -16,9 +16,27 @@ jest.mock('@/components/ai-keys/UsageStats', () => ({
 jest.mock('@/lib/encryption', () => ({
   AIProvider: {},
   AI_PROVIDERS: {
-    openai: { name: 'OpenAI', models: ['gpt-4'], rateLimitPerMinute: 60, maxTokens: 128000, requiresOrganization: false },
-    anthropic: { name: 'Anthropic', models: ['claude-3'], rateLimitPerMinute: 50, maxTokens: 200000, requiresOrganization: false },
-    google: { name: 'Google', models: ['gemini'], rateLimitPerMinute: 60, maxTokens: 30000, requiresOrganization: false },
+    openai: {
+      name: 'OpenAI',
+      models: ['gpt-4'],
+      rateLimitPerMinute: 60,
+      maxTokens: 128000,
+      requiresOrganization: false,
+    },
+    anthropic: {
+      name: 'Anthropic',
+      models: ['claude-3'],
+      rateLimitPerMinute: 50,
+      maxTokens: 200000,
+      requiresOrganization: false,
+    },
+    google: {
+      name: 'Google',
+      models: ['gemini'],
+      rateLimitPerMinute: 60,
+      maxTokens: 30000,
+      requiresOrganization: false,
+    },
   },
 }));
 jest.mock('lucide-react', () => ({
@@ -35,15 +53,26 @@ jest.mock('lucide-react', () => ({
 
 const mock = useAIKeyStore as jest.MockedFunction<typeof useAIKeyStore>;
 const base = {
-  apiKeys: [], error: undefined, showAddKeyDialog: false,
-  selectedProvider: undefined, editingKeyId: undefined, usageStats: undefined,
-  setShowAddKeyDialog: jest.fn(), setSelectedProvider: jest.fn(),
-  setEditingKeyId: jest.fn(), deleteApiKey: jest.fn(),
-  setDefaultApiKey: jest.fn(), loadUsageStats: jest.fn(), clearError: jest.fn(),
+  apiKeys: [],
+  error: undefined,
+  showAddKeyDialog: false,
+  selectedProvider: undefined,
+  editingKeyId: undefined,
+  usageStats: undefined,
+  setShowAddKeyDialog: jest.fn(),
+  setSelectedProvider: jest.fn(),
+  setEditingKeyId: jest.fn(),
+  deleteApiKey: jest.fn(),
+  setDefaultApiKey: jest.fn(),
+  loadUsageStats: jest.fn(),
+  clearError: jest.fn(),
 };
 
 describe('AIKeyManager', () => {
-  beforeEach(() => { jest.clearAllMocks(); mock.mockReturnValue(base as any); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    mock.mockReturnValue(base as any);
+  });
 
   it('should render header', () => {
     render(<AIKeyManager />);
@@ -62,20 +91,36 @@ describe('AIKeyManager', () => {
   });
 
   it('should render key cards', () => {
-    mock.mockReturnValue({ ...base, apiKeys: [{
-      provider: 'openai', keyId: 'k1', encryptedKey: 'e',
-      createdAt: '2026-02-17T00:00:00.000Z', isDefault: true,
-    }] } as any);
+    mock.mockReturnValue({
+      ...base,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'k1',
+          encryptedKey: 'e',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: true,
+        },
+      ],
+    } as any);
     render(<AIKeyManager />);
     expect(screen.getByText('OpenAI')).toBeInTheDocument();
     expect(screen.getByText('Default')).toBeInTheDocument();
   });
 
   it('should show Set Default for non-default', () => {
-    mock.mockReturnValue({ ...base, apiKeys: [{
-      provider: 'openai', keyId: 'k1', encryptedKey: 'e',
-      createdAt: '2026-02-17T00:00:00.000Z', isDefault: false,
-    }] } as any);
+    mock.mockReturnValue({
+      ...base,
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'k1',
+          encryptedKey: 'e',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: false,
+        },
+      ],
+    } as any);
     render(<AIKeyManager />);
     expect(screen.getByText('Set Default')).toBeInTheDocument();
   });
