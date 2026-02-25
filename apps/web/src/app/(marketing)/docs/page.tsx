@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useState } from 'react';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   BookOpen,
   Code,
@@ -18,92 +18,92 @@ import {
   Check,
   Github,
   ExternalLink,
-} from "lucide-react";
-import { FadeIn } from "@/components/landing/FadeIn";
+} from 'lucide-react';
+import { FadeIn } from '@/components/landing/FadeIn';
 
-const DOCS_BASE = "https://docs.siza.dev/docs";
+const DOCS_BASE = 'https://docs.siza.dev/docs';
 
 const categories = [
   {
-    title: "Getting Started",
+    title: 'Getting Started',
     icon: Rocket,
     links: [
       {
-        label: "Quick Start",
+        label: 'Quick Start',
         href: `${DOCS_BASE}/getting-started/quick-start`,
       },
       {
-        label: "Configuration",
+        label: 'Configuration',
         href: `${DOCS_BASE}/getting-started/configuration`,
       },
       {
-        label: "Deployment",
+        label: 'Deployment',
         href: `${DOCS_BASE}/getting-started/deployment`,
       },
       {
-        label: "Self-Hosting",
+        label: 'Self-Hosting',
         href: `${DOCS_BASE}/getting-started/self-hosting`,
       },
     ],
   },
   {
-    title: "Guides",
+    title: 'Guides',
     icon: BookOpen,
     links: [
       {
-        label: "First Component",
+        label: 'First Component',
         href: `${DOCS_BASE}/guides/first-component`,
       },
       {
-        label: "Components",
+        label: 'Components',
         href: `${DOCS_BASE}/guides/components`,
       },
       {
-        label: "Desktop App",
+        label: 'Desktop App',
         href: `${DOCS_BASE}/guides/desktop-app`,
       },
       {
-        label: "MCP Integration",
+        label: 'MCP Integration',
         href: `${DOCS_BASE}/guides/mcp-integration`,
       },
       {
-        label: "GitHub Export",
+        label: 'GitHub Export',
         href: `${DOCS_BASE}/guides/github-export`,
       },
       {
-        label: "Troubleshooting",
+        label: 'Troubleshooting',
         href: `${DOCS_BASE}/guides/troubleshooting`,
       },
     ],
   },
   {
-    title: "API Reference",
+    title: 'API Reference',
     icon: Code,
     links: [
       {
-        label: "REST API",
+        label: 'REST API',
         href: `${DOCS_BASE}/api-reference/rest-api`,
       },
       {
-        label: "MCP Tools",
+        label: 'MCP Tools',
         href: `${DOCS_BASE}/api-reference/mcp-tools`,
       },
       {
-        label: "Webhooks",
+        label: 'Webhooks',
         href: `${DOCS_BASE}/api-reference/webhooks`,
       },
     ],
   },
   {
-    title: "Ecosystem",
+    title: 'Ecosystem',
     icon: Zap,
     links: [
       {
-        label: "Architecture",
+        label: 'Architecture',
         href: `${DOCS_BASE}/ecosystem/architecture`,
       },
       {
-        label: "Contributing",
+        label: 'Contributing',
         href: `${DOCS_BASE}/ecosystem/contributing`,
       },
     ],
@@ -113,18 +113,18 @@ const categories = [
 const concepts = [
   {
     icon: Shield,
-    title: "MCP Protocol",
-    text: "Connect Siza to any IDE via the Model Context Protocol.",
+    title: 'MCP Protocol',
+    text: 'Connect Siza to any IDE via the Model Context Protocol.',
   },
   {
     icon: Monitor,
-    title: "Desktop + Web",
-    text: "Same generation engine, local or cloud.",
+    title: 'Desktop + Web',
+    text: 'Same generation engine, local or cloud.',
   },
   {
     icon: Cloud,
-    title: "Deploy Anywhere",
-    text: "Cloudflare Workers, Vercel, or self-hosted.",
+    title: 'Deploy Anywhere',
+    text: 'Cloudflare Workers, Vercel, or self-hosted.',
   },
 ];
 
@@ -140,11 +140,7 @@ function CopyButton({ text }: { text: string }) {
       className="text-muted-foreground hover:text-foreground transition-colors"
       aria-label="Copy to clipboard"
     >
-      {copied ? (
-        <Check className="w-4 h-4" />
-      ) : (
-        <Copy className="w-4 h-4" />
-      )}
+      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
     </button>
   );
 }
@@ -181,8 +177,7 @@ export default function DocsPage() {
               className="text-lg text-muted-foreground
                 max-w-xl mx-auto mb-10"
             >
-              Guides, API references, and examples for
-              AI-powered component generation.
+              Guides, API references, and examples for AI-powered component generation.
             </p>
           </FadeIn>
 
@@ -241,9 +236,7 @@ export default function DocsPage() {
       <section className="py-24 px-6 border-t border-border/50">
         <div className="max-w-5xl mx-auto">
           <FadeIn className="text-center mb-14">
-            <h2 className="text-3xl font-bold tracking-tight mb-3">
-              Documentation
-            </h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-3">Documentation</h2>
             <p
               className="text-muted-foreground
                 max-w-md mx-auto"
@@ -268,9 +261,7 @@ export default function DocsPage() {
                       group-hover:text-[#8B5CF6]
                       transition-colors"
                   />
-                  <h3 className="font-semibold mb-3">
-                    {cat.title}
-                  </h3>
+                  <h3 className="font-semibold mb-3">{cat.title}</h3>
                   <ul className="space-y-2">
                     {cat.links.map((link) => (
                       <li key={link.label}>
@@ -304,9 +295,7 @@ export default function DocsPage() {
       <section className="py-24 px-6 border-t border-border/50">
         <div className="max-w-4xl mx-auto">
           <FadeIn className="text-center mb-14">
-            <h2 className="text-3xl font-bold tracking-tight mb-3">
-              Quick Example
-            </h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-3">Quick Example</h2>
           </FadeIn>
 
           <FadeIn delay={0.1}>
@@ -358,112 +347,66 @@ const { code } = await res.json();`}
                 <pre className="text-sm font-mono leading-relaxed">
                   <code>
                     <span className="text-[#C586C0]">const</span>
-                    <span className="text-foreground/90">
-                      {" "}
-                      res ={" "}
-                    </span>
+                    <span className="text-foreground/90"> res = </span>
                     <span className="text-[#C586C0]">await</span>
-                    <span className="text-[#DCDCAA]">
-                      {" "}
-                      fetch
-                    </span>
-                    <span className="text-[#CE9178]">
-                      (&quot;/api/generate&quot;
-                    </span>
-                    <span className="text-foreground/90">
-                      , {"{"}
-                    </span>
+                    <span className="text-[#DCDCAA]"> fetch</span>
+                    <span className="text-[#CE9178]">(&quot;/api/generate&quot;</span>
+                    <span className="text-foreground/90">, {'{'}</span>
                     {`
 `}
-                    <span className="text-foreground/90">
-                      {"  "}method:{" "}
-                    </span>
-                    <span className="text-[#CE9178]">
-                      &quot;POST&quot;
-                    </span>
+                    <span className="text-foreground/90">{'  '}method: </span>
+                    <span className="text-[#CE9178]">&quot;POST&quot;</span>
                     <span className="text-foreground/90">,</span>
                     {`
 `}
                     <span className="text-foreground/90">
-                      {"  "}headers: {"{"}{" "}
+                      {'  '}headers: {'{'}{' '}
                     </span>
-                    <span className="text-[#CE9178]">
-                      &quot;Content-Type&quot;
-                    </span>
+                    <span className="text-[#CE9178]">&quot;Content-Type&quot;</span>
                     <span className="text-foreground/90">: </span>
-                    <span className="text-[#CE9178]">
-                      &quot;application/json&quot;
-                    </span>
-                    <span className="text-foreground/90">
-                      {" "}
-                      {"}"},
-                    </span>
+                    <span className="text-[#CE9178]">&quot;application/json&quot;</span>
+                    <span className="text-foreground/90"> {'}'},</span>
                     {`
 `}
-                    <span className="text-foreground/90">
-                      {"  "}body: JSON.
-                    </span>
-                    <span className="text-[#DCDCAA]">
-                      stringify
-                    </span>
-                    <span className="text-foreground/90">
-                      ({"{"})
-                    </span>
+                    <span className="text-foreground/90">{'  '}body: JSON.</span>
+                    <span className="text-[#DCDCAA]">stringify</span>
+                    <span className="text-foreground/90">({'{'})</span>
                     {`
 `}
-                    <span className="text-foreground/90">
-                      {"    "}description:{" "}
-                    </span>
-                    <span className="text-[#CE9178]">
-                      &quot;A pricing card with toggle&quot;
-                    </span>
+                    <span className="text-foreground/90">{'    '}description: </span>
+                    <span className="text-[#CE9178]">&quot;A pricing card with toggle&quot;</span>
+                    <span className="text-foreground/90">,</span>
+                    {`
+`}
+                    <span className="text-foreground/90">{'    '}framework: </span>
+                    <span className="text-[#CE9178]">&quot;react&quot;</span>
+                    <span className="text-foreground/90">,</span>
+                    {`
+`}
+                    <span className="text-foreground/90">{'    '}cssFramework: </span>
+                    <span className="text-[#CE9178]">&quot;tailwind&quot;</span>
                     <span className="text-foreground/90">,</span>
                     {`
 `}
                     <span className="text-foreground/90">
-                      {"    "}framework:{" "}
-                    </span>
-                    <span className="text-[#CE9178]">
-                      &quot;react&quot;
-                    </span>
-                    <span className="text-foreground/90">,</span>
-                    {`
-`}
-                    <span className="text-foreground/90">
-                      {"    "}cssFramework:{" "}
-                    </span>
-                    <span className="text-[#CE9178]">
-                      &quot;tailwind&quot;
-                    </span>
-                    <span className="text-foreground/90">,</span>
-                    {`
-`}
-                    <span className="text-foreground/90">
-                      {"  "}
-                      {"}"}),
+                      {'  '}
+                      {'}'}),
                     </span>
                     {`
 `}
-                    <span className="text-foreground/90">
-                      {"}"});
-                    </span>
+                    <span className="text-foreground/90">{'}'});</span>
                     {`
 
 `}
                     <span className="text-[#C586C0]">const</span>
                     <span className="text-foreground/90">
-                      {" "}
-                      {"{"} code {"}"} ={" "}
+                      {' '}
+                      {'{'} code {'}'} ={' '}
                     </span>
                     <span className="text-[#C586C0]">await</span>
-                    <span className="text-foreground/90">
-                      {" "}
-                      res.
-                    </span>
+                    <span className="text-foreground/90"> res.</span>
                     <span className="text-[#DCDCAA]">json</span>
-                    <span className="text-foreground/90">
-                      ();
-                    </span>
+                    <span className="text-foreground/90">();</span>
                   </code>
                 </pre>
               </div>
@@ -475,9 +418,7 @@ const { code } = await res.json();`}
       <section className="py-24 px-6 border-t border-border/50">
         <div className="max-w-4xl mx-auto">
           <FadeIn className="text-center mb-14">
-            <h2 className="text-3xl font-bold tracking-tight mb-3">
-              Key Concepts
-            </h2>
+            <h2 className="text-3xl font-bold tracking-tight mb-3">Key Concepts</h2>
           </FadeIn>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -493,9 +434,7 @@ const { code } = await res.json();`}
                       group-hover:text-[#8B5CF6]
                       transition-colors"
                   />
-                  <h3 className="font-semibold mb-1.5">
-                    {c.title}
-                  </h3>
+                  <h3 className="font-semibold mb-1.5">{c.title}</h3>
                   <p
                     className="text-sm text-muted-foreground
                       leading-relaxed"
@@ -514,16 +453,14 @@ const { code } = await res.json();`}
           <h2 className="text-3xl font-bold tracking-tight mb-3">
             Open source.
             <br />
-            <span className="text-muted-foreground">
-              Community driven.
-            </span>
+            <span className="text-muted-foreground">Community driven.</span>
           </h2>
           <p
             className="text-muted-foreground mb-8
               max-w-md mx-auto"
           >
-            Siza is free to use with generous limits. Read the
-            docs, explore the code, start building.
+            Siza is free to use with generous limits. Read the docs, explore the code, start
+            building.
           </p>
           <div className="flex justify-center gap-4">
             <Button variant="outline" asChild>
