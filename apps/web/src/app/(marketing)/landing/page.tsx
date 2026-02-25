@@ -17,8 +17,7 @@ import {
   ArrowRight,
   Terminal,
 } from 'lucide-react';
-
-const EASE_SIZA = [0.16, 1, 0.3, 1] as const;
+import { EASE_SIZA } from './constants';
 
 function FadeIn({
   children,
@@ -369,6 +368,7 @@ export default function LandingPage() {
                   href="https://github.com/Forge-Space"
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Siza on GitHub"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Github className="w-4 h-4" />
@@ -377,6 +377,7 @@ export default function LandingPage() {
                   href="https://www.linkedin.com/in/devlucassantana/"
                   target="_blank"
                   rel="noopener noreferrer"
+                  aria-label="Lucas Santana on LinkedIn"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Linkedin className="w-4 h-4" />

@@ -15,18 +15,21 @@ export function LandingNav({ user }: LandingNavProps) {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    let ticking = false;
+    setIsScrolled(window.scrollY > 0);
+    let rafId = 0;
     const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
           setIsScrolled(window.scrollY > 0);
-          ticking = false;
+          rafId = 0;
         });
-        ticking = true;
       }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   const navLinks = [

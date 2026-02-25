@@ -14,6 +14,7 @@ export function LandingFooter() {
                 href="https://github.com/Forge-Space"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Siza on GitHub"
                 className="text-[#71717A] hover:text-[#FAFAFA] transition-colors"
               >
                 <Github className="w-4 h-4" />
@@ -22,6 +23,7 @@ export function LandingFooter() {
                 href="https://www.linkedin.com/in/devlucassantana/"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Lucas Santana on LinkedIn"
                 className="text-[#71717A] hover:text-[#FAFAFA] transition-colors"
               >
                 <Linkedin className="w-4 h-4" />
