@@ -44,12 +44,52 @@ export type Database = {
         };
         Relationships: [];
       };
+      component_patterns: {
+        Row: {
+          avg_quality_score: number | null;
+          category: string;
+          code: string;
+          created_at: string | null;
+          description: string;
+          embedding: string | null;
+          framework: string;
+          id: string;
+          name: string;
+          usage_count: number | null;
+        };
+        Insert: {
+          avg_quality_score?: number | null;
+          category: string;
+          code: string;
+          created_at?: string | null;
+          description: string;
+          embedding?: string | null;
+          framework: string;
+          id?: string;
+          name: string;
+          usage_count?: number | null;
+        };
+        Update: {
+          avg_quality_score?: number | null;
+          category?: string;
+          code?: string;
+          created_at?: string | null;
+          description?: string;
+          embedding?: string | null;
+          framework?: string;
+          id?: string;
+          name?: string;
+          usage_count?: number | null;
+        };
+        Relationships: [];
+      };
       components: {
         Row: {
           code_file_path: string | null;
           component_type: string;
           created_at: string;
           description: string | null;
+          embedding: string | null;
           framework: string;
           id: string;
           name: string;
@@ -64,6 +104,7 @@ export type Database = {
           component_type: string;
           created_at?: string;
           description?: string | null;
+          embedding?: string | null;
           framework: string;
           id?: string;
           name: string;
@@ -78,6 +119,7 @@ export type Database = {
           component_type?: string;
           created_at?: string;
           description?: string | null;
+          embedding?: string | null;
           framework?: string;
           id?: string;
           name?: string;
@@ -97,56 +139,192 @@ export type Database = {
           },
         ];
       };
+      feature_flag_changes: {
+        Row: {
+          changed_by: string | null;
+          created_at: string;
+          field: string;
+          flag_id: string;
+          id: string;
+          new_value: string | null;
+          old_value: string | null;
+        };
+        Insert: {
+          changed_by?: string | null;
+          created_at?: string;
+          field: string;
+          flag_id: string;
+          id?: string;
+          new_value?: string | null;
+          old_value?: string | null;
+        };
+        Update: {
+          changed_by?: string | null;
+          created_at?: string;
+          field?: string;
+          flag_id?: string;
+          id?: string;
+          new_value?: string | null;
+          old_value?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'feature_flag_changes_flag_id_fkey';
+            columns: ['flag_id'];
+            isOneToOne: false;
+            referencedRelation: 'feature_flags';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      feature_flags: {
+        Row: {
+          category: string;
+          created_at: string;
+          description: string | null;
+          enabled: boolean;
+          enabled_for_users: string[] | null;
+          id: string;
+          name: string;
+          scope: string[];
+          updated_at: string;
+        };
+        Insert: {
+          category?: string;
+          created_at?: string;
+          description?: string | null;
+          enabled?: boolean;
+          enabled_for_users?: string[] | null;
+          id?: string;
+          name: string;
+          scope?: string[];
+          updated_at?: string;
+        };
+        Update: {
+          category?: string;
+          created_at?: string;
+          description?: string | null;
+          enabled?: boolean;
+          enabled_for_users?: string[] | null;
+          id?: string;
+          name?: string;
+          scope?: string[];
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      file_versions: {
+        Row: {
+          content: string;
+          created_at: string;
+          created_by: string | null;
+          file_path: string;
+          id: string;
+          project_id: string;
+          version_number: number;
+        };
+        Insert: {
+          content: string;
+          created_at?: string;
+          created_by?: string | null;
+          file_path: string;
+          id?: string;
+          project_id: string;
+          version_number: number;
+        };
+        Update: {
+          content?: string;
+          created_at?: string;
+          created_by?: string | null;
+          file_path?: string;
+          id?: string;
+          project_id?: string;
+          version_number?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'file_versions_project_id_fkey';
+            columns: ['project_id'];
+            isOneToOne: false;
+            referencedRelation: 'projects';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
       generations: {
         Row: {
           ai_provider: string | null;
           component_id: string | null;
+          component_library: string | null;
+          component_name: string | null;
           component_type: string | null;
           created_at: string;
           error_message: string | null;
           framework: string;
+          generated_code: string | null;
           generation_time_ms: number | null;
           id: string;
           model_used: string | null;
           project_id: string | null;
           prompt: string;
+          prompt_embedding: string | null;
+          quality_score: number | null;
           result_file_path: string | null;
           status: string;
+          style: string | null;
           tokens_used: number | null;
+          typescript: boolean | null;
+          user_feedback: string | null;
           user_id: string;
         };
         Insert: {
           ai_provider?: string | null;
           component_id?: string | null;
+          component_library?: string | null;
+          component_name?: string | null;
           component_type?: string | null;
           created_at?: string;
           error_message?: string | null;
           framework: string;
+          generated_code?: string | null;
           generation_time_ms?: number | null;
           id?: string;
           model_used?: string | null;
           project_id?: string | null;
           prompt: string;
+          prompt_embedding?: string | null;
+          quality_score?: number | null;
           result_file_path?: string | null;
           status?: string;
+          style?: string | null;
           tokens_used?: number | null;
+          typescript?: boolean | null;
+          user_feedback?: string | null;
           user_id: string;
         };
         Update: {
           ai_provider?: string | null;
           component_id?: string | null;
+          component_library?: string | null;
+          component_name?: string | null;
           component_type?: string | null;
           created_at?: string;
           error_message?: string | null;
           framework?: string;
+          generated_code?: string | null;
           generation_time_ms?: number | null;
           id?: string;
           model_used?: string | null;
           project_id?: string | null;
           prompt?: string;
+          prompt_embedding?: string | null;
+          quality_score?: number | null;
           result_file_path?: string | null;
           status?: string;
+          style?: string | null;
           tokens_used?: number | null;
+          typescript?: boolean | null;
+          user_feedback?: string | null;
           user_id?: string;
         };
         Relationships: [
@@ -166,13 +344,124 @@ export type Database = {
           },
         ];
       };
+      github_installations: {
+        Row: {
+          account_login: string;
+          account_type: string;
+          created_at: string | null;
+          id: string;
+          installation_id: number;
+          permissions: Json | null;
+          suspended_at: string | null;
+          updated_at: string | null;
+          user_id: string;
+        };
+        Insert: {
+          account_login: string;
+          account_type: string;
+          created_at?: string | null;
+          id?: string;
+          installation_id: number;
+          permissions?: Json | null;
+          suspended_at?: string | null;
+          updated_at?: string | null;
+          user_id: string;
+        };
+        Update: {
+          account_login?: string;
+          account_type?: string;
+          created_at?: string | null;
+          id?: string;
+          installation_id?: number;
+          permissions?: Json | null;
+          suspended_at?: string | null;
+          updated_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      github_repos: {
+        Row: {
+          created_at: string | null;
+          default_branch: string | null;
+          full_name: string;
+          github_repo_id: number;
+          id: string;
+          installation_id: string | null;
+          project_id: string | null;
+        };
+        Insert: {
+          created_at?: string | null;
+          default_branch?: string | null;
+          full_name: string;
+          github_repo_id: number;
+          id?: string;
+          installation_id?: string | null;
+          project_id?: string | null;
+        };
+        Update: {
+          created_at?: string | null;
+          default_branch?: string | null;
+          full_name?: string;
+          github_repo_id?: number;
+          id?: string;
+          installation_id?: string | null;
+          project_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: 'github_repos_installation_id_fkey';
+            columns: ['installation_id'];
+            isOneToOne: false;
+            referencedRelation: 'github_installations';
+            referencedColumns: ['id'];
+          },
+          {
+            foreignKeyName: 'github_repos_project_id_fkey';
+            columns: ['project_id'];
+            isOneToOne: false;
+            referencedRelation: 'projects';
+            referencedColumns: ['id'];
+          },
+        ];
+      };
+      plan_limits: {
+        Row: {
+          features: Json | null;
+          generations_per_month: number;
+          id: string;
+          max_components_per_project: number;
+          max_projects: number;
+          plan: string;
+        };
+        Insert: {
+          features?: Json | null;
+          generations_per_month: number;
+          id?: string;
+          max_components_per_project: number;
+          max_projects: number;
+          plan: string;
+        };
+        Update: {
+          features?: Json | null;
+          generations_per_month?: number;
+          id?: string;
+          max_components_per_project?: number;
+          max_projects?: number;
+          plan?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;
           bio: string | null;
           created_at: string;
           full_name: string | null;
+          global_preferences: Json | null;
           id: string;
+          project_access: Json | null;
+          role: string | null;
           theme: string | null;
           updated_at: string;
           username: string | null;
@@ -182,7 +471,10 @@ export type Database = {
           bio?: string | null;
           created_at?: string;
           full_name?: string | null;
+          global_preferences?: Json | null;
           id: string;
+          project_access?: Json | null;
+          role?: string | null;
           theme?: string | null;
           updated_at?: string;
           username?: string | null;
@@ -192,10 +484,40 @@ export type Database = {
           bio?: string | null;
           created_at?: string;
           full_name?: string | null;
+          global_preferences?: Json | null;
           id?: string;
+          project_access?: Json | null;
+          role?: string | null;
           theme?: string | null;
           updated_at?: string;
           username?: string | null;
+        };
+        Relationships: [];
+      };
+      project_permissions: {
+        Row: {
+          granted_at: string | null;
+          granted_by: string | null;
+          id: string;
+          permissions: string[];
+          project_name: string;
+          user_id: string;
+        };
+        Insert: {
+          granted_at?: string | null;
+          granted_by?: string | null;
+          id?: string;
+          permissions: string[];
+          project_name: string;
+          user_id: string;
+        };
+        Update: {
+          granted_at?: string | null;
+          granted_by?: string | null;
+          id?: string;
+          permissions?: string[];
+          project_name?: string;
+          user_id?: string;
         };
         Relationships: [];
       };
@@ -241,6 +563,252 @@ export type Database = {
         };
         Relationships: [];
       };
+      shared_logs: {
+        Row: {
+          context: Json | null;
+          correlation_id: string | null;
+          created_at: string | null;
+          environment: string;
+          id: string;
+          level: string;
+          message: string;
+          request_id: string | null;
+          service_name: string;
+          service_version: string | null;
+          session_id: string | null;
+          span_id: string | null;
+          tags: Json | null;
+          timestamp: string | null;
+          trace_id: string | null;
+          updated_at: string | null;
+          user_id: string | null;
+        };
+        Insert: {
+          context?: Json | null;
+          correlation_id?: string | null;
+          created_at?: string | null;
+          environment: string;
+          id?: string;
+          level: string;
+          message: string;
+          request_id?: string | null;
+          service_name: string;
+          service_version?: string | null;
+          session_id?: string | null;
+          span_id?: string | null;
+          tags?: Json | null;
+          timestamp?: string | null;
+          trace_id?: string | null;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
+        Update: {
+          context?: Json | null;
+          correlation_id?: string | null;
+          created_at?: string | null;
+          environment?: string;
+          id?: string;
+          level?: string;
+          message?: string;
+          request_id?: string | null;
+          service_name?: string;
+          service_version?: string | null;
+          session_id?: string | null;
+          span_id?: string | null;
+          tags?: Json | null;
+          timestamp?: string | null;
+          trace_id?: string | null;
+          updated_at?: string | null;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
+      stripe_events: {
+        Row: {
+          created_at: string;
+          id: string;
+          payload: Json | null;
+          processed: boolean;
+          type: string;
+        };
+        Insert: {
+          created_at?: string;
+          id: string;
+          payload?: Json | null;
+          processed?: boolean;
+          type: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          payload?: Json | null;
+          processed?: boolean;
+          type?: string;
+        };
+        Relationships: [];
+      };
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean | null;
+          created_at: string;
+          current_period_end: string | null;
+          current_period_start: string | null;
+          id: string;
+          plan: string;
+          status: string;
+          stripe_customer_id: string | null;
+          stripe_price_id: string | null;
+          stripe_subscription_id: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          cancel_at_period_end?: boolean | null;
+          created_at?: string;
+          current_period_end?: string | null;
+          current_period_start?: string | null;
+          id?: string;
+          plan?: string;
+          status?: string;
+          stripe_customer_id?: string | null;
+          stripe_price_id?: string | null;
+          stripe_subscription_id?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          cancel_at_period_end?: boolean | null;
+          created_at?: string;
+          current_period_end?: string | null;
+          current_period_start?: string | null;
+          id?: string;
+          plan?: string;
+          status?: string;
+          stripe_customer_id?: string | null;
+          stripe_price_id?: string | null;
+          stripe_subscription_id?: string | null;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      templates: {
+        Row: {
+          category: string;
+          code: Json;
+          created_at: string;
+          created_by: string | null;
+          description: string | null;
+          framework: string;
+          id: string;
+          is_official: boolean | null;
+          name: string;
+          thumbnail_url: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          category: string;
+          code: Json;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          framework: string;
+          id?: string;
+          is_official?: boolean | null;
+          name: string;
+          thumbnail_url?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          category?: string;
+          code?: Json;
+          created_at?: string;
+          created_by?: string | null;
+          description?: string | null;
+          framework?: string;
+          id?: string;
+          is_official?: boolean | null;
+          name?: string;
+          thumbnail_url?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      usage_tracking: {
+        Row: {
+          billing_period_end: string;
+          billing_period_start: string;
+          created_at: string;
+          generations_count: number;
+          generations_limit: number;
+          id: string;
+          projects_count: number;
+          projects_limit: number;
+          tokens_used: number;
+          user_id: string;
+        };
+        Insert: {
+          billing_period_end: string;
+          billing_period_start: string;
+          created_at?: string;
+          generations_count?: number;
+          generations_limit?: number;
+          id?: string;
+          projects_count?: number;
+          projects_limit?: number;
+          tokens_used?: number;
+          user_id: string;
+        };
+        Update: {
+          billing_period_end?: string;
+          billing_period_start?: string;
+          created_at?: string;
+          generations_count?: number;
+          generations_limit?: number;
+          id?: string;
+          projects_count?: number;
+          projects_limit?: number;
+          tokens_used?: number;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      user_provider_tokens: {
+        Row: {
+          access_token: string;
+          created_at: string | null;
+          expires_at: string | null;
+          id: string;
+          provider: string;
+          refresh_token: string | null;
+          scopes: string[] | null;
+          updated_at: string | null;
+          user_id: string;
+        };
+        Insert: {
+          access_token: string;
+          created_at?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          provider: string;
+          refresh_token?: string | null;
+          scopes?: string[] | null;
+          updated_at?: string | null;
+          user_id: string;
+        };
+        Update: {
+          access_token?: string;
+          created_at?: string | null;
+          expires_at?: string | null;
+          id?: string;
+          provider?: string;
+          refresh_token?: string | null;
+          scopes?: string[] | null;
+          updated_at?: string | null;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -254,448 +822,43 @@ export type Database = {
       };
       get_user_project_count: { Args: { user_uuid: string }; Returns: number };
       get_user_storage_usage: { Args: { user_uuid: string }; Returns: number };
+      match_generations: {
+        Args: {
+          match_count?: number;
+          match_threshold?: number;
+          min_quality?: number;
+          query_embedding: string;
+        };
+        Returns: {
+          framework: string;
+          generated_code: string;
+          id: string;
+          prompt: string;
+          quality_score: number;
+          similarity: number;
+        }[];
+      };
+      match_patterns: {
+        Args: {
+          match_count?: number;
+          match_threshold?: number;
+          query_embedding: string;
+        };
+        Returns: {
+          category: string;
+          code: string;
+          description: string;
+          framework: string;
+          id: string;
+          name: string;
+          similarity: number;
+        }[];
+      };
+      show_limit: { Args: never; Returns: number };
+      show_trgm: { Args: { '': string }; Returns: string[] };
     };
     Enums: {
       [_ in never]: never;
-    };
-    CompositeTypes: {
-      [_ in never]: never;
-    };
-  };
-  storage: {
-    Tables: {
-      buckets: {
-        Row: {
-          allowed_mime_types: string[] | null;
-          avif_autodetection: boolean | null;
-          created_at: string | null;
-          file_size_limit: number | null;
-          id: string;
-          name: string;
-          owner: string | null;
-          owner_id: string | null;
-          public: boolean | null;
-          type: Database['storage']['Enums']['buckettype'];
-          updated_at: string | null;
-        };
-        Insert: {
-          allowed_mime_types?: string[] | null;
-          avif_autodetection?: boolean | null;
-          created_at?: string | null;
-          file_size_limit?: number | null;
-          id: string;
-          name: string;
-          owner?: string | null;
-          owner_id?: string | null;
-          public?: boolean | null;
-          type?: Database['storage']['Enums']['buckettype'];
-          updated_at?: string | null;
-        };
-        Update: {
-          allowed_mime_types?: string[] | null;
-          avif_autodetection?: boolean | null;
-          created_at?: string | null;
-          file_size_limit?: number | null;
-          id?: string;
-          name?: string;
-          owner?: string | null;
-          owner_id?: string | null;
-          public?: boolean | null;
-          type?: Database['storage']['Enums']['buckettype'];
-          updated_at?: string | null;
-        };
-        Relationships: [];
-      };
-      buckets_analytics: {
-        Row: {
-          created_at: string;
-          deleted_at: string | null;
-          format: string;
-          id: string;
-          name: string;
-          type: Database['storage']['Enums']['buckettype'];
-          updated_at: string;
-        };
-        Insert: {
-          created_at?: string;
-          deleted_at?: string | null;
-          format?: string;
-          id?: string;
-          name: string;
-          type?: Database['storage']['Enums']['buckettype'];
-          updated_at?: string;
-        };
-        Update: {
-          created_at?: string;
-          deleted_at?: string | null;
-          format?: string;
-          id?: string;
-          name?: string;
-          type?: Database['storage']['Enums']['buckettype'];
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      buckets_vectors: {
-        Row: {
-          created_at: string;
-          id: string;
-          type: Database['storage']['Enums']['buckettype'];
-          updated_at: string;
-        };
-        Insert: {
-          created_at?: string;
-          id: string;
-          type?: Database['storage']['Enums']['buckettype'];
-          updated_at?: string;
-        };
-        Update: {
-          created_at?: string;
-          id?: string;
-          type?: Database['storage']['Enums']['buckettype'];
-          updated_at?: string;
-        };
-        Relationships: [];
-      };
-      migrations: {
-        Row: {
-          executed_at: string | null;
-          hash: string;
-          id: number;
-          name: string;
-        };
-        Insert: {
-          executed_at?: string | null;
-          hash: string;
-          id: number;
-          name: string;
-        };
-        Update: {
-          executed_at?: string | null;
-          hash?: string;
-          id?: number;
-          name?: string;
-        };
-        Relationships: [];
-      };
-      objects: {
-        Row: {
-          bucket_id: string | null;
-          created_at: string | null;
-          id: string;
-          last_accessed_at: string | null;
-          metadata: Json | null;
-          name: string | null;
-          owner: string | null;
-          owner_id: string | null;
-          path_tokens: string[] | null;
-          updated_at: string | null;
-          user_metadata: Json | null;
-          version: string | null;
-        };
-        Insert: {
-          bucket_id?: string | null;
-          created_at?: string | null;
-          id?: string;
-          last_accessed_at?: string | null;
-          metadata?: Json | null;
-          name?: string | null;
-          owner?: string | null;
-          owner_id?: string | null;
-          path_tokens?: string[] | null;
-          updated_at?: string | null;
-          user_metadata?: Json | null;
-          version?: string | null;
-        };
-        Update: {
-          bucket_id?: string | null;
-          created_at?: string | null;
-          id?: string;
-          last_accessed_at?: string | null;
-          metadata?: Json | null;
-          name?: string | null;
-          owner?: string | null;
-          owner_id?: string | null;
-          path_tokens?: string[] | null;
-          updated_at?: string | null;
-          user_metadata?: Json | null;
-          version?: string | null;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'objects_bucketId_fkey';
-            columns: ['bucket_id'];
-            isOneToOne: false;
-            referencedRelation: 'buckets';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      s3_multipart_uploads: {
-        Row: {
-          bucket_id: string;
-          created_at: string;
-          id: string;
-          in_progress_size: number;
-          key: string;
-          owner_id: string | null;
-          upload_signature: string;
-          user_metadata: Json | null;
-          version: string;
-        };
-        Insert: {
-          bucket_id: string;
-          created_at?: string;
-          id: string;
-          in_progress_size?: number;
-          key: string;
-          owner_id?: string | null;
-          upload_signature: string;
-          user_metadata?: Json | null;
-          version: string;
-        };
-        Update: {
-          bucket_id?: string;
-          created_at?: string;
-          id?: string;
-          in_progress_size?: number;
-          key?: string;
-          owner_id?: string | null;
-          upload_signature?: string;
-          user_metadata?: Json | null;
-          version?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 's3_multipart_uploads_bucket_id_fkey';
-            columns: ['bucket_id'];
-            isOneToOne: false;
-            referencedRelation: 'buckets';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      s3_multipart_uploads_parts: {
-        Row: {
-          bucket_id: string;
-          created_at: string;
-          etag: string;
-          id: string;
-          key: string;
-          owner_id: string | null;
-          part_number: number;
-          size: number;
-          upload_id: string;
-          version: string;
-        };
-        Insert: {
-          bucket_id: string;
-          created_at?: string;
-          etag: string;
-          id?: string;
-          key: string;
-          owner_id?: string | null;
-          part_number: number;
-          size?: number;
-          upload_id: string;
-          version: string;
-        };
-        Update: {
-          bucket_id?: string;
-          created_at?: string;
-          etag?: string;
-          id?: string;
-          key?: string;
-          owner_id?: string | null;
-          part_number?: number;
-          size?: number;
-          upload_id?: string;
-          version?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 's3_multipart_uploads_parts_bucket_id_fkey';
-            columns: ['bucket_id'];
-            isOneToOne: false;
-            referencedRelation: 'buckets';
-            referencedColumns: ['id'];
-          },
-          {
-            foreignKeyName: 's3_multipart_uploads_parts_upload_id_fkey';
-            columns: ['upload_id'];
-            isOneToOne: false;
-            referencedRelation: 's3_multipart_uploads';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-      vector_indexes: {
-        Row: {
-          bucket_id: string;
-          created_at: string;
-          data_type: string;
-          dimension: number;
-          distance_metric: string;
-          id: string;
-          metadata_configuration: Json | null;
-          name: string;
-          updated_at: string;
-        };
-        Insert: {
-          bucket_id: string;
-          created_at?: string;
-          data_type: string;
-          dimension: number;
-          distance_metric: string;
-          id?: string;
-          metadata_configuration?: Json | null;
-          name: string;
-          updated_at?: string;
-        };
-        Update: {
-          bucket_id?: string;
-          created_at?: string;
-          data_type?: string;
-          dimension?: number;
-          distance_metric?: string;
-          id?: string;
-          metadata_configuration?: Json | null;
-          name?: string;
-          updated_at?: string;
-        };
-        Relationships: [
-          {
-            foreignKeyName: 'vector_indexes_bucket_id_fkey';
-            columns: ['bucket_id'];
-            isOneToOne: false;
-            referencedRelation: 'buckets_vectors';
-            referencedColumns: ['id'];
-          },
-        ];
-      };
-    };
-    Views: {
-      [_ in never]: never;
-    };
-    Functions: {
-      can_insert_object: {
-        Args: { bucketid: string; metadata: Json; name: string; owner: string };
-        Returns: undefined;
-      };
-      extension: { Args: { name: string }; Returns: string };
-      filename: { Args: { name: string }; Returns: string };
-      foldername: { Args: { name: string }; Returns: string[] };
-      get_common_prefix: {
-        Args: { p_delimiter: string; p_key: string; p_prefix: string };
-        Returns: string;
-      };
-      get_size_by_bucket: {
-        Args: never;
-        Returns: {
-          bucket_id: string;
-          size: number;
-        }[];
-      };
-      list_multipart_uploads_with_delimiter: {
-        Args: {
-          bucket_id: string;
-          delimiter_param: string;
-          max_keys?: number;
-          next_key_token?: string;
-          next_upload_token?: string;
-          prefix_param: string;
-        };
-        Returns: {
-          created_at: string;
-          id: string;
-          key: string;
-        }[];
-      };
-      list_objects_with_delimiter: {
-        Args: {
-          _bucket_id: string;
-          delimiter_param: string;
-          max_keys?: number;
-          next_token?: string;
-          prefix_param: string;
-          sort_order?: string;
-          start_after?: string;
-        };
-        Returns: {
-          created_at: string;
-          id: string;
-          last_accessed_at: string;
-          metadata: Json;
-          name: string;
-          updated_at: string;
-        }[];
-      };
-      operation: { Args: never; Returns: string };
-      search: {
-        Args: {
-          bucketname: string;
-          levels?: number;
-          limits?: number;
-          offsets?: number;
-          prefix: string;
-          search?: string;
-          sortcolumn?: string;
-          sortorder?: string;
-        };
-        Returns: {
-          created_at: string;
-          id: string;
-          last_accessed_at: string;
-          metadata: Json;
-          name: string;
-          updated_at: string;
-        }[];
-      };
-      search_by_timestamp: {
-        Args: {
-          p_bucket_id: string;
-          p_level: number;
-          p_limit: number;
-          p_prefix: string;
-          p_sort_column: string;
-          p_sort_column_after: string;
-          p_sort_order: string;
-          p_start_after: string;
-        };
-        Returns: {
-          created_at: string;
-          id: string;
-          key: string;
-          last_accessed_at: string;
-          metadata: Json;
-          name: string;
-          updated_at: string;
-        }[];
-      };
-      search_v2: {
-        Args: {
-          bucket_name: string;
-          levels?: number;
-          limits?: number;
-          prefix: string;
-          sort_column?: string;
-          sort_column_after?: string;
-          sort_order?: string;
-          start_after?: string;
-        };
-        Returns: {
-          created_at: string;
-          id: string;
-          key: string;
-          last_accessed_at: string;
-          metadata: Json;
-          name: string;
-          updated_at: string;
-        }[];
-      };
-    };
-    Enums: {
-      buckettype: 'STANDARD' | 'ANALYTICS' | 'VECTOR';
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -821,10 +984,5 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {},
-  },
-  storage: {
-    Enums: {
-      buckettype: ['STANDARD', 'ANALYTICS', 'VECTOR'],
-    },
   },
 } as const;

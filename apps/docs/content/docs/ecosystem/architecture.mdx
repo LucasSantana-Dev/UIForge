@@ -25,10 +25,10 @@ graph TB
 
 The main web application. A Next.js monorepo deployed to Cloudflare Workers.
 
-| App | Purpose |
-|-----|---------|
+| App        | Purpose                                                |
+| ---------- | ------------------------------------------------------ |
 | `apps/web` | Next.js frontend (dashboard, editor, preview, billing) |
-| `apps/api` | Cloudflare Workers API with AI provider integrations |
+| `apps/api` | Cloudflare Workers API with AI provider integrations   |
 
 **Stack:** Next.js 16, React 19, Supabase, Stripe, Tailwind CSS, shadcn/ui, Monaco Editor
 
@@ -39,6 +39,7 @@ The main web application. A Next.js monorepo deployed to Cloudflare Workers.
 Model Context Protocol server with 17 tools for AI-powered UI generation. Runs as a standalone process that any MCP-compatible IDE can connect to.
 
 **Key features:**
+
 - Multi-framework code generation (React, Vue, Svelte, Angular, HTML)
 - ML composition pipeline with quality scoring
 - RAG-based design reference matching
@@ -52,6 +53,7 @@ Model Context Protocol server with 17 tools for AI-powered UI generation. Runs a
 Python service that routes AI requests across multiple providers (Gemini, Claude, GPT) with intelligent selection, scoring, and caching.
 
 **Key features:**
+
 - Multi-provider AI routing with cost optimization
 - Pattern matching and scoring algorithms
 - Training pipeline for model improvement
@@ -64,6 +66,7 @@ Python service that routes AI requests across multiple providers (Gemini, Claude
 Shared configurations, TypeScript types, security framework, and ecosystem standards. Every other repository depends on this.
 
 **Provides:**
+
 - Shared TypeScript types and interfaces
 - ESLint and Prettier configurations
 - Security scanning utilities
@@ -97,12 +100,12 @@ User → Stripe Checkout → Webhook → Supabase sync → Plan limits enforced
 
 ## Technology Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Frontend | Next.js 16, React 19, Tailwind CSS, shadcn/ui |
-| Backend | Cloudflare Workers, Supabase (Postgres + Auth + Storage) |
-| AI | Google Gemini, Anthropic Claude, OpenAI GPT |
-| MCP | TypeScript MCP server, SQLite (RAG), vector search |
-| Gateway | Python, Redis, FastAPI |
-| Deploy | Cloudflare Workers (OpenNext), GitHub Actions CI/CD |
-| Shared | forge-patterns (TypeScript, ESLint, security) |
+| Layer    | Technology                                               |
+| -------- | -------------------------------------------------------- |
+| Frontend | Next.js 16, React 19, Tailwind CSS, shadcn/ui            |
+| Backend  | Cloudflare Workers, Supabase (Postgres + Auth + Storage) |
+| AI       | Google Gemini, Anthropic Claude, OpenAI GPT              |
+| MCP      | TypeScript MCP server, SQLite (RAG), vector search       |
+| Gateway  | Python, Redis, FastAPI                                   |
+| Deploy   | Cloudflare Workers (OpenNext), GitHub Actions CI/CD      |
+| Shared   | forge-patterns (TypeScript, ESLint, security)            |

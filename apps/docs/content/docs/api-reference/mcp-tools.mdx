@@ -11,48 +11,48 @@ Complete reference for all Model Context Protocol tools exposed by siza-mcp.
 
 Generate individual UI components with RAG-based design references.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `component_type` | string | yes | Component type (button, card, form, navbar, etc.) |
-| `framework` | string | yes | Target framework |
-| `description` | string | no | Natural language description |
-| `mood` | string | no | Design mood |
-| `industry` | string | no | Industry context |
-| `visual_style` | string | no | Visual style |
-| `component_library` | string | no | UI library (shadcn, radix, etc.) |
+| Parameter           | Type   | Required | Description                                       |
+| ------------------- | ------ | -------- | ------------------------------------------------- |
+| `component_type`    | string | yes      | Component type (button, card, form, navbar, etc.) |
+| `framework`         | string | yes      | Target framework                                  |
+| `description`       | string | no       | Natural language description                      |
+| `mood`              | string | no       | Design mood                                       |
+| `industry`          | string | no       | Industry context                                  |
+| `visual_style`      | string | no       | Visual style                                      |
+| `component_library` | string | no       | UI library (shadcn, radix, etc.)                  |
 
 ### `generate_page_template`
 
 Generate complete page templates with ML composition and quality scoring.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `template` | string | yes | Page type (landing, dashboard, auth, pricing, settings, ecommerce) |
-| `framework` | string | yes | Target framework |
-| `mood` | string | no | Design mood |
-| `industry` | string | no | Industry context |
-| `visual_style` | string | no | Visual style |
+| Parameter      | Type   | Required | Description                                                        |
+| -------------- | ------ | -------- | ------------------------------------------------------------------ |
+| `template`     | string | yes      | Page type (landing, dashboard, auth, pricing, settings, ecommerce) |
+| `framework`    | string | yes      | Target framework                                                   |
+| `mood`         | string | no       | Design mood                                                        |
+| `industry`     | string | no       | Industry context                                                   |
+| `visual_style` | string | no       | Visual style                                                       |
 
 ### `scaffold_full_application`
 
 Generate full project boilerplate with ML-composed pages.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `app_type` | string | yes | Application type |
-| `framework` | string | yes | Target framework |
-| `pages` | string[] | no | Pages to include |
-| `mood` | string | no | Design mood |
-| `industry` | string | no | Industry context |
+| Parameter   | Type     | Required | Description      |
+| ----------- | -------- | -------- | ---------------- |
+| `app_type`  | string   | yes      | Application type |
+| `framework` | string   | yes      | Target framework |
+| `pages`     | string[] | no       | Pages to include |
+| `mood`      | string   | no       | Design mood      |
+| `industry`  | string   | no       | Industry context |
 
 ### `generate_from_template_pack`
 
 Generate a multi-page application from a template pack.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `pack` | string | yes | Pack name (`saas-dashboard`, `startup-landing`, `ecommerce`) |
-| `framework` | string | yes | Target framework |
+| Parameter   | Type   | Required | Description                                                  |
+| ----------- | ------ | -------- | ------------------------------------------------------------ |
+| `pack`      | string | yes      | Pack name (`saas-dashboard`, `startup-landing`, `ecommerce`) |
+| `framework` | string | yes      | Target framework                                             |
 
 ### `generate_prototype`
 
@@ -62,11 +62,11 @@ Generate interactive prototypes with component library integration.
 
 Iteratively improve components based on natural language feedback.
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `code` | string | yes | Existing component code |
-| `instructions` | string | yes | Refinement instructions |
-| `framework` | string | no | Target framework |
+| Parameter      | Type   | Required | Description             |
+| -------------- | ------ | -------- | ----------------------- |
+| `code`         | string | yes      | Existing component code |
+| `instructions` | string | yes      | Refinement instructions |
+| `framework`    | string | no       | Target framework        |
 
 ## Design Tools
 
@@ -103,6 +103,7 @@ Push design tokens and variables to Figma.
 Audit components for WCAG 2.1 accessibility violations.
 
 Returns a detailed report with:
+
 - Color contrast violations
 - Missing ARIA attributes
 - Keyboard navigation issues
