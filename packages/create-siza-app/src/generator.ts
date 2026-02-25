@@ -65,10 +65,14 @@ export async function generateProject(options: GeneratorOptions): Promise<void> 
 }
 
 async function writePackageJson(
-  dir: string, name: string, framework: Framework, ui: UILibrary
+  dir: string,
+  name: string,
+  framework: Framework,
+  ui: UILibrary
 ): Promise<void> {
   const scripts: Record<string, string> = {
-    nextjs: '{ "dev": "next dev", "build": "next build", "start": "next start", "lint": "next lint" }',
+    nextjs:
+      '{ "dev": "next dev", "build": "next build", "start": "next start", "lint": "next lint" }',
     react: '{ "dev": "vite", "build": "vite build", "preview": "vite preview" }',
     vue: '{ "dev": "vite", "build": "vite build", "preview": "vite preview" }',
     svelte: '{ "dev": "vite dev", "build": "vite build", "preview": "vite preview" }',
@@ -125,8 +129,9 @@ dist/
 async function writeGlobalsCss(dir: string, ui: UILibrary): Promise<void> {
   if (ui === 'none') return;
 
-  const content = ui === 'shadcn'
-    ? `@import 'tailwindcss';
+  const content =
+    ui === 'shadcn'
+      ? `@import 'tailwindcss';
 
 :root {
   --background: 0 0% 7%;
@@ -149,7 +154,7 @@ body {
   font-family: system-ui, sans-serif;
 }
 `
-    : `@import 'tailwindcss';
+      : `@import 'tailwindcss';
 
 body {
   background: #111;
@@ -162,7 +167,10 @@ body {
 }
 
 async function writeEntryPage(
-  dir: string, framework: Framework, template: Template, name: string
+  dir: string,
+  framework: Framework,
+  template: Template,
+  name: string
 ): Promise<void> {
   const templates: Record<Template, string> = {
     blank: `<main className="flex min-h-screen flex-col items-center justify-center p-8">
@@ -356,7 +364,11 @@ async function writeMcpConfig(dir: string): Promise<void> {
 }
 
 async function writeReadme(
-  dir: string, name: string, framework: Framework, ui: UILibrary, template: Template
+  dir: string,
+  name: string,
+  framework: Framework,
+  ui: UILibrary,
+  template: Template
 ): Promise<void> {
   const frameworkName = { nextjs: 'Next.js', react: 'React', vue: 'Vue', svelte: 'SvelteKit' };
   const content = `# ${name}

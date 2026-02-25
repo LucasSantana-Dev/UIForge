@@ -79,9 +79,7 @@ export async function promptOptions(
     });
   }
 
-  const answers = questions.length > 0
-    ? await (enquirer as any).prompt(questions)
-    : {};
+  const answers = questions.length > 0 ? await (enquirer as any).prompt(questions) : {};
 
   return {
     framework: overrides.framework || answers.framework,
