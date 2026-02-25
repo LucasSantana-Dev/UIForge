@@ -3,9 +3,7 @@ import crypto from 'crypto';
 
 function getAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-  const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
   return createClient(url, key);
 }
 
@@ -20,27 +18,17 @@ export interface TestSubscription {
 export async function seedSubscription(opts: TestSubscription) {
   const supabase = getAdminClient();
   const now = new Date();
-  const periodStart = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    1
-  ).toISOString();
-  const periodEnd = new Date(
-    now.getFullYear(),
-    now.getMonth() + 1,
-    1
-  ).toISOString();
+  const periodStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
 
   const { error } = await supabase.from('subscriptions').upsert(
     {
       user_id: opts.userId,
       plan: opts.plan,
       status: opts.status ?? 'active',
-      stripe_customer_id:
-        opts.stripeCustomerId ?? `cus_test_${crypto.randomUUID().slice(0, 8)}`,
+      stripe_customer_id: opts.stripeCustomerId ?? `cus_test_${crypto.randomUUID().slice(0, 8)}`,
       stripe_subscription_id:
-        opts.stripeSubscriptionId ??
-        `sub_test_${crypto.randomUUID().slice(0, 8)}`,
+        opts.stripeSubscriptionId ?? `sub_test_${crypto.randomUUID().slice(0, 8)}`,
       stripe_price_id:
         opts.plan === 'pro'
           ? (process.env.STRIPE_PRO_PRICE_ID ?? 'price_pro_test')
@@ -64,16 +52,8 @@ export async function seedUsageTracking(
 ) {
   const supabase = getAdminClient();
   const now = new Date();
-  const periodStart = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    1
-  ).toISOString();
-  const periodEnd = new Date(
-    now.getFullYear(),
-    now.getMonth() + 1,
-    1
-  ).toISOString();
+  const periodStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1).toISOString();
 
   const { error } = await supabase.from('usage_tracking').upsert(
     {
@@ -109,10 +89,7 @@ export async function cleanupTestBilling(userId: string) {
     .eq('user_id', userId);
 }
 
-export function generateStripeWebhookSignature(
-  payload: string,
-  secret: string
-): string {
+export function generateStripeWebhookSignature(payload: string, secret: string): string {
   const timestamp = Math.floor(Date.now() / 1000);
   const hmac = crypto.createHmac('sha256', secret);
   hmac.update(`${timestamp}.${payload}`);
