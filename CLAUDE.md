@@ -107,6 +107,13 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 - **Build command**: `cd apps/web && npx opennextjs-cloudflare build`
 - **Deploy command**: `cd apps/web && ./scripts/deploy.sh`
 
+## Documentation Governance
+- NEVER create task-specific docs in repo root or docs/ (e.g., *_COMPLETE.md, *_SUMMARY.md, STATUS_*.md, PHASE*.md, *_REPORT.md, *_CHECKLIST.md)
+- Task completion info belongs in: commit messages, CHANGELOG.md, PR descriptions, or memory files
+- Session plans stay in .claude/plans/ (ephemeral, not committed)
+- Allowed root .md: README, CHANGELOG, CONTRIBUTING, CLAUDE, ARCHITECTURE
+- docs/ is for living operational/architectural guides only
+
 ## Conventions
 
 - Turborepo for build orchestration
