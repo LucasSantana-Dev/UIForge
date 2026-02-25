@@ -96,10 +96,15 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 
 ## CI/CD
 
-- GitHub Actions: ci.yml, deploy-web.yml, deploy-web-admin.yml, feature-branch.yml, release-branch.yml, release-automation.yml, supabase-setup-admin.yml, secret-scan.yml
+- GitHub Actions: ci.yml, deploy-web.yml, deploy-docs.yml, deploy-web-admin.yml, feature-branch.yml, release-branch.yml, release-automation.yml, supabase-setup-admin.yml, secret-scan.yml
 - Cloudflare Workers deployment via OpenNext + wrangler
 - Pre-commit: lint-staged (ESLint + Prettier) + type-check via Husky
 - Supabase migrations, npm audit security, shellcheck + shfmt
+
+## GitHub Secrets & Variables
+
+13 secrets: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `CODECOV_TOKEN`, `NEXT_PUBLIC_BASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_PRICE_ID`, `STRIPE_TEAM_PRICE_ID`
+3 variables: `CLOUDFLARE_DEPLOY_ENABLED=true`, `NEXT_PUBLIC_ENABLE_STRIPE_BILLING=true`, `NEXT_PUBLIC_ENABLE_USAGE_LIMITS=true`
 
 ## Deployment Gotchas
 - **apps/docs type errors**: Fumadocs `.source/server` not generated until build — blocks all pre-commit hooks. Use `HUSKY=0` for non-code commits
