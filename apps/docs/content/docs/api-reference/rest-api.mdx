@@ -3,6 +3,178 @@ title: REST API
 description: REST endpoints for templates and generation
 ---
 
-Documentation for Siza's REST API.
+Siza exposes REST endpoints via the Next.js App Router at `/api/*`. All endpoints require authentication via Supabase session cookies unless noted.
 
-Content coming soon.
+## Generation
+
+### `POST /api/generate`
+
+Generate UI components via AI.
+
+```json
+{
+  "prompt": "A responsive navbar with logo and mobile menu",
+  "framework": "react",
+  "projectId": "uuid"
+}
+```
+
+### `POST /api/generate/format`
+
+Format generated code with Prettier.
+
+### `POST /api/generate/validate`
+
+Validate generation parameters before submission.
+
+### `POST /api/wireframe`
+
+Generate a wireframe from a text description.
+
+## Projects
+
+### `GET /api/projects`
+
+List all projects for the authenticated user.
+
+### `POST /api/projects`
+
+Create a new project.
+
+### `GET /api/projects/[id]`
+
+Get project details.
+
+### `PATCH /api/projects/[id]`
+
+Update a project.
+
+### `DELETE /api/projects/[id]`
+
+Delete a project.
+
+## Components
+
+### `GET /api/components`
+
+List components (filtered by project).
+
+### `POST /api/components`
+
+Create a component.
+
+### `GET /api/components/[id]`
+
+Get component details.
+
+### `PATCH /api/components/[id]`
+
+Update a component.
+
+### `DELETE /api/components/[id]`
+
+Delete a component.
+
+## Templates
+
+### `GET /api/templates`
+
+List available templates. Returns 20 seeded templates across categories.
+
+### `POST /api/templates`
+
+Create a custom template.
+
+### `GET /api/templates/[id]`
+
+Get template details.
+
+## Generations History
+
+### `GET /api/generations`
+
+List generation history for the authenticated user.
+
+### `POST /api/generations`
+
+Record a generation event.
+
+### `GET /api/generations/[id]`
+
+Get generation details.
+
+## GitHub Integration
+
+### `GET /api/github/repos`
+
+List repositories accessible via the GitHub App.
+
+### `POST /api/github/push`
+
+Push generated code to a GitHub repository.
+
+### `GET /api/github/callback`
+
+GitHub OAuth callback handler.
+
+### `POST /api/github/webhook`
+
+GitHub webhook handler for installation and push events.
+
+## Billing (Stripe)
+
+### `POST /api/stripe/create-checkout-session`
+
+Create a Stripe Checkout session for plan upgrade.
+
+### `POST /api/stripe/create-portal-session`
+
+Create a Stripe Customer Portal session for subscription management.
+
+### `POST /api/stripe/webhook`
+
+Stripe webhook handler. Processes `checkout.session.completed` and `customer.subscription.*` events.
+
+## Feature Flags
+
+### `GET /api/features`
+
+List all feature flags and their current values.
+
+### `POST /api/features`
+
+Create a feature flag (admin only).
+
+### `POST /api/features/resolve`
+
+Resolve feature flag values for the current user context.
+
+## Usage
+
+### `GET /api/usage/current`
+
+Get current usage stats (generations count, projects count) against plan limits.
+
+## Auth
+
+### `POST /api/auth/resend-verification`
+
+Resend email verification link.
+
+### `POST /api/auth/welcome`
+
+Trigger welcome email after signup.
+
+## Health
+
+### `GET /api/health`
+
+Health check endpoint. No authentication required.
+
+Returns `{ "status": "ok" }`.
+
+## Image Analysis
+
+### `POST /api/analyze-image`
+
+Analyze a design image using AI. Returns extracted patterns, colors, and component suggestions.

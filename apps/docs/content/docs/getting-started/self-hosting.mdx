@@ -3,6 +3,93 @@ title: Self-Hosting
 description: Deploy Siza with your own API keys and infrastructure
 ---
 
-Set up Siza with BYOK (Bring Your Own Keys) for full control.
+Siza is fully self-hostable. Bring your own API keys (BYOK) and deploy to Cloudflare Workers, Vercel, or run locally.
 
-Content coming soon.
+## Prerequisites
+
+- Node.js 22+
+- A [Supabase](https://supabase.com) project (free tier works)
+- A [Google AI Studio](https://aistudio.google.com/apikey) API key (Gemini, free tier available)
+
+## 1. Clone and install
+
+```bash
+git clone https://github.com/Forge-Space/siza.git
+cd siza
+npm install
+```
+
+## 2. Set up Supabase
+
+Create a project at [supabase.com](https://supabase.com). Then run the migrations:
+
+```bash
+npx supabase db push --project-ref YOUR_PROJECT_REF
+```
+
+This creates 11 tables (`profiles`, `projects`, `components`, `generations`, `api_keys`, `feature_flags`, `feature_flag_changes`, `subscriptions`, `plan_limits`, `usage_tracking`, `stripe_events`) and 4 storage buckets.
+
+## 3. Configure environment
+
+Copy the example and fill in your values:
+
+```bash
+cp apps/web/.env.example apps/web/.env.local
+```
+
+**Required variables:**
+
+| Variable | Where to get it |
+|----------|----------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase Dashboard > Settings > API |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase Dashboard > Settings > API |
+| `NEXT_PUBLIC_BASE_URL` | `http://localhost:3000` for local dev |
+| `GEMINI_API_KEY` | [Google AI Studio](https://aistudio.google.com/apikey) |
+
+**Optional (enable features):**
+
+| Variable | Feature |
+|----------|---------|
+| `RESEND_API_KEY` | Transactional emails (verification, welcome) |
+| `STRIPE_SECRET_KEY` | Billing and subscriptions |
+| `GITHUB_APP_ID` + keys | GitHub App integration for repo export |
+| `GOOGLE_CLIENT_ID` | Google OAuth sign-in |
+| `GITHUB_CLIENT_ID` | GitHub OAuth sign-in |
+
+## 4. Run locally
+
+```bash
+npm run dev
+```
+
+The web app starts at `http://localhost:3000`.
+
+## 5. Deploy to Cloudflare Workers
+
+Siza uses [OpenNext](https://opennext.js.org/cloudflare) to deploy Next.js to Cloudflare Workers:
+
+```bash
+cd apps/web
+npx opennextjs-cloudflare build
+npx wrangler deploy
+```
+
+The `wrangler.jsonc` is pre-configured. Set your secrets:
+
+```bash
+npx wrangler secret put NEXT_PUBLIC_SUPABASE_URL
+npx wrangler secret put NEXT_PUBLIC_SUPABASE_ANON_KEY
+npx wrangler secret put GEMINI_API_KEY
+```
+
+## Feature flags
+
+17 feature flags control what's enabled. All default to sensible values. Override via environment variables:
+
+```bash
+NEXT_PUBLIC_ENABLE_STRIPE_BILLING=true
+NEXT_PUBLIC_ENABLE_USAGE_LIMITS=true
+NEXT_PUBLIC_ENABLE_MULTI_LLM=true
+```
+
+See [Configuration](/docs/getting-started/configuration) for the full list.

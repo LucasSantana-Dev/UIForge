@@ -27,6 +27,9 @@ apps/
       stores/           # State management
     e2e/                # Playwright E2E tests
   api/                  # API service (@siza/api)
+  docs/                 # Fumadocs documentation site (@siza/docs)
+    content/docs/       # MDX content files
+    src/                # Next.js app (no Tailwind — uses Fumadocs UI CSS)
 packages/
   eslint-config/        # Shared ESLint config
 supabase/
@@ -47,6 +50,7 @@ supabase/
 - **AI**: Anthropic SDK, Google Generative AI, MCP SDK
 - **Testing**: Jest (unit) + Playwright (E2E)
 - **Deploy**: Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`, `wrangler.jsonc`)
+- **Docs**: Fumadocs v16 (`fumadocs-core`, `fumadocs-ui`, `fumadocs-mdx`) — no Tailwind, uses `--color-fd-*` CSS vars for theming
 
 ## Architecture
 
@@ -74,6 +78,8 @@ The webapp consumes the mcp-gateway API to provide AI-powered UI generation to u
 - `apps/web/src/emails/` — react-email templates (verification, welcome, password reset)
 - `apps/web/src/stores/` — Zustand stores (auth, generation)
 - `apps/api/` — Cloudflare Workers API with AI provider integrations
+- `apps/docs/content/docs/` — MDX documentation content (Fumadocs)
+- `apps/docs/src/lib/source.ts` — Fumadocs source loader (imports from `.source/server`)
 - `supabase/migrations/` — 10 migration files (schema, storage, templates, logging, providers, github, generation fields, embeddings, feature flags, subscriptions)
 
 ## Supabase Schema
@@ -97,6 +103,7 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 
 ## Deployment Gotchas
 - **apps/docs type errors**: Fumadocs `.source/server` not generated until build — blocks all pre-commit hooks. Use `HUSKY=0` for non-code commits
+- **apps/docs NODE_ENV**: Must use `NODE_ENV=production next build` — shell `NODE_ENV=development` causes `useMemo`/`useContext` null errors during SSR prerendering
 
 - **Workers free tier**: 3 MiB (3072 KiB) gzipped limit. Current bundle: ~2882 KiB
 - **WASM stub required**: `@vercel/og` WASM (~1.4 MiB) bundled by Next.js via `next/dist/compiled/` even when unused — stub at deploy time (automated in CI and `scripts/deploy.sh`)
@@ -117,6 +124,8 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 
 ## Conventions
 
+- **Dark-only UI** — no `dark:` prefixes, no theme toggle (`next-themes` removed)
+- **Commitlint**: sentence-case subjects (`feat: Add feature` not `feat: add feature`), body lines ≤100 chars
 - Turborepo for build orchestration
 - Next.js App Router (not Pages)
 - Radix + Tailwind + shadcn/ui component pattern

@@ -3,6 +3,92 @@ title: Generate Your First Component
 description: Step-by-step component generation guide
 ---
 
-A hands-on guide to generating your first production-ready component.
+A detailed walkthrough of generating a production-ready component using Siza's MCP tools.
 
-Content coming soon.
+## What you'll build
+
+A responsive pricing card component with:
+- Three tiers (Free, Pro, Enterprise)
+- Feature lists per tier
+- Call-to-action buttons
+- Dark theme with brand colors
+
+## Step 1: Generate the base component
+
+Ask your AI assistant (or use the web app):
+
+```
+Use siza's generate_ui_component tool to create a pricing card
+with the following parameters:
+- framework: react
+- component_library: shadcn
+- mood: premium
+- visual_style: dark-premium
+```
+
+Siza's ML pipeline will:
+1. Search the design reference registry for matching patterns
+2. Compose a template from high-quality snippets
+3. Score the output quality (threshold: 5/10)
+4. Fall back to handcrafted templates if quality is insufficient
+
+## Step 2: Review the output
+
+The tool returns one or more files:
+
+```
+pricing-card.tsx     # Component code
+pricing-card.css     # Optional styles (if not using Tailwind)
+```
+
+The generated component uses semantic color tokens (`bg-primary`, `text-foreground`) instead of hardcoded colors, making it theme-compatible.
+
+## Step 3: Refine
+
+Use the `refine_component` tool to iterate:
+
+```
+Use siza's refine_component tool to:
+- Add a "Most Popular" badge to the Pro tier
+- Make the Enterprise tier visually distinct
+- Ensure WCAG 2.1 AA compliance
+```
+
+## Step 4: Audit accessibility
+
+Run an accessibility audit:
+
+```
+Use siza's audit_accessibility tool on the pricing card component
+```
+
+This checks for:
+- Color contrast ratios
+- Keyboard navigation
+- ARIA labels and roles
+- Screen reader compatibility
+
+## Step 5: Export
+
+Export the component to your project via GitHub:
+
+```
+Use siza's github push to export the pricing card
+to my-repo/src/components/pricing-card.tsx
+```
+
+Or copy the code directly from the web app's editor.
+
+## Design parameters
+
+Siza supports these design axes for component generation:
+
+**Moods:** bold, calm, playful, professional, premium, energetic, minimal, editorial, futuristic, warm, corporate, creative
+
+**Industries:** saas, fintech, ecommerce, healthcare, education, startup, agency, media, devtools, general
+
+**Visual styles:** glassmorphism, neubrutalism, soft-depth, bento-grid, gradient-mesh, dark-premium, minimal-editorial, linear-modern, retro-playful, corporate-trust
+
+**Frameworks:** React, Next.js, Vue, Angular, Svelte, HTML
+
+**Component libraries:** shadcn/ui, Radix UI, Headless UI, PrimeVue, Material UI

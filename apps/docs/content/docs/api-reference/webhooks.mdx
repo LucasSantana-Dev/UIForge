@@ -1,8 +1,70 @@
 ---
 title: Webhooks
-description: Stripe webhooks and event handling
+description: Stripe and GitHub webhook handling
 ---
 
-Guide to handling payment webhooks.
+Siza processes webhooks from Stripe (billing) and GitHub (repo sync).
 
-Content coming soon.
+## Stripe Webhooks
+
+**Endpoint:** `POST /api/stripe/webhook`
+
+### Setup
+
+1. Create a webhook in the [Stripe Dashboard](https://dashboard.stripe.com/webhooks)
+2. Point it to `https://your-domain.com/api/stripe/webhook`
+3. Select events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
+4. Copy the signing secret to `STRIPE_WEBHOOK_SECRET`
+
+### Events Handled
+
+| Event | Action |
+|-------|--------|
+| `checkout.session.completed` | Create subscription record, update plan limits |
+| `customer.subscription.updated` | Sync plan changes (upgrade/downgrade) |
+| `customer.subscription.deleted` | Revert to free plan, reset limits |
+
+### Plan Resolution
+
+The webhook handler uses `getPlanFromPriceId()` to map Stripe Price IDs to plan names:
+
+- `STRIPE_PRO_PRICE_ID` maps to `pro`
+- `STRIPE_TEAM_PRICE_ID` maps to `team`
+- Unknown price IDs default to `pro`
+
+### Verification
+
+All webhook requests are verified using the `STRIPE_WEBHOOK_SECRET` signing secret. Requests with invalid signatures are rejected with 400.
+
+### Local Testing
+
+Use the Stripe CLI for local webhook testing:
+
+```bash
+stripe listen --forward-to localhost:3000/api/stripe/webhook
+```
+
+The CLI outputs a webhook signing secret — use it as `STRIPE_WEBHOOK_SECRET` in your `.env.local`.
+
+## GitHub Webhooks
+
+**Endpoint:** `POST /api/github/webhook`
+
+### Setup
+
+Configure in your GitHub App settings:
+1. Set webhook URL to `https://your-domain.com/api/github/webhook`
+2. Set the webhook secret to match `GITHUB_APP_WEBHOOK_SECRET`
+3. Subscribe to events: `installation`, `push`
+
+### Events Handled
+
+| Event | Action |
+|-------|--------|
+| `installation.created` | Store installation ID and accessible repos |
+| `installation.deleted` | Remove installation record |
+| `push` | Update component metadata for tracked repos |
+
+### Verification
+
+GitHub webhook payloads are verified using HMAC-SHA256 with the `GITHUB_APP_WEBHOOK_SECRET`.

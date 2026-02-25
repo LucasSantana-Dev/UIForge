@@ -3,6 +3,66 @@ title: GitHub Export
 description: Export templates and components to GitHub
 ---
 
-Export your Siza-generated templates directly to GitHub repositories.
+Push Siza-generated components and templates directly to your GitHub repositories.
 
-Content coming soon.
+## Prerequisites
+
+- A GitHub account connected to Siza (via GitHub OAuth or GitHub App)
+- The `ENABLE_GITHUB_APP` feature flag enabled (default: `true`)
+
+## Web App Export
+
+### 1. Connect your repository
+
+Go to **Settings > Integrations** and install the Siza GitHub App on your repositories.
+
+### 2. Generate a component
+
+Use the Generate tab to create a component or page template.
+
+### 3. Export
+
+Click the **Export to GitHub** button in the editor toolbar. Select:
+
+- **Repository** — target repo from your connected repos
+- **Branch** — branch to push to (default: main)
+- **Path** — file path in the repo (e.g., `src/components/pricing-card.tsx`)
+
+Siza creates a commit with the generated code and pushes it to your repository.
+
+## MCP Export
+
+From your IDE, use the `github_push` endpoint:
+
+```
+Push the generated pricing card to my-app/src/components/pricing-card.tsx
+on the feat/pricing branch
+```
+
+## API Export
+
+```bash
+POST /api/github/push
+Content-Type: application/json
+
+{
+  "repository": "owner/repo",
+  "branch": "main",
+  "path": "src/components/pricing-card.tsx",
+  "content": "...",
+  "message": "feat: Add pricing card component"
+}
+```
+
+## How it works
+
+1. Siza stores GitHub App installation tokens encrypted with `TOKEN_ENCRYPTION_KEY`
+2. On export, Siza uses the GitHub API to create a commit via the Contents API
+3. The push respects branch protection rules — if the target branch is protected, the push creates a PR instead
+
+## Webhook sync
+
+Siza listens for GitHub webhook events to keep project state in sync:
+
+- **Installation events** — track which repos have the app installed
+- **Push events** — update component metadata when files change externally
