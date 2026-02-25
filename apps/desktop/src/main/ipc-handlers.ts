@@ -7,7 +7,17 @@ import {
   writeProjectFile,
   listDirectoryRecursive,
 } from './file-system';
+import { resolve, normalize } from 'path';
 import type { OllamaStatus, OllamaModel } from '../shared/types';
+
+function validateFilePath(filePath: string): string {
+  const normalized = normalize(resolve(filePath));
+  const home = process.env.HOME || process.env.USERPROFILE || '';
+  if (!normalized.startsWith(home)) {
+    throw new Error('Access denied: path outside home directory');
+  }
+  return normalized;
+}
 
 const OLLAMA_BASE = 'http://localhost:11434';
 
@@ -86,22 +96,22 @@ export function registerIpcHandlers(mainWindow: BrowserWindow) {
 
   ipcMain.handle(
     IPC.FS_READ_FILE,
-    async (_e, path: string) => {
-      return readProjectFile(path);
+    async (_e, filePath: string) => {
+      return readProjectFile(validateFilePath(filePath));
     }
   );
 
   ipcMain.handle(
     IPC.FS_WRITE_FILE,
-    async (_e, path: string, content: string) => {
-      return writeProjectFile(path, content);
+    async (_e, filePath: string, content: string) => {
+      return writeProjectFile(validateFilePath(filePath), content);
     }
   );
 
   ipcMain.handle(
     IPC.FS_LIST_DIRECTORY,
-    async (_e, path: string) => {
-      return listDirectoryRecursive(path);
+    async (_e, dirPath: string) => {
+      return listDirectoryRecursive(validateFilePath(dirPath));
     }
   );
 
