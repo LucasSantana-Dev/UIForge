@@ -9,6 +9,13 @@ function getServiceClient() {
   return createClient(url, key);
 }
 
+function getPlanFromPriceId(priceId: string | undefined): string {
+  if (!priceId) return 'free';
+  if (priceId === process.env.STRIPE_PRO_PRICE_ID) return 'pro';
+  if (priceId === process.env.STRIPE_TEAM_PRICE_ID) return 'team';
+  return 'pro';
+}
+
 function getItemPeriod(subscription: Stripe.Subscription) {
   const item = subscription.items.data[0];
   return {
@@ -59,7 +66,7 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
       stripe_customer_id: session.customer as string,
       stripe_subscription_id: subscription.id,
       stripe_price_id: subscription.items.data[0]?.price.id,
-      plan: 'pro',
+      plan: getPlanFromPriceId(subscription.items.data[0]?.price.id),
       status: 'active',
       current_period_start: period.start,
       current_period_end: period.end,
@@ -68,7 +75,7 @@ export async function handleCheckoutCompleted(session: Stripe.Checkout.Session) 
     { onConflict: 'user_id' }
   );
 
-  await updateUsageLimits(userId, 'pro');
+  await updateUsageLimits(userId, getPlanFromPriceId(subscription.items.data[0]?.price.id));
 }
 
 export async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
@@ -82,7 +89,8 @@ export async function handleSubscriptionUpdated(subscription: Stripe.Subscriptio
 
   if (!sub) return;
 
-  const plan = subscription.status === 'active' ? 'pro' : 'free';
+  const priceId = subscription.items.data[0]?.price.id;
+  const plan = subscription.status === 'active' ? getPlanFromPriceId(priceId) : 'free';
   const period = getItemPeriod(subscription);
 
   await supabase
