@@ -41,7 +41,10 @@
     "react-router-dom": "^7.0.0"
   },
   "description": "Siza desktop app - AI-powered UI generation with local MCP support",
-  "author": "Forge Space",
+  "author": {
+    "name": "Forge Space",
+    "email": "contact@forgespace.dev"
+  },
   "homepage": "https://github.com/Forge-Space/siza",
   "repository": {
     "type": "git",
