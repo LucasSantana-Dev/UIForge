@@ -106,14 +106,16 @@ describe('AI Keys Store', () => {
 
   describe('loadApiKeys', () => {
     it('should load API keys', async () => {
-      const mockKeys = [{
-        provider: testProvider,
-        keyId: testKeyId,
-        encryptedKey: 'encrypted_key',
-        createdAt: '2026-02-17T12:00:00.000Z',
-        lastUsed: '2026-02-17T12:00:00.000Z',
-        isDefault: false,
-      }];
+      const mockKeys = [
+        {
+          provider: testProvider,
+          keyId: testKeyId,
+          encryptedKey: 'encrypted_key',
+          createdAt: '2026-02-17T12:00:00.000Z',
+          lastUsed: '2026-02-17T12:00:00.000Z',
+          isDefault: false,
+        },
+      ];
       mockAIKeyManager.getApiKeys.mockResolvedValue(mockKeys);
 
       const { result } = renderHook(() => useAIKeyStore());
@@ -176,23 +178,33 @@ describe('AI Keys Store', () => {
     it('should show/hide add key dialog', () => {
       const { result } = renderHook(() => useAIKeyStore());
       expect(result.current.showAddKeyDialog).toBe(false);
-      act(() => { result.current.setShowAddKeyDialog(true); });
+      act(() => {
+        result.current.setShowAddKeyDialog(true);
+      });
       expect(result.current.showAddKeyDialog).toBe(true);
-      act(() => { result.current.setShowAddKeyDialog(false); });
+      act(() => {
+        result.current.setShowAddKeyDialog(false);
+      });
       expect(result.current.showAddKeyDialog).toBe(false);
     });
 
     it('should set selected provider', () => {
       const { result } = renderHook(() => useAIKeyStore());
-      act(() => { result.current.setSelectedProvider('anthropic'); });
+      act(() => {
+        result.current.setSelectedProvider('anthropic');
+      });
       expect(result.current.selectedProvider).toBe('anthropic');
     });
 
     it('should set editing key ID', () => {
       const { result } = renderHook(() => useAIKeyStore());
-      act(() => { result.current.setEditingKeyId('test-key-id'); });
+      act(() => {
+        result.current.setEditingKeyId('test-key-id');
+      });
       expect(result.current.editingKeyId).toBe('test-key-id');
-      act(() => { result.current.setEditingKeyId(undefined); });
+      act(() => {
+        result.current.setEditingKeyId(undefined);
+      });
       expect(result.current.editingKeyId).toBeUndefined();
     });
   });
@@ -200,21 +212,27 @@ describe('AI Keys Store', () => {
   describe('preferences', () => {
     it('should set default provider', () => {
       const { result } = renderHook(() => useAIKeyStore());
-      act(() => { result.current.setDefaultProvider('anthropic'); });
+      act(() => {
+        result.current.setDefaultProvider('anthropic');
+      });
       expect(result.current.defaultProvider).toBe('anthropic');
     });
 
     it('should toggle Gemini fallback', () => {
       const { result } = renderHook(() => useAIKeyStore());
       expect(result.current.geminiFallbackEnabled).toBe(true);
-      act(() => { result.current.setGeminiFallbackEnabled(false); });
+      act(() => {
+        result.current.setGeminiFallbackEnabled(false);
+      });
       expect(result.current.geminiFallbackEnabled).toBe(false);
     });
 
     it('should toggle usage tracking', () => {
       const { result } = renderHook(() => useAIKeyStore());
       expect(result.current.usageTrackingEnabled).toBe(true);
-      act(() => { result.current.setUsageTrackingEnabled(false); });
+      act(() => {
+        result.current.setUsageTrackingEnabled(false);
+      });
       expect(result.current.usageTrackingEnabled).toBe(false);
     });
   });
@@ -222,9 +240,13 @@ describe('AI Keys Store', () => {
   describe('error handling', () => {
     it('should clear error', () => {
       const { result } = renderHook(() => useAIKeyStore());
-      act(() => { result.current.setError('test error'); });
+      act(() => {
+        result.current.setError('test error');
+      });
       expect(result.current.error).toBe('test error');
-      act(() => { result.current.clearError(); });
+      act(() => {
+        result.current.clearError();
+      });
       expect(result.current.error).toBeUndefined();
     });
   });
@@ -235,8 +257,12 @@ describe('AI Keys Store', () => {
       await act(async () => {
         await result.current.initialize(testEncryptionKey);
       });
-      act(() => { result.current.setShowAddKeyDialog(true); });
-      act(() => { result.current.reset(); });
+      act(() => {
+        result.current.setShowAddKeyDialog(true);
+      });
+      act(() => {
+        result.current.reset();
+      });
       expect(result.current.encryptionKey).toBeUndefined();
       expect(result.current.apiKeys).toEqual([]);
       expect(result.current.showAddKeyDialog).toBe(false);

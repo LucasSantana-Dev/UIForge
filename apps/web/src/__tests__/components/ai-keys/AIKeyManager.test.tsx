@@ -88,7 +88,7 @@ describe('AIKeyManager', () => {
   it('should render empty state when no keys', () => {
     render(<AIKeyManager />);
     expect(screen.getByText('No API Keys Yet')).toBeInTheDocument();
-    expect(screen.getByText(/Add your first API key/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Add your first API key/i).length).toBeGreaterThanOrEqual(1);
   });
 
   it('should render error state', () => {
