@@ -141,7 +141,7 @@
   }
   50% {
     transform: translate(var(--drift-x, 20px), var(--drift-y, -15px));
-    opacity: calc(var(--particle-opacity, 0.2) * 1.5);
+    opacity: min(calc(var(--particle-opacity, 0.2) * 1.5), 1);
   }
 }
 @keyframes cursor-blink {

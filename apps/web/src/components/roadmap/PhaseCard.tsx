@@ -143,9 +143,12 @@ export function PhaseCard({
           type="button"
           onClick={onToggle}
           aria-expanded={expanded}
+          aria-controls={`phase-${phase.number}-items`}
           className="w-full text-left flex items-center gap-3 mb-1"
         >
-          <h2 className="text-xl font-bold">Phase {phase.number}</h2>
+          <span role="heading" aria-level={2} className="text-xl font-bold">
+            Phase {phase.number}
+          </span>
           <span className="text-muted-foreground">&mdash;</span>
           <span className="text-lg font-semibold">{phase.title}</span>
           {isActive && (
@@ -164,6 +167,7 @@ export function PhaseCard({
         <AnimatePresence initial={false}>
           {expanded && (
             <motion.div
+              id={`phase-${phase.number}-items`}
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}

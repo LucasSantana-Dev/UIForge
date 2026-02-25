@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -223,15 +221,16 @@ const component = instantiateTemplate(template, {
               <Github className="w-5 h-5" />
               GitHub Discussions
             </Button>
-            <a
-              href="https://www.linkedin.com/in/devlucassantana/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 px-8"
-            >
-              <Linkedin className="w-5 h-5" />
-              Connect on LinkedIn
-            </a>
+            <Button size="lg" variant="outline" className="gap-2" asChild>
+              <a
+                href="https://www.linkedin.com/in/devlucassantana/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Linkedin className="w-5 h-5" />
+                Connect on LinkedIn
+              </a>
+            </Button>
           </div>
         </div>
       </section>
