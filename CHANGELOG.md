@@ -42,6 +42,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Stripe E2E tests**: Checkout flow, webhook processing, DB sync validation (#95)
 - **Roadmap Phase 1 completion**: All 11 features marked as done in roadmap UI (#97)
 
+### Fixed
+
+- **Desktop MCP connection**: LOG_LEVEL `silent` → `error` (siza-gen Zod rejects silent), tool name kebab→snake_case, callTool schema args matched to MCP server
+
 ### Changed
 
 - `apps/web` UI components now re-export from `@siza/ui` (zero breaking changes, all tests pass)

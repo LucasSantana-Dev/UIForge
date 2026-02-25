@@ -25,11 +25,13 @@ export function Generate() {
     if (!prompt.trim() || !componentName.trim()) return;
     try {
       const result = await callTool('generate_ui_component', {
+        component_type: componentName
+          .toLowerCase()
+          .replace(/([A-Z])/g, ' $1')
+          .trim(),
         description: prompt,
         framework,
-        componentName,
-        componentLibrary: 'shadcn',
-        typescript: true,
+        component_library: 'shadcn',
       });
 
       const text = result.content?.find((c) => c.type === 'text')?.text;
