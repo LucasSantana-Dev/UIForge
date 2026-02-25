@@ -18,11 +18,11 @@ Siza processes webhooks from Stripe (billing) and GitHub (repo sync).
 
 ### Events Handled
 
-| Event | Action |
-|-------|--------|
-| `checkout.session.completed` | Create subscription record, update plan limits |
-| `customer.subscription.updated` | Sync plan changes (upgrade/downgrade) |
-| `customer.subscription.deleted` | Revert to free plan, reset limits |
+| Event                           | Action                                         |
+| ------------------------------- | ---------------------------------------------- |
+| `checkout.session.completed`    | Create subscription record, update plan limits |
+| `customer.subscription.updated` | Sync plan changes (upgrade/downgrade)          |
+| `customer.subscription.deleted` | Revert to free plan, reset limits              |
 
 ### Plan Resolution
 
@@ -53,17 +53,18 @@ The CLI outputs a webhook signing secret — use it as `STRIPE_WEBHOOK_SECRET` i
 ### Setup
 
 Configure in your GitHub App settings:
+
 1. Set webhook URL to `https://your-domain.com/api/github/webhook`
 2. Set the webhook secret to match `GITHUB_APP_WEBHOOK_SECRET`
 3. Subscribe to events: `installation`, `push`
 
 ### Events Handled
 
-| Event | Action |
-|-------|--------|
-| `installation.created` | Store installation ID and accessible repos |
-| `installation.deleted` | Remove installation record |
-| `push` | Update component metadata for tracked repos |
+| Event                  | Action                                      |
+| ---------------------- | ------------------------------------------- |
+| `installation.created` | Store installation ID and accessible repos  |
+| `installation.deleted` | Remove installation record                  |
+| `push`                 | Update component metadata for tracked repos |
 
 ### Verification
 
