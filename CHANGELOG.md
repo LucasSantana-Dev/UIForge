@@ -44,6 +44,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `apps/web` UI components now re-export from `@siza/ui` (zero breaking changes, all tests pass)
 - `apps/web/tailwind.config.ts` includes `packages/ui` in content paths
 
+### Fixed
+
+- ESLint configs for `@siza/ui` and `@siza/desktop` (flat config with React/TS rules)
+- 18 lint errors: unused imports, React hooks violations, unescaped entities
+- Vite build: set `root: src/renderer` with absolute electron entry paths
+- Path traversal: `relative()` check instead of `startsWith()` in file IPC handlers
+- Component name sanitization in file save (allowlist: `[a-zA-Z0-9_-]`)
+- Navigation security: `setWindowOpenHandler` + `will-navigate` guards
+- Auto-updater initialized in packaged builds
+- `electron-store` singleton pattern (avoid race conditions)
+
 ---
 
 ## [0.7.0] — 2026-02-25
