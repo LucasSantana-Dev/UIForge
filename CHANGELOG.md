@@ -15,7 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Visual overhaul**: Dark-only Siza brand identity across 37 files
 - **SizaBackground component**: Ambient dot grid + brand glow for marketing/auth pages
 - **Skip-to-content link**: Accessibility improvement in root layout
-- **Stripe production activation**: Webhook endpoint, test-mode products (Pro $19/mo, Team $49/mo), 12 Cloudflare Workers secrets
+- **Stripe production activation**: Webhook endpoint, test-mode products (Pro $19/mo, Team $49/mo), 13 GitHub Secrets, Cloudflare Workers runtime secrets
+- **Deploy workflow**: Stripe build-time env vars (publishable key, billing + usage feature flags)
 - **CI status badge**: README now shows CI workflow status
 - **GitHub Discussions**: Enabled on siza repository for community engagement
 - **Stripe webhook tests**: 19 tests for checkout, subscription update/delete, event deduplication, plan detection
