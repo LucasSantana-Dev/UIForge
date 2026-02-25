@@ -14,7 +14,7 @@ test.describe('Landing Page', () => {
   test('should render hero section with headline and CTAs', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     await expect(page.getByText(/an ecosystem that enables/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: /get started free/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /get started free/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /view on github/i })).toBeVisible();
   });
 
@@ -54,19 +54,33 @@ test.describe('Landing Page', () => {
   });
 
   test('should navigate to sign up from Get Started CTA', async ({ page }) => {
-    await page.getByRole('link', { name: /get started free/i }).click();
+    await page
+      .getByRole('link', { name: /get started free/i })
+      .first()
+      .click();
     await expect(page).toHaveURL('/signup');
   });
 
   test('should apply nav blur on scroll', async ({ page }) => {
-    const nav = page.locator('nav').first();
     await page.evaluate(() => window.scrollTo(0, 200));
-    await expect(nav.locator('..')).toHaveCSS('backdrop-filter', /blur/);
+    await page.waitForTimeout(500);
+    const hasBlur = await page.evaluate(() => {
+      const nav = document.querySelector('nav');
+      if (!nav) return false;
+      const el = nav.closest('header') || nav.parentElement || nav;
+      const style = window.getComputedStyle(el);
+      return (
+        style.backdropFilter.includes('blur') ||
+        style.webkitBackdropFilter?.includes('blur') ||
+        false
+      );
+    });
+    expect(hasBlur).toBe(true);
   });
 
   test('should render responsive mobile layout', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect(page.getByRole('link', { name: /get started free/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: /get started free/i }).first()).toBeVisible();
   });
 });
