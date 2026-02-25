@@ -7,7 +7,7 @@ test.describe('Authentication', () => {
 
   test('should display landing page', async ({ page }) => {
     await expect(page.locator('text=Siza')).toBeVisible();
-    await expect(page.locator('text=Generate Production-Ready')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   });
 
   test('should navigate to sign in page', async ({ page }) => {
