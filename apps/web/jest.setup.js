@@ -1,3 +1,8 @@
+// Polyfill structuredClone for jsdom (used by IndexedDB storage)
+if (typeof globalThis.structuredClone === 'undefined') {
+  globalThis.structuredClone = (val) => JSON.parse(JSON.stringify(val));
+}
+
 import 'fake-indexeddb/auto';
 import '@testing-library/jest-dom';
 

@@ -5,7 +5,6 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { AIKeyManager } from '@/components/ai-keys/AIKeyManager';
 import { useAIKeyStore } from '@/stores/ai-keys';
 
@@ -104,14 +103,16 @@ describe('AIKeyManager', () => {
   it('should render API key cards', () => {
     mockUseAIKeyStore.mockReturnValue({
       ...defaultMockStore,
-      apiKeys: [{
-        provider: 'openai',
-        keyId: 'key_123',
-        encryptedKey: 'enc_key',
-        createdAt: '2026-02-17T00:00:00.000Z',
-        lastUsed: '2026-02-17T12:00:00.000Z',
-        isDefault: true,
-      }],
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_123',
+          encryptedKey: 'enc_key',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          lastUsed: '2026-02-17T12:00:00.000Z',
+          isDefault: true,
+        },
+      ],
     } as any);
     render(<AIKeyManager />);
     expect(screen.getByText('OpenAI')).toBeInTheDocument();
@@ -122,13 +123,15 @@ describe('AIKeyManager', () => {
   it('should show Set Default button for non-default keys', () => {
     mockUseAIKeyStore.mockReturnValue({
       ...defaultMockStore,
-      apiKeys: [{
-        provider: 'openai',
-        keyId: 'key_123',
-        encryptedKey: 'enc_key',
-        createdAt: '2026-02-17T00:00:00.000Z',
-        isDefault: false,
-      }],
+      apiKeys: [
+        {
+          provider: 'openai',
+          keyId: 'key_123',
+          encryptedKey: 'enc_key',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: false,
+        },
+      ],
     } as any);
     render(<AIKeyManager />);
     expect(screen.getByText('Set Default')).toBeInTheDocument();
