@@ -9,6 +9,7 @@ import { storeGenerationEmbedding } from '@/lib/services/embeddings';
 import { createClient } from '@/lib/supabase/server';
 import { checkGenerationQuota } from '@/lib/usage/limits';
 import { incrementGenerationCount } from '@/lib/usage/tracker';
+import { captureServerError } from '@/lib/sentry/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -184,6 +185,7 @@ export async function POST(request: NextRequest) {
               })
               .eq('id', generationId);
           }
+          captureServerError(error, { route: '/api/generate', userId: user.id });
           controller.enqueue(
             encoder.encode(
               `data: ${JSON.stringify({
@@ -208,6 +210,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    captureServerError(error, { route: '/api/generate' });
     const message = error instanceof Error ? error.message : 'Internal server error';
     const status = message === 'Authentication required' ? 401 : 500;
     return new Response(JSON.stringify({ error: message }), {
