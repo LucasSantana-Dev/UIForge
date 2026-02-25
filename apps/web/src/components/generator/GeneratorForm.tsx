@@ -440,7 +440,11 @@ export default function GeneratorForm({
           </div>
 
           {designContextEnabled && (
-            <DesignContext values={designContext} onChange={setDesignContext} />
+            <DesignContext
+              projectId={projectId}
+              values={designContext}
+              onChange={setDesignContext}
+            />
           )}
 
           <div className="space-y-4">
