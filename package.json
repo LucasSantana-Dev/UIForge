@@ -3,7 +3,7 @@
   "version": "0.8.3",
   "private": true,
   "license": "MIT",
-  "description": "The open full-stack AI workspace \u2014 generate, integrate, ship",
+  "description": "The open full-stack AI workspace — generate, integrate, ship",
   "workspaces": [
     "apps/*",
     "packages/*"
