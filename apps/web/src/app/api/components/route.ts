@@ -10,6 +10,7 @@ import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, createdResponse, errorResponse } from '@/lib/api/response';
 import { UnauthorizedError, ForbiddenError, ValidationError } from '@/lib/api/errors';
+import { captureServerError } from '@/lib/sentry/server';
 import { createComponentSchema, componentQuerySchema } from '@/lib/api/validation/components';
 import {
   uploadToStorage,
@@ -85,6 +86,7 @@ export async function GET(request: NextRequest) {
     }
 
     console.error('GET /api/components error:', error);
+    captureServerError(error, { route: '/api/components' });
     return errorResponse('Internal server error', 500);
   }
 }
@@ -247,6 +249,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('POST /api/components error:', error);
+    captureServerError(error, { route: '/api/components' });
     return errorResponse('Internal server error', 500);
   }
 }

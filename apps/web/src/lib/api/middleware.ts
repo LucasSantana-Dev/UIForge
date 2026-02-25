@@ -8,6 +8,7 @@ import { checkRateLimit } from './rate-limit';
 import { verifySession } from './auth';
 import { ValidationError, type APIError } from './errors';
 import { errorResponse, apiErrorResponse } from './response';
+import { captureServerError } from '@/lib/sentry/server';
 import { type ZodSchema } from 'zod';
 
 type RouteHandler = (request: NextRequest, context?: any) => Promise<NextResponse>;
@@ -25,6 +26,7 @@ export function withAuth(handler: RouteHandler): RouteHandler {
         return apiErrorResponse(error as APIError);
       }
       console.error('Auth middleware error:', error);
+      captureServerError(error, { route: request.nextUrl.pathname });
       return errorResponse('Authentication failed', 401);
     }
   };
@@ -65,6 +67,7 @@ export function withRateLimit(
         return apiErrorResponse(error as APIError);
       }
       console.error('Rate limit middleware error:', error);
+      captureServerError(error, { route: request.nextUrl.pathname });
       return errorResponse('Rate limit check failed', 500);
     }
   };
@@ -94,6 +97,7 @@ export function withValidation<T>(
         return apiErrorResponse(error as APIError);
       }
       console.error('Validation middleware error:', error);
+      captureServerError(error, { route: request.nextUrl.pathname });
       return errorResponse('Validation failed', 400);
     }
   };
@@ -111,6 +115,7 @@ export function withErrorHandling(handler: RouteHandler): RouteHandler {
         return apiErrorResponse(error as APIError);
       }
       console.error('Route handler error:', error);
+      captureServerError(error, { route: request.nextUrl.pathname });
       return errorResponse('An unexpected error occurred', 500);
     }
   };
