@@ -1,0 +1,106 @@
+---
+title: Contributing
+description: How to contribute to Siza
+---
+
+Siza is open-source. Contributions welcome across all five repositories.
+
+## Getting Started
+
+1. Fork the repository you want to contribute to
+2. Clone your fork
+3. Create a feature branch from `main`
+4. Make your changes
+5. Open a PR against `main`
+
+## Development Setup
+
+```bash
+git clone https://github.com/YOUR_USERNAME/siza.git
+cd siza
+npm install
+npm run dev
+```
+
+Each repository has its own `CLAUDE.md` with specific setup instructions and conventions.
+
+## Branching Strategy
+
+We use trunk-based development:
+
+- **main** — production branch, always deployable
+- **feat/*** — feature branches
+- **fix/*** — bug fix branches
+- **chore/*** — maintenance branches
+
+PRs merge to `main` via squash merge.
+
+## Commit Conventions
+
+[Conventional Commits](https://www.conventionalcommits.org/) required:
+
+```
+feat: Add template pack generation tool
+fix: Resolve webhook plan resolution for team tier
+refactor: Extract quality scoring into separate module
+chore: Update CI workflows to Node 22
+docs: Add MCP integration guide
+```
+
+## Code Standards
+
+- TypeScript strict mode
+- Functions under 50 lines, cyclomatic complexity under 10
+- Line width under 100 characters
+- No comments unless necessary — code should be self-documenting
+- Security-first: validate inputs, sanitize outputs, never expose credentials
+
+## Testing
+
+- Coverage target: 80%+
+- Test business logic, not trivial getters/setters
+- Edge cases and error conditions
+- Use realistic test data
+
+```bash
+npm run test        # Unit tests
+npm run test:e2e    # E2E tests (siza only)
+npm run lint        # Linting
+npm run type-check  # TypeScript checking
+```
+
+## Repository-Specific Notes
+
+### siza (Web App)
+
+- Next.js App Router + Turborepo
+- shadcn/ui component pattern
+- Supabase SSR auth
+- Cloudflare Workers deployment
+
+### siza-mcp (MCP Server)
+
+- Jest ESM mode (`NODE_OPTIONS=--experimental-vm-modules`)
+- SQLite for RAG storage (`.uiforge/rag.sqlite`)
+- Delete the SQLite DB when changing snippet files
+
+### mcp-gateway
+
+- Python + FastAPI
+- `ruff check` AND `ruff format` required
+- Redis for caching (optional for development)
+
+### forge-patterns
+
+- Shared TypeScript library
+- Changes here affect all downstream repos
+- Run tests in consuming repos before merging
+
+## Reporting Issues
+
+Open issues on the relevant repository:
+
+- [siza issues](https://github.com/Forge-Space/siza/issues)
+- [siza-mcp issues](https://github.com/Forge-Space/ui-mcp/issues)
+- [mcp-gateway issues](https://github.com/Forge-Space/mcp-gateway/issues)
+- [forge-patterns issues](https://github.com/Forge-Space/core/issues)

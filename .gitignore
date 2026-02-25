@@ -15,6 +15,9 @@ build/
 .next/
 out/
 
+# Generated (Fumadocs)
+.source/
+
 # Misc
 .DS_Store
 *.pem
@@ -80,3 +83,5 @@ POST_CLEANUP_CHECKLIST.md
 !.claude/agents/
 !.claude/skills/
 .worktrees/
+.windsurf/plans/
+.claude/plans/

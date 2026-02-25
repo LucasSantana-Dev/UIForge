@@ -1,0 +1,35 @@
+---
+title: Welcome to Siza
+description: The Open Full-Stack AI Workspace
+---
+
+Siza generates production-ready UI components, full applications, and design systems with AI.
+
+Named after [Álvaro Siza Vieira](https://en.wikipedia.org/wiki/%C3%81lvaro_Siza_Vieira), the Portuguese Pritzker Prize-winning architect — Siza transforms how you build interfaces, not just complete code.
+
+## What is Siza?
+
+An open-source AI workspace that connects AI models to your development workflow through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/):
+
+- **Web App** — generate components, manage projects, preview live, export to GitHub
+- **MCP Server** — integrate AI generation directly into Claude Desktop, Cursor, or any MCP-compatible IDE
+- **Design System** — consistent tokens, patterns, and ML-composed templates
+
+## Architecture
+
+Five repositories power the ecosystem:
+
+| Repository | Purpose |
+|------------|---------|
+| **siza** | Next.js web app + Cloudflare Workers API |
+| **siza-mcp** | MCP server with 17 AI generation tools |
+| **mcp-gateway** | Multi-provider AI routing (Gemini, Claude, GPT) |
+| **forge-patterns** | Shared configs, types, and security framework |
+| **branding-mcp** | Brand identity generation tools |
+
+## Quick links
+
+- [Quick Start](/docs/getting-started/quick-start) — zero to first component in 5 minutes
+- [Self-Hosting](/docs/getting-started/self-hosting) — BYOK deployment guide
+- [MCP Integration](/docs/guides/mcp-integration) — connect siza-mcp to your IDE
+- [Architecture](/docs/ecosystem/architecture) — how the 5 repos connect

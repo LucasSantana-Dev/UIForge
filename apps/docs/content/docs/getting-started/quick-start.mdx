@@ -1,0 +1,65 @@
+---
+title: Quick Start
+description: Get started with Siza in minutes
+---
+
+Generate your first AI-powered component in under 5 minutes.
+
+## Option A: Web App
+
+### 1. Sign up
+
+Go to the Siza web app and create an account with email, Google, or GitHub.
+
+### 2. Create a project
+
+Click **New Project** from the dashboard. Give it a name and optional description.
+
+### 3. Generate a component
+
+Navigate to the **Generate** tab. Describe what you want:
+
+```
+A pricing card with three tiers (Free, Pro, Enterprise),
+dark theme, gradient borders, React + Tailwind CSS
+```
+
+Select your framework (React, Vue, Svelte, Angular, or HTML) and click **Generate**.
+
+### 4. Preview and iterate
+
+The live preview renders your component instantly. Use the code editor to make adjustments, or click **Refine** and describe changes in natural language:
+
+```
+Add a "Most Popular" badge to the Pro tier,
+make the CTA buttons more prominent
+```
+
+### 5. Export
+
+Click **Export to GitHub** to push directly to a repository, or copy the code from the editor.
+
+## Option B: MCP Server (IDE)
+
+If you prefer working in your IDE, use siza-mcp directly:
+
+```bash
+npx @forgespace/ui-mcp
+```
+
+This starts the MCP server. Connect it to Claude Desktop, Cursor, or Windsurf — see the [MCP Integration guide](/docs/guides/mcp-integration) for setup instructions.
+
+Then ask your AI assistant:
+
+```
+Generate a dashboard page with a sidebar navigation,
+stats cards, and a data table using React and shadcn/ui
+```
+
+The MCP server handles component generation with ML-composed templates, quality scoring, and design system consistency.
+
+## Next steps
+
+- [Configuration](/docs/getting-started/configuration) — environment variables and feature flags
+- [Generate Your First Component](/docs/guides/first-component) — detailed walkthrough
+- [Self-Hosting](/docs/getting-started/self-hosting) — deploy with your own API keys
