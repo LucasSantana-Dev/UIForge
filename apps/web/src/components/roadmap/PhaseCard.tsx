@@ -2,14 +2,14 @@
 
 import { useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { clsx } from 'clsx';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Check, Circle, Loader2, ChevronDown, ExternalLink } from 'lucide-react';
+import { EASE_SIZA } from '@/components/landing/constants';
 import type { Phase, ItemStatus, RoadmapItem } from './types';
 import { calculatePhaseProgress, filterItemsByStatus } from './utils';
-
-const EASE_SIZA = [0.16, 1, 0.3, 1] as const;
 
 function StatusIcon({ status }: { status: ItemStatus }) {
   switch (status) {
@@ -41,7 +41,7 @@ function StatusBadge({ status }: { status: ItemStatus }) {
     planned: { cls: 'bg-muted text-muted-foreground border-0', lbl: 'Planned' },
   };
   return (
-    <Badge variant="outline" className={`text-xs ${cfg[status].cls}`}>
+    <Badge variant="outline" className={clsx('text-xs', cfg[status].cls)}>
       {cfg[status].lbl}
     </Badge>
   );
@@ -65,7 +65,11 @@ function ItemRow({
     >
       <StatusIcon status={item.status} />
       <span
-        className={`flex-1 text-sm ${item.status === 'done' ? 'text-muted-foreground line-through' : item.status === 'in-progress' ? 'text-foreground' : 'text-muted-foreground'}`}
+        className={clsx('flex-1 text-sm', {
+          'text-muted-foreground line-through': item.status === 'done',
+          'text-foreground': item.status === 'in-progress',
+          'text-muted-foreground': item.status === 'planned',
+        })}
       >
         {item.label}
       </span>
@@ -74,6 +78,7 @@ function ItemRow({
           href={item.githubUrl}
           target="_blank"
           rel="noopener noreferrer"
+          aria-label={`View ${item.label} on GitHub`}
           className="text-muted-foreground hover:text-primary transition-colors"
         >
           <ExternalLink className="w-3.5 h-3.5" />
@@ -120,15 +125,30 @@ export function PhaseCard({
         <div className="absolute left-[18px] md:left-[26px] top-12 bottom-0 w-px bg-border" />
       )}
       <div
-        className={`absolute left-0 md:left-2 top-1 w-[38px] h-[38px] rounded-full flex items-center justify-center font-bold text-sm ${isActive ? 'bg-primary text-primary-foreground shadow-[0_0_16px_rgba(124,58,237,0.4)]' : 'bg-card border border-border text-muted-foreground'}`}
+        className={clsx(
+          'absolute left-0 md:left-2 top-1 w-[38px] h-[38px] rounded-full flex items-center justify-center font-bold text-sm',
+          isActive
+            ? 'bg-primary text-primary-foreground shadow-[0_0_16px_rgba(124,58,237,0.4)]'
+            : 'bg-card border border-border text-muted-foreground'
+        )}
       >
         {phase.number}
       </div>
       <Card
-        className={`p-6 mb-8 bg-card border-border ${isActive ? 'shadow-[0_0_20px_rgba(124,58,237,0.1)]' : ''}`}
+        className={clsx('p-6 mb-8 bg-card border-border', {
+          'shadow-[0_0_20px_rgba(124,58,237,0.1)]': isActive,
+        })}
       >
-        <button onClick={onToggle} className="w-full text-left flex items-center gap-3 mb-1">
-          <h2 className="text-xl font-bold">Phase {phase.number}</h2>
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={expanded}
+          aria-controls={`phase-${phase.number}-items`}
+          className="w-full text-left flex items-center gap-3 mb-1"
+        >
+          <span role="heading" aria-level={2} className="text-xl font-bold">
+            Phase {phase.number}
+          </span>
           <span className="text-muted-foreground">&mdash;</span>
           <span className="text-lg font-semibold">{phase.title}</span>
           {isActive && (
@@ -147,6 +167,7 @@ export function PhaseCard({
         <AnimatePresence initial={false}>
           {expanded && (
             <motion.div
+              id={`phase-${phase.number}-items`}
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}

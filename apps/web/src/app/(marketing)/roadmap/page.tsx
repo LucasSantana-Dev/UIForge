@@ -1,15 +1,14 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { phases } from '@/components/roadmap/data';
 import { PhaseCard } from '@/components/roadmap/PhaseCard';
 import { StatusFilter } from '@/components/roadmap/StatusFilter';
 import { PhaseNavigator } from '@/components/roadmap/PhaseNavigator';
 import { countByStatus } from '@/components/roadmap/utils';
+import { EASE_SIZA } from '@/components/landing/constants';
 import type { ItemStatus } from '@/components/roadmap/types';
-
-const EASE_SIZA = [0.16, 1, 0.3, 1] as const;
 
 export default function RoadmapPage() {
   const [activeFilter, setActiveFilter] = useState<ItemStatus | 'all'>('all');
@@ -31,14 +30,18 @@ export default function RoadmapPage() {
     setActivePhase(n);
     setExpandedPhases((prev) => new Set([...prev, n]));
     document.getElementById(`phase-${n}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => setActivePhase(null), 1500);
   }, []);
 
-  const counts = {
-    all: countByStatus(phases, 'all'),
-    done: countByStatus(phases, 'done'),
-    'in-progress': countByStatus(phases, 'in-progress'),
-    planned: countByStatus(phases, 'planned'),
-  };
+  const counts = useMemo(
+    () => ({
+      all: countByStatus(phases, 'all'),
+      done: countByStatus(phases, 'done'),
+      'in-progress': countByStatus(phases, 'in-progress'),
+      planned: countByStatus(phases, 'planned'),
+    }),
+    []
+  );
 
   return (
     <div className="min-h-screen bg-background">

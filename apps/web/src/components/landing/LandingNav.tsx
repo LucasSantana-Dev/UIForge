@@ -12,21 +12,25 @@ interface LandingNavProps {
 }
 
 export function LandingNav({ user }: LandingNavProps) {
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(
+    () => typeof window !== 'undefined' && window.scrollY > 0
+  );
 
   useEffect(() => {
-    let ticking = false;
+    let rafId = 0;
     const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
           setIsScrolled(window.scrollY > 0);
-          ticking = false;
+          rafId = 0;
         });
-        ticking = true;
       }
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      cancelAnimationFrame(rafId);
+    };
   }, []);
 
   const navLinks = [
@@ -86,7 +90,10 @@ export function LandingNav({ user }: LandingNavProps) {
           )}
 
           <Sheet>
-            <SheetTrigger className="md:hidden p-2 text-[#A1A1AA] hover:text-[#FAFAFA]">
+            <SheetTrigger
+              aria-label="Open menu"
+              className="md:hidden p-2 text-[#A1A1AA] hover:text-[#FAFAFA]"
+            >
               <Menu size={20} />
             </SheetTrigger>
             <SheetContent className="bg-[#121214] border-[#27272A]">

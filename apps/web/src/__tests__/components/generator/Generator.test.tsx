@@ -34,12 +34,12 @@ function MockLivePreview(props: any) {
 }
 jest.mock('@/components/generator/LivePreview', () => MockLivePreview);
 
-function MockGenerationHistory(props: any) {
+function MockGenerationHistory(_props: any) {
   return <div data-testid="generation-history">History</div>;
 }
 jest.mock('@/components/generator/GenerationHistory', () => MockGenerationHistory);
 
-function MockSaveToProject(props: any) {
+function MockSaveToProject(_props: any) {
   return <div data-testid="save-to-project">Save</div>;
 }
 jest.mock('@/components/generator/SaveToProject', () => MockSaveToProject);
