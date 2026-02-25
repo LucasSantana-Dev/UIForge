@@ -2,6 +2,8 @@ import { app, BrowserWindow } from 'electron';
 import { join } from 'path';
 import { startMcpServer, stopMcpServer } from './mcp-server';
 import { registerIpcHandlers } from './ipc-handlers';
+import { createNativeMenu } from './native-menu';
+import { createTray, destroyTray } from './tray';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -26,7 +28,9 @@ function createWindow() {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
     mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(join(__dirname, '..', 'renderer', 'index.html'));
+    mainWindow.loadFile(
+      join(__dirname, '..', 'renderer', 'index.html')
+    );
   }
 
   mainWindow.on('closed', () => {
@@ -34,6 +38,8 @@ function createWindow() {
   });
 
   registerIpcHandlers(mainWindow);
+  createNativeMenu(mainWindow);
+  createTray(mainWindow);
 }
 
 app.whenReady().then(async () => {
@@ -60,5 +66,6 @@ app.on('window-all-closed', () => {
 });
 
 app.on('will-quit', async () => {
+  destroyTray();
   await stopMcpServer();
 });
