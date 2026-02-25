@@ -52,6 +52,8 @@ baseTest.describe('Pricing Page (public)', () => {
 });
 
 test.describe('Billing Page (authenticated)', () => {
+  test.skip(!process.env.SUPABASE_SERVICE_ROLE_KEY, 'Requires SUPABASE_SERVICE_ROLE_KEY');
+
   test('should display billing page with current plan', async ({ authenticatedPage }) => {
     await authenticatedPage.goto('/billing');
 
@@ -89,10 +91,9 @@ test.describe('Billing Page (authenticated)', () => {
 });
 
 test.describe('Checkout Redirect (authenticated)', () => {
-  test('should redirect to Stripe Checkout for Pro plan', async ({
-    authenticatedPage,
-    testUser,
-  }) => {
+  test.skip(!process.env.SUPABASE_SERVICE_ROLE_KEY, 'Requires SUPABASE_SERVICE_ROLE_KEY');
+
+  test('should redirect to Stripe Checkout for Pro plan', async ({ authenticatedPage }) => {
     const priceId = process.env.STRIPE_PRO_PRICE_ID ?? 'price_pro_test';
 
     const response = await authenticatedPage.request.post('/api/stripe/create-checkout-session', {
@@ -145,7 +146,10 @@ baseTest.describe('Webhook API', () => {
 
   baseTest('should reject webhook with invalid signature', async ({ request }) => {
     const response = await request.post('/api/stripe/webhook', {
-      data: JSON.stringify({ type: 'test', id: 'evt_test_invalid' }),
+      data: JSON.stringify({
+        type: 'test',
+        id: 'evt_test_invalid',
+      }),
       headers: {
         'Content-Type': 'application/json',
         'stripe-signature': 't=1234,v1=invalid_signature',
@@ -194,6 +198,8 @@ baseTest.describe('Webhook API', () => {
 });
 
 test.describe('Billing Page for Subscribed User', () => {
+  test.skip(!process.env.SUPABASE_SERVICE_ROLE_KEY, 'Requires SUPABASE_SERVICE_ROLE_KEY');
+
   test('should show Pro plan details for Pro subscriber', async ({
     authenticatedPage,
     testUser,
@@ -222,7 +228,7 @@ test.describe('Billing Page for Subscribed User', () => {
     await cleanupTestBilling(testUser.id);
   });
 
-  test('should show upgrade button for free plan user', async ({ authenticatedPage, testUser }) => {
+  test('should show upgrade button for free plan user', async ({ authenticatedPage }) => {
     await authenticatedPage.goto('/billing');
 
     await expect(authenticatedPage.getByRole('link', { name: /upgrade/i })).toBeVisible();
@@ -234,13 +240,23 @@ test.describe('Billing Page for Subscribed User', () => {
   });
 });
 
-baseTest.describe('Billing Success Page', () => {
-  baseTest('should display success message', async ({ page }) => {
-    await page.goto('/billing/success');
+test.describe('Billing Success Page', () => {
+  test.skip(!process.env.SUPABASE_SERVICE_ROLE_KEY, 'Requires SUPABASE_SERVICE_ROLE_KEY');
 
-    await baseExpect(page.getByText('Welcome to Pro!')).toBeVisible();
-    await baseExpect(page.getByRole('link', { name: /go to dashboard/i })).toBeVisible();
-    await baseExpect(page.getByRole('link', { name: /view billing/i })).toBeVisible();
+  test('should display success message', async ({ authenticatedPage }) => {
+    await authenticatedPage.goto('/billing/success');
+
+    await expect(authenticatedPage.getByText('Welcome to Pro!')).toBeVisible();
+    await expect(
+      authenticatedPage.getByRole('link', {
+        name: /go to dashboard/i,
+      })
+    ).toBeVisible();
+    await expect(
+      authenticatedPage.getByRole('link', {
+        name: /view billing/i,
+      })
+    ).toBeVisible();
   });
 });
 
@@ -249,7 +265,9 @@ baseTest.describe('Billing Auth Guard', () => {
     await page.context().clearCookies();
     await page.goto('/billing');
 
-    await baseExpect(page).toHaveURL(/\/signin/, { timeout: 10000 });
+    await baseExpect(page).toHaveURL(/\/signin/, {
+      timeout: 10000,
+    });
   });
 });
 
