@@ -9,11 +9,16 @@
 6. **Bundle must stay under 3072 KiB gzip** — Free tier limit. Currently at 2880 KiB. Monitor with `wrangler deploy --dry-run`.
 7. **`middleware.ts` IS the one exception** — Uses `runtime = 'experimental-edge'` for auth checks, rate limiting, and request routing.
 
-## GitHub Secrets Required (6)
-- `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
-- `CODECOV_TOKEN`
-- `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `NEXT_PUBLIC_BASE_URL`
+## GitHub Secrets Required (12)
+- Infra: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `CODECOV_TOKEN`
+- Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_BASE_URL`
+- Stripe: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_PRICE_ID`, `STRIPE_TEAM_PRICE_ID`
+- Missing: `SUPABASE_SERVICE_ROLE_KEY` (for Stripe webhook handler)
+
+## GitHub Variables (3)
+- `CLOUDFLARE_DEPLOY_ENABLED=true`
+- `NEXT_PUBLIC_ENABLE_STRIPE_BILLING=false`
+- `NEXT_PUBLIC_ENABLE_USAGE_LIMITS=false`
 
 ## Deploy Commands
 ```bash

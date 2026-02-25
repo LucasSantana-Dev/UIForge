@@ -27,8 +27,14 @@
 stripe listen --forward-to localhost:3000/api/stripe/webhook
 ```
 
-## Bug Fixes (v0.3.0)
-- `getPlanFromPriceId()` was missing Team plan mapping
-- Team plan migration added (supabase migration)
-- `STRIPE_TEAM_PRICE_ID` env var required
-- 5 webhook integration tests added
+## Testing (v0.4.0)
+- 19 webhook tests in `__tests__/lib/stripe/webhooks.test.ts`
+- Covers: verifyWebhookSignature, isEventProcessed, handleCheckoutCompleted, handleSubscriptionUpdated, handleSubscriptionDeleted, processWebhookEvent
+- Plan detection: pro, team, unknown (defaults to pro), missing (defaults to free)
+
+## Production State (2026-02-25)
+- GitHub secrets: 6 Stripe keys configured (sandbox/test mode)
+- Webhook endpoint: `we_1T4Wal...` → `siza-web.uiforge.workers.dev/api/stripe/webhook`
+- Feature flags: `ENABLE_STRIPE_BILLING=false`, `ENABLE_USAGE_LIMITS=false`
+- Missing: `SUPABASE_SERVICE_ROLE_KEY` (needed for webhook DB writes)
+- To enable: flip both flags to `true`, add service role key, redeploy
