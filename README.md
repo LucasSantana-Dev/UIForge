@@ -157,6 +157,37 @@ Automated via GitHub Actions on push to `main`:
 | Gemini 2.0 Flash | 60 RPM |
 | GitHub Actions | 2,000 min/month |
 
+## Documentation
+
+Full documentation is available in the `apps/docs/` directory, built with [Fumadocs](https://fumadocs.vercel.app/):
+
+```bash
+npm run dev --workspace=apps/docs  # localhost:3001
+```
+
+Covers: quick start, self-hosting, configuration, MCP integration, API reference, and architecture.
+
+## Community
+
+- [**GitHub Discussions**](https://github.com/Forge-Space/siza/discussions) — questions, ideas, show & tell
+- [**Issue Templates**](https://github.com/Forge-Space/siza/issues/new/choose) — bug reports, feature requests, security reports
+- [**Contributing Guide**](CONTRIBUTING.md) — how to contribute code and docs
+
+## Documentation
+
+Full documentation at [siza-docs.uiforge.workers.dev](https://siza-docs.uiforge.workers.dev) (or run `npm run dev` in `apps/docs/`).
+
+- [Quick Start](https://siza-docs.uiforge.workers.dev/docs/getting-started/quick-start)
+- [Configuration](https://siza-docs.uiforge.workers.dev/docs/getting-started/configuration)
+- [MCP Integration](https://siza-docs.uiforge.workers.dev/docs/guides/mcp-integration)
+- [API Reference](https://siza-docs.uiforge.workers.dev/docs/api-reference/mcp-tools)
+
+## Community
+
+- [GitHub Discussions](https://github.com/Forge-Space/siza/discussions) — Questions, ideas, show & tell
+- [Issues](https://github.com/Forge-Space/siza/issues) — Bug reports and feature requests
+- [Contributing Guide](CONTRIBUTING.md) — How to contribute
+
 ## Contributing
 
 We welcome contributions. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.

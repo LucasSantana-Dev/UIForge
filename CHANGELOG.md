@@ -5,10 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.4.0] — 2026-02-25
 
 ### Added
 
+- **Documentation site**: Fumadocs-powered docs at `apps/docs/` with 12 content pages (Getting Started, Guides, API Reference, Ecosystem)
+- **Docs deployment**: Cloudflare Workers deploy workflow for documentation
+- **Community infrastructure**: GitHub Discussions, homepage URL, updated repo descriptions
 - **Visual overhaul**: Dark-only Siza brand identity across 37 files
 - **SizaBackground component**: Ambient dot grid + brand glow for marketing/auth pages
 - **Skip-to-content link**: Accessibility improvement in root layout
@@ -32,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Supabase migration**: Fixed gin_trgm_ops_ops typo in shared_logging migration
 - **pgvector indexes**: Removed IVFFlat indexes exceeding 2000-dim limit in rag_embeddings migration
 - **Jest coverage**: Updated collectCoverageFrom scope and thresholds, excluded integration tests
+- **Docs CI**: ESLint flat config with TS parser, fumadocs-mdx postinstall for type generation, .source/ excluded from prettier
 
 ### Removed
 
