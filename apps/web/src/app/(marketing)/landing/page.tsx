@@ -287,10 +287,10 @@ export default function LandingPage() {
           <h2 className="text-3xl font-bold tracking-tight mb-3">
             Built in the open.
             <br />
-            <span className="text-muted-foreground">Zero-cost forever.</span>
+            <span className="text-muted-foreground">Free to start, low cost to scale.</span>
           </h2>
           <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-            Siza runs entirely on free-tier infrastructure. No surprises, no paywalls.
+            Generous free tier with high usage limits. No surprises, no paywalls.
           </p>
           <div className="flex justify-center gap-4">
             <Button variant="outline" asChild>

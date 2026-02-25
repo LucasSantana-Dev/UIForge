@@ -1,6 +1,6 @@
 # siza
 
-Zero-cost web application for AI-driven UI generation. Turborepo monorepo.
+AI-driven UI generation with a generous free tier. Turborepo monorepo.
 
 ## Quick Reference
 

@@ -53,9 +53,9 @@ const principles = [
   },
   {
     icon: DollarSign,
-    title: 'True zero-cost, not freemium bait',
+    title: 'Low cost, not freemium bait',
     description:
-      'Cloudflare Workers, Supabase, Gemini free tiers support ~50K users at $0/month. No VC burn rate, no surprise bills. Sustainable from day one.',
+      'Generous free tier with high usage limits. Cloudflare Workers, Supabase, and scalable infrastructure keep costs low. No surprise bills, sustainable from day one.',
   },
   {
     icon: Unlock,

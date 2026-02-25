@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] — 2026-02-24
+
+### Changed
+
+- **Production Supabase**: Linked project nfwmwdzbnvsyziyeubqb, config.toml with production URLs
+- **Auth redirect URLs**: OAuth callback URIs for Google/GitHub point to production Supabase
+- **Email URL fix**: auth-emails.ts uses NEXT_PUBLIC_BASE_URL (deploy workflow) instead of undefined NEXT_PUBLIC_APP_URL
+- **Messaging**: Updated all zero-cost references to generous free tier / low cost positioning
+
+### Notes
+
+- OAuth providers (Google, GitHub) require manual setup in Supabase Dashboard + provider consoles
+- Email delivery requires Resend SMTP configuration in Supabase Dashboard
+- Stripe remains in test mode for beta period
+
+---
+
 ## [0.4.0] — 2026-02-25
 
 ### Added

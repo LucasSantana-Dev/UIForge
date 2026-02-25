@@ -23,7 +23,7 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 | Full-stack (UI + backend + deploy) | Frontend-only generator |
 | MCP-native (composable AI tools) | Monolithic AI black box |
 | Privacy-first (BYOK, zero telemetry) | Data-harvesting freemium |
-| Zero-cost by default | Free trial with paywall |
+| Generous free tier, low cost to scale | Free trial with paywall |
 
 ## Features
 
@@ -118,7 +118,7 @@ npm run type-check      # TypeScript
 
 ## Pricing
 
-Free for individuals, paid for scale and convenience.
+Generous free tier, paid for scale and convenience.
 
 | Tier | Price | Generations | Projects |
 |------|-------|-------------|----------|

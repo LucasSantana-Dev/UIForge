@@ -26,7 +26,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: 'Siza - AI-Driven UI Generation',
   description:
-    'Generate production-ready UI components with AI. Zero-cost platform for developers.',
+    'Generate production-ready UI components with AI. Generous free tier for developers.',
   keywords: ['UI generation', 'AI', 'React', 'Next.js', 'Vue', 'Components'],
   authors: [{ name: 'Siza Team' }],
   icons: {

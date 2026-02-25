@@ -42,10 +42,10 @@ export function PricingPageClient() {
             <Code2 className="h-8 w-8 text-primary" />
             <span className="text-2xl font-bold">Siza</span>
           </Link>
-          <h1 className="mt-8 text-4xl font-bold">Free for individuals, paid for scale</h1>
+          <h1 className="mt-8 text-4xl font-bold">Generous free tier, paid for scale</h1>
           <p className="mt-4 text-lg text-muted-foreground">
-            Start free forever. BYOK unlocks unlimited generations at no cost. Upgrade when you need
-            team features.
+            Start free with high usage limits. BYOK unlocks unlimited generations. Upgrade when you
+            need team features.
           </p>
         </div>
 
