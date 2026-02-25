@@ -30,7 +30,7 @@ function AppError({ error, reset }: { error: Error & { digest?: string }; reset:
             exception: { values: [{ type: error.name, value: error.message }] },
           }),
         ].join('\n');
-        fetch(\`https://\${host}/api/\${projectId}/envelope/\`, {
+        fetch(`https://${host}/api/${projectId}/envelope/`, {
           method: 'POST',
           body: envelope,
         }).catch(() => {});
