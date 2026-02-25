@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import * as Sentry from '@sentry/nextjs';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
@@ -10,7 +9,11 @@ import { Card, CardContent } from '@/components/ui/card';
 
 function AppError({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+      import('@sentry/nextjs').then((Sentry) => {
+        Sentry.captureException(error);
+      });
+    }
     if (process.env.NODE_ENV === 'development') {
       console.error('Error boundary caught:', error);
     }

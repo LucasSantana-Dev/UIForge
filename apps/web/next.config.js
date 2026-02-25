@@ -3,8 +3,6 @@ if (process.env.NODE_ENV === 'development') {
   initOpenNextCloudflareForDev();
 }
 
-const { withSentryConfig } = require('@sentry/nextjs');
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -19,13 +17,20 @@ const nextConfig = {
   turbopack: {},
 };
 
-const sentryConfig = process.env.NEXT_PUBLIC_SENTRY_DSN
-  ? withSentryConfig(nextConfig, {
+let finalConfig = nextConfig;
+
+if (process.env.NEXT_PUBLIC_SENTRY_DSN) {
+  try {
+    const { withSentryConfig } = require('@sentry/nextjs');
+    finalConfig = withSentryConfig(nextConfig, {
       silent: !process.env.CI,
       widenClientFileUpload: true,
       disableServerWebpackPlugin: true,
       disableClientWebpackPlugin: !process.env.NEXT_PUBLIC_SENTRY_DSN,
-    })
-  : nextConfig;
+    });
+  } catch {
+    // @sentry/nextjs not available
+  }
+}
 
-module.exports = sentryConfig;
+module.exports = finalConfig;
