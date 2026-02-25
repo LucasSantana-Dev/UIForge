@@ -1,0 +1,53 @@
+{
+  "name": "create-siza-app",
+  "version": "0.1.0",
+  "description": "Create a new Siza app with AI-powered UI generation",
+  "type": "module",
+  "bin": {
+    "create-siza-app": "./dist/index.js"
+  },
+  "main": "./dist/index.js",
+  "files": [
+    "dist",
+    "templates"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "lint": "eslint src --ext .ts",
+    "type-check": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "siza",
+    "create-app",
+    "scaffold",
+    "ai",
+    "ui",
+    "mcp",
+    "react",
+    "nextjs"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Forge-Space/siza.git",
+    "directory": "packages/create-siza-app"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "commander": "^13.0.0",
+    "enquirer": "^2.4.1",
+    "kleur": "^4.1.5",
+    "fs-extra": "^11.2.0",
+    "validate-npm-package-name": "^6.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^22.0.0",
+    "@types/validate-npm-package-name": "^4.0.2"
+  }
+}

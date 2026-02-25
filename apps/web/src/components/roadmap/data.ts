@@ -39,7 +39,7 @@ export const phases: Phase[] = [
       { label: 'Documentation site (docs.siza.dev)', status: 'planned' },
       { label: 'Public roadmap (GitHub Projects)', status: 'planned' },
       { label: 'Discord community launch', status: 'planned' },
-      { label: 'CONTRIBUTING.md in all repos', status: 'in-progress' },
+      { label: 'CONTRIBUTING.md in all repos', status: 'done' },
       { label: 'MCP server directory (community servers)', status: 'planned' },
       { label: 'Template marketplace (creator submissions)', status: 'planned' },
       { label: 'CLI tool: npx create-siza-app', status: 'planned' },
