@@ -13,26 +13,27 @@ baseTest.describe('Pricing Page (public)', () => {
 
     await baseExpect(page.getByText('Free for individuals, paid for scale')).toBeVisible();
 
-    await baseExpect(page.getByText('Free')).toBeVisible();
-    await baseExpect(page.getByText('Pro')).toBeVisible();
-    await baseExpect(page.getByText('Team')).toBeVisible();
-    await baseExpect(page.getByText('Enterprise')).toBeVisible();
+    const headings = page.getByRole('heading');
+    await baseExpect(headings.filter({ hasText: 'Free' }).first()).toBeVisible();
+    await baseExpect(headings.filter({ hasText: 'Pro' }).first()).toBeVisible();
+    await baseExpect(headings.filter({ hasText: 'Team' }).first()).toBeVisible();
+    await baseExpect(headings.filter({ hasText: 'Enterprise' }).first()).toBeVisible();
   });
 
   baseTest('should display plan prices', async ({ page }) => {
     await page.goto('/pricing');
 
-    await baseExpect(page.getByText('$0')).toBeVisible();
-    await baseExpect(page.getByText('$19')).toBeVisible();
-    await baseExpect(page.getByText('$49')).toBeVisible();
+    await baseExpect(page.getByText('$0').first()).toBeVisible();
+    await baseExpect(page.getByText('$19').first()).toBeVisible();
+    await baseExpect(page.getByText('$49').first()).toBeVisible();
   });
 
   baseTest('should display plan features', async ({ page }) => {
     await page.goto('/pricing');
 
-    await baseExpect(page.getByText('10 AI generations per month')).toBeVisible();
-    await baseExpect(page.getByText('500 AI generations per month')).toBeVisible();
-    await baseExpect(page.getByText('2,500 AI generations per month')).toBeVisible();
+    await baseExpect(page.getByText('10 AI generations per month').first()).toBeVisible();
+    await baseExpect(page.getByText('500 AI generations per month').first()).toBeVisible();
+    await baseExpect(page.getByText('2,500 AI generations per month').first()).toBeVisible();
   });
 
   baseTest('should navigate to signin for unauthenticated subscribe', async ({ page }) => {
@@ -63,7 +64,7 @@ test.describe('Billing Page (authenticated)', () => {
   test('should show free plan for new users', async ({ authenticatedPage }) => {
     await authenticatedPage.goto('/billing');
 
-    await expect(authenticatedPage.getByText(/free/i)).toBeVisible();
+    await expect(authenticatedPage.getByText(/free/i).first()).toBeVisible();
     await expect(authenticatedPage.getByRole('link', { name: /upgrade/i })).toBeVisible();
   });
 
@@ -164,13 +165,13 @@ baseTest.describe('Webhook API', () => {
     }
 
     const eventPayload = JSON.stringify({
-      id: `evt_test_${Date.now()}`,
+      id: 'evt_test_' + Date.now(),
       type: 'checkout.session.completed',
       data: {
         object: {
-          id: `cs_test_${Date.now()}`,
-          subscription: `sub_test_${Date.now()}`,
-          customer: `cus_test_${Date.now()}`,
+          id: 'cs_test_' + Date.now(),
+          subscription: 'sub_test_' + Date.now(),
+          customer: 'cus_test_' + Date.now(),
           metadata: { userId: 'test-user-does-not-exist' },
         },
       },
