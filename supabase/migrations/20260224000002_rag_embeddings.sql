@@ -38,21 +38,8 @@ create policy "Patterns are readable by authenticated users"
   to authenticated
   using (true);
 
--- IVFFlat indexes for cosine similarity (efficient for < 1M rows)
-create index if not exists generations_embedding_idx
-  on public.generations
-  using ivfflat (prompt_embedding vector_cosine_ops)
-  with (lists = 100);
-
-create index if not exists components_embedding_idx
-  on public.components
-  using ivfflat (embedding vector_cosine_ops)
-  with (lists = 100);
-
-create index if not exists patterns_embedding_idx
-  on public.component_patterns
-  using ivfflat (embedding vector_cosine_ops)
-  with (lists = 100);
+-- Vector indexes omitted: local pgvector 2000-dim limit, vectors are 3072-dim
+-- Create in production Supabase dashboard where pgvector supports higher dims
 
 -- Index on quality_score for filtering high-quality examples
 create index if not exists generations_quality_idx
