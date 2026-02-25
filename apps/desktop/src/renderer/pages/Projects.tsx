@@ -1,11 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@siza/ui';
+import { Button } from '@siza/ui';
 import {
   FolderOpenIcon,
   FolderIcon,

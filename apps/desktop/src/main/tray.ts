@@ -45,7 +45,11 @@ export function createTray(mainWindow: BrowserWindow) {
   tray.setContextMenu(contextMenu);
 
   tray.on('click', () => {
-    mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+    if (mainWindow.isVisible()) {
+      mainWindow.hide();
+    } else {
+      mainWindow.show();
+    }
   });
 }
 

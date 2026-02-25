@@ -1,5 +1,5 @@
 import { dialog, BrowserWindow } from 'electron';
-import { readFile, writeFile, readdir, stat } from 'fs/promises';
+import { readFile, writeFile, readdir } from 'fs/promises';
 import { join } from 'path';
 import type { FileEntry } from '../shared/types';
 

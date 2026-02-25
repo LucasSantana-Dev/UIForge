@@ -1,9 +1,6 @@
 import { ipcMain, BrowserWindow, app } from 'electron';
 import { IPC } from '../shared/ipc-channels';
-import {
-  getMcpClient,
-  startMcpServer,
-} from './mcp-server';
+import { getMcpClient } from './mcp-server';
 import {
   selectDirectory,
   readProjectFile,

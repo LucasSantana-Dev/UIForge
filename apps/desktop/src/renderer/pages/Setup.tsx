@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Card,
   CardContent,
@@ -33,15 +33,14 @@ interface SetupProps {
 
 export function Setup({ onComplete }: SetupProps) {
   const { running, models, refresh } = useOllama();
-  const [step, setStep] = useState<'detect' | 'models' | 'done'>('detect');
+  const [manualStep, setManualStep] = useState<'detect' | 'models' | 'done' | null>(null);
 
-  useEffect(() => {
-    if (running && models.length > 0) {
-      setStep('done');
-    } else if (running) {
-      setStep('models');
-    }
-  }, [running, models]);
+  const step = useMemo(() => {
+    if (manualStep) return manualStep;
+    if (running && models.length > 0) return 'done';
+    if (running) return 'models';
+    return 'detect';
+  }, [running, models, manualStep]);
 
   return (
     <div className="flex items-center justify-center min-h-screen p-8">
@@ -71,7 +70,7 @@ export function Setup({ onComplete }: SetupProps) {
                 <Button variant="outline" onClick={refresh}>
                   Re-check
                 </Button>
-                <Button onClick={() => running ? setStep('models') : onComplete()}>
+                <Button onClick={() => running ? setManualStep('models') : onComplete()}>
                   {running ? 'Next' : 'Skip for now'}
                   <ArrowRightIcon className="w-4 h-4 ml-1" />
                 </Button>
@@ -117,7 +116,7 @@ export function Setup({ onComplete }: SetupProps) {
                   ))}
                 </ul>
               )}
-              <Button onClick={() => setStep('done')}>
+              <Button onClick={() => setManualStep('done')}>
                 Continue
                 <ArrowRightIcon className="w-4 h-4 ml-1" />
               </Button>
@@ -128,7 +127,7 @@ export function Setup({ onComplete }: SetupProps) {
             <>
               <div className="text-center py-4">
                 <CheckCircleIcon className="w-12 h-12 text-success mx-auto mb-3" />
-                <p className="font-medium">You're all set!</p>
+                <p className="font-medium">You&apos;re all set!</p>
                 <p className="text-sm text-text-secondary mt-1">
                   Siza is ready to generate code
                   {running ? ' with local Ollama' : ''}.

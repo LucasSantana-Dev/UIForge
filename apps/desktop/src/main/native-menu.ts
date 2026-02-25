@@ -1,4 +1,4 @@
-import { Menu, BrowserWindow, app } from 'electron';
+import { Menu, BrowserWindow, app, shell } from 'electron';
 
 export function createNativeMenu(mainWindow: BrowserWindow) {
   const isMac = process.platform === 'darwin';
@@ -84,7 +84,6 @@ export function createNativeMenu(mainWindow: BrowserWindow) {
         {
           label: 'Documentation',
           click: () => {
-            const { shell } = require('electron');
             shell.openExternal('https://siza.dev/docs');
           },
         },

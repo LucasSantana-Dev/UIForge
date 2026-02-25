@@ -10,11 +10,11 @@ import {
 } from 'lucide-react';
 import type { FileEntry } from '../../shared/types';
 
-function getFileIcon(name: string) {
-  if (/\.(tsx?|jsx?)$/.test(name)) return FileCodeIcon;
-  if (/\.(md|txt|json)$/.test(name)) return FileTextIcon;
-  if (/\.(png|jpg|svg|webp)$/.test(name)) return ImageIcon;
-  return FileIcon;
+function FileEntryIcon({ name }: { name: string }) {
+  if (/\.(tsx?|jsx?)$/.test(name)) return <FileCodeIcon className="w-4 h-4 text-text-muted shrink-0" />;
+  if (/\.(md|txt|json)$/.test(name)) return <FileTextIcon className="w-4 h-4 text-text-muted shrink-0" />;
+  if (/\.(png|jpg|svg|webp)$/.test(name)) return <ImageIcon className="w-4 h-4 text-text-muted shrink-0" />;
+  return <FileIcon className="w-4 h-4 text-text-muted shrink-0" />;
 }
 
 interface FileTreeNodeProps {
@@ -29,10 +29,6 @@ function FileTreeNode({
   onSelect,
 }: FileTreeNodeProps) {
   const [expanded, setExpanded] = useState(depth < 1);
-  const Icon = entry.isDirectory
-    ? FolderIcon
-    : getFileIcon(entry.name);
-
   if (!entry.isDirectory) {
     return (
       <button
@@ -40,7 +36,7 @@ function FileTreeNode({
         className="flex items-center gap-2 py-1 px-2 text-sm text-text-secondary hover:bg-surface-2 rounded w-full text-left"
         style={{ paddingLeft: `${depth * 16 + 8}px` }}
       >
-        <Icon className="w-4 h-4 text-text-muted shrink-0" />
+        <FileEntryIcon name={entry.name} />
         <span className="truncate">{entry.name}</span>
       </button>
     );

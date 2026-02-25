@@ -4,7 +4,6 @@ import type {
   OllamaStatus,
   FileEntry,
   AppPreferences,
-  SizaApi,
 } from '../shared/types';
 
 describe('Shared Types', () => {
