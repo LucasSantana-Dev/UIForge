@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Infrastructure
 - MCP Gateway client (`lib/mcp/client.ts`) for AI generation routing (behind `ENABLE_MCP_GATEWAY` flag, disabled by default)
 
-## [Unreleased]
+## [0.8.1] - 2026-02-25
 
 ### Added
 
@@ -39,10 +39,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 4 Vitest test suites: MCP server, IPC channels, file system, types
 - **Desktop CI** (`.github/workflows/desktop-release.yml`): Cross-platform matrix build (macOS, Windows, Linux) triggered by `desktop-v*` tags
 
+- **Stripe E2E tests**: Checkout flow, webhook processing, DB sync validation (#95)
+- **Roadmap Phase 1 completion**: All 11 features marked as done in roadmap UI (#97)
+
 ### Changed
 
 - `apps/web` UI components now re-export from `@siza/ui` (zero breaking changes, all tests pass)
 - `apps/web/tailwind.config.ts` includes `packages/ui` in content paths
+- Electron bumped to v40.6.1 (#96)
 
 ### Fixed
 
@@ -54,6 +58,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Navigation security: `setWindowOpenHandler` + `will-navigate` guards
 - Auto-updater initialized in packaged builds
 - `electron-store` singleton pattern (avoid race conditions)
+- CI Build/Test exclude desktop app (`--filter=!@siza/desktop`) — Rollup native binaries fail on Linux (#98)
 
 ---
 
