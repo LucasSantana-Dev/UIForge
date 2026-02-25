@@ -123,7 +123,9 @@ export async function POST(request: NextRequest) {
       async start(controller) {
         let generationId: string | null = null;
         const activeProvider = mcpEnabled ? 'mcp-gateway' : requestedProvider;
-        const activeModel = mcpEnabled ? 'mcp-specialist' : (requestedModel || 'gemini-2.0-flash');
+        const activeModel = mcpEnabled
+          ? 'mcp-specialist'
+          : (requestedModel || 'gemini-2.0-flash');
 
         try {
           const supabase = await createClient();

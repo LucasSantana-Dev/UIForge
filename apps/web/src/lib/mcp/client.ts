@@ -113,7 +113,8 @@ export async function generateComponent(
     dark_mode: true,
     framework: options.framework === 'react' ? 'react' : options.framework,
     design_system:
-      options.componentLibrary === 'tailwind' || options.componentLibrary === 'shadcn'
+      options.componentLibrary === 'tailwind' ||
+      options.componentLibrary === 'shadcn'
         ? 'tailwind_ui'
         : options.componentLibrary === 'mui'
           ? 'material_design'

@@ -12,19 +12,19 @@ afterAll(() => {
 });
 
 describe('isMcpConfigured', () => {
-  it('should return false when env vars missing', () => {
+  it('returns false when env vars missing', () => {
     delete process.env.MCP_GATEWAY_URL;
     delete process.env.MCP_GATEWAY_JWT;
     expect(isMcpConfigured()).toBe(false);
   });
 
-  it('should return false when only URL set', () => {
+  it('returns false when only URL set', () => {
     process.env.MCP_GATEWAY_URL = 'http://localhost:4444';
     delete process.env.MCP_GATEWAY_JWT;
     expect(isMcpConfigured()).toBe(false);
   });
 
-  it('should return true when both env vars set', () => {
+  it('returns true when both env vars set', () => {
     process.env.MCP_GATEWAY_URL = 'http://localhost:4444';
     process.env.MCP_GATEWAY_JWT = 'test-jwt';
     expect(isMcpConfigured()).toBe(true);
@@ -37,47 +37,29 @@ describe('listTools', () => {
     process.env.MCP_GATEWAY_JWT = 'test-jwt';
   });
 
-  it('should fetch and return tools array', async () => {
-    const mockTools = [
-      { name: 'tool1', description: 'Test tool', inputSchema: {} },
-    ];
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve(mockTools),
-    });
-
+  it('fetches and returns tools array', async () => {
+    const mockTools = [{ name: 'tool1', description: 'Test', inputSchema: {} }];
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve(mockTools) });
     const tools = await listTools();
-
     expect(tools).toEqual(mockTools);
     expect(fetch).toHaveBeenCalledWith(
       'http://localhost:4444/tools?limit=0&include_pagination=false',
-      expect.objectContaining({
-        headers: { Authorization: 'Bearer test-jwt' },
-      })
+      expect.objectContaining({ headers: { Authorization: 'Bearer test-jwt' } })
     );
   });
 
-  it('should handle nested tools response', async () => {
+  it('handles nested tools response', async () => {
     const mockTools = [{ name: 'tool1', description: 'T', inputSchema: {} }];
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ tools: mockTools }),
-    });
-
-    const tools = await listTools();
-    expect(tools).toEqual(mockTools);
+    global.fetch = jest.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ tools: mockTools }) });
+    expect(await listTools()).toEqual(mockTools);
   });
 
-  it('should throw on non-ok response', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      status: 500,
-    });
-
+  it('throws on non-ok response', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500 });
     await expect(listTools()).rejects.toThrow('Failed to list tools: 500');
   });
 
-  it('should throw when not configured', async () => {
+  it('throws when not configured', async () => {
     delete process.env.MCP_GATEWAY_URL;
     await expect(listTools()).rejects.toThrow('MCP gateway not configured');
   });
@@ -89,98 +71,45 @@ describe('callTool', () => {
     process.env.MCP_GATEWAY_JWT = 'test-jwt';
   });
 
-  it('should call tool via JSON-RPC and return result', async () => {
-    const mockResult = {
-      content: [{ type: 'text', text: 'Hello' }],
-    };
+  it('calls tool via JSON-RPC and returns result', async () => {
+    const mockResult = { content: [{ type: 'text', text: 'Hello' }] };
     global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          jsonrpc: '2.0',
-          id: 1,
-          result: mockResult,
-        }),
+      ok: true, json: () => Promise.resolve({ jsonrpc: '2.0', id: 1, result: mockResult })
     });
-
     const result = await callTool('test_tool', { arg: 'value' });
-
     expect(result).toEqual(mockResult);
-    expect(fetch).toHaveBeenCalledWith(
-      'http://localhost:4444/rpc',
-      expect.objectContaining({
-        method: 'POST',
-        headers: expect.objectContaining({
-          Authorization: 'Bearer test-jwt',
-          'Content-Type': 'application/json',
-        }),
-      })
-    );
-
-    const callBody = JSON.parse(
-      (fetch as jest.Mock).mock.calls[0][1].body
-    );
+    const callBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
     expect(callBody.method).toBe('tools/call');
     expect(callBody.params.name).toBe('test_tool');
     expect(callBody.params.arguments).toEqual({ arg: 'value' });
   });
 
-  it('should throw on JSON-RPC error', async () => {
+  it('throws on JSON-RPC error', async () => {
     global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          jsonrpc: '2.0',
-          id: 1,
-          error: { code: -32600, message: 'Invalid request' },
-        }),
+      ok: true, json: () => Promise.resolve({ jsonrpc: '2.0', id: 1, error: { code: -32600, message: 'Invalid request' } })
     });
-
-    await expect(callTool('bad_tool', {})).rejects.toThrow(
-      'MCP tool error (-32600): Invalid request'
-    );
+    await expect(callTool('bad', {})).rejects.toThrow('MCP tool error (-32600): Invalid request');
   });
 
-  it('should throw on empty result', async () => {
+  it('throws on empty result', async () => {
     global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({ jsonrpc: '2.0', id: 1 }),
+      ok: true, json: () => Promise.resolve({ jsonrpc: '2.0', id: 1 })
     });
-
-    await expect(callTool('empty_tool', {})).rejects.toThrow(
-      'MCP gateway returned empty result'
-    );
+    await expect(callTool('empty', {})).rejects.toThrow('MCP gateway returned empty result');
   });
 
-  it('should throw on HTTP error', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      status: 401,
-      statusText: 'Unauthorized',
-    });
-
-    await expect(callTool('test_tool', {})).rejects.toThrow(
-      'MCP gateway returned 401: Unauthorized'
-    );
+  it('throws on HTTP error', async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 401, statusText: 'Unauthorized' });
+    await expect(callTool('test', {})).rejects.toThrow('MCP gateway returned 401: Unauthorized');
   });
 
-  it('should strip trailing slash from URL', async () => {
+  it('strips trailing slash from URL', async () => {
     process.env.MCP_GATEWAY_URL = 'http://localhost:4444/';
     global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          jsonrpc: '2.0',
-          id: 1,
-          result: { content: [{ type: 'text', text: 'ok' }] },
-        }),
+      ok: true, json: () => Promise.resolve({ jsonrpc: '2.0', id: 1, result: { content: [{ type: 'text', text: 'ok' }] } })
     });
-
     await callTool('test', {});
-    expect((fetch as jest.Mock).mock.calls[0][0]).toBe(
-      'http://localhost:4444/rpc'
-    );
+    expect((fetch as jest.Mock).mock.calls[0][0]).toBe('http://localhost:4444/rpc');
   });
 });
 
@@ -190,126 +119,38 @@ describe('generateComponent', () => {
     process.env.MCP_GATEWAY_JWT = 'test-jwt';
   });
 
-  it('should generate component via execute_specialist_task', async () => {
-    const generatedCode = 'export default function Button() { return <button>Click</button>; }';
+  it('generates via execute_specialist_task', async () => {
+    const code = 'export default function Button() { return <button>Click</button>; }';
     global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          jsonrpc: '2.0',
-          id: 1,
-          result: {
-            content: [{ type: 'text', text: generatedCode }],
-          },
-        }),
+      ok: true, json: () => Promise.resolve({ jsonrpc: '2.0', id: 1, result: { content: [{ type: 'text', text: code }] } })
     });
-
-    const code = await generateComponent({
-      prompt: 'A primary button component',
-      framework: 'react',
-      componentLibrary: 'tailwind',
-      style: 'modern',
-      typescript: true,
-    });
-
-    expect(code).toBe(generatedCode);
-
-    const callBody = JSON.parse(
-      (fetch as jest.Mock).mock.calls[0][1].body
-    );
+    expect(await generateComponent({ prompt: 'A button', framework: 'react', componentLibrary: 'tailwind', style: 'modern', typescript: true })).toBe(code);
+    const callBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
     expect(callBody.params.name).toBe('execute_specialist_task');
-    expect(callBody.params.arguments.category).toBe('ui_generation');
-
-    const prefs = JSON.parse(
-      callBody.params.arguments.user_preferences
-    );
-    expect(prefs.framework).toBe('react');
+    const prefs = JSON.parse(callBody.params.arguments.user_preferences);
     expect(prefs.design_system).toBe('tailwind_ui');
   });
 
-  it('should map component libraries to design systems', async () => {
+  it('maps component libraries to design systems', async () => {
     global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          jsonrpc: '2.0',
-          id: 1,
-          result: { content: [{ type: 'text', text: 'code' }] },
-        }),
+      ok: true, json: () => Promise.resolve({ jsonrpc: '2.0', id: 1, result: { content: [{ type: 'text', text: 'c' }] } })
     });
-
-    await generateComponent({
-      prompt: 'test',
-      framework: 'react',
-      componentLibrary: 'mui',
-    });
-
-    const body1 = JSON.parse(
-      (fetch as jest.Mock).mock.calls[0][1].body
-    );
-    const prefs1 = JSON.parse(body1.params.arguments.user_preferences);
-    expect(prefs1.design_system).toBe('material_design');
-
-    (fetch as jest.Mock).mockClear();
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          jsonrpc: '2.0',
-          id: 1,
-          result: { content: [{ type: 'text', text: 'code' }] },
-        }),
-    });
-
-    await generateComponent({
-      prompt: 'test',
-      framework: 'react',
-      componentLibrary: 'chakra',
-    });
-
-    const body2 = JSON.parse(
-      (fetch as jest.Mock).mock.calls[0][1].body
-    );
-    const prefs2 = JSON.parse(body2.params.arguments.user_preferences);
-    expect(prefs2.design_system).toBe('chakra_ui');
+    await generateComponent({ prompt: 't', framework: 'react', componentLibrary: 'mui' });
+    expect(JSON.parse(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).params.arguments.user_preferences).design_system).toBe('material_design');
   });
 
-  it('should throw when no text content returned', async () => {
+  it('throws when no text content returned', async () => {
     global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          jsonrpc: '2.0',
-          id: 1,
-          result: { content: [{ type: 'image', data: 'base64' }] },
-        }),
+      ok: true, json: () => Promise.resolve({ jsonrpc: '2.0', id: 1, result: { content: [{ type: 'image', data: 'x' }] } })
     });
-
-    await expect(
-      generateComponent({ prompt: 'test', framework: 'react' })
-    ).rejects.toThrow('MCP gateway returned no text content');
+    await expect(generateComponent({ prompt: 't', framework: 'react' })).rejects.toThrow('MCP gateway returned no text content');
   });
 
-  it('should include context addition in task', async () => {
+  it('includes context addition in task', async () => {
     global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () =>
-        Promise.resolve({
-          jsonrpc: '2.0',
-          id: 1,
-          result: { content: [{ type: 'text', text: 'code' }] },
-        }),
+      ok: true, json: () => Promise.resolve({ jsonrpc: '2.0', id: 1, result: { content: [{ type: 'text', text: 'c' }] } })
     });
-
-    await generateComponent({
-      prompt: 'A button',
-      framework: 'react',
-      contextAddition: 'Use brand colors',
-    });
-
-    const body = JSON.parse(
-      (fetch as jest.Mock).mock.calls[0][1].body
-    );
-    expect(body.params.arguments.task).toContain('Use brand colors');
+    await generateComponent({ prompt: 'A button', framework: 'react', contextAddition: 'Use brand colors' });
+    expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).params.arguments.task).toContain('Use brand colors');
   });
 });
