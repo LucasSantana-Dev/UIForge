@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
 const navLinks = [
-  { href: '/landing', label: 'Home' },
+  { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/roadmap', label: 'Roadmap' },
   { href: '/docs', label: 'Docs' },
@@ -17,7 +17,7 @@ export default function MarketingNav() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
-        <Link href="/landing" className="text-lg font-bold tracking-tight">
+        <Link href="/" className="text-lg font-bold tracking-tight">
           <span className="bg-gradient-to-r from-primary to-[#6366F1] bg-clip-text text-transparent">
             Siza
           </span>

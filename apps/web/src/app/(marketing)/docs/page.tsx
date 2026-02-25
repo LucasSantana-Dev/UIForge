@@ -1,252 +1,549 @@
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+"use client";
+
+import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   BookOpen,
   Code,
   Zap,
   Shield,
   Rocket,
-  Users,
+  Terminal,
+  Monitor,
+  Cloud,
   ArrowRight,
+  Copy,
+  Check,
   Github,
-  Linkedin,
-} from 'lucide-react';
+  ExternalLink,
+} from "lucide-react";
+import { FadeIn } from "@/components/landing/FadeIn";
+
+const DOCS_BASE = "https://docs.siza.dev/docs";
+
+const categories = [
+  {
+    title: "Getting Started",
+    icon: Rocket,
+    links: [
+      {
+        label: "Quick Start",
+        href: `${DOCS_BASE}/getting-started/quick-start`,
+      },
+      {
+        label: "Configuration",
+        href: `${DOCS_BASE}/getting-started/configuration`,
+      },
+      {
+        label: "Deployment",
+        href: `${DOCS_BASE}/getting-started/deployment`,
+      },
+      {
+        label: "Self-Hosting",
+        href: `${DOCS_BASE}/getting-started/self-hosting`,
+      },
+    ],
+  },
+  {
+    title: "Guides",
+    icon: BookOpen,
+    links: [
+      {
+        label: "First Component",
+        href: `${DOCS_BASE}/guides/first-component`,
+      },
+      {
+        label: "Components",
+        href: `${DOCS_BASE}/guides/components`,
+      },
+      {
+        label: "Desktop App",
+        href: `${DOCS_BASE}/guides/desktop-app`,
+      },
+      {
+        label: "MCP Integration",
+        href: `${DOCS_BASE}/guides/mcp-integration`,
+      },
+      {
+        label: "GitHub Export",
+        href: `${DOCS_BASE}/guides/github-export`,
+      },
+      {
+        label: "Troubleshooting",
+        href: `${DOCS_BASE}/guides/troubleshooting`,
+      },
+    ],
+  },
+  {
+    title: "API Reference",
+    icon: Code,
+    links: [
+      {
+        label: "REST API",
+        href: `${DOCS_BASE}/api-reference/rest-api`,
+      },
+      {
+        label: "MCP Tools",
+        href: `${DOCS_BASE}/api-reference/mcp-tools`,
+      },
+      {
+        label: "Webhooks",
+        href: `${DOCS_BASE}/api-reference/webhooks`,
+      },
+    ],
+  },
+  {
+    title: "Ecosystem",
+    icon: Zap,
+    links: [
+      {
+        label: "Architecture",
+        href: `${DOCS_BASE}/ecosystem/architecture`,
+      },
+      {
+        label: "Contributing",
+        href: `${DOCS_BASE}/ecosystem/contributing`,
+      },
+    ],
+  },
+];
+
+const concepts = [
+  {
+    icon: Shield,
+    title: "MCP Protocol",
+    text: "Connect Siza to any IDE via the Model Context Protocol.",
+  },
+  {
+    icon: Monitor,
+    title: "Desktop + Web",
+    text: "Same generation engine, local or cloud.",
+  },
+  {
+    icon: Cloud,
+    title: "Deploy Anywhere",
+    text: "Cloudflare Workers, Vercel, or self-hosted.",
+  },
+];
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }}
+      className="text-muted-foreground hover:text-foreground transition-colors"
+      aria-label="Copy to clipboard"
+    >
+      {copied ? (
+        <Check className="w-4 h-4" />
+      ) : (
+        <Copy className="w-4 h-4" />
+      )}
+    </button>
+  );
+}
 
 export default function DocsPage() {
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-950 to-purple-950 py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center">
-            <Badge className="mb-4">Documentation</Badge>
-            <h1 className="text-5xl font-bold mb-6">Everything you need to build with Siza</h1>
-            <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Comprehensive guides, API references, and examples to help you get the most out of
-              Siza&apos;s AI-powered component generation.
+      <section className="relative py-24 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <FadeIn>
+            <Badge
+              variant="outline"
+              className="mb-8 px-4 py-1.5 text-xs font-mono
+                border-border text-muted-foreground"
+            >
+              Documentation
+            </Badge>
+          </FadeIn>
+
+          <FadeIn delay={0.1}>
+            <h1
+              className="text-4xl sm:text-5xl font-bold
+                tracking-tight mb-6"
+            >
+              <span
+                className="bg-gradient-to-r from-primary
+                  via-[#8B5CF6] to-[#6366F1] bg-clip-text
+                  text-transparent"
+              >
+                Build with Siza
+              </span>
+            </h1>
+            <p
+              className="text-lg text-muted-foreground
+                max-w-xl mx-auto mb-10"
+            >
+              Guides, API references, and examples for
+              AI-powered component generation.
             </p>
-            <div className="flex gap-4 justify-center">
-              <Button size="lg" className="gap-2">
-                <BookOpen className="w-5 h-5" />
-                Quick Start
-              </Button>
-              <Button size="lg" variant="outline" className="gap-2">
-                <Github className="w-5 h-5" />
-                View on GitHub
-              </Button>
+          </FadeIn>
+
+          <FadeIn delay={0.2}>
+            <div
+              className="rounded-xl border border-[#27272A]
+                bg-[#18181B] overflow-hidden max-w-md mx-auto"
+            >
+              <div
+                className="flex items-center justify-between
+                  px-4 py-3 border-b border-border/50"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div
+                      className="w-2.5 h-2.5 rounded-full
+                        bg-red-500/60"
+                    />
+                    <div
+                      className="w-2.5 h-2.5 rounded-full
+                        bg-yellow-500/60"
+                    />
+                    <div
+                      className="w-2.5 h-2.5 rounded-full
+                        bg-green-500/60"
+                    />
+                  </div>
+                  <span
+                    className="text-xs text-muted-foreground
+                      ml-2 font-mono"
+                  >
+                    terminal
+                  </span>
+                </div>
+                <CopyButton text="npx create-siza-app my-app" />
+              </div>
+              <div className="p-5">
+                <div className="flex items-center gap-2">
+                  <Terminal
+                    className="w-4 h-4 text-primary
+                      flex-shrink-0"
+                  />
+                  <code
+                    className="text-sm font-mono
+                      text-foreground/90"
+                  >
+                    npx create-siza-app my-app
+                  </code>
+                </div>
+              </div>
             </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      <section className="py-24 px-6 border-t border-border/50">
+        <div className="max-w-5xl mx-auto">
+          <FadeIn className="text-center mb-14">
+            <h2 className="text-3xl font-bold tracking-tight mb-3">
+              Documentation
+            </h2>
+            <p
+              className="text-muted-foreground
+                max-w-md mx-auto"
+            >
+              Everything you need, organized by topic.
+            </p>
+          </FadeIn>
+
+          <div
+            className="grid grid-cols-1 md:grid-cols-2
+              lg:grid-cols-4 gap-5"
+          >
+            {categories.map((cat, i) => (
+              <FadeIn key={cat.title} delay={i * 0.08}>
+                <Card
+                  className="p-6 h-full bg-card border-border
+                    hover:border-primary/30 transition-all
+                    duration-300 group"
+                >
+                  <cat.icon
+                    className="w-5 h-5 text-primary mb-4
+                      group-hover:text-[#8B5CF6]
+                      transition-colors"
+                  />
+                  <h3 className="font-semibold mb-3">
+                    {cat.title}
+                  </h3>
+                  <ul className="space-y-2">
+                    {cat.links.map((link) => (
+                      <li key={link.label}>
+                        <a
+                          href={link.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm
+                            text-muted-foreground
+                            hover:text-foreground
+                            transition-colors flex
+                            items-center gap-1 group/link"
+                        >
+                          {link.label}
+                          <ExternalLink
+                            className="w-3 h-3 opacity-0
+                              group-hover/link:opacity-100
+                              transition-opacity"
+                          />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              </FadeIn>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Quick Links */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Quick Links</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
-              <Rocket className="w-8 h-8 text-brand mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Getting Started</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Learn the basics and set up your first project
-              </p>
-              <Button variant="ghost" className="p-0 h-auto">
-                Get Started <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Card>
+      <section className="py-24 px-6 border-t border-border/50">
+        <div className="max-w-4xl mx-auto">
+          <FadeIn className="text-center mb-14">
+            <h2 className="text-3xl font-bold tracking-tight mb-3">
+              Quick Example
+            </h2>
+          </FadeIn>
 
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
-              <Code className="w-8 h-8 text-green-600 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">API Reference</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Complete API documentation and examples
-              </p>
-              <Button variant="ghost" className="p-0 h-auto">
-                View API <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Card>
-
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
-              <Zap className="w-8 h-8 text-yellow-600 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Templates</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Explore our library of pre-built components
-              </p>
-              <Button variant="ghost" className="p-0 h-auto">
-                Browse Templates <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Card>
-
-            <Card className="p-6 hover:shadow-lg transition-shadow cursor-pointer">
-              <Shield className="w-8 h-8 text-purple-600 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Security</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Learn about our security practices and BYOK
-              </p>
-              <Button variant="ghost" className="p-0 h-auto">
-                Security Guide <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Documentation Sections */}
-      <section className="py-16 bg-background">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Documentation</h2>
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Getting Started */}
-            <div className="space-y-6">
-              <h3 className="text-xl font-semibold">Getting Started</h3>
-              <div className="space-y-4">
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Installation</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Set up Siza in your development environment
-                  </p>
-                </Card>
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">First Project</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Create your first AI-generated component
-                  </p>
-                </Card>
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Configuration</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Configure AI providers and settings
-                  </p>
-                </Card>
-              </div>
-            </div>
-
-            {/* Core Features */}
-            <div className="space-y-6">
-              <h3 className="text-xl font-semibold">Core Features</h3>
-              <div className="space-y-4">
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Component Generation</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Generate components with natural language
-                  </p>
-                </Card>
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Template Library</h4>
-                  <p className="text-sm text-muted-foreground">Use pre-built component templates</p>
-                </Card>
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Project Management</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Organize and manage your components
-                  </p>
-                </Card>
-              </div>
-            </div>
-
-            {/* Advanced Topics */}
-            <div className="space-y-6">
-              <h3 className="text-xl font-semibold">Advanced Topics</h3>
-              <div className="space-y-4">
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Custom AI Providers</h4>
-                  <p className="text-sm text-muted-foreground">Integrate your own AI models</p>
-                </Card>
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">Deployment</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Deploy to production with Cloudflare
-                  </p>
-                </Card>
-                <Card className="p-4">
-                  <h4 className="font-medium mb-2">API Integration</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Use Siza in your existing projects
-                  </p>
-                </Card>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Code Examples */}
-      <section className="py-16">
-        <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center mb-12">Code Examples</h2>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Basic Component Generation</h3>
-              <div className="bg-secondary rounded-lg p-4 font-mono text-sm">
-                <pre>{`// Generate a button component
-const response = await fetch('/api/generate', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
+          <FadeIn delay={0.1}>
+            <div
+              className="rounded-xl border border-[#27272A]
+                bg-[#18181B] overflow-hidden"
+            >
+              <div
+                className="flex items-center justify-between
+                  px-4 py-3 border-b border-border/50"
+              >
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div
+                      className="w-2.5 h-2.5 rounded-full
+                        bg-red-500/60"
+                    />
+                    <div
+                      className="w-2.5 h-2.5 rounded-full
+                        bg-yellow-500/60"
+                    />
+                    <div
+                      className="w-2.5 h-2.5 rounded-full
+                        bg-green-500/60"
+                    />
+                  </div>
+                  <span
+                    className="text-xs text-muted-foreground
+                      ml-2 font-mono"
+                  >
+                    generate.ts
+                  </span>
+                </div>
+                <CopyButton
+                  text={`const res = await fetch("/api/generate", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({
-    description: 'Create a modern button with hover effects',
-    framework: 'react',
-    componentLibrary: 'tailwind'
-  })
-});`}</pre>
-              </div>
-            </Card>
+    description: "A pricing card with toggle",
+    framework: "react",
+    cssFramework: "tailwind",
+  }),
+});
 
-            <Card className="p-6">
-              <h3 className="text-xl font-semibold mb-4">Using Templates</h3>
-              <div className="bg-secondary rounded-lg p-4 font-mono text-sm">
-                <pre>{`// Use a pre-built template
-const template = await fetch('/api/templates/navigation-bar');
-const component = instantiateTemplate(template, {
-  brandName: 'My App',
-  items: ['Home', 'About', 'Contact']
-});`}</pre>
+const { code } = await res.json();`}
+                />
               </div>
-            </Card>
+              <div className="p-5 overflow-x-auto">
+                <pre className="text-sm font-mono leading-relaxed">
+                  <code>
+                    <span className="text-[#C586C0]">const</span>
+                    <span className="text-foreground/90">
+                      {" "}
+                      res ={" "}
+                    </span>
+                    <span className="text-[#C586C0]">await</span>
+                    <span className="text-[#DCDCAA]">
+                      {" "}
+                      fetch
+                    </span>
+                    <span className="text-[#CE9178]">
+                      (&quot;/api/generate&quot;
+                    </span>
+                    <span className="text-foreground/90">
+                      , {"{"}
+                    </span>
+                    {`
+`}
+                    <span className="text-foreground/90">
+                      {"  "}method:{" "}
+                    </span>
+                    <span className="text-[#CE9178]">
+                      &quot;POST&quot;
+                    </span>
+                    <span className="text-foreground/90">,</span>
+                    {`
+`}
+                    <span className="text-foreground/90">
+                      {"  "}headers: {"{"}{" "}
+                    </span>
+                    <span className="text-[#CE9178]">
+                      &quot;Content-Type&quot;
+                    </span>
+                    <span className="text-foreground/90">: </span>
+                    <span className="text-[#CE9178]">
+                      &quot;application/json&quot;
+                    </span>
+                    <span className="text-foreground/90">
+                      {" "}
+                      {"}"},
+                    </span>
+                    {`
+`}
+                    <span className="text-foreground/90">
+                      {"  "}body: JSON.
+                    </span>
+                    <span className="text-[#DCDCAA]">
+                      stringify
+                    </span>
+                    <span className="text-foreground/90">
+                      ({"{"})
+                    </span>
+                    {`
+`}
+                    <span className="text-foreground/90">
+                      {"    "}description:{" "}
+                    </span>
+                    <span className="text-[#CE9178]">
+                      &quot;A pricing card with toggle&quot;
+                    </span>
+                    <span className="text-foreground/90">,</span>
+                    {`
+`}
+                    <span className="text-foreground/90">
+                      {"    "}framework:{" "}
+                    </span>
+                    <span className="text-[#CE9178]">
+                      &quot;react&quot;
+                    </span>
+                    <span className="text-foreground/90">,</span>
+                    {`
+`}
+                    <span className="text-foreground/90">
+                      {"    "}cssFramework:{" "}
+                    </span>
+                    <span className="text-[#CE9178]">
+                      &quot;tailwind&quot;
+                    </span>
+                    <span className="text-foreground/90">,</span>
+                    {`
+`}
+                    <span className="text-foreground/90">
+                      {"  "}
+                      {"}"}),
+                    </span>
+                    {`
+`}
+                    <span className="text-foreground/90">
+                      {"}"});
+                    </span>
+                    {`
+
+`}
+                    <span className="text-[#C586C0]">const</span>
+                    <span className="text-foreground/90">
+                      {" "}
+                      {"{"} code {"}"} ={" "}
+                    </span>
+                    <span className="text-[#C586C0]">await</span>
+                    <span className="text-foreground/90">
+                      {" "}
+                      res.
+                    </span>
+                    <span className="text-[#DCDCAA]">json</span>
+                    <span className="text-foreground/90">
+                      ();
+                    </span>
+                  </code>
+                </pre>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
+      <section className="py-24 px-6 border-t border-border/50">
+        <div className="max-w-4xl mx-auto">
+          <FadeIn className="text-center mb-14">
+            <h2 className="text-3xl font-bold tracking-tight mb-3">
+              Key Concepts
+            </h2>
+          </FadeIn>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {concepts.map((c, i) => (
+              <FadeIn key={c.title} delay={i * 0.1}>
+                <Card
+                  className="p-6 h-full bg-card border-border
+                    hover:border-primary/30 transition-all
+                    duration-300 group"
+                >
+                  <c.icon
+                    className="w-5 h-5 text-primary mb-4
+                      group-hover:text-[#8B5CF6]
+                      transition-colors"
+                  />
+                  <h3 className="font-semibold mb-1.5">
+                    {c.title}
+                  </h3>
+                  <p
+                    className="text-sm text-muted-foreground
+                      leading-relaxed"
+                  >
+                    {c.text}
+                  </p>
+                </Card>
+              </FadeIn>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Community */}
-      <section className="py-16 bg-brand/10 bg-brand-muted">
-        <div className="max-w-6xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-4">Join the Community</h2>
-          <p className="text-xl text-muted-foreground mb-8">
-            Connect with other developers, share your creations, and get help
+      <section className="relative py-24 px-6 border-t border-border/50">
+        <FadeIn className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl font-bold tracking-tight mb-3">
+            Open source.
+            <br />
+            <span className="text-muted-foreground">
+              Community driven.
+            </span>
+          </h2>
+          <p
+            className="text-muted-foreground mb-8
+              max-w-md mx-auto"
+          >
+            Siza is free to use with generous limits. Read the
+            docs, explore the code, start building.
           </p>
-          <div className="flex gap-4 justify-center">
-            <Button size="lg" className="gap-2">
-              <Github className="w-5 h-5" />
-              GitHub Discussions
-            </Button>
-            <Button size="lg" variant="outline" className="gap-2" asChild>
+          <div className="flex justify-center gap-4">
+            <Button variant="outline" asChild>
               <a
-                href="https://www.linkedin.com/in/devlucassantana/"
+                href="https://github.com/Forge-Space/siza"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <Linkedin className="w-5 h-5" />
-                Connect on LinkedIn
+                <Github className="w-4 h-4 mr-2" />
+                View on GitHub
+              </a>
+            </Button>
+            <Button asChild>
+              <a href="/signup">
+                Start Building
+                <ArrowRight className="w-4 h-4 ml-2" />
               </a>
             </Button>
           </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to start building?</h2>
-          <p className="text-xl text-muted-foreground mb-8">
-            Join thousands of developers using Siza to build better UI components faster
-          </p>
-          <Button size="lg" className="gap-2">
-            <Users className="w-5 h-5" />
-            Get Started Now
-          </Button>
-        </div>
+        </FadeIn>
       </section>
     </div>
   );
