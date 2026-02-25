@@ -171,7 +171,7 @@ export default function GeneratorForm({
       const file = e.dataTransfer.files[0];
       if (file) processFile(file);
     },
-    [processFile]
+    [processFile, setIsDragOver]
   );
 
   const handleFileInput = useCallback(
