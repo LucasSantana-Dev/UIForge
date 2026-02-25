@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Stripe production activation**: Webhook endpoint, test-mode products (Pro $19/mo, Team $49/mo), 12 Cloudflare Workers secrets
 - **CI status badge**: README now shows CI workflow status
 - **GitHub Discussions**: Enabled on siza repository for community engagement
+- **Stripe webhook tests**: 19 tests for checkout, subscription update/delete, event deduplication, plan detection
 
 ### Changed
 
