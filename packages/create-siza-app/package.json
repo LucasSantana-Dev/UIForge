@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "lint": "eslint src --ext .ts",
+    "lint": "eslint src/",
     "type-check": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
