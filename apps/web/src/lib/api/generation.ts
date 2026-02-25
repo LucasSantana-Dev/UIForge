@@ -13,6 +13,14 @@ export interface GenerationOptions {
   model?: string;
   imageBase64?: string;
   imageMimeType?: 'image/png' | 'image/jpeg' | 'image/webp';
+  colorMode?: 'dark' | 'light' | 'both';
+  primaryColor?: string;
+  secondaryColor?: string;
+  accentColor?: string;
+  animation?: 'none' | 'subtle' | 'standard' | 'rich';
+  spacing?: 'compact' | 'default' | 'spacious';
+  borderRadius?: 'none' | 'small' | 'medium' | 'large' | 'full';
+  typography?: 'system' | 'sans' | 'serif' | 'mono';
 }
 
 export interface GenerationEvent {

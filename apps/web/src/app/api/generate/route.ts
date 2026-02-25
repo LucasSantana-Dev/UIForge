@@ -31,6 +31,23 @@ const generateSchema = z.object({
   useRag: z.boolean().optional(),
   imageBase64: z.string().max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)').optional(),
   imageMimeType: z.enum(['image/png', 'image/jpeg', 'image/webp']).optional(),
+  colorMode: z.enum(['dark', 'light', 'both']).optional(),
+  primaryColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
+  secondaryColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
+  accentColor: z
+    .string()
+    .regex(/^#[0-9A-Fa-f]{6}$/)
+    .optional(),
+  animation: z.enum(['none', 'subtle', 'standard', 'rich']).optional(),
+  spacing: z.enum(['compact', 'default', 'spacious']).optional(),
+  borderRadius: z.enum(['none', 'small', 'medium', 'large', 'full']).optional(),
+  typography: z.enum(['system', 'sans', 'serif', 'mono']).optional(),
 });
 
 function shouldUseMcpGateway(): boolean {
@@ -94,12 +111,44 @@ export async function POST(request: NextRequest) {
       useRag,
       imageBase64,
       imageMimeType,
+      colorMode,
+      primaryColor,
+      secondaryColor,
+      accentColor,
+      animation,
+      spacing,
+      borderRadius,
+      typography,
     } = parsed.data;
+
+    const BORDER_RADIUS_PX: Record<string, string> = {
+      none: '0',
+      small: '4px',
+      medium: '8px',
+      large: '12px',
+      full: '9999px',
+    };
+
+    let designContextBlock = '';
+    if (colorMode || primaryColor) {
+      const parts: string[] = [];
+      if (colorMode) parts.push(colorMode + ' mode');
+      if (primaryColor) parts.push('primary ' + primaryColor);
+      if (secondaryColor) parts.push('secondary ' + secondaryColor);
+      if (accentColor) parts.push('accent ' + accentColor);
+      if (animation) parts.push(animation + ' animations');
+      if (spacing && spacing !== 'default') parts.push(spacing + ' spacing');
+      if (borderRadius) parts.push('border-radius ' + (BORDER_RADIUS_PX[borderRadius] || '8px'));
+      if (typography && typography !== 'system') parts.push(typography + ' typography');
+      designContextBlock = '\nDesign context: ' + parts.join(', ') + '.';
+    }
+
+    const enrichedDescription = description + designContextBlock;
 
     let contextAddition = '';
     if (useRag !== false) {
       try {
-        const enrichment = await enrichPromptWithContext(description, {
+        const enrichment = await enrichPromptWithContext(enrichedDescription, {
           framework,
           apiKey: userApiKey,
         });
@@ -143,7 +192,7 @@ export async function POST(request: NextRequest) {
 
             try {
               fullCode = await generateComponent({
-                prompt: description,
+                prompt: enrichedDescription,
                 framework,
                 componentLibrary,
                 style,
@@ -162,7 +211,7 @@ export async function POST(request: NextRequest) {
 
             if (!fullCode) {
               for await (const event of generateComponentStream({
-                prompt: description,
+                prompt: enrichedDescription,
                 framework,
                 componentLibrary,
                 style,
@@ -197,7 +246,7 @@ export async function POST(request: NextRequest) {
             for await (const event of generateWithProvider({
               provider: requestedProvider as AIProvider,
               model: requestedModel || 'gemini-2.0-flash',
-              prompt: description,
+              prompt: enrichedDescription,
               framework,
               componentLibrary,
               style,

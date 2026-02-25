@@ -19,6 +19,7 @@ import { decryptApiKey, type AIProvider } from '@/lib/encryption';
 import { PROVIDER_MODELS } from '@/lib/services/generation';
 import { isFeatureEnabled } from '@/lib/features/flags';
 import GenerationProgress from './GenerationProgress';
+import { DesignContext, DESIGN_DEFAULTS, type DesignContextValues } from './DesignContext';
 import { UpgradePrompt } from '@/components/billing/UpgradePrompt';
 import { useSubscription } from '@/hooks/use-subscription';
 
@@ -108,6 +109,8 @@ export default function GeneratorForm({
     style: '',
     typescript: false,
   });
+  const designContextEnabled = isFeatureEnabled('ENABLE_DESIGN_CONTEXT');
+  const [designContext, setDesignContext] = useState<DesignContextValues>(DESIGN_DEFAULTS);
   const [image, setImage] = useState<ImageState | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [showImageUpload, setShowImageUpload] = useState(false);
@@ -168,7 +171,7 @@ export default function GeneratorForm({
       const file = e.dataTransfer.files[0];
       if (file) processFile(file);
     },
-    [processFile]
+    [processFile, setIsDragOver]
   );
 
   const handleFileInput = useCallback(
@@ -217,6 +220,16 @@ export default function GeneratorForm({
           imageMimeType: image.mimeType,
         }),
         ...(apiKey && { userApiKey: apiKey }),
+        ...(designContextEnabled && {
+          colorMode: designContext.colorMode,
+          primaryColor: designContext.primaryColor,
+          secondaryColor: designContext.secondaryColor,
+          accentColor: designContext.accentColor,
+          animation: designContext.animation,
+          spacing: designContext.spacing,
+          borderRadius: designContext.borderRadius,
+          typography: designContext.typography,
+        }),
       });
     } catch (err) {
       console.error('Generation failed:', err);
@@ -425,6 +438,14 @@ export default function GeneratorForm({
               </div>
             )}
           </div>
+
+          {designContextEnabled && (
+            <DesignContext
+              projectId={projectId}
+              values={designContext}
+              onChange={setDesignContext}
+            />
+          )}
 
           <div className="space-y-4">
             <div>
