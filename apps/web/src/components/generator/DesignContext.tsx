@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { ChevronDownIcon, PaletteIcon } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { ThemeSelector } from './ThemeSelector';
-import { useThemeStore } from '@/stores/theme-store';
 
 export type ColorMode = 'dark' | 'light' | 'both';
 export type AnimationLevel = 'none' | 'subtle' | 'standard' | 'rich';
@@ -85,15 +84,6 @@ export function DesignContext({ projectId, values, onChange }: DesignContextProp
     onChange({ ...values, ...partial });
   };
 
-  const { createTheme, setActiveTheme } = useThemeStore();
-
-  const handleSaveAsTheme = () => {
-    const name = window.prompt('Theme name:');
-    if (!name) return;
-    const id = createTheme({ name, ...values });
-    setActiveTheme(projectId, id);
-  };
-
   return (
     <div className="border border-surface-3 rounded-lg overflow-hidden">
       <button
@@ -128,12 +118,7 @@ export function DesignContext({ projectId, values, onChange }: DesignContextProp
 
       {expanded && (
         <div className="px-4 pb-4 space-y-4 border-t border-surface-3 pt-4">
-          <ThemeSelector
-            projectId={projectId}
-            currentValues={values}
-            onSelectTheme={onChange}
-            onSaveAsTheme={handleSaveAsTheme}
-          />
+          <ThemeSelector projectId={projectId} currentValues={values} onSelectTheme={onChange} />
 
           <fieldset>
             <legend className="block text-sm font-medium text-text-primary mb-2">Color Mode</legend>
