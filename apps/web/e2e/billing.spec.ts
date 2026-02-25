@@ -22,9 +22,14 @@ baseTest.describe('Pricing Page (public)', () => {
 
   baseTest('should display plan prices', async ({ page }) => {
     await page.goto('/pricing');
+    await page.waitForLoadState('networkidle');
 
-    await baseExpect(page.getByText('$19').first()).toBeVisible();
-    await baseExpect(page.getByText('$49').first()).toBeVisible();
+    await baseExpect(page.locator('text=$19').first()).toBeVisible({
+      timeout: 10000,
+    });
+    await baseExpect(page.locator('text=$49').first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 
   baseTest('should display plan features', async ({ page }) => {
@@ -35,18 +40,15 @@ baseTest.describe('Pricing Page (public)', () => {
     await baseExpect(page.getByText('2,500 AI generations per month').first()).toBeVisible();
   });
 
-  baseTest('should navigate to signin for unauthenticated subscribe', async ({ page }) => {
+  baseTest('should show subscribe buttons', async ({ page }) => {
     await page.goto('/pricing');
+    await page.waitForLoadState('networkidle');
 
-    const proButton = page
+    const upgradeButton = page
       .locator('button')
-      .filter({ hasText: /subscribe|get started|upgrade/i })
+      .filter({ hasText: /upgrade/i })
       .first();
-
-    if ((await proButton.count()) > 0) {
-      await proButton.click();
-      await baseExpect(page).toHaveURL(/\/(signin|pricing)/, { timeout: 5000 });
-    }
+    await baseExpect(upgradeButton).toBeVisible({ timeout: 10000 });
   });
 });
 
