@@ -1,4 +1,8 @@
-import React from 'react';
+/**
+ * ComponentGenerator Component Tests
+ * Tests for the main component generation interface (delegation pattern)
+ */
+
 import { render, screen } from '@testing-library/react';
 import ComponentGenerator from '@/components/generator/ComponentGenerator';
 import { useProject } from '@/hooks/use-projects';
@@ -8,118 +12,127 @@ jest.mock('@/hooks/use-projects');
 jest.mock('@/hooks/use-generation');
 
 function MockGeneratorForm(props: any) {
-  return <div data-testid="generator-form" data-pid={props.projectId} />;
+  return (
+    <div data-testid="generator-form" data-pid={props.projectId}>
+      GeneratorForm
+    </div>
+  );
 }
-function MockCodeEditor(props: any) {
-  return <div data-testid="code-editor">{props.code}</div>;
-}
-function MockLivePreview(props: any) {
-  return <div data-testid="live-preview" data-fw={props.framework} />;
-}
-function MockGenHistory() {
-  return <div data-testid="gen-history" />;
-}
-function MockSaveToProject() {
-  return <div data-testid="save-project" />;
-}
-
 jest.mock('@/components/generator/GeneratorForm', () => MockGeneratorForm);
+
+function MockCodeEditor(props: any) {
+  return <div data-testid="code-editor">{props.code || 'No code'}</div>;
+}
 jest.mock('@/components/generator/CodeEditor', () => MockCodeEditor);
+
+function MockLivePreview(props: any) {
+  return (
+    <div data-testid="live-preview" data-framework={props.framework}>
+      Preview
+    </div>
+  );
+}
 jest.mock('@/components/generator/LivePreview', () => MockLivePreview);
-jest.mock('@/components/generator/GenerationHistory', () => MockGenHistory);
+
+function MockGenerationHistory(props: any) {
+  return <div data-testid="generation-history">History</div>;
+}
+jest.mock('@/components/generator/GenerationHistory', () => MockGenerationHistory);
+
+function MockSaveToProject(props: any) {
+  return <div data-testid="save-to-project">Save</div>;
+}
 jest.mock('@/components/generator/SaveToProject', () => MockSaveToProject);
-jest.mock('lucide-react', () => ({
-  SparklesIcon: function SparklesIcon() {
-    return <span />;
-  },
-}));
 
-const mockProject = useProject as jest.MockedFunction<typeof useProject>;
-const mockGen = useGeneration as jest.MockedFunction<typeof useGeneration>;
-const genDefault = {
-  isGenerating: false,
-  progress: 0,
-  code: '',
-  error: null,
-  events: [],
-  startGeneration: jest.fn(),
-  stopGeneration: jest.fn(),
-  reset: jest.fn(),
-};
+const mockUseProject = useProject as jest.MockedFunction<typeof useProject>;
+const mockUseGeneration = useGeneration as jest.MockedFunction<typeof useGeneration>;
 
-describe('ComponentGenerator', () => {
+describe('ComponentGenerator Component', () => {
+  const mockProject = {
+    id: 'test-project',
+    name: 'Test Project',
+    framework: 'react',
+    component_library: 'shadcn',
+    created_at: '2026-02-17T00:00:00.000Z',
+    updated_at: '2026-02-17T00:00:00.000Z',
+    user_id: 'user-123',
+  };
+
+  const mockGeneration = {
+    isGenerating: false,
+    progress: 0,
+    code: '',
+    error: null,
+    events: [],
+    startGeneration: jest.fn(),
+    stopGeneration: jest.fn(),
+    reset: jest.fn(),
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGen.mockReturnValue(genDefault);
+    mockUseProject.mockReturnValue({
+      data: mockProject,
+      isLoading: false,
+    } as any);
+    mockUseGeneration.mockReturnValue(mockGeneration);
   });
 
-  it('should show loading', () => {
-    mockProject.mockReturnValue({ data: undefined, isLoading: true } as any);
-    render(<ComponentGenerator projectId="p1" />);
+  it('should render loading state', () => {
+    mockUseProject.mockReturnValue({
+      data: undefined,
+      isLoading: true,
+    } as any);
+
+    render(<ComponentGenerator projectId="test-project" />);
     expect(screen.getByText('Loading project...')).toBeInTheDocument();
   });
 
-  it('should show not found', () => {
-    mockProject.mockReturnValue({ data: null, isLoading: false } as any);
-    render(<ComponentGenerator projectId="p1" />);
+  it('should render project not found', () => {
+    mockUseProject.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+    } as any);
+
+    render(<ComponentGenerator projectId="test-project" />);
     expect(screen.getByText('Project not found')).toBeInTheDocument();
   });
 
-  it('should render sub-components', () => {
-    mockProject.mockReturnValue({
-      data: { id: 'p1', framework: 'react', name: 'T' },
-      isLoading: false,
-    } as any);
-    render(<ComponentGenerator projectId="p1" />);
-    expect(screen.getByTestId('generator-form')).toBeInTheDocument();
-    expect(screen.getByTestId('code-editor')).toBeInTheDocument();
-    expect(screen.getByTestId('live-preview')).toBeInTheDocument();
-    expect(screen.getByTestId('gen-history')).toBeInTheDocument();
-  });
-
-  it('should show header', () => {
-    mockProject.mockReturnValue({
-      data: { id: 'p1', framework: 'react', name: 'T' },
-      isLoading: false,
-    } as any);
-    render(<ComponentGenerator projectId="p1" />);
+  it('should render Component Generator heading', () => {
+    render(<ComponentGenerator projectId="test-project" />);
     expect(screen.getByText('Component Generator')).toBeInTheDocument();
   });
 
-  it('should pass projectId to form', () => {
-    mockProject.mockReturnValue({
-      data: { id: 'p1', framework: 'react', name: 'T' },
-      isLoading: false,
-    } as any);
-    render(<ComponentGenerator projectId="p1" />);
-    expect(screen.getByTestId('generator-form')).toHaveAttribute('data-pid', 'p1');
+  it('should render sub-components', () => {
+    render(<ComponentGenerator projectId="test-project" />);
+    expect(screen.getByTestId('generator-form')).toBeInTheDocument();
+    expect(screen.getByTestId('code-editor')).toBeInTheDocument();
+    expect(screen.getByTestId('live-preview')).toBeInTheDocument();
+    expect(screen.getByTestId('generation-history')).toBeInTheDocument();
   });
 
-  it('should pass framework to preview', () => {
-    mockProject.mockReturnValue({
-      data: { id: 'p1', framework: 'vue', name: 'T' },
-      isLoading: false,
-    } as any);
-    render(<ComponentGenerator projectId="p1" />);
-    expect(screen.getByTestId('live-preview')).toHaveAttribute('data-fw', 'vue');
+  it('should pass projectId to GeneratorForm', () => {
+    render(<ComponentGenerator projectId="test-project" />);
+    expect(screen.getByTestId('generator-form')).toHaveAttribute('data-pid', 'test-project');
   });
 
-  it('should show save when code exists', () => {
-    mockGen.mockReturnValue({ ...genDefault, code: 'function X(){}' });
-    mockProject.mockReturnValue({
-      data: { id: 'p1', framework: 'react', name: 'T' },
-      isLoading: false,
-    } as any);
-    render(<ComponentGenerator projectId="p1" />);
-    expect(screen.getByTestId('save-project')).toBeInTheDocument();
+  it('should pass framework to LivePreview', () => {
+    render(<ComponentGenerator projectId="test-project" />);
+    expect(screen.getByTestId('live-preview')).toHaveAttribute('data-framework', 'react');
   });
 
-  it('should hide save when no code', () => {
-    mockProject.mockReturnValue({
-      data: { id: 'p1', framework: 'react', name: 'T' },
-      isLoading: false,
-    } as any);
-    render(<ComponentGenerator projectId="p1" />);
-    expect(screen.queryByTestId('save-project')).not.toBeInTheDocument();
+  it('should show SaveToProject when code is generated', () => {
+    mockUseGeneration.mockReturnValue({
+      ...mockGeneration,
+      code: 'export default function Button() { return <button>Click</button>; }',
+    });
+
+    render(<ComponentGenerator projectId="test-project" />);
+    expect(screen.getByTestId('save-to-project')).toBeInTheDocument();
+  });
+
+  it('should not show SaveToProject when no code', () => {
+    render(<ComponentGenerator projectId="test-project" />);
+    expect(screen.queryByTestId('save-to-project')).not.toBeInTheDocument();
   });
 });

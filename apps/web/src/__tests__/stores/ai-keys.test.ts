@@ -1,26 +1,34 @@
+/**
+ * AI Keys Store Tests
+ * Tests for BYOK system Zustand state management
+ */
+
 import { act, renderHook } from '@testing-library/react';
 import { useAIKeyStore } from '@/stores/ai-keys';
 import { aiKeyManager } from '@/lib/ai-keys';
 import { AIProvider } from '@/lib/encryption';
-import { TEST_CONFIG } from '../../../test-config';
 
 jest.mock('@/lib/ai-keys');
-const mockManager = aiKeyManager as jest.Mocked<typeof aiKeyManager>;
+const mockAIKeyManager = aiKeyManager as jest.Mocked<typeof aiKeyManager>;
 
 describe('AI Keys Store', () => {
-  const key = TEST_CONFIG.API_KEYS.OPENAI;
-  const provider: AIProvider = 'openai';
-  const encKey = TEST_CONFIG.ENCRYPTION.TEST_KEY;
+  const testProvider: AIProvider = 'openai';
+  const testEncryptionKey = 'test-encryption-key-256bit';
+  const testApiKey = 'sk-test-key-1234567890';
+  const testKeyId = 'key_test_123';
 
   beforeEach(() => {
     useAIKeyStore.getState().reset();
     jest.clearAllMocks();
-    mockManager.initialize.mockResolvedValue(undefined);
-    mockManager.addApiKey.mockResolvedValue(undefined);
-    mockManager.getApiKeys.mockResolvedValue([]);
-    mockManager.deleteApiKey.mockResolvedValue(undefined);
-    mockManager.setDefaultApiKey.mockResolvedValue(undefined);
-    mockManager.getUsageStats.mockResolvedValue({
+
+    mockAIKeyManager.initialize.mockResolvedValue(undefined);
+    mockAIKeyManager.addApiKey.mockResolvedValue(undefined);
+    mockAIKeyManager.getApiKeys.mockResolvedValue([]);
+    mockAIKeyManager.getDefaultApiKey.mockResolvedValue(null);
+    mockAIKeyManager.updateApiKey.mockResolvedValue(undefined);
+    mockAIKeyManager.deleteApiKey.mockResolvedValue(undefined);
+    mockAIKeyManager.setDefaultApiKey.mockResolvedValue(undefined);
+    mockAIKeyManager.getUsageStats.mockResolvedValue({
       totalKeys: 0,
       keysByProvider: { openai: 0, anthropic: 0, google: 0 },
       lastUsedTimes: {},
@@ -28,139 +36,376 @@ describe('AI Keys Store', () => {
     });
   });
 
-  it('should have default state', () => {
-    const { result } = renderHook(() => useAIKeyStore());
-    expect(result.current.apiKeys).toEqual([]);
-    expect(result.current.loading).toBe(false);
-    expect(result.current.error).toBeUndefined();
+  describe('initialization', () => {
+    it('should initialize with default state', () => {
+      const { result } = renderHook(() => useAIKeyStore());
+
+      expect(result.current.apiKeys).toEqual([]);
+      expect(result.current.loading).toBe(false);
+      expect(result.current.error).toBeUndefined();
+      expect(result.current.encryptionKey).toBeUndefined();
+    });
+
+    it('should initialize with encryption key', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+
+      expect(mockAIKeyManager.initialize).toHaveBeenCalledWith(testEncryptionKey);
+      expect(result.current.encryptionKey).toBe(testEncryptionKey);
+    });
+
+    it('should handle initialization errors', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+      mockAIKeyManager.initialize.mockRejectedValue(new Error('Init failed'));
+
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+
+      expect(result.current.error).toBe('Init failed');
+    });
   });
 
-  it('should initialize with encryption key', async () => {
-    const { result } = renderHook(() => useAIKeyStore());
-    await act(async () => {
-      await result.current.initialize(encKey);
+  describe('addApiKey', () => {
+    it('should add a new API key', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+
+      await act(async () => {
+        await result.current.addApiKey(testProvider, testApiKey);
+      });
+
+      expect(mockAIKeyManager.addApiKey).toHaveBeenCalledWith(
+        testProvider,
+        testApiKey,
+        testEncryptionKey
+      );
+      expect(result.current.loading).toBe(false);
     });
-    expect(mockManager.initialize).toHaveBeenCalledWith(encKey);
-    expect(result.current.encryptionKey).toBe(encKey);
+
+    it('should handle add errors', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+      mockAIKeyManager.addApiKey.mockRejectedValue(new Error('Add failed'));
+
+      await act(async () => {
+        await result.current.addApiKey(testProvider, testApiKey);
+      });
+
+      expect(result.current.error).toBe('Add failed');
+      expect(result.current.loading).toBe(false);
+    });
+
+    it('should set error if not initialized', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+
+      await act(async () => {
+        await result.current.addApiKey(testProvider, testApiKey);
+      });
+
+      expect(result.current.error).toBe('Encryption key not set');
+    });
   });
 
-  it('should handle init error', async () => {
-    mockManager.initialize.mockRejectedValue(new Error('Init failed'));
-    const { result } = renderHook(() => useAIKeyStore());
-    await act(async () => {
-      await result.current.initialize(encKey);
+  describe('loadApiKeys', () => {
+    it('should load API keys', async () => {
+      const mockKeys = [
+        {
+          provider: testProvider as AIProvider,
+          keyId: testKeyId,
+          encryptedKey: 'encrypted_key',
+          createdAt: '2026-02-17T12:00:00.000Z',
+          lastUsed: '2026-02-17T12:00:00.000Z',
+          isDefault: false,
+        },
+      ];
+      mockAIKeyManager.getApiKeys.mockResolvedValue(mockKeys);
+
+      const { result } = renderHook(() => useAIKeyStore());
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+
+      expect(result.current.apiKeys).toEqual(mockKeys);
+      expect(result.current.loading).toBe(false);
     });
-    expect(result.current.error).toBe('Init failed');
+
+    it('should handle load errors', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+      mockAIKeyManager.getApiKeys.mockRejectedValue(new Error('Load failed'));
+
+      await act(async () => {
+        await result.current.loadApiKeys();
+      });
+
+      expect(result.current.error).toBe('Load failed');
+    });
   });
 
-  it('should add API key', async () => {
-    const { result } = renderHook(() => useAIKeyStore());
-    await act(async () => {
-      await result.current.initialize(encKey);
+  describe('updateApiKey', () => {
+    it('should update an API key', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+
+      await act(async () => {
+        await result.current.updateApiKey(testKeyId, 'new-api-key');
+      });
+
+      expect(mockAIKeyManager.updateApiKey).toHaveBeenCalledWith(
+        testKeyId,
+        'new-api-key',
+        testEncryptionKey
+      );
     });
-    await act(async () => {
-      await result.current.addApiKey(provider, key);
+
+    it('should handle update errors', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+      mockAIKeyManager.updateApiKey.mockRejectedValue(new Error('Update failed'));
+
+      await act(async () => {
+        await result.current.updateApiKey(testKeyId, 'new-api-key');
+      });
+
+      expect(result.current.error).toBe('Update failed');
     });
-    expect(mockManager.addApiKey).toHaveBeenCalledWith(provider, key, encKey);
   });
 
-  it('should set error when adding without init', async () => {
-    const { result } = renderHook(() => useAIKeyStore());
-    await act(async () => {
-      await result.current.addApiKey(provider, key);
+  describe('deleteApiKey', () => {
+    it('should delete an API key', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+
+      await act(async () => {
+        await result.current.deleteApiKey(testKeyId);
+      });
+
+      expect(mockAIKeyManager.deleteApiKey).toHaveBeenCalledWith(testKeyId);
     });
-    expect(result.current.error).toBe('Encryption key not set');
+
+    it('should handle delete errors', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+      mockAIKeyManager.deleteApiKey.mockRejectedValue(new Error('Delete failed'));
+
+      await act(async () => {
+        await result.current.deleteApiKey(testKeyId);
+      });
+
+      expect(result.current.error).toBe('Delete failed');
+    });
   });
 
-  it('should load API keys on init', async () => {
-    const mockKeys = [
-      { provider, keyId: 'k1', encryptedKey: 'e', createdAt: '2026-01-01', isDefault: false },
-    ];
-    mockManager.getApiKeys.mockResolvedValue(mockKeys);
-    const { result } = renderHook(() => useAIKeyStore());
-    await act(async () => {
-      await result.current.initialize(encKey);
+  describe('setDefaultApiKey', () => {
+    it('should set default API key', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+
+      await act(async () => {
+        await result.current.setDefaultApiKey(testKeyId);
+      });
+
+      expect(mockAIKeyManager.setDefaultApiKey).toHaveBeenCalledWith(testKeyId);
     });
-    expect(result.current.apiKeys).toEqual(mockKeys);
+
+    it('should handle set default errors', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+      mockAIKeyManager.setDefaultApiKey.mockRejectedValue(new Error('Set default failed'));
+
+      await act(async () => {
+        await result.current.setDefaultApiKey(testKeyId);
+      });
+
+      expect(result.current.error).toBe('Set default failed');
+    });
   });
 
-  it('should delete API key', async () => {
-    const { result } = renderHook(() => useAIKeyStore());
-    await act(async () => {
-      await result.current.initialize(encKey);
+  describe('UI state management', () => {
+    it('should show/hide add key dialog', () => {
+      const { result } = renderHook(() => useAIKeyStore());
+
+      expect(result.current.showAddKeyDialog).toBe(false);
+
+      act(() => {
+        result.current.setShowAddKeyDialog(true);
+      });
+
+      expect(result.current.showAddKeyDialog).toBe(true);
+
+      act(() => {
+        result.current.setShowAddKeyDialog(false);
+      });
+
+      expect(result.current.showAddKeyDialog).toBe(false);
     });
-    await act(async () => {
-      await result.current.deleteApiKey('k1');
+
+    it('should set selected provider', () => {
+      const { result } = renderHook(() => useAIKeyStore());
+
+      act(() => {
+        result.current.setSelectedProvider('anthropic');
+      });
+
+      expect(result.current.selectedProvider).toBe('anthropic');
     });
-    expect(mockManager.deleteApiKey).toHaveBeenCalledWith('k1');
+
+    it('should set editing key ID', () => {
+      const { result } = renderHook(() => useAIKeyStore());
+
+      act(() => {
+        result.current.setEditingKeyId('test-key-id');
+      });
+
+      expect(result.current.editingKeyId).toBe('test-key-id');
+
+      act(() => {
+        result.current.setEditingKeyId(undefined);
+      });
+
+      expect(result.current.editingKeyId).toBeUndefined();
+    });
   });
 
-  it('should set default API key', async () => {
-    const { result } = renderHook(() => useAIKeyStore());
-    await act(async () => {
-      await result.current.initialize(encKey);
+  describe('preferences', () => {
+    it('should set default provider', () => {
+      const { result } = renderHook(() => useAIKeyStore());
+
+      act(() => {
+        result.current.setDefaultProvider('anthropic');
+      });
+
+      expect(result.current.defaultProvider).toBe('anthropic');
     });
-    await act(async () => {
-      await result.current.setDefaultApiKey('k1');
+
+    it('should toggle Gemini fallback', () => {
+      const { result } = renderHook(() => useAIKeyStore());
+
+      expect(result.current.geminiFallbackEnabled).toBe(true);
+
+      act(() => {
+        result.current.setGeminiFallbackEnabled(false);
+      });
+
+      expect(result.current.geminiFallbackEnabled).toBe(false);
     });
-    expect(mockManager.setDefaultApiKey).toHaveBeenCalledWith('k1');
+
+    it('should toggle usage tracking', () => {
+      const { result } = renderHook(() => useAIKeyStore());
+
+      expect(result.current.usageTrackingEnabled).toBe(true);
+
+      act(() => {
+        result.current.setUsageTrackingEnabled(false);
+      });
+
+      expect(result.current.usageTrackingEnabled).toBe(false);
+    });
   });
 
-  it('should manage dialog state', () => {
-    const { result } = renderHook(() => useAIKeyStore());
-    expect(result.current.showAddKeyDialog).toBe(false);
-    act(() => {
-      result.current.setShowAddKeyDialog(true);
+  describe('computed properties', () => {
+    it('should reflect api keys after load', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+
+      expect(result.current.apiKeys.length).toBe(0);
+
+      mockAIKeyManager.getApiKeys.mockResolvedValue([
+        {
+          provider: testProvider as AIProvider,
+          keyId: testKeyId,
+          encryptedKey: 'encrypted_key',
+          createdAt: '2026-02-17T00:00:00.000Z',
+          isDefault: false,
+        },
+      ]);
+
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+
+      expect(result.current.apiKeys.length).toBe(1);
     });
-    expect(result.current.showAddKeyDialog).toBe(true);
   });
 
-  it('should set provider and editing key', () => {
-    const { result } = renderHook(() => useAIKeyStore());
-    act(() => {
-      result.current.setSelectedProvider('anthropic');
+  describe('error handling', () => {
+    it('should clear errors', () => {
+      const { result } = renderHook(() => useAIKeyStore());
+
+      act(() => {
+        result.current.setError('test error');
+      });
+
+      expect(result.current.error).toBe('test error');
+
+      act(() => {
+        result.current.clearError();
+      });
+
+      expect(result.current.error).toBeUndefined();
     });
-    expect(result.current.selectedProvider).toBe('anthropic');
-    act(() => {
-      result.current.setEditingKeyId('k1');
+
+    it('should recover from errors on next operation', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+
+      mockAIKeyManager.addApiKey.mockRejectedValueOnce(new Error('First error'));
+      await act(async () => {
+        await result.current.addApiKey(testProvider, testApiKey);
+      });
+      expect(result.current.error).toBe('First error');
+
+      mockAIKeyManager.addApiKey.mockResolvedValueOnce(undefined);
+      await act(async () => {
+        await result.current.addApiKey(testProvider, testApiKey);
+      });
+      expect(result.current.error).toBeUndefined();
     });
-    expect(result.current.editingKeyId).toBe('k1');
   });
 
-  it('should manage preferences', () => {
-    const { result } = renderHook(() => useAIKeyStore());
-    act(() => {
-      result.current.setDefaultProvider('anthropic');
-    });
-    expect(result.current.defaultProvider).toBe('anthropic');
-    expect(result.current.geminiFallbackEnabled).toBe(true);
-    act(() => {
-      result.current.setGeminiFallbackEnabled(false);
-    });
-    expect(result.current.geminiFallbackEnabled).toBe(false);
-  });
+  describe('reset', () => {
+    it('should reset store to initial state', async () => {
+      const { result } = renderHook(() => useAIKeyStore());
 
-  it('should clear error', () => {
-    const { result } = renderHook(() => useAIKeyStore());
-    act(() => {
-      result.current.setError('err');
-    });
-    expect(result.current.error).toBe('err');
-    act(() => {
-      result.current.clearError();
-    });
-    expect(result.current.error).toBeUndefined();
-  });
+      await act(async () => {
+        await result.current.initialize(testEncryptionKey);
+      });
+      act(() => {
+        result.current.setShowAddKeyDialog(true);
+        result.current.setSelectedProvider('anthropic');
+      });
 
-  it('should reset state', async () => {
-    const { result } = renderHook(() => useAIKeyStore());
-    await act(async () => {
-      await result.current.initialize(encKey);
+      act(() => {
+        result.current.reset();
+      });
+
+      expect(result.current.encryptionKey).toBeUndefined();
+      expect(result.current.apiKeys).toEqual([]);
+      expect(result.current.showAddKeyDialog).toBe(false);
+      expect(result.current.selectedProvider).toBeUndefined();
     });
-    act(() => {
-      result.current.reset();
-    });
-    expect(result.current.encryptionKey).toBeUndefined();
-    expect(result.current.apiKeys).toEqual([]);
   });
 });
