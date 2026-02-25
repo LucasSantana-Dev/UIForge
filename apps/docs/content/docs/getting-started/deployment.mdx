@@ -1,0 +1,125 @@
+---
+title: Deployment
+description: Deploy Siza to production with Cloudflare Workers
+---
+
+Siza deploys to [Cloudflare Workers](https://workers.cloudflare.com) using [OpenNext](https://opennext.js.org/cloudflare), which compiles Next.js to the Workers runtime.
+
+## Prerequisites
+
+- [Cloudflare account](https://dash.cloudflare.com/sign-up) (free tier works)
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/install-and-update/)
+- Supabase project with migrations applied
+- API keys for your AI provider (Gemini, Anthropic, or OpenAI)
+
+## Quick Deploy
+
+```bash
+cd apps/web
+npx opennextjs-cloudflare build
+npx wrangler deploy
+```
+
+The `wrangler.jsonc` is pre-configured with the worker name and compatibility settings.
+
+## Bundle Size
+
+Cloudflare Workers free tier has a **3 MiB gzipped limit**. The current Siza bundle is ~2,882 KiB — close to the limit.
+
+To stay under the limit:
+
+- The `@vercel/og` WASM module (~1.4 MiB) is stubbed at deploy time
+- Don't add `export const runtime = 'edge'` to API routes — OpenNext handles this
+- Monitor bundle size after adding dependencies
+
+The deploy script at `apps/web/scripts/deploy.sh` handles WASM stubbing and `_redirects` cleanup automatically.
+
+## Environment Variables
+
+Set secrets via Wrangler:
+
+```bash
+npx wrangler secret put NEXT_PUBLIC_SUPABASE_URL
+npx wrangler secret put NEXT_PUBLIC_SUPABASE_ANON_KEY
+npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+npx wrangler secret put GEMINI_API_KEY
+```
+
+### Required secrets
+
+| Secret                         | Purpose              |
+| ------------------------------ | -------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`     | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`| Supabase anon key    |
+| `SUPABASE_SERVICE_ROLE_KEY`    | Supabase admin ops   |
+| `GEMINI_API_KEY`               | Default AI provider  |
+| `NEXT_PUBLIC_BASE_URL`         | Production URL       |
+
+### Optional secrets
+
+| Secret                 | Feature              |
+| ---------------------- | -------------------- |
+| `STRIPE_SECRET_KEY`    | Billing              |
+| `STRIPE_WEBHOOK_SECRET`| Stripe webhooks      |
+| `RESEND_API_KEY`       | Transactional emails |
+| `GITHUB_APP_ID`        | GitHub integration   |
+
+## CI/CD Pipeline
+
+GitHub Actions handles automated deployments:
+
+| Workflow           | Trigger                     | Target                                       |
+| ------------------ | --------------------------- | -------------------------------------------- |
+| `deploy-web.yml`   | Push to `main`              | Production (`siza-web.uiforge.workers.dev`)  |
+| `deploy-docs.yml`  | Push to `main` (docs)       | Docs site                                    |
+| `ci.yml`           | All PRs                     | Lint, type-check, build, test, security      |
+
+### Dev environment
+
+Push to the `dev` branch to deploy to the dev worker:
+
+```bash
+git push origin dev
+# Deploys to siza-web-dev.uiforge.workers.dev via --env dev
+```
+
+## Workers Runtime Constraints
+
+Cloudflare Workers is not Node.js. Key differences:
+
+| Feature          | Status                                    |
+| ---------------- | ----------------------------------------- |
+| `setInterval`    | Not available — use bounded lazy cleanup  |
+| `fs` module      | Not available — use Workers KV or R2      |
+| WASM modules     | Must be under size limit                  |
+| `process.env`    | Use `env` parameter from handler          |
+| Long-running     | 30s CPU (free), 15min (paid)              |
+
+## Monitoring
+
+- **Cloudflare Dashboard** — request analytics, error rates, CPU time
+- **Supabase Dashboard** — database queries, auth events, storage usage
+- **GitHub Actions** — CI/CD pipeline status and logs
+
+## Rollback
+
+To roll back to a previous deployment:
+
+```bash
+npx wrangler rollback
+```
+
+Or redeploy a specific commit:
+
+```bash
+git checkout <commit-hash>
+cd apps/web
+npx opennextjs-cloudflare build
+npx wrangler deploy
+```
+
+## Next steps
+
+- [Self-Hosting](/docs/getting-started/self-hosting) — run locally with your own keys
+- [Configuration](/docs/getting-started/configuration) — all environment variables
+- [Architecture](/docs/ecosystem/architecture) — how the 6 repos connect
