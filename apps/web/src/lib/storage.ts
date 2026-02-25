@@ -127,7 +127,7 @@ class IndexedDBStorage {
     return new Promise((resolve, reject) => {
       const transaction = this.db!.transaction([USER_STORE_NAME], 'readwrite');
       const store = transaction.objectStore(USER_STORE_NAME);
-      const request = store.put(preferences, 'user_prefs');
+      const request = store.put({ ...preferences, id: 'user_prefs' });
       request.onsuccess = () => resolve();
       request.onerror = () => reject(new Error('Failed to store user preferences'));
     });
@@ -140,9 +140,11 @@ class IndexedDBStorage {
       const store = transaction.objectStore(USER_STORE_NAME);
       const request = store.get('user_prefs');
       request.onsuccess = () => {
-        const record = request.result as UserPreferences | undefined;
-        if (record) {
-          resolve(record);
+        const raw = request.result as (UserPreferences & { id?: string }) | undefined;
+        if (raw) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { id, ...record } = raw;
+          resolve(record as UserPreferences);
         } else {
           resolve({
             encryptionKey: '',

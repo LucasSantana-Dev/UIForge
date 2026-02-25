@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 import { createClient } from '@/lib/supabase/server';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { HeroSection } from '@/components/landing/HeroSection';

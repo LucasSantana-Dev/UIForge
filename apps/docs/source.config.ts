@@ -4,4 +4,13 @@ export const docs = defineDocs({
   dir: 'content/docs',
 });
 
-export default defineConfig();
+export default defineConfig({
+  mdxOptions: {
+    rehypeCodeOptions: {
+      themes: {
+        light: 'rose-pine-moon',
+        dark: 'rose-pine-moon',
+      },
+    },
+  },
+});

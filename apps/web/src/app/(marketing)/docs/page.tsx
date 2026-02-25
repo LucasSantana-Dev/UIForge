@@ -12,7 +12,7 @@ import {
   Users,
   ArrowRight,
   Github,
-  Twitter,
+  Linkedin,
 } from 'lucide-react';
 
 export default function DocsPage() {
@@ -223,10 +223,16 @@ const component = instantiateTemplate(template, {
               <Github className="w-5 h-5" />
               GitHub Discussions
             </Button>
-            <Button size="lg" variant="outline" className="gap-2">
-              <Twitter className="w-5 h-5" />
-              Follow on Twitter
-            </Button>
+            <a
+              href="https://www.linkedin.com/in/devlucassantana/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button size="lg" variant="outline" className="gap-2">
+                <Linkedin className="w-5 h-5" />
+                Connect on LinkedIn
+              </Button>
+            </a>
           </div>
         </div>
       </section>
