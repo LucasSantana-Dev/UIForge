@@ -45,7 +45,13 @@ export async function* streamGeneration(
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error?.message || 'Generation failed');
+    const message =
+      typeof errorData.error === 'string'
+        ? errorData.error
+        : errorData.error?.message || 'Generation failed';
+    const err = new Error(message);
+    if (errorData.quota) (err as any).quota = errorData.quota;
+    throw err;
   }
 
   if (!response.body) {
