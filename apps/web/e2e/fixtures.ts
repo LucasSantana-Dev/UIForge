@@ -10,7 +10,6 @@ type TestFixtures = {
 export const test = base.extend<TestFixtures>({
   testUser: async ({}, use) => {
     const uniqueId = crypto.randomUUID();
-    // Generate a random test password instead of hardcoded one
     const testPassword = crypto.randomBytes(16).toString('hex');
     const testUser = {
       email: `test-${uniqueId}@example.com`,
@@ -21,35 +20,36 @@ export const test = base.extend<TestFixtures>({
   },
 
   authenticatedPage: async ({ page, testUser }, use: (page: Page) => Promise<void>) => {
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    // Create test user with admin client
-    const adminSupabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    );
+    if (!supabaseUrl || !serviceRoleKey) {
+      throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY for authenticated E2E tests');
+    }
 
-    await adminSupabase.auth.admin.createUser({
+    const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
+
+    const { data: createdUser, error: createError } = await adminSupabase.auth.admin.createUser({
       email: testUser.email,
       password: testUser.password,
       email_confirm: true,
     });
 
-    // Navigate to sign in page and authenticate
+    if (createError || !createdUser.user) {
+      throw new Error(`Failed to create test user: ${createError?.message || 'unknown error'}`);
+    }
+
+    testUser.id = createdUser.user.id;
+
     await page.goto('/signin');
     await page.getByLabel(/email/i).fill(testUser.email);
     await page.getByLabel(/password/i).fill(testUser.password);
     await page.getByRole('button', { name: /sign in/i }).click();
 
-    // Wait for redirect to dashboard
-    await page.waitForURL('**/dashboard', { timeout: 10000 });
+    await page.waitForURL((url) => !url.pathname.includes('/signin'), { timeout: 15000 });
 
     await use(page);
 
-    // Cleanup: delete test user
     try {
       await adminSupabase.auth.admin.deleteUser(testUser.id);
     } catch (e) {

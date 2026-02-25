@@ -22,6 +22,7 @@ test.describe('Landing Page', () => {
   test('should render stats bar with counters', async ({ page }) => {
     await expect(page.getByText(/ai providers/i).first()).toBeVisible();
     await expect(page.getByText(/ui components/i).first()).toBeVisible();
+    await expect(page.getByText(/core repositories/i).first()).toBeVisible();
   });
 
   test('should render capabilities section', async ({ page }) => {
