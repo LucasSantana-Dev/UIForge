@@ -9,6 +9,8 @@ import { useGeneration } from '@/hooks/use-generation';
 import { useApiKeyForProvider, useHasApiKey, useAIKeyStore } from '@/stores/ai-keys';
 import { decryptApiKey } from '@/lib/encryption';
 import GenerationProgress from './GenerationProgress';
+import { UpgradePrompt } from '@/components/billing/UpgradePrompt';
+import { useSubscription } from '@/hooks/use-subscription';
 
 const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const;
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
@@ -63,6 +65,12 @@ export default function GeneratorForm({
   const googleKey = useApiKeyForProvider('google');
   const hasGoogleKey = useHasApiKey('google');
   const encryptionKey = useAIKeyStore((s) => s.encryptionKey);
+  const { usage } = useSubscription();
+  const isQuotaExceeded =
+    usage != null &&
+    usage.generations_limit !== -1 &&
+    usage.generations_count >= usage.generations_limit;
+
   const [currentSettings, setCurrentSettings] = useState({
     componentName: '',
     componentLibrary: '',
@@ -196,11 +204,17 @@ export default function GeneratorForm({
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {generation.error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
-              {generation.error}
-            </div>
-          )}
+          {generation.error &&
+            (generation.error.toLowerCase().includes('quota') ||
+            generation.error.toLowerCase().includes('limit reached') ? (
+              <UpgradePrompt resource="Generation" />
+            ) : (
+              <div className="rounded-md border border-red-800 bg-red-900/20 px-4 py-3 text-sm text-red-400">
+                {generation.error}
+              </div>
+            ))}
+
+          {isQuotaExceeded && !generation.error && <UpgradePrompt resource="Generation" />}
 
           <div className="flex items-center gap-2 text-xs px-3 py-2 rounded-md border">
             <KeyIcon className="h-3.5 w-3.5" />
@@ -215,6 +229,18 @@ export default function GeneratorForm({
               </span>
             )}
           </div>
+
+          {usage && usage.generations_limit !== -1 && (
+            <div className="flex items-center justify-between text-xs px-3 py-2 rounded-md border border-surface-3">
+              <span className="text-text-secondary">
+                {usage.generations_count} / {usage.generations_limit} generations this month
+              </span>
+              {usage.generations_count >= usage.generations_limit * 0.8 &&
+                usage.generations_count < usage.generations_limit && (
+                  <span className="text-yellow-400 font-medium">Nearing limit</span>
+                )}
+            </div>
+          )}
 
           <div>
             <label
@@ -366,7 +392,7 @@ export default function GeneratorForm({
 
           <button
             type="submit"
-            disabled={generation.isGenerating}
+            disabled={generation.isGenerating || isQuotaExceeded}
             className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {generation.isGenerating ? (

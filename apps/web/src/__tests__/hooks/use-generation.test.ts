@@ -426,4 +426,64 @@ describe('useGeneration', () => {
       expect(result.current.events[1].type).toBe('error');
     });
   });
+
+  describe('quota handling', () => {
+    it('should show quota exceeded message on 429 response', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        const error = new Error('Generation quota exceeded');
+        (error as any).quota = { current: 10, limit: 10, remaining: 0 };
+        throw error;
+      });
+
+      const options = {
+        framework: 'react' as const,
+        componentLibrary: 'tailwind' as const,
+        description: 'Create a button',
+        style: 'modern' as const,
+        typescript: false,
+      };
+
+      await act(async () => {
+        await result.current.startGeneration({
+          ...options,
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.isGenerating).toBe(false);
+      expect(result.current.error).toBe('Generation quota exceeded');
+      expect(result.current.code).toBe('');
+    });
+
+    it('should show rate limit message on rate limit error', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        throw new Error('Rate limit exceeded. Try again shortly.');
+      });
+
+      const options = {
+        framework: 'react' as const,
+        componentLibrary: 'tailwind' as const,
+        description: 'Create a button',
+        style: 'modern' as const,
+        typescript: false,
+      };
+
+      await act(async () => {
+        await result.current.startGeneration({
+          ...options,
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.error).toBe('Rate limit exceeded. Try again shortly.');
+    });
+  });
 });
