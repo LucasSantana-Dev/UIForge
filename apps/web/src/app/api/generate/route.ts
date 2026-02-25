@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import { z } from 'zod';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
-import { generateWithProvider } from '@/lib/services/generation';
+import { generateComponentStream } from '@/lib/services/gemini';
 import { runAllGates } from '@/lib/quality/gates';
 import { enrichPromptWithContext } from '@/lib/services/context-enrichment';
 import { storeGenerationEmbedding } from '@/lib/services/embeddings';
@@ -10,7 +10,8 @@ import { createClient } from '@/lib/supabase/server';
 import { checkGenerationQuota } from '@/lib/usage/limits';
 import { incrementGenerationCount } from '@/lib/usage/tracker';
 import { captureServerError } from '@/lib/sentry/server';
-import type { AIProvider } from '@/lib/encryption';
+import { getFeatureFlag } from '@/lib/features/flags';
+import { isMcpConfigured, generateComponent } from '@/lib/mcp/client';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,16 +20,25 @@ const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const generateSchema = z.object({
   description: z.string().min(10).max(2000),
   framework: z.enum(['react', 'vue', 'angular', 'svelte']).default('react'),
-  componentLibrary: z.enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none']).optional(),
+  componentLibrary: z
+    .enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none'])
+    .optional(),
   style: z.enum(['modern', 'minimal', 'colorful']).optional(),
   typescript: z.boolean().optional(),
   userApiKey: z.string().min(1).optional(),
-  provider: z.enum(['openai', 'anthropic', 'google']).optional(),
-  model: z.string().min(1).optional(),
   useRag: z.boolean().optional(),
-  imageBase64: z.string().max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)').optional(),
-  imageMimeType: z.enum(['image/png', 'image/jpeg', 'image/webp']).optional(),
+  imageBase64: z
+    .string()
+    .max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)')
+    .optional(),
+  imageMimeType: z
+    .enum(['image/png', 'image/jpeg', 'image/webp'])
+    .optional(),
 });
+
+function shouldUseMcpGateway(): boolean {
+  return getFeatureFlag('ENABLE_MCP_GATEWAY') && isMcpConfigured();
+}
 
 function createSseEvent(data: object): string {
   return `data: ${JSON.stringify(data)}\n\n`;
@@ -39,7 +49,9 @@ export async function POST(request: NextRequest) {
     const rateLimitResult = await checkRateLimit(request, 15, 60000);
     if (!rateLimitResult.allowed) {
       return new Response(
-        JSON.stringify({ error: 'Rate limit exceeded. Try again shortly.' }),
+        JSON.stringify({
+          error: 'Rate limit exceeded. Try again shortly.',
+        }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -51,7 +63,11 @@ export async function POST(request: NextRequest) {
       return new Response(
         JSON.stringify({
           error: 'Generation quota exceeded',
-          quota: { current: quota.current, limit: quota.limit, remaining: quota.remaining },
+          quota: {
+            current: quota.current,
+            limit: quota.limit,
+            remaining: quota.remaining,
+          },
         }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
       );
@@ -62,7 +78,9 @@ export async function POST(request: NextRequest) {
 
     if (!parsed.success) {
       return new Response(
-        JSON.stringify({ error: parsed.error.issues[0]?.message || 'Invalid request' }),
+        JSON.stringify({
+          error: parsed.error.issues[0]?.message || 'Invalid request',
+        }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -74,15 +92,10 @@ export async function POST(request: NextRequest) {
       style,
       typescript,
       userApiKey,
-      provider,
-      model,
       useRag,
       imageBase64,
       imageMimeType,
     } = parsed.data;
-
-    const activeProvider: AIProvider = provider || 'google';
-    const activeModel = model || (activeProvider === 'google' ? 'gemini-2.0-flash' : '');
 
     let contextAddition = '';
     if (useRag !== false) {
@@ -98,10 +111,12 @@ export async function POST(request: NextRequest) {
     }
 
     const encoder = new TextEncoder();
+    const mcpEnabled = shouldUseMcpGateway();
 
     const stream = new ReadableStream({
       async start(controller) {
         let generationId: string | null = null;
+        const provider = mcpEnabled ? 'mcp-gateway' : 'google';
 
         try {
           const supabase = await createClient();
@@ -112,8 +127,10 @@ export async function POST(request: NextRequest) {
               prompt: description,
               framework,
               status: 'processing',
-              ai_provider: activeProvider,
-              model_used: activeModel,
+              ai_provider: provider,
+              model_used: mcpEnabled
+                ? 'mcp-specialist'
+                : 'gemini-2.0-flash',
             })
             .select('id')
             .single();
@@ -121,34 +138,101 @@ export async function POST(request: NextRequest) {
 
           let fullCode = '';
 
-          for await (const event of generateWithProvider({
-            provider: activeProvider,
-            model: activeModel,
-            prompt: description,
-            framework,
-            componentLibrary,
-            style,
-            typescript,
-            apiKey: userApiKey,
-            contextAddition,
-            imageBase64,
-            imageMimeType,
-          })) {
-            if (event.type === 'chunk' && event.content) {
-              fullCode += event.content;
+          if (mcpEnabled) {
+            controller.enqueue(
+              encoder.encode(
+                createSseEvent({ type: 'start', timestamp: Date.now() })
+              )
+            );
+
+            try {
+              fullCode = await generateComponent({
+                prompt: description,
+                framework,
+                componentLibrary,
+                style,
+                typescript,
+                imageBase64,
+                imageMimeType,
+                contextAddition,
+              });
+            } catch (mcpError) {
+              captureServerError(mcpError, {
+                route: '/api/generate',
+                extra: { fallback: 'mcp-to-gemini' },
+              });
+              fullCode = '';
             }
 
-            if (event.type === 'complete') {
-              break;
+            if (!fullCode) {
+              for await (const event of generateComponentStream({
+                prompt: description,
+                framework,
+                componentLibrary,
+                style,
+                typescript,
+                apiKey: userApiKey,
+                contextAddition,
+                imageBase64,
+                imageMimeType,
+              })) {
+                if (event.type === 'chunk' && event.content) {
+                  fullCode += event.content;
+                }
+                if (event.type !== 'complete') {
+                  controller.enqueue(
+                    encoder.encode(createSseEvent(event))
+                  );
+                }
+              }
+            } else {
+              const chunkSize = 200;
+              for (let i = 0; i < fullCode.length; i += chunkSize) {
+                controller.enqueue(
+                  encoder.encode(
+                    createSseEvent({
+                      type: 'chunk',
+                      content: fullCode.slice(i, i + chunkSize),
+                      timestamp: Date.now(),
+                    })
+                  )
+                );
+              }
             }
+          } else {
+            for await (const event of generateComponentStream({
+              prompt: description,
+              framework,
+              componentLibrary,
+              style,
+              typescript,
+              apiKey: userApiKey,
+              contextAddition,
+              imageBase64,
+              imageMimeType,
+            })) {
+              if (event.type === 'chunk' && event.content) {
+                fullCode += event.content;
+              }
 
-            controller.enqueue(encoder.encode(createSseEvent(event)));
+              if (event.type === 'complete') {
+                break;
+              }
+
+              controller.enqueue(
+                encoder.encode(`data: ${JSON.stringify(event)}\n\n`)
+              );
+            }
           }
 
           const qualityReport = runAllGates(fullCode);
           controller.enqueue(
             encoder.encode(
-              createSseEvent({ type: 'quality', report: qualityReport, timestamp: Date.now() })
+              createSseEvent({
+                type: 'quality',
+                report: qualityReport,
+                timestamp: Date.now(),
+              })
             )
           );
 
@@ -156,10 +240,18 @@ export async function POST(request: NextRequest) {
             const supabase2 = await createClient();
             await supabase2
               .from('generations')
-              .update({ status: 'completed', generated_code: fullCode })
+              .update({
+                status: 'completed',
+                generated_code: fullCode,
+                ai_provider: fullCode ? provider : 'google',
+              })
               .eq('id', generationId);
 
-            storeGenerationEmbedding(generationId, description, userApiKey).catch(() => {});
+            storeGenerationEmbedding(
+              generationId,
+              description,
+              userApiKey
+            ).catch(() => {});
             incrementGenerationCount(user.id).catch(() => {});
           }
 
@@ -172,8 +264,7 @@ export async function POST(request: NextRequest) {
                 totalLength: fullCode.length,
                 qualityPassed: qualityReport.passed,
                 ragEnriched: contextAddition.length > 0,
-                provider: activeProvider,
-                model: activeModel,
+                provider,
                 timestamp: Date.now(),
               })
             )
@@ -185,16 +276,25 @@ export async function POST(request: NextRequest) {
               .from('generations')
               .update({
                 status: 'failed',
-                error_message: error instanceof Error ? error.message : 'Generation failed',
+                error_message:
+                  error instanceof Error
+                    ? error.message
+                    : 'Generation failed',
               })
               .eq('id', generationId);
           }
-          captureServerError(error, { route: '/api/generate', userId: user.id });
+          captureServerError(error, {
+            route: '/api/generate',
+            userId: user.id,
+          });
           controller.enqueue(
             encoder.encode(
               createSseEvent({
                 type: 'error',
-                message: error instanceof Error ? error.message : 'Stream failed',
+                message:
+                  error instanceof Error
+                    ? error.message
+                    : 'Stream failed',
                 timestamp: Date.now(),
               })
             )
@@ -215,7 +315,8 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     captureServerError(error, { route: '/api/generate' });
-    const message = error instanceof Error ? error.message : 'Internal server error';
+    const message =
+      error instanceof Error ? error.message : 'Internal server error';
     const status = message === 'Authentication required' ? 401 : 500;
     return new Response(JSON.stringify({ error: message }), {
       status,
@@ -225,13 +326,20 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
+  const mcpEnabled = shouldUseMcpGateway();
   return new Response(
     JSON.stringify({
       message: 'UI Generation API',
       version: '3.1.0',
       status: 'active',
-      providers: ['google', 'openai', 'anthropic'],
-      features: ['rag', 'quality-gates', 'streaming', 'image-input', 'multi-llm'],
+      provider: mcpEnabled ? 'mcp-gateway' : 'gemini-2.0-flash',
+      features: [
+        'rag',
+        'quality-gates',
+        'streaming',
+        'image-input',
+        ...(mcpEnabled ? ['mcp-gateway'] : []),
+      ],
     }),
     {
       status: 200,

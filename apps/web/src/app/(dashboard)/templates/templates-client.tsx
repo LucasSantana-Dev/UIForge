@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Search, Filter, Loader2 } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { Search, Loader2, ChevronLeftIcon, ChevronRightIcon, SortAscIcon } from 'lucide-react';
 import { TemplateCard } from '@/components/templates/TemplateCard';
 import { TemplatePreview } from '@/components/templates/TemplatePreview';
 import { useRouter } from 'next/navigation';
@@ -65,7 +65,7 @@ function mapDBTemplate(t: DBTemplate): Template {
   };
 }
 
-const categories = [
+const CATEGORIES = [
   'All',
   'Landing',
   'Dashboard',
@@ -77,6 +77,17 @@ const categories = [
   'Other',
 ];
 
+const ITEMS_PER_PAGE = 12;
+
+function useDebounce(value: string, delay: number): string {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debouncedValue;
+}
+
 export function TemplatesClient() {
   const router = useRouter();
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -85,8 +96,11 @@ export function TemplatesClient() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('recent');
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
+
+  const debouncedSearch = useDebounce(searchTerm, 300);
 
   useEffect(() => {
     async function fetchTemplates() {
@@ -107,30 +121,46 @@ export function TemplatesClient() {
     fetchTemplates();
   }, []);
 
-  const filteredTemplates = templates.filter((template) => {
-    const matchesSearch =
-      !searchTerm ||
-      template.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      template.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      template.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase()));
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, selectedCategory, sortBy]);
 
-    const matchesCategory =
-      selectedCategory === 'All' ||
-      template.category.toLowerCase() === selectedCategory.toLowerCase();
+  const filteredTemplates = useMemo(() => {
+    return templates.filter((template) => {
+      const matchesSearch =
+        !debouncedSearch ||
+        template.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        template.description.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        template.tags.some((tag) =>
+          tag.toLowerCase().includes(debouncedSearch.toLowerCase())
+        );
 
-    return matchesSearch && matchesCategory;
-  });
+      const matchesCategory =
+        selectedCategory === 'All' ||
+        template.category.toLowerCase() === selectedCategory.toLowerCase();
 
-  const sortedTemplates = [...filteredTemplates].sort((a, b) => {
-    switch (sortBy) {
-      case 'name':
-        return a.name.localeCompare(b.name);
-      case 'recent':
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      default:
-        return 0;
-    }
-  });
+      return matchesSearch && matchesCategory;
+    });
+  }, [templates, debouncedSearch, selectedCategory]);
+
+  const sortedTemplates = useMemo(() => {
+    return [...filteredTemplates].sort((a, b) => {
+      switch (sortBy) {
+        case 'name':
+          return a.name.localeCompare(b.name);
+        case 'recent':
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        default:
+          return 0;
+      }
+    });
+  }, [filteredTemplates, sortBy]);
+
+  const totalPages = Math.ceil(sortedTemplates.length / ITEMS_PER_PAGE);
+  const paginatedTemplates = sortedTemplates.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   const handleUseTemplate = (template: Template) => {
     const params = new URLSearchParams({
@@ -150,55 +180,70 @@ export function TemplatesClient() {
   return (
     <div className="h-full flex flex-col">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Component Templates</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <h1 className="text-3xl font-bold text-text-primary">Component Templates</h1>
+        <p className="mt-2 text-sm text-text-secondary">
           Choose from our library of pre-built components to jumpstart your project
         </p>
       </div>
 
-      <div className="mb-6 space-y-4">
+      <div className="mb-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted w-4 h-4" />
           <input
             type="text"
-            placeholder="Search templates..."
+            placeholder="Search templates by name, description, or tag..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full pl-10 pr-4 py-2.5 border border-surface-3 rounded-lg bg-surface-1 text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand"
           />
         </div>
+      </div>
 
-        <div className="flex flex-wrap gap-4 items-center">
-          <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-muted-foreground" />
-            <select
-              value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-1 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            >
-              {categories.map((category) => (
-                <option key={category} value={category}>
-                  {category}
-                </option>
-              ))}
-            </select>
-          </div>
-
+      <div className="mb-6 flex flex-wrap items-center gap-2">
+        {CATEGORIES.map((category) => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+              selectedCategory === category
+                ? 'border-brand bg-brand/10 text-brand-light font-medium'
+                : 'border-surface-3 text-text-secondary hover:border-surface-3 hover:text-text-primary'
+            }`}
+          >
+            {category}
+          </button>
+        ))}
+        <div className="ml-auto flex items-center gap-2">
+          <SortAscIcon className="w-4 h-4 text-text-muted" />
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="px-3 py-1 border border-border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+            className="px-3 py-1.5 border border-surface-3 rounded-md text-sm bg-surface-1 text-text-primary focus:outline-none focus:ring-2 focus:ring-brand"
           >
             <option value="recent">Recently Added</option>
-            <option value="name">Name</option>
+            <option value="name">Name A-Z</option>
           </select>
         </div>
       </div>
 
       <div className="flex-1 overflow-auto">
         {loading && (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div
+                key={i}
+                className="rounded-lg border border-surface-3 bg-surface-1 p-4 animate-pulse"
+              >
+                <div className="h-4 bg-surface-2 rounded w-3/4 mb-3" />
+                <div className="h-3 bg-surface-2 rounded w-full mb-2" />
+                <div className="h-3 bg-surface-2 rounded w-2/3 mb-4" />
+                <div className="flex gap-2 mb-3">
+                  <div className="h-5 bg-surface-2 rounded-full w-16" />
+                  <div className="h-5 bg-surface-2 rounded-full w-20" />
+                </div>
+                <div className="h-8 bg-surface-2 rounded w-full mt-4" />
+              </div>
+            ))}
           </div>
         )}
 
@@ -207,7 +252,7 @@ export function TemplatesClient() {
             <p className="text-sm text-red-600 mb-2">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="text-sm text-primary underline"
+              className="text-sm text-brand underline"
             >
               Retry
             </button>
@@ -216,8 +261,14 @@ export function TemplatesClient() {
 
         {!loading && !error && (
           <>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-sm text-text-secondary">
+                {sortedTemplates.length} template{sortedTemplates.length !== 1 ? 's' : ''} found
+              </p>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {sortedTemplates.map((template) => (
+              {paginatedTemplates.map((template) => (
                 <TemplateCard
                   key={template.id}
                   template={template}
@@ -228,12 +279,12 @@ export function TemplatesClient() {
             </div>
 
             {sortedTemplates.length === 0 && (
-              <div className="flex flex-col items-center justify-center h-full text-center">
-                <div className="text-muted-foreground mb-4">
-                  <Search className="w-12 h-12 mx-auto mb-2" />
-                </div>
-                <h3 className="text-lg font-semibold mb-2">No templates found</h3>
-                <p className="text-sm text-muted-foreground">
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <Search className="w-12 h-12 text-text-muted mb-4" />
+                <h3 className="text-lg font-semibold text-text-primary mb-2">
+                  No templates found
+                </h3>
+                <p className="text-sm text-text-secondary">
                   Try adjusting your search or filters to find what you&apos;re looking for.
                 </p>
               </div>
@@ -241,6 +292,46 @@ export function TemplatesClient() {
           </>
         )}
       </div>
+
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between border-t border-surface-3 pt-4 mt-4">
+          <p className="text-sm text-text-secondary">
+            Page {currentPage} of {totalPages}
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage <= 1}
+              className="p-2 rounded-md border border-surface-3 disabled:opacity-50 hover:bg-surface-2"
+            >
+              <ChevronLeftIcon className="h-4 w-4" />
+            </button>
+            {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
+              const page = i + 1;
+              return (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`px-3 py-1 rounded-md text-sm ${
+                    currentPage === page
+                      ? 'bg-brand text-white'
+                      : 'border border-surface-3 hover:bg-surface-2'
+                  }`}
+                >
+                  {page}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage >= totalPages}
+              className="p-2 rounded-md border border-surface-3 disabled:opacity-50 hover:bg-surface-2"
+            >
+              <ChevronRightIcon className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       <TemplatePreview
         template={selectedTemplate}

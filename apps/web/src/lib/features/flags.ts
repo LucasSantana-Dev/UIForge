@@ -18,6 +18,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_CENTRALIZED_FEATURE_FLAGS: false,
   ENABLE_STRIPE_BILLING: false,
   ENABLE_USAGE_LIMITS: false,
+  ENABLE_MCP_GATEWAY: false,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -122,6 +123,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_USAGE_LIMITS,
     description: 'Enforce per-plan usage limits on generations and projects',
     category: 'billing',
+  },
+  {
+    name: 'ENABLE_MCP_GATEWAY',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_MCP_GATEWAY,
+    description: 'Route AI generation through MCP gateway instead of direct Gemini',
+    category: 'generation',
   },
 ];
 
