@@ -66,6 +66,8 @@ describe('Feature Flags', () => {
 
   describe('getFeatureFlag', () => {
     it('should return default value when no env var set', () => {
+      delete process.env.NEXT_PUBLIC_ENABLE_GOOGLE_SSO;
+      delete process.env.NEXT_PUBLIC_ENABLE_STRIPE_BILLING;
       expect(getFeatureFlag('ENABLE_GOOGLE_SSO')).toBe(true);
       expect(getFeatureFlag('ENABLE_STRIPE_BILLING')).toBe(false);
     });
@@ -88,6 +90,8 @@ describe('Feature Flags', () => {
 
   describe('getAllFeatureFlags', () => {
     it('should return all flags with defaults', () => {
+      delete process.env.NEXT_PUBLIC_ENABLE_STRIPE_BILLING;
+      delete process.env.NEXT_PUBLIC_ENABLE_USAGE_LIMITS;
       const flags = getAllFeatureFlags();
       expect(Object.keys(flags)).toHaveLength(17);
       expect(flags.ENABLE_GOOGLE_SSO).toBe(true);
