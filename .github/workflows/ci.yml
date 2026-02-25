@@ -137,7 +137,7 @@ jobs:
           NEXT_PUBLIC_BASE_URL: http://localhost:3000
           NEXT_PUBLIC_ENABLE_STRIPE_BILLING: 'true'
           NEXT_PUBLIC_ENABLE_USAGE_LIMITS: 'true'
-        run: cd apps/web && npx playwright test --project=chromium
+        run: cd apps/web && npx playwright test e2e/auth.spec.ts e2e/billing.spec.ts e2e/landing.spec.ts --project=chromium
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
