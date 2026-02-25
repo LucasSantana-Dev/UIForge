@@ -13,7 +13,7 @@ import {
   LayoutGrid,
   Eye,
   Github,
-  Twitter,
+  Linkedin,
   ArrowRight,
   Terminal,
 } from 'lucide-react';
@@ -374,12 +374,12 @@ export default function LandingPage() {
                   <Github className="w-4 h-4" />
                 </a>
                 <a
-                  href="https://twitter.com"
+                  href="https://www.linkedin.com/in/devlucassantana/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  <Twitter className="w-4 h-4" />
+                  <Linkedin className="w-4 h-4" />
                 </a>
               </div>
             </div>

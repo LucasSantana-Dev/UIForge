@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Github, Twitter } from 'lucide-react';
+import { Github, Linkedin } from 'lucide-react';
 
 export function LandingFooter() {
   return (
@@ -18,8 +18,13 @@ export function LandingFooter() {
               >
                 <Github className="w-4 h-4" />
               </Link>
-              <Link href="#" className="text-[#71717A] hover:text-[#FAFAFA] transition-colors">
-                <Twitter className="w-4 h-4" />
+              <Link
+                href="https://www.linkedin.com/in/devlucassantana/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#71717A] hover:text-[#FAFAFA] transition-colors"
+              >
+                <Linkedin className="w-4 h-4" />
               </Link>
             </div>
           </div>
