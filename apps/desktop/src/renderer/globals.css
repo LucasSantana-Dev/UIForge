@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --surface-0: #0a0a0f;
+  --surface-1: #12121a;
+  --surface-2: #1a1a25;
+  --surface-3: #252530;
+  --surface-4: #30303d;
+
+  --brand: #7c3aed;
+  --brand-light: #8b5cf6;
+  --brand-dark: #6d28d9;
+  --brand-muted: rgba(124, 58, 237, 0.15);
+
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b0;
+  --text-muted: #606070;
+  --text-brand: #a78bfa;
+
+  --success: #22c55e;
+  --warning: #eab308;
+  --error: #ef4444;
+  --info: #3b82f6;
+
+  --ease-siza: cubic-bezier(0.22, 1, 0.36, 1);
+  --radius: 0.75rem;
+
+  --background: 240 10% 4%;
+  --foreground: 240 10% 96%;
+  --card: 240 10% 7%;
+  --card-foreground: 240 10% 96%;
+  --popover: 240 10% 7%;
+  --popover-foreground: 240 10% 96%;
+  --primary: 263 70% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 10% 15%;
+  --secondary-foreground: 240 10% 96%;
+  --muted: 240 10% 15%;
+  --muted-foreground: 240 10% 60%;
+  --accent: 263 70% 58%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 240 10% 18%;
+  --input: 240 10% 18%;
+  --ring: 263 70% 58%;
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
