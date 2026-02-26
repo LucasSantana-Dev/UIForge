@@ -1,7 +1,15 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import { Search, ChevronLeftIcon, ChevronRightIcon, SortAscIcon } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import {
+  Search,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  SortAscIcon,
+  Sparkles,
+  User,
+  Globe,
+} from 'lucide-react';
 import { TemplateCard } from '@/components/templates/TemplateCard';
 import { TemplatePreview } from '@/components/templates/TemplatePreview';
 import { useRouter } from 'next/navigation';
@@ -33,6 +41,7 @@ interface Template {
   rating: number;
   createdAt: string;
   code?: string;
+  isOfficial: boolean;
 }
 
 function mapDBTemplate(t: DBTemplate): Template {
@@ -62,6 +71,7 @@ function mapDBTemplate(t: DBTemplate): Template {
     rating: t.is_official ? 4.5 : 0,
     createdAt: t.created_at,
     code: firstFile?.content,
+    isOfficial: t.is_official,
   };
 }
 
@@ -76,6 +86,18 @@ const CATEGORIES = [
   'Admin',
   'Other',
 ];
+
+const FRAMEWORKS = ['All', 'react', 'vue', 'angular', 'svelte'];
+
+const FRAMEWORK_LABELS: Record<string, string> = {
+  All: 'All Frameworks',
+  react: 'React',
+  vue: 'Vue',
+  angular: 'Angular',
+  svelte: 'Svelte',
+};
+
+type OwnershipFilter = 'all' | 'official' | 'mine';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -95,6 +117,8 @@ export function TemplatesClient() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [selectedFramework, setSelectedFramework] = useState('All');
+  const [ownershipFilter, setOwnershipFilter] = useState<OwnershipFilter>('all');
   const [sortBy, setSortBy] = useState('recent');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
@@ -102,60 +126,53 @@ export function TemplatesClient() {
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
-  useEffect(() => {
-    async function fetchTemplates() {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch('/api/templates?limit=100');
-        if (!res.ok) throw new Error('Failed to load templates');
-        const json = await res.json();
-        const dbTemplates: DBTemplate[] = json.data?.templates || [];
-        setTemplates(dbTemplates.map(mapDBTemplate));
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load templates');
-      } finally {
-        setLoading(false);
+  const fetchTemplates = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({ limit: '100' });
+      if (selectedCategory !== 'All') {
+        params.set('category', selectedCategory.toLowerCase());
       }
+      if (selectedFramework !== 'All') {
+        params.set('framework', selectedFramework);
+      }
+      if (debouncedSearch) {
+        params.set('search', debouncedSearch);
+      }
+      params.set('sort', sortBy === 'name' ? 'name' : 'created_at');
+
+      const res = await fetch('/api/templates?' + params.toString());
+      if (!res.ok) throw new Error('Failed to load templates');
+      const json = await res.json();
+      const dbTemplates: DBTemplate[] = json.data?.templates || [];
+      setTemplates(dbTemplates.map(mapDBTemplate));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load templates');
+    } finally {
+      setLoading(false);
     }
+  }, [selectedCategory, selectedFramework, debouncedSearch, sortBy]);
+
+  useEffect(() => {
     fetchTemplates();
-  }, []);
+  }, [fetchTemplates]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [debouncedSearch, selectedCategory, sortBy]);
+  }, [debouncedSearch, selectedCategory, selectedFramework, ownershipFilter, sortBy]);
 
   const filteredTemplates = useMemo(() => {
-    return templates.filter((template) => {
-      const matchesSearch =
-        !debouncedSearch ||
-        template.name.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        template.description.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        template.tags.some((tag) => tag.toLowerCase().includes(debouncedSearch.toLowerCase()));
-
-      const matchesCategory =
-        selectedCategory === 'All' ||
-        template.category.toLowerCase() === selectedCategory.toLowerCase();
-
-      return matchesSearch && matchesCategory;
+    if (ownershipFilter === 'all') return templates;
+    return templates.filter((t) => {
+      if (ownershipFilter === 'official') return t.isOfficial;
+      if (ownershipFilter === 'mine') return !t.isOfficial;
+      return true;
     });
-  }, [templates, debouncedSearch, selectedCategory]);
+  }, [templates, ownershipFilter]);
 
-  const sortedTemplates = useMemo(() => {
-    return [...filteredTemplates].sort((a, b) => {
-      switch (sortBy) {
-        case 'name':
-          return a.name.localeCompare(b.name);
-        case 'recent':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        default:
-          return 0;
-      }
-    });
-  }, [filteredTemplates, sortBy]);
-
-  const totalPages = Math.ceil(sortedTemplates.length / ITEMS_PER_PAGE);
-  const paginatedTemplates = sortedTemplates.slice(
+  const totalPages = Math.ceil(filteredTemplates.length / ITEMS_PER_PAGE);
+  const paginatedTemplates = filteredTemplates.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
@@ -167,13 +184,19 @@ export function TemplatesClient() {
       componentLibrary: template.componentLibrary,
       description: template.description,
     });
-    router.push(`/generate?${params.toString()}`);
+    router.push('/generate?' + params.toString());
   };
 
   const handlePreview = (template: Template) => {
     setSelectedTemplate(template);
     setPreviewOpen(true);
   };
+
+  const ownershipTabs: { key: OwnershipFilter; label: string; icon: typeof Globe }[] = [
+    { key: 'all', label: 'All Templates', icon: Globe },
+    { key: 'official', label: 'Official', icon: Sparkles },
+    { key: 'mine', label: 'My Templates', icon: User },
+  ];
 
   return (
     <div className="h-full flex flex-col">
@@ -184,12 +207,30 @@ export function TemplatesClient() {
         </p>
       </div>
 
+      <div className="mb-4 flex items-center gap-1 border-b border-surface-3">
+        {ownershipTabs.map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setOwnershipFilter(key)}
+            className={
+              'flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ' +
+              (ownershipFilter === key
+                ? 'border-brand text-brand-light'
+                : 'border-transparent text-text-secondary hover:text-text-primary')
+            }
+          >
+            <Icon className="w-4 h-4" />
+            {label}
+          </button>
+        ))}
+      </div>
+
       <div className="mb-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-text-muted w-4 h-4" />
           <input
             type="text"
-            placeholder="Search templates by name, description, or tag..."
+            placeholder="Search templates by name or description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2.5 border border-surface-3 rounded-lg bg-surface-1 text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-brand"
@@ -197,18 +238,36 @@ export function TemplatesClient() {
         </div>
       </div>
 
-      <div className="mb-6 flex flex-wrap items-center gap-2">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
         {CATEGORIES.map((category) => (
           <button
             key={category}
             onClick={() => setSelectedCategory(category)}
-            className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
-              selectedCategory === category
+            className={
+              'px-3 py-1.5 text-sm rounded-full border transition-colors ' +
+              (selectedCategory === category
                 ? 'border-brand bg-brand/10 text-brand-light font-medium'
-                : 'border-surface-3 text-text-secondary hover:border-surface-3 hover:text-text-primary'
-            }`}
+                : 'border-surface-3 text-text-secondary hover:border-surface-3 hover:text-text-primary')
+            }
           >
             {category}
+          </button>
+        ))}
+      </div>
+
+      <div className="mb-6 flex flex-wrap items-center gap-2">
+        {FRAMEWORKS.map((fw) => (
+          <button
+            key={fw}
+            onClick={() => setSelectedFramework(fw)}
+            className={
+              'px-3 py-1.5 text-xs rounded-md border transition-colors ' +
+              (selectedFramework === fw
+                ? 'border-brand bg-brand/10 text-brand-light font-medium'
+                : 'border-surface-3 text-text-muted hover:text-text-secondary')
+            }
+          >
+            {FRAMEWORK_LABELS[fw]}
           </button>
         ))}
         <div className="ml-auto flex items-center gap-2">
@@ -248,10 +307,7 @@ export function TemplatesClient() {
         {error && !loading && (
           <div className="flex flex-col items-center justify-center py-20 text-center">
             <p className="text-sm text-red-600 mb-2">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="text-sm text-brand underline"
-            >
+            <button onClick={fetchTemplates} className="text-sm text-brand underline">
               Retry
             </button>
           </div>
@@ -261,7 +317,7 @@ export function TemplatesClient() {
           <>
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm text-text-secondary">
-                {sortedTemplates.length} template{sortedTemplates.length !== 1 ? 's' : ''} found
+                {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''} found
               </p>
             </div>
 
@@ -276,7 +332,7 @@ export function TemplatesClient() {
               ))}
             </div>
 
-            {sortedTemplates.length === 0 && (
+            {filteredTemplates.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <Search className="w-12 h-12 text-text-muted mb-4" />
                 <h3 className="text-lg font-semibold text-text-primary mb-2">No templates found</h3>
@@ -308,11 +364,12 @@ export function TemplatesClient() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`px-3 py-1 rounded-md text-sm ${
-                    currentPage === page
+                  className={
+                    'px-3 py-1 rounded-md text-sm ' +
+                    (currentPage === page
                       ? 'bg-brand text-white'
-                      : 'border border-surface-3 hover:bg-surface-2'
-                  }`}
+                      : 'border border-surface-3 hover:bg-surface-2')
+                  }
                 >
                   {page}
                 </button>
