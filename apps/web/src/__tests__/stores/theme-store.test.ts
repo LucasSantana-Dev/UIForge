@@ -5,7 +5,6 @@ import { BUILT_IN_THEMES } from '@/lib/themes/defaults';
 describe('Theme Store', () => {
   beforeEach(() => {
     act(() => {
-      const state = useThemeStore.getState();
       useThemeStore.setState({
         themes: [],
         activeThemeIds: {},
