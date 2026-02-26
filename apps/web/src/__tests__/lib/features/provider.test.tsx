@@ -81,8 +81,6 @@ describe('useFeatureFlagContext', () => {
     }
 
     render(<Bare />);
-    expect(JSON.parse(screen.getByTestId('flags').textContent!)).toEqual(
-      DEFAULT_FEATURE_FLAGS
-    );
+    expect(JSON.parse(screen.getByTestId('flags').textContent!)).toEqual(DEFAULT_FEATURE_FLAGS);
   });
 });

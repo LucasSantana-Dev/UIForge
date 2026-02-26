@@ -38,47 +38,43 @@ describe('Storage Utilities', () => {
     });
 
     it('rejects projectId with path traversal', () => {
-      expect(() =>
-        generateComponentStoragePath('../etc', 'comp-1', 'react')
-      ).toThrow('Invalid projectId');
+      expect(() => generateComponentStoragePath('../etc', 'comp-1', 'react')).toThrow(
+        'Invalid projectId'
+      );
     });
 
     it('rejects componentId with path traversal', () => {
-      expect(() =>
-        generateComponentStoragePath('proj-1', '../../passwd', 'react')
-      ).toThrow('Invalid componentId');
+      expect(() => generateComponentStoragePath('proj-1', '../../passwd', 'react')).toThrow(
+        'Invalid componentId'
+      );
     });
 
     it('rejects projectId with forward slash', () => {
-      expect(() =>
-        generateComponentStoragePath('proj/1', 'comp-1', 'react')
-      ).toThrow('Invalid projectId');
+      expect(() => generateComponentStoragePath('proj/1', 'comp-1', 'react')).toThrow(
+        'Invalid projectId'
+      );
     });
 
     it('rejects projectId with backslash', () => {
-      expect(() =>
-        generateComponentStoragePath('proj\\1', 'comp-1', 'react')
-      ).toThrow('Invalid projectId');
+      expect(() => generateComponentStoragePath('proj\\1', 'comp-1', 'react')).toThrow(
+        'Invalid projectId'
+      );
     });
 
     it('rejects projectId with null byte', () => {
-      expect(() =>
-        generateComponentStoragePath('proj\x001', 'comp-1', 'react')
-      ).toThrow('Invalid projectId');
+      expect(() => generateComponentStoragePath('proj\x001', 'comp-1', 'react')).toThrow(
+        'Invalid projectId'
+      );
     });
 
     it('rejects projectId with special characters', () => {
-      expect(() =>
-        generateComponentStoragePath('proj@1', 'comp-1', 'react')
-      ).toThrow('Invalid projectId');
+      expect(() => generateComponentStoragePath('proj@1', 'comp-1', 'react')).toThrow(
+        'Invalid projectId'
+      );
     });
 
     it('accepts valid alphanumeric with hyphens and underscores', () => {
-      const path = generateComponentStoragePath(
-        'my-project_123',
-        'my-component_456',
-        'react'
-      );
+      const path = generateComponentStoragePath('my-project_123', 'my-component_456', 'react');
       expect(path).toBe('my-project_123/my-component_456.tsx');
     });
   });

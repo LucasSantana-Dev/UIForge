@@ -300,9 +300,7 @@ describe('Theme Store', () => {
 
       let id: string | null;
       act(() => {
-        id = result.current.importTheme(
-          JSON.stringify({ name: 'Minimal', primaryColor: '#999' })
-        );
+        id = result.current.importTheme(JSON.stringify({ name: 'Minimal', primaryColor: '#999' }));
       });
 
       expect(id!).toBeDefined();
@@ -318,9 +316,7 @@ describe('Theme Store', () => {
 
       let id: string | null;
       act(() => {
-        id = result.current.importTheme(
-          JSON.stringify({ name: longName, primaryColor: '#000' })
-        );
+        id = result.current.importTheme(JSON.stringify({ name: longName, primaryColor: '#000' }));
       });
 
       const imported = result.current.getThemes().find((t) => t.id === id!);
