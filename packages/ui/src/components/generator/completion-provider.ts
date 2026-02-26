@@ -2,7 +2,6 @@ import { reactSnippets, type Snippet } from './snippets/react-snippets';
 import { tailwindSnippets } from './snippets/tailwind-snippets';
 import { shadcnSnippets } from './snippets/shadcn-snippets';
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
 type Monaco = any;
 
 function toCompletionItems(
