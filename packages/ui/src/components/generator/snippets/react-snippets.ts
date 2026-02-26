@@ -8,11 +8,9 @@ export interface Snippet {
 export const reactSnippets: Snippet[] = [
   {
     label: 'useState',
-    insertText:
-      'const [${1:state}, set${1/(.*)/${1:/capitalize}/}] = useState(${2:initialValue});',
+    insertText: 'const [${1:state}, set${1/(.*)/${1:/capitalize}/}] = useState(${2:initialValue});',
     detail: 'React useState hook',
-    documentation:
-      'Declare a state variable with its setter function.',
+    documentation: 'Declare a state variable with its setter function.',
   },
   {
     label: 'useEffect',
@@ -28,14 +26,12 @@ export const reactSnippets: Snippet[] = [
   },
   {
     label: 'useRef',
-    insertText:
-      'const ${1:ref} = useRef<${2:HTMLDivElement}>(null);',
+    insertText: 'const ${1:ref} = useRef<${2:HTMLDivElement}>(null);',
     detail: 'React useRef hook',
   },
   {
     label: 'useMemo',
-    insertText:
-      'const ${1:value} = useMemo(() => ${2:computation}, [${3:deps}]);',
+    insertText: 'const ${1:value} = useMemo(() => ${2:computation}, [${3:deps}]);',
     detail: 'React useMemo hook',
   },
   {
@@ -52,8 +48,7 @@ export const reactSnippets: Snippet[] = [
       '}',
     ].join('\n'),
     detail: 'React function component',
-    documentation:
-      'Create a typed React function component with props interface.',
+    documentation: 'Create a typed React function component with props interface.',
   },
   {
     label: 'forwardRef',
@@ -88,8 +83,7 @@ export const reactSnippets: Snippet[] = [
   },
   {
     label: 'cn-classname',
-    insertText:
-      'className={cn("${1:base-classes}", ${2:conditional && "active-class"})}',
+    insertText: 'className={cn("${1:base-classes}", ${2:conditional && "active-class"})}',
     detail: 'Conditional className with cn()',
   },
   {

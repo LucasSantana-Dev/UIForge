@@ -18,8 +18,7 @@ export const tailwindSnippets: Snippet[] = [
   },
   {
     label: 'grid-responsive',
-    insertText:
-      'grid grid-cols-1 md:grid-cols-${1:2} lg:grid-cols-${2:3} gap-${3:6}',
+    insertText: 'grid grid-cols-1 md:grid-cols-${1:2} lg:grid-cols-${2:3} gap-${3:6}',
     detail: 'Responsive grid layout',
   },
   {

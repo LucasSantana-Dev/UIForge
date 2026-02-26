@@ -14,11 +14,7 @@ interface Suggestion {
 
 export async function GET(request: NextRequest) {
   try {
-    const { allowed, remaining, resetAt } = await checkRateLimit(
-      request,
-      60,
-      60_000
-    );
+    const { allowed, remaining, resetAt } = await checkRateLimit(request, 60, 60_000);
     if (!allowed) {
       const response = errorResponse('Rate limit exceeded', 429);
       setRateLimitHeaders(response, { allowed, remaining, resetAt }, 60);
@@ -30,10 +26,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const query = searchParams.get('q')?.trim();
     const framework = searchParams.get('framework');
-    const limit = Math.min(
-      parseInt(searchParams.get('limit') || '8', 10),
-      20
-    );
+    const limit = Math.min(parseInt(searchParams.get('limit') || '8', 10), 20);
 
     if (!query || query.length < 3) {
       return successResponse({ suggestions: [] });
@@ -53,9 +46,7 @@ export async function GET(request: NextRequest) {
       supabase
         .from('templates')
         .select('name, description, framework, created_at')
-        .or(
-          `name.ilike.%${query}%,description.ilike.%${query}%`
-        )
+        .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
         .limit(limit),
     ]);
 
@@ -103,11 +94,7 @@ export async function GET(request: NextRequest) {
     const response = successResponse({
       suggestions: suggestions.slice(0, limit),
     });
-    setRateLimitHeaders(
-      response,
-      { allowed, remaining, resetAt },
-      60
-    );
+    setRateLimitHeaders(response, { allowed, remaining, resetAt }, 60);
     return response;
   } catch (error) {
     if (error instanceof UnauthorizedError) {

@@ -13,7 +13,13 @@ interface CodeEditorProps {
   componentLibrary?: string;
 }
 
-export default function CodeEditor({ code, onChange, language = 'typescript', framework = 'react', componentLibrary = 'tailwind' }: CodeEditorProps) {
+export default function CodeEditor({
+  code,
+  onChange,
+  language = 'typescript',
+  framework = 'react',
+  componentLibrary = 'tailwind',
+}: CodeEditorProps) {
   const [copied, setCopied] = useState(false);
   const editorRef = useRef<any>(null);
 
@@ -22,11 +28,7 @@ export default function CodeEditor({ code, onChange, language = 'typescript', fr
   const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
     if (disposeRef.current) disposeRef.current();
-    disposeRef.current = registerSizaCompletions(
-      monaco,
-      framework,
-      componentLibrary
-    );
+    disposeRef.current = registerSizaCompletions(monaco, framework, componentLibrary);
   };
 
   const handleCopy = async () => {

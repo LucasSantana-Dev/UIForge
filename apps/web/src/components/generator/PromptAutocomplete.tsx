@@ -2,10 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { HistoryIcon, LayoutTemplateIcon } from 'lucide-react';
-import {
-  useSuggestions,
-  type Suggestion,
-} from '@/hooks/use-suggestions';
+import { useSuggestions, type Suggestion } from '@/hooks/use-suggestions';
 
 interface PromptAutocompleteProps {
   value: string;
@@ -40,16 +37,12 @@ export function PromptAutocomplete({
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(e.target as Node)
-      ) {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
         setDismissed(true);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
-    return () =>
-      document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const handleChange = (val: string) => {
@@ -70,16 +63,11 @@ export function PromptAutocomplete({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setSelectedIndex(
-          (i) => (i + 1) % suggestions.length
-        );
+        setSelectedIndex((i) => (i + 1) % suggestions.length);
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setSelectedIndex(
-          (i) =>
-            (i - 1 + suggestions.length) % suggestions.length
-        );
+        setSelectedIndex((i) => (i - 1 + suggestions.length) % suggestions.length);
         break;
       case 'Enter':
         if (e.shiftKey) return;
@@ -101,9 +89,7 @@ export function PromptAutocomplete({
         value={value}
         onChange={(e) => handleChange(e.target.value)}
         onKeyDown={handleKeyDown}
-        onFocus={() =>
-          suggestions.length > 0 && setDismissed(false)
-        }
+        onFocus={() => suggestions.length > 0 && setDismissed(false)}
         className={className}
         placeholder={placeholder}
         role="combobox"
@@ -140,9 +126,7 @@ export function PromptAutocomplete({
                 <p className="truncate">{s.text}</p>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-xs text-text-muted">
-                    {s.source === 'history'
-                      ? 'History'
-                      : 'Template'}
+                    {s.source === 'history' ? 'History' : 'Template'}
                   </span>
                   {s.framework && (
                     <span className="text-xs px-1.5 py-0.5 rounded bg-surface-2 text-text-muted">
@@ -154,9 +138,7 @@ export function PromptAutocomplete({
             </li>
           ))}
           {isLoading && (
-            <li className="px-3 py-2 text-xs text-text-muted text-center">
-              Loading...
-            </li>
+            <li className="px-3 py-2 text-xs text-text-muted text-center">Loading...</li>
           )}
         </ul>
       )}
