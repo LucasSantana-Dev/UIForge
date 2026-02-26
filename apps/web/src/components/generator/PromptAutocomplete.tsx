@@ -26,7 +26,7 @@ export function PromptAutocomplete({
   placeholder,
   className = '',
 }: PromptAutocompleteProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -36,10 +36,7 @@ export function PromptAutocomplete({
     framework,
   });
 
-  useEffect(() => {
-    setIsOpen(suggestions.length > 0);
-    setSelectedIndex(0);
-  }, [suggestions]);
+  const isOpen = suggestions.length > 0 && !dismissed;
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -47,7 +44,7 @@ export function PromptAutocomplete({
         wrapperRef.current &&
         !wrapperRef.current.contains(e.target as Node)
       ) {
-        setIsOpen(false);
+        setDismissed(true);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -55,9 +52,15 @@ export function PromptAutocomplete({
       document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const handleChange = (val: string) => {
+    onChange(val);
+    setDismissed(false);
+    setSelectedIndex(0);
+  };
+
   const selectSuggestion = (suggestion: Suggestion) => {
     onChange(suggestion.text);
-    setIsOpen(false);
+    setDismissed(true);
     textareaRef.current?.focus();
   };
 
@@ -84,7 +87,7 @@ export function PromptAutocomplete({
         selectSuggestion(suggestions[selectedIndex]);
         break;
       case 'Escape':
-        setIsOpen(false);
+        setDismissed(true);
         break;
     }
   };
@@ -96,10 +99,10 @@ export function PromptAutocomplete({
         id={id}
         rows={rows}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => handleChange(e.target.value)}
         onKeyDown={handleKeyDown}
         onFocus={() =>
-          suggestions.length > 0 && setIsOpen(true)
+          suggestions.length > 0 && setDismissed(false)
         }
         className={className}
         placeholder={placeholder}

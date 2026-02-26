@@ -2,7 +2,8 @@ import { reactSnippets, type Snippet } from './snippets/react-snippets';
 import { tailwindSnippets } from './snippets/tailwind-snippets';
 import { shadcnSnippets } from './snippets/shadcn-snippets';
 
-type Monaco = typeof import('monaco-editor');
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type Monaco = any;
 
 function toCompletionItems(
   monaco: Monaco,
@@ -39,7 +40,7 @@ export function registerSizaCompletions(
     const disposable =
       monaco.languages.registerCompletionItemProvider(lang, {
         triggerCharacters: ['<', '.', 'u', 'c'],
-        provideCompletionItems(model, position) {
+        provideCompletionItems(model: any, position: any) {
           const word = model.getWordUntilPosition(position);
           const range = {
             startLineNumber: position.lineNumber,
