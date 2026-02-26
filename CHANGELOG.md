@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+- Template library: Add framework filter, ownership tabs (All/Official/My Templates), server-side filtering
+- Template library: Remove 669 lines of hardcoded template code from TemplateCard (templates serve code from DB)
+- TemplateCard.tsx: 770 → 127 lines (-84% reduction)
+
 ## [0.9.0] - 2026-02-25
 
 ### Added
