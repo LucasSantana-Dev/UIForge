@@ -17,7 +17,9 @@ export type FeatureFlagName =
   | 'ENABLE_STRIPE_BILLING'
   | 'ENABLE_USAGE_LIMITS'
   | 'ENABLE_MCP_GATEWAY'
-  | 'ENABLE_DESIGN_CONTEXT';
+  | 'ENABLE_DESIGN_CONTEXT'
+  | 'ENABLE_PROMPT_AUTOCOMPLETE'
+  | 'ENABLE_CODE_INTELLISENSE';
 
 export type FeatureFlagCategory =
   | 'auth'

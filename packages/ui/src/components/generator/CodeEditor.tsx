@@ -3,19 +3,32 @@
 import { useRef, useState } from 'react';
 import Editor from '@monaco-editor/react';
 import { CopyIcon, DownloadIcon, CheckIcon } from 'lucide-react';
+import { registerSizaCompletions } from './completion-provider';
 
 interface CodeEditorProps {
   code: string;
   onChange: (code: string) => void;
   language?: string;
+  framework?: string;
+  componentLibrary?: string;
 }
 
-export default function CodeEditor({ code, onChange, language = 'typescript' }: CodeEditorProps) {
+export default function CodeEditor({
+  code,
+  onChange,
+  language = 'typescript',
+  framework = 'react',
+  componentLibrary = 'tailwind',
+}: CodeEditorProps) {
   const [copied, setCopied] = useState(false);
   const editorRef = useRef<any>(null);
 
-  const handleEditorDidMount = (editor: any) => {
+  const disposeRef = useRef<(() => void) | null>(null);
+
+  const handleEditorDidMount = (editor: any, monaco: any) => {
     editorRef.current = editor;
+    if (disposeRef.current) disposeRef.current();
+    disposeRef.current = registerSizaCompletions(monaco, framework, componentLibrary);
   };
 
   const handleCopy = async () => {

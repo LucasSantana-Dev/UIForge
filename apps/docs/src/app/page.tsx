@@ -43,7 +43,10 @@ const techStack = [
 
 const ecosystem = [
   { name: 'forge-patterns', desc: 'Shared configs & standards', active: false },
+  { name: 'siza-gen', desc: 'AI generation core library', active: false },
+  { name: 'siza-mcp', desc: 'MCP protocol adapter', active: false },
   { name: 'mcp-gateway', desc: 'AI routing & orchestration', active: false },
+  { name: 'branding-mcp', desc: 'Brand identity generation', active: false },
   { name: 'siza', desc: 'Full-stack AI workspace', active: true },
 ];
 

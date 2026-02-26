@@ -20,6 +20,7 @@ import { PROVIDER_MODELS } from '@/lib/services/generation';
 import { isFeatureEnabled } from '@/lib/features/flags';
 import GenerationProgress from './GenerationProgress';
 import { DesignContext, DESIGN_DEFAULTS, type DesignContextValues } from './DesignContext';
+import { PromptAutocomplete } from './PromptAutocomplete';
 import { UpgradePrompt } from '@/components/billing/UpgradePrompt';
 import { useSubscription } from '@/hooks/use-subscription';
 
@@ -110,7 +111,9 @@ export default function GeneratorForm({
     typescript: false,
   });
   const designContextEnabled = isFeatureEnabled('ENABLE_DESIGN_CONTEXT');
+  const autocompleteEnabled = isFeatureEnabled('ENABLE_PROMPT_AUTOCOMPLETE');
   const [designContext, setDesignContext] = useState<DesignContextValues>(DESIGN_DEFAULTS);
+  const [promptValue, setPromptValue] = useState(initialDescription || '');
   const [image, setImage] = useState<ImageState | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
   const [showImageUpload, setShowImageUpload] = useState(false);
@@ -360,13 +363,28 @@ export default function GeneratorForm({
             <label htmlFor="prompt" className="block text-sm font-medium text-text-primary mb-2">
               Describe Your Component *
             </label>
-            <textarea
-              {...register('prompt')}
-              id="prompt"
-              rows={6}
-              className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-              placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
-            />
+            {autocompleteEnabled ? (
+              <PromptAutocomplete
+                id="prompt"
+                value={promptValue}
+                onChange={(val) => {
+                  setPromptValue(val);
+                  setValue('prompt', val, { shouldValidate: true });
+                }}
+                framework={framework}
+                rows={6}
+                className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
+              />
+            ) : (
+              <textarea
+                {...register('prompt')}
+                id="prompt"
+                rows={6}
+                className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
+              />
+            )}
             {errors.prompt && <p className="mt-1 text-sm text-red-600">{errors.prompt.message}</p>}
           </div>
 

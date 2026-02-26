@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Prompt Autocomplete**: Suggestion dropdown for generation prompt with history + template search
+  - `/api/suggestions` endpoint queries user generations and templates with prefix matching
+  - `useSuggestions` hook with 300ms debounce and request cancellation
+  - `PromptAutocomplete` component with keyboard navigation (Arrow/Enter/Escape) and ARIA combobox
+  - Gated behind `ENABLE_PROMPT_AUTOCOMPLETE` feature flag (enabled by default)
+- **Code IntelliSense**: Framework-aware snippet completions in Monaco editor
+  - 10 React snippets, 12 Tailwind utilities, 7 shadcn/ui component templates
+  - Auto-registered on editor mount based on framework and component library
+  - Gated behind `ENABLE_CODE_INTELLISENSE` feature flag (enabled by default)
+- **Docs search**: Fumadocs built-in search with static pre-rendering (`/api/search`)
+- **Docs ecosystem**: Homepage updated to show all 6 Forge Space repos
+
 ### Changed
 - Template library: Add framework filter, ownership tabs (All/Official/My Templates), server-side filtering
 - Template library: Remove 669 lines of hardcoded template code from TemplateCard (templates serve code from DB)
