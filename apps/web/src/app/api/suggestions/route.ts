@@ -12,6 +12,12 @@ interface Suggestion {
   createdAt?: string;
 }
 
+const ALLOWED_FRAMEWORKS = ['react', 'vue', 'angular', 'svelte', 'html', 'nextjs'] as const;
+
+function sanitizeIlike(str: string): string {
+  return str.replace(/[%_\\]/g, '\\$&');
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { allowed, remaining, resetAt } = await checkRateLimit(request, 60, 60_000);
@@ -28,6 +34,13 @@ export async function GET(request: NextRequest) {
     const framework = searchParams.get('framework');
     const limit = Math.min(parseInt(searchParams.get('limit') || '8', 10), 20);
 
+    if (
+      framework &&
+      !ALLOWED_FRAMEWORKS.includes(framework as (typeof ALLOWED_FRAMEWORKS)[number])
+    ) {
+      return errorResponse('Invalid framework parameter', 400);
+    }
+
     if (!query || query.length < 3) {
       return successResponse({ suggestions: [] });
     }
@@ -40,13 +53,13 @@ export async function GET(request: NextRequest) {
         .from('generations')
         .select('prompt, framework, created_at')
         .eq('user_id', user.id)
-        .ilike('prompt', `%${query}%`)
+        .ilike('prompt', `%${sanitizeIlike(query)}%`)
         .order('created_at', { ascending: false })
         .limit(limit),
       supabase
         .from('templates')
         .select('name, description, framework, created_at')
-        .or(`name.ilike.%${query}%,description.ilike.%${query}%`)
+        .or(`name.ilike.%${sanitizeIlike(query)}%,description.ilike.%${sanitizeIlike(query)}%`)
         .limit(limit),
     ]);
 
