@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-02-26
+
 ### Added
 - **Prompt Autocomplete**: Suggestion dropdown for generation prompt with history + template search
   - `/api/suggestions` endpoint queries user generations and templates with prefix matching
@@ -24,6 +26,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Template library: Add framework filter, ownership tabs (All/Official/My Templates), server-side filtering
 - Template library: Remove 669 lines of hardcoded template code from TemplateCard (templates serve code from DB)
 - TemplateCard.tsx: 770 → 127 lines (-84% reduction)
+
+### Testing
+- Test coverage boosted from 81% to 86% with 44 new tests (theme store, storage utils, feature provider)
 
 ## [0.9.0] - 2026-02-25
 
