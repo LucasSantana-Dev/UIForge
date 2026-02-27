@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Code, Github, Loader2, Check, AlertTriangle, Save } from 'lucide-react';
 import FeedbackPanel from '@/components/generator/FeedbackPanel';
+import { QualityBadge } from '@/components/generator/QualityBadge';
+import type { QualityReport } from '@/lib/quality/gates';
 import { SaveTemplateDialog } from '@/components/generator/SaveTemplateDialog';
 import { isFeatureEnabled } from '@/lib/features/flags';
 
@@ -33,6 +35,7 @@ function GeneratePageClient() {
   const [pushError, setPushError] = useState<string | null>(null);
   const [generationId, setGenerationId] = useState<string | null>(null);
   const [ragEnriched, setRagEnriched] = useState(false);
+  const [qualityReport, setQualityReport] = useState<QualityReport | null>(null);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
 
   const githubEnabled = isFeatureEnabled('ENABLE_GITHUB_APP');
@@ -82,6 +85,7 @@ export default function TemplateComponent() {
       componentName?: string;
       generationId?: string;
       ragEnriched?: boolean;
+      qualityReport?: QualityReport | null;
     }
   ) => {
     setGeneratedCode(code);
@@ -93,6 +97,7 @@ export default function TemplateComponent() {
     if (settings?.componentName) setComponentName(settings.componentName);
     setGenerationId(settings?.generationId ?? null);
     setRagEnriched(settings?.ragEnriched ?? false);
+    setQualityReport(settings?.qualityReport ?? null);
   };
 
   const handlePushToGitHub = async () => {
@@ -247,7 +252,10 @@ export default function TemplateComponent() {
 
       {generatedCode && !isGenerating && (
         <div className="mt-4 flex items-center justify-between gap-3 p-3 rounded-lg border bg-card">
-          <FeedbackPanel generationId={generationId} ragEnriched={ragEnriched} />
+          <div className="flex items-center gap-3">
+            <FeedbackPanel generationId={generationId} ragEnriched={ragEnriched} />
+            <QualityBadge report={qualityReport} />
+          </div>
           <div className="flex items-center gap-3">
             <Button onClick={() => setSaveDialogOpen(true)} variant="outline" size="sm">
               <Save className="mr-2 h-4 w-4" />

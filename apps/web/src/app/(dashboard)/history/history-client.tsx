@@ -27,6 +27,7 @@ interface HistoryGeneration {
   model_used?: string;
   tokens_used?: number;
   generation_time_ms?: number;
+  quality_score?: number;
   created_at: string;
 }
 

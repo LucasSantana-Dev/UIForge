@@ -241,7 +241,10 @@ export default function GeneratorForm({
 
   useEffect(() => {
     if (generation.code && !generation.isGenerating && !generation.error) {
-      onGenerate(generation.code, currentSettings);
+      onGenerate(generation.code, {
+        ...currentSettings,
+        qualityReport: generation.qualityReport,
+      });
     }
   }, [generation.code, generation.isGenerating, generation.error, onGenerate, currentSettings]);
 

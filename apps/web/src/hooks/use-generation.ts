@@ -4,6 +4,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { streamGeneration, GenerationOptions, GenerationEvent } from '@/lib/api/generation';
+import type { QualityReport } from '@/lib/quality/gates';
 import { useCreateGeneration } from './use-generations';
 
 export interface UseGenerationState {
@@ -12,6 +13,7 @@ export interface UseGenerationState {
   code: string;
   error: string | null;
   events: GenerationEvent[];
+  qualityReport: QualityReport | null;
 }
 
 export function useGeneration(projectId?: string) {
@@ -21,6 +23,7 @@ export function useGeneration(projectId?: string) {
     code: '',
     error: null,
     events: [],
+    qualityReport: null,
   });
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -38,7 +41,7 @@ export function useGeneration(projectId?: string) {
           abortControllerRef.current.abort();
         }
 
-        setState({ isGenerating: true, progress: 0, code: '', error: null, events: [] });
+        setState({ isGenerating: true, progress: 0, code: '', error: null, events: [], qualityReport: null });
 
         abortControllerRef.current = new AbortController();
 
@@ -69,6 +72,13 @@ export function useGeneration(projectId?: string) {
                   progress: Math.min((chunkCount / 10) * 100, 95),
                 }));
               }
+              break;
+
+            case 'quality':
+              setState((prev) => ({
+                ...prev,
+                qualityReport: (event.report as QualityReport) ?? null,
+              }));
               break;
 
             case 'complete':
@@ -128,7 +138,7 @@ export function useGeneration(projectId?: string) {
 
   const reset = useCallback(() => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
-    setState({ isGenerating: false, progress: 0, code: '', error: null, events: [] });
+    setState({ isGenerating: false, progress: 0, code: '', error: null, events: [], qualityReport: null });
   }, []);
 
   return { ...state, startGeneration, stopGeneration, reset };
