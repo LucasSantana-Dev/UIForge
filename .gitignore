@@ -95,7 +95,7 @@ STATUS_*.md
 PHASE*.md
 
 # Root test/demo scripts (keep tests in apps/*/src/__tests__/)
-test-config.ts
+/test-config.ts
 test_*.py
 demo_*.py
 validate_*.py
