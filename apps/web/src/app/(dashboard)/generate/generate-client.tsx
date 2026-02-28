@@ -1,19 +1,32 @@
 'use client';
 
-import { useState, Suspense, useEffect } from 'react';
+import { useState, useCallback, Suspense, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import GeneratorForm from '@/components/generator/GeneratorForm';
 import CodeEditor from '@/components/generator/CodeEditor';
 import LivePreview from '@/components/generator/LivePreview';
+import RefinementInput from '@/components/generator/RefinementInput';
+import GenerationHistory from '@/components/generator/GenerationHistory';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Code, Github, Loader2, Check, AlertTriangle, Save } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  ArrowLeft,
+  Code,
+  Github,
+  Loader2,
+  Check,
+  AlertTriangle,
+  Save,
+  HistoryIcon,
+} from 'lucide-react';
 import FeedbackPanel from '@/components/generator/FeedbackPanel';
 import { QualityBadge } from '@/components/generator/QualityBadge';
 import type { QualityReport } from '@/lib/quality/gates';
 import { SaveTemplateDialog } from '@/components/generator/SaveTemplateDialog';
 import { isFeatureEnabled } from '@/lib/features/flags';
+import { useGeneration } from '@/hooks/use-generation';
 
 function GeneratePageClient() {
   const searchParams = useSearchParams();
@@ -23,6 +36,9 @@ function GeneratePageClient() {
   const componentLibrary = searchParams.get('componentLibrary') || 'tailwind';
   const template = searchParams.get('template');
   const description = searchParams.get('description');
+
+  const generation = useGeneration(projectId ?? undefined);
+  const conversationEnabled = isFeatureEnabled('ENABLE_CONVERSATION_MODE');
 
   const [generatedCode, setGeneratedCode] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -37,6 +53,7 @@ function GeneratePageClient() {
   const [ragEnriched, setRagEnriched] = useState(false);
   const [qualityReport, setQualityReport] = useState<QualityReport | null>(null);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [lastFormOptions, setLastFormOptions] = useState<any>(null);
 
   const githubEnabled = isFeatureEnabled('ENABLE_GITHUB_APP');
 
@@ -57,21 +74,13 @@ function GeneratePageClient() {
           }
         }
       } catch {
-        // fall through to stub
+        // fall through
       }
 
       if (description) {
-        const stub = `import React from 'react';
-
-export default function TemplateComponent() {
-  return (
-    <div className="p-4">
-      <h2>${template}</h2>
-      <p>${description}</p>
-    </div>
-  );
-}`;
-        setGeneratedCode(stub);
+        setGeneratedCode(
+          `import React from 'react';\nexport default function TemplateComponent() {\n  return <div className="p-4"><h2>${template}</h2><p>${description}</p></div>;\n}`
+        );
         setIsTemplateMode(true);
       }
     }
@@ -79,26 +88,63 @@ export default function TemplateComponent() {
     loadTemplate();
   }, [template, description]);
 
-  const handleGenerate = async (
-    code: string,
-    settings?: {
-      componentName?: string;
-      generationId?: string;
-      ragEnriched?: boolean;
-      qualityReport?: QualityReport | null;
-    }
-  ) => {
-    setGeneratedCode(code);
-    setIsGenerating(false);
-    setIsTemplateMode(false);
-    setPushState('idle');
-    setPrUrl(null);
-    setPushError(null);
-    if (settings?.componentName) setComponentName(settings.componentName);
-    setGenerationId(settings?.generationId ?? null);
-    setRagEnriched(settings?.ragEnriched ?? false);
-    setQualityReport(settings?.qualityReport ?? null);
-  };
+  const handleGenerate = useCallback(
+    async (
+      code: string,
+      settings?: {
+        componentName?: string;
+        generationId?: string;
+        ragEnriched?: boolean;
+        qualityReport?: QualityReport | null;
+        formOptions?: any;
+      }
+    ) => {
+      setGeneratedCode(code);
+      setIsGenerating(false);
+      setIsTemplateMode(false);
+      setPushState('idle');
+      setPrUrl(null);
+      setPushError(null);
+      if (settings?.componentName) setComponentName(settings.componentName);
+      setGenerationId(settings?.generationId ?? null);
+      setRagEnriched(settings?.ragEnriched ?? false);
+      setQualityReport(settings?.qualityReport ?? null);
+      if (settings?.formOptions) setLastFormOptions(settings.formOptions);
+    },
+    []
+  );
+
+  const handleRefine = useCallback(
+    async (refinementPrompt: string) => {
+      if (!lastFormOptions) return;
+      generation.startRefinement(refinementPrompt, lastFormOptions);
+    },
+    [generation, lastFormOptions]
+  );
+
+  const handleNewGeneration = useCallback(() => {
+    generation.reset();
+    setGeneratedCode('');
+    setGenerationId(null);
+    setQualityReport(null);
+  }, [generation]);
+
+  const handleSelectFromHistory = useCallback(
+    (code: string, id: string) => {
+      setGeneratedCode(code);
+      setGenerationId(id);
+      generation.reset();
+    },
+    [generation]
+  );
+
+  const handleForkFromHistory = useCallback(
+    (code: string, _prompt: string) => {
+      setGeneratedCode(code);
+      generation.reset();
+    },
+    [generation]
+  );
 
   const handlePushToGitHub = async () => {
     if (!generatedCode || !projectId) return;
@@ -123,7 +169,7 @@ export default function TemplateComponent() {
       if (!res.ok) {
         if (res.status === 404) {
           setPushState('no-repo');
-          setPushError('No GitHub repo linked. Go to Settings to link one.');
+          setPushError('No GitHub repo linked.');
         } else {
           setPushState('error');
           setPushError(data.error || 'Failed to push');
@@ -139,28 +185,11 @@ export default function TemplateComponent() {
     }
   };
 
-  const handleGenerating = () => {
-    setIsGenerating(true);
-  };
+  const handleGenerating = () => setIsGenerating(true);
 
   const handleCodeChange = (code: string) => {
     setGeneratedCode(code);
     setIsTemplateMode(false);
-  };
-
-  const handleBackToTemplates = () => {
-    router.push('/templates');
-  };
-
-  const handleClearTemplate = () => {
-    setGeneratedCode('');
-    setIsTemplateMode(false);
-    const url = new URL(window.location.href);
-    url.searchParams.delete('template');
-    url.searchParams.delete('framework');
-    url.searchParams.delete('componentLibrary');
-    url.searchParams.delete('description');
-    window.history.replaceState({}, '', url.toString());
   };
 
   if (!projectId) {
@@ -186,17 +215,45 @@ export default function TemplateComponent() {
               Describe your component and let AI generate the code for you
             </p>
           </div>
-          {isTemplateMode && (
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={handleBackToTemplates}>
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to Templates
-              </Button>
-              <Button variant="ghost" onClick={handleClearTemplate}>
-                Clear Template
-              </Button>
-            </div>
-          )}
+          <div className="flex items-center gap-2">
+            {isTemplateMode && (
+              <>
+                <Button variant="outline" onClick={() => router.push('/templates')}>
+                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  Back to Templates
+                </Button>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setGeneratedCode('');
+                    setIsTemplateMode(false);
+                  }}
+                >
+                  Clear Template
+                </Button>
+              </>
+            )}
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <HistoryIcon className="w-4 h-4 mr-2" />
+                  History
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[380px] sm:w-[420px] p-0">
+                <SheetHeader className="p-4 border-b">
+                  <SheetTitle>Generation History</SheetTitle>
+                </SheetHeader>
+                <div className="overflow-y-auto h-[calc(100%-60px)]">
+                  <GenerationHistory
+                    projectId={projectId}
+                    onSelectGeneration={handleSelectFromHistory}
+                    onForkGeneration={handleForkFromHistory}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
 
         {isTemplateMode && (
@@ -211,10 +268,6 @@ export default function TemplateComponent() {
                 {componentLibrary}
               </Badge>
             </div>
-            <p className="text-xs text-text-brand mt-1">
-              This template has been pre-loaded. You can customize it further or generate new
-              components.
-            </p>
           </div>
         )}
       </div>
@@ -251,58 +304,59 @@ export default function TemplateComponent() {
       </div>
 
       {generatedCode && !isGenerating && (
-        <div className="mt-4 flex items-center justify-between gap-3 p-3 rounded-lg border bg-card">
-          <div className="flex items-center gap-3">
-            <FeedbackPanel generationId={generationId} ragEnriched={ragEnriched} />
-            <QualityBadge report={qualityReport} />
-          </div>
-          <div className="flex items-center gap-3">
-            <Button onClick={() => setSaveDialogOpen(true)} variant="outline" size="sm">
-              <Save className="mr-2 h-4 w-4" />
-              Save as Template
-            </Button>
+        <div className="mt-4 space-y-3">
+          {conversationEnabled && generation.parentGenerationId && (
+            <RefinementInput
+              onRefine={handleRefine}
+              onNewGeneration={handleNewGeneration}
+              isGenerating={generation.isGenerating}
+              conversationTurn={generation.conversationTurn}
+              maxTurns={generation.maxConversationTurns}
+            />
+          )}
 
-            {githubEnabled && (
-              <>
-                {pushState === 'idle' && (
-                  <Button onClick={handlePushToGitHub} variant="outline" size="sm">
-                    <Github className="mr-2 h-4 w-4" />
-                    Push to GitHub
-                  </Button>
-                )}
-                {pushState === 'pushing' && (
-                  <Button disabled variant="outline" size="sm">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating PR...
-                  </Button>
-                )}
-                {pushState === 'success' && prUrl && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <Check className="h-4 w-4 text-green-500" />
-                    <span>PR created!</span>
-                    <a
-                      href={prUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary underline"
-                    >
-                      View on GitHub
-                    </a>
-                  </div>
-                )}
-                {(pushState === 'error' || pushState === 'no-repo') && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                    <span className="text-muted-foreground">{pushError}</span>
-                    {pushState === 'error' && (
-                      <Button onClick={handlePushToGitHub} variant="ghost" size="sm">
-                        Retry
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
+          <div className="flex items-center justify-between gap-3 p-3 rounded-lg border bg-card">
+            <div className="flex items-center gap-3">
+              <FeedbackPanel generationId={generationId} ragEnriched={ragEnriched} />
+              <QualityBadge report={qualityReport} />
+            </div>
+            <div className="flex items-center gap-3">
+              <Button onClick={() => setSaveDialogOpen(true)} variant="outline" size="sm">
+                <Save className="mr-2 h-4 w-4" />
+                Save as Template
+              </Button>
+              {githubEnabled && pushState === 'idle' && (
+                <Button onClick={handlePushToGitHub} variant="outline" size="sm">
+                  <Github className="mr-2 h-4 w-4" />
+                  Push to GitHub
+                </Button>
+              )}
+              {githubEnabled && pushState === 'pushing' && (
+                <Button disabled variant="outline" size="sm">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Creating PR...
+                </Button>
+              )}
+              {githubEnabled && pushState === 'success' && prUrl && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Check className="h-4 w-4 text-green-500" />
+                  <a
+                    href={prUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary underline"
+                  >
+                    View PR
+                  </a>
+                </div>
+              )}
+              {githubEnabled && (pushState === 'error' || pushState === 'no-repo') && (
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                  {pushError}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -22,8 +22,8 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_DESIGN_CONTEXT: true,
   ENABLE_PROMPT_AUTOCOMPLETE: true,
   ENABLE_CODE_INTELLISENSE: true,
-  ENABLE_CONVERSATION_MODE: false,
-  ENABLE_DESIGN_ANALYSIS: false,
+  ENABLE_CONVERSATION_MODE: true,
+  ENABLE_DESIGN_ANALYSIS: true,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
