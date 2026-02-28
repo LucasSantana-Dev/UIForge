@@ -64,6 +64,7 @@ export function useGeneration(_projectId?: string) {
 
         let chunkCount = 0;
         let code = '';
+        let resultGenerationId: string | null = null;
 
         for await (const event of streamGeneration(options)) {
           if (abortControllerRef.current?.signal.aborted) break;
@@ -99,6 +100,7 @@ export function useGeneration(_projectId?: string) {
               break;
 
             case 'complete':
+              resultGenerationId = event.generationId ?? null;
               setState((prev) => ({
                 ...prev,
                 code,
@@ -123,12 +125,16 @@ export function useGeneration(_projectId?: string) {
           if (prev.isGenerating) return { ...prev, isGenerating: false };
           return prev;
         });
+
+        return { code, generationId: resultGenerationId };
       } catch (error) {
         setState((prev) => ({
           ...prev,
           error: error instanceof Error ? error.message : 'Unknown error',
           isGenerating: false,
         }));
+
+        return null;
       }
     },
     []

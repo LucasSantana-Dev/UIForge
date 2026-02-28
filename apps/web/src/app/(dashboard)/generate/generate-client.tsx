@@ -114,13 +114,24 @@ function GeneratePageClient() {
     []
   );
 
-  const handleRefine = useCallback(
-    async (refinementPrompt: string) => {
-      if (!lastFormOptions) return;
-      generation.startRefinement(refinementPrompt, lastFormOptions);
-    },
-    [generation, lastFormOptions]
-  );
+  const handleRefine = async (refinementPrompt: string) => {
+    if (!lastFormOptions) return;
+    setIsGenerating(true);
+    try {
+      const result = await generation.startGeneration({
+        ...lastFormOptions,
+        parentGenerationId: generationId ?? undefined,
+        previousCode: generatedCode,
+        refinementPrompt,
+      });
+      if (result) {
+        setGeneratedCode(result.code);
+        setGenerationId(result.generationId);
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleNewGeneration = useCallback(() => {
     generation.reset();
@@ -305,7 +316,7 @@ function GeneratePageClient() {
 
       {generatedCode && !isGenerating && (
         <div className="mt-4 space-y-3">
-          {conversationEnabled && generation.parentGenerationId && (
+          {conversationEnabled && generationId && (
             <RefinementInput
               onRefine={handleRefine}
               onNewGeneration={handleNewGeneration}
