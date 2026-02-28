@@ -4,7 +4,7 @@ export function EmailFooter() {
   return (
     <Section className="mt-8 text-center">
       <Text className="m-0 text-xs text-[#71717a]">
-        <Link href="https://siza.dev" className="text-[#71717a] underline">
+        <Link href="https://siza.forgespace.co" className="text-[#71717a] underline">
           Siza
         </Link>
         {' - '}AI-powered UI generation

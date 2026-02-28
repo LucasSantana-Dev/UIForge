@@ -9,7 +9,7 @@
 
 # API routes
 /api/*
-  Access-Control-Allow-Origin: https://uiforge.workers.dev
+  Access-Control-Allow-Origin: https://siza.forgespace.co
   Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
   Access-Control-Allow-Headers: Content-Type, Authorization
 

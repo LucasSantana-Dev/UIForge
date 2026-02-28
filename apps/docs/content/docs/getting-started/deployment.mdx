@@ -70,7 +70,7 @@ GitHub Actions handles automated deployments:
 
 | Workflow           | Trigger                     | Target                                       |
 | ------------------ | --------------------------- | -------------------------------------------- |
-| `deploy-web.yml`   | Push to `main`              | Production (`siza.dev`)  |
+| `deploy-web.yml`   | Push to `main`              | Production (`siza.forgespace.co`)  |
 | `deploy-docs.yml`  | Push to `main` (docs)       | Docs site                                    |
 | `ci.yml`           | All PRs                     | Lint, type-check, build, test, security      |
 
@@ -80,7 +80,7 @@ Push to the `dev` branch to deploy to the dev worker:
 
 ```bash
 git push origin dev
-# Deploys to siza-web-dev.uiforge.workers.dev via --env dev
+# Deploys to dev.forgespace.co via --env dev
 ```
 
 ## Workers Runtime Constraints

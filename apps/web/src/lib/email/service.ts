@@ -7,7 +7,7 @@ interface SendEmailOptions {
   react: ReactElement;
 }
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'noreply@siza.dev';
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? 'noreply@forgespace.co';
 const FROM_NAME = process.env.RESEND_FROM_NAME ?? 'Siza';
 
 export async function sendEmail({ to, subject, react }: SendEmailOptions) {

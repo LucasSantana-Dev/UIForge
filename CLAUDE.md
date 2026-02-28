@@ -125,7 +125,7 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 - **Turbopack is default** in Next.js 16 — add `turbopack: {}` to next.config.js if using webpack config
 - **Build command**: `cd apps/web && npx opennextjs-cloudflare build`
 - **Deploy command**: `cd apps/web && ./scripts/deploy.sh`
-- **Dev deploy**: Push to `dev` branch → auto-deploys to `siza-web-dev.uiforge.workers.dev` via `--env dev`
+- **Dev deploy**: Push to `dev` branch → auto-deploys to `dev.forgespace.co` via `--env dev`
 
 ## Documentation Governance
 - NEVER create task-specific docs in repo root or docs/ (e.g., *_COMPLETE.md, *_SUMMARY.md, STATUS_*.md, PHASE*.md, *_REPORT.md, *_CHECKLIST.md)
