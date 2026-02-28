@@ -21,6 +21,14 @@ export interface GenerationOptions {
   spacing?: 'compact' | 'default' | 'spacious';
   borderRadius?: 'none' | 'small' | 'medium' | 'large' | 'full';
   typography?: 'system' | 'sans' | 'serif' | 'mono';
+  brandHeadingFont?: string;
+  brandBodyFont?: string;
+  brandSemanticColors?: {
+    success: string;
+    warning: string;
+    error: string;
+    info: string;
+  };
 }
 
 export interface GenerationEvent {
