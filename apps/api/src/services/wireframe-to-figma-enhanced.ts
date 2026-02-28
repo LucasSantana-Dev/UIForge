@@ -193,16 +193,14 @@ function createComponentWithVariants(
     // Create variants for different states
     const variants = createComponentVariants(elements);
     baseComponent.children = variants;
-    baseComponent.variants = createVariants
-      ? [
-          {
-            name: 'State',
-            type: 'VARIANT',
-            values: ['Default', 'Hover', 'Pressed', 'Disabled'],
-            defaultValue: 'Default',
-          },
-        ]
-      : undefined;
+    baseComponent.variants = [
+      {
+        name: 'State',
+        type: 'VARIANT',
+        values: ['Default', 'Hover', 'Pressed', 'Disabled'],
+        defaultValue: 'Default',
+      },
+    ];
   } else {
     // Single component
     const mainElement = elements[0];

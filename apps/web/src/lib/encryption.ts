@@ -95,11 +95,10 @@ export function validateApiKey(apiKey: string, provider: AIProvider): boolean {
 }
 
 export function generateKeyId(): string {
-  const hex = () =>
-    Math.floor(Math.random() * 0x10000)
-      .toString(16)
-      .padStart(4, '0');
-  return `key_${hex()}${hex()}-${hex()}-${hex()}-${hex()}-${hex()}${hex()}${hex()}`;
+  const bytes = new Uint8Array(16);
+  crypto.getRandomValues(bytes);
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  return `key_${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
 export function hashApiKey(apiKey: string): string {

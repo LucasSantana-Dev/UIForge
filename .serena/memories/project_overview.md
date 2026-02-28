@@ -47,7 +47,7 @@ Precise, confident, technical, dry, architectural. Write for engineers. No emoji
 - **Dev**: `siza-web-dev.uiforge.workers.dev`
 - Production: siza.dev (planned custom domain, Issue #64)
 - Health: `GET /api/health → { status, timestamp, version }`
-- **Tags**: v0.2.1, v0.3.0, v0.4.0, v0.5.0, v0.6.0, v0.7.0, v0.7.1, v0.8.0, v0.8.1
-- **Open PRs**: #108 (docs redesign + landing cleanup), #94 (desktop app), #87 (docs overhaul)
-- **Recent Merges**: #105 (create-siza-app CLI), #106 (desktop publish fix)
-- **Open Issues**: #61 (Stripe E2E), #64 (custom domain)
+- **Tags**: v0.2.1, v0.3.0, v0.4.0, v0.5.0, v0.6.0, v0.7.0, v0.7.1, v0.8.0, v0.8.1, v0.8.2, v0.9.0, v0.10.0, v0.11.0, v0.12.0, v0.12.1, v0.13.0, v0.13.1, v0.15.0
+- **Open PRs**: #153 (docs UI overhaul), #154 (brand identity v3)
+- **Recent Merges**: #150 (CodeQL security fixes — 15 alerts resolved)
+- **Open Issues**: 0

@@ -328,7 +328,7 @@ const name = '${name}';
   const name = '${name}';
 </script>
 
-${jsx.replace(/className=/g, 'class=').replace(/\{name\}/g, '{name}')}
+${jsx.replace(/className=/g, 'class=')}
 
 <style>
   @import '../globals.css';

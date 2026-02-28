@@ -1,4 +1,5 @@
 import type { NextRequest } from 'next/server';
+import { captureServerError } from '@/lib/sentry/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
       headers: { 'Content-Type': contentType },
     });
   } catch (error) {
-    console.error('Formatting error:', error);
+    captureServerError(error, { route: '/api/generate/format' });
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

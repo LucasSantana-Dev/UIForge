@@ -32,7 +32,7 @@ export function SignInClient() {
       setError(error.message);
       setLoading(false);
     } else {
-      router.push('/dashboard');
+      router.push('/projects');
       router.refresh();
     }
   };

@@ -190,7 +190,8 @@ async function* generateWithOpenAI(options: MultiProviderOptions): AsyncGenerato
 async function* generateWithAnthropic(
   options: MultiProviderOptions
 ): AsyncGenerator<GenerationEvent> {
-  if (!options.apiKey) {
+  const apiKey = options.apiKey || process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
     yield {
       type: 'error',
       message: 'Anthropic API key is required. Add your key in AI Keys settings.',
@@ -208,7 +209,7 @@ async function* generateWithAnthropic(
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'x-api-key': options.apiKey,
+        'x-api-key': apiKey,
         'Content-Type': 'application/json',
         'anthropic-version': '2023-06-01',
       },

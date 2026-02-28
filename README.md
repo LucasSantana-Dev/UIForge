@@ -13,7 +13,9 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![Discussions](https://img.shields.io/github/discussions/Forge-Space/siza)](https://github.com/Forge-Space/siza/discussions)
 
-**Live**: [siza.dev](https://siza.dev)\
+**Live**: [siza.forgespace.co](https://siza.forgespace.co)
+
+![Siza Landing Page](assets/demo.gif)\
 **Dev**: [dev.forgespace.co](https://dev.forgespace.co)
 
 ## Why Siza
@@ -29,7 +31,7 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 ## Features
 
 - **AI-Powered Generation** — Natural language or screenshot to production-ready UI components
-- **MCP-Native** — 12 UI tools, 7 branding tools, 20+ gateway servers, all composable via Model Context Protocol
+- **MCP-Native** — 21 UI/backend tools, 9 branding tools, 20+ gateway servers, all composable via Model Context Protocol
 - **Privacy-First BYOK** — Bring Your Own Key with client-side AES-256 encryption
 - **Generous Free Tier** — Cloudflare Workers + Supabase + Gemini free tiers give you a generous starting point at $0/month
 - **Self-Hostable** — Run everything locally with Docker, MIT licensed
@@ -133,12 +135,13 @@ Free for individuals, paid for scale and convenience.
 
 ## The Forge Space Ecosystem
 
-Siza is part of [Forge Space](https://github.com/Forge-Space) — five open-source repos designed to work together:
+Siza is part of [Forge Space](https://github.com/Forge-Space) — six open-source repos designed to work together:
 
 | Repo | Purpose |
 |------|---------|
 | **[siza](https://github.com/Forge-Space/siza)** | AI workspace (this repo) |
-| **[siza-mcp](https://github.com/Forge-Space/ui-mcp)** | 12 MCP tools for UI generation |
+| **[siza-mcp](https://github.com/Forge-Space/ui-mcp)** | 21 MCP tools for UI and backend generation |
+| **[siza-gen](https://github.com/Forge-Space/siza-gen)** | AI generation engine (502-snippet registry, ML quality) |
 | **[mcp-gateway](https://github.com/Forge-Space/mcp-gateway)** | AI-powered tool routing hub |
 | **[forge-patterns](https://github.com/Forge-Space/core)** | Shared standards and MCP context server |
 | **[branding-mcp](https://github.com/Forge-Space/branding-mcp)** | Brand identity generation |
@@ -193,4 +196,4 @@ MIT — see [LICENSE](LICENSE).
 
 ---
 
-Part of the [Forge Space](https://github.com/Forge-Space) ecosystem. Built by [Lucas Santana](https://github.com/LucasSantana-Dev).
+Part of the [Forge Space](https://github.com/Forge-Space) ecosystem.

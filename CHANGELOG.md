@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-02-28
+
+### Added
+- **Service layer**: Extract business logic from API route handlers into dedicated service files (conversation, project, component, generation)
+- **Repository layer**: Thin Supabase data access layer (base, project, component, generation, feedback repos) with pagination and error handling
+- **Security headers**: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy added to all responses via middleware
+- **CORS allowlist**: Origin validation replacing wildcard `*` — forgespace.co subdomains + localhost in dev
+- **XSS sanitization**: Zod `.transform(sanitizeText)` on all user text fields (projects, components)
+- **Request tracing**: X-Request-ID header (crypto.randomUUID) on every response
+- **Route-based rate limits**: Per-endpoint rate limit configuration (15/min generate, 60/min CRUD, 10/min auth)
+- **Error boundaries**: Generic ErrorBoundary and RouteErrorBoundary components
+- **TTLCache utility**: Generic in-memory cache with LRU eviction for server-side caching
+- **29 service layer tests**: Full unit test coverage for conversation, project, and component services
+
+### Changed
+- **GeneratorForm refactored**: 578 → 313 lines via ImageUpload, ProviderSelector, QuotaGuard extraction
+- **Structured error logging**: console.error replaced with captureServerError (Sentry) across all API routes
+- **Templates routes**: Fixed variable name mismatches in error handlers (dbError/deleteError)
+- **.env.example**: Completed with all missing environment variables
 
 ## [0.14.0] - 2026-02-28
 

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
 import { successResponse, errorResponse } from '@/lib/api/response';
+import { captureServerError } from '@/lib/sentry/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
     const { data: generations, error, count } = await query;
 
     if (error) {
-      console.error('Failed to fetch generation history:', error);
+      captureServerError(error, { route: '/api/generations/history' });
       return errorResponse('Failed to fetch history', 500);
     }
 
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('History GET error:', error);
+    captureServerError(error, { route: '/api/generations/history' });
     return errorResponse('Internal server error', 500);
   }
 }

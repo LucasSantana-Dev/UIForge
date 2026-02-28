@@ -14,7 +14,7 @@ export const baseOptions: BaseLayoutProps = {
     { text: 'Docs', url: '/docs', active: 'nested-url' },
     { text: 'API', url: '/docs/api-reference/mcp-tools' },
     { text: 'Guides', url: '/docs/guides/first-component' },
-    { text: 'Platform', url: 'https://siza.dev', external: true },
+    { text: 'Platform', url: 'https://siza.forgespace.co', external: true },
     { text: 'GitHub', url: 'https://github.com/Forge-Space', external: true },
   ],
 };

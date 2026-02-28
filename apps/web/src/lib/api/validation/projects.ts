@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { sanitizeText } from '@/lib/security/sanitize';
 
 export const frameworkEnum = z.enum(['react', 'vue', 'angular', 'svelte']);
 
@@ -17,8 +18,12 @@ export const componentLibraryEnum = z.enum([
 ]);
 
 export const createProjectSchema = z.object({
-  name: z.string().min(1).max(100),
-  description: z.string().max(500).optional(),
+  name: z.string().min(1).max(100).transform(sanitizeText),
+  description: z
+    .string()
+    .max(500)
+    .optional()
+    .transform((v) => (v ? sanitizeText(v) : v)),
   framework: frameworkEnum,
   component_library: componentLibraryEnum.default('none'),
   is_public: z.boolean().default(false),

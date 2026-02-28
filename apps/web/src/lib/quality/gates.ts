@@ -109,7 +109,7 @@ export function runAccessibilityCheck(code: string): QualityResult {
     }
   }
 
-  if (/tabIndex\s*=\s*\{?\s*[1-9]/.test(code)) {
+  if (/tabIndex\s*=\s*[{\s]*[1-9]/.test(code)) {
     issues.push('Positive tabIndex values harm accessibility');
   }
 
