@@ -11,7 +11,7 @@ import {
   CheckIcon,
   XIcon,
 } from 'lucide-react';
-import { useThemeStore, parseBrandIdentity, type SizaTheme } from '@/stores/theme-store';
+import { useThemeStore, type SizaTheme } from '@/stores/theme-store';
 import type { DesignContextValues } from './DesignContext';
 
 interface ThemeSelectorProps {
