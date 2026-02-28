@@ -25,7 +25,6 @@ export function withAuth(handler: RouteHandler): RouteHandler {
       if ((error as APIError).statusCode) {
         return apiErrorResponse(error as APIError);
       }
-      console.error('Auth middleware error:', error);
       captureServerError(error, { route: request.nextUrl.pathname });
       return errorResponse('Authentication failed', 401);
     }
@@ -66,7 +65,6 @@ export function withRateLimit(
       if ((error as APIError).statusCode) {
         return apiErrorResponse(error as APIError);
       }
-      console.error('Rate limit middleware error:', error);
       captureServerError(error, { route: request.nextUrl.pathname });
       return errorResponse('Rate limit check failed', 500);
     }
@@ -96,7 +94,6 @@ export function withValidation<T>(
       if ((error as APIError).statusCode) {
         return apiErrorResponse(error as APIError);
       }
-      console.error('Validation middleware error:', error);
       captureServerError(error, { route: request.nextUrl.pathname });
       return errorResponse('Validation failed', 400);
     }
@@ -114,7 +111,6 @@ export function withErrorHandling(handler: RouteHandler): RouteHandler {
       if ((error as APIError).statusCode) {
         return apiErrorResponse(error as APIError);
       }
-      console.error('Route handler error:', error);
       captureServerError(error, { route: request.nextUrl.pathname });
       return errorResponse('An unexpected error occurred', 500);
     }

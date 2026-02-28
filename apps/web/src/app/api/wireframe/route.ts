@@ -1,4 +1,5 @@
 import type { NextRequest } from 'next/server';
+import { captureServerError } from '@/lib/sentry/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -292,7 +293,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Wireframe generation error:', error);
+    captureServerError(error, { route: '/api/wireframe' });
     return new Response(JSON.stringify({ error: 'Internal server error' }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },

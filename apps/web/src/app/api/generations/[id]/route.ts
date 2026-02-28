@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, errorResponse } from '@/lib/api/response';
+import { captureServerError } from '@/lib/sentry/server';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: generationId } = await params;
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return successResponse({ generation });
   } catch (error) {
-    console.error('Generation GET error:', error);
+    captureServerError(error, { route: '/api/generations/[id]' });
     return errorResponse('Internal server error', 500);
   }
 }
@@ -110,13 +111,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       .single();
 
     if (error) {
-      console.error('Failed to update generation:', error);
+    captureServerError(error, { route: '/api/generations/[id]' });
       return errorResponse('Failed to update generation', 500);
     }
 
     return successResponse({ generation });
   } catch (error) {
-    console.error('Generation PATCH error:', error);
+    captureServerError(error, { route: '/api/generations/[id]' });
     return errorResponse('Internal server error', 500);
   }
 }
@@ -160,13 +161,13 @@ export async function DELETE(
     const { error } = await supabase.from('generations').delete().eq('id', generationId);
 
     if (error) {
-      console.error('Failed to delete generation:', error);
+    captureServerError(error, { route: '/api/generations/[id]' });
       return errorResponse('Failed to delete generation', 500);
     }
 
     return successResponse({ message: 'Generation deleted successfully' });
   } catch (error) {
-    console.error('Generation DELETE error:', error);
+    captureServerError(error, { route: '/api/generations/[id]' });
     return errorResponse('Internal server error', 500);
   }
 }
