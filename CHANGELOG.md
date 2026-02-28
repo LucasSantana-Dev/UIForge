@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-02-28
+
 ### Added
 - **LivePreview Library Shims**: Generated code using lucide-react icons and shadcn/ui components now renders correctly in the preview iframe
   - `cn()` utility for Tailwind class joining
@@ -14,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 30+ shadcn/ui component stubs (Button, Card, Badge, Input, Label, Alert, Dialog, Table, Tabs, Select, etc.)
   - shadcn dark theme CSS custom properties and Tailwind color config
   - Zero server bundle cost — all shims are inline template strings in the iframe HTML
+
+### Fixed
+- Health endpoint now returns build-time injected version instead of reading package.json at runtime
+- Docs site layout and component structure fixes
 
 ## [desktop-v0.2.0] - 2026-02-27
 
