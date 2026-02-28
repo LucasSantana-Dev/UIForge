@@ -5,19 +5,16 @@ export const baseOptions: BaseLayoutProps = {
   nav: {
     title: (
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <Image src="/siza-icon.png" alt="Siza" width={24} height={24} />
-        <span style={{ fontWeight: 600 }}>Siza</span>
+        <Image src="/siza-logo.svg" alt="Siza" width={20} height={20} />
+        <span style={{ fontWeight: 700, letterSpacing: '-0.02em' }}>Siza</span>
       </div>
     ),
   },
   links: [
-    {
-      text: 'Platform',
-      url: 'https://siza.dev',
-    },
-    {
-      text: 'GitHub',
-      url: 'https://github.com/Forge-Space',
-    },
+    { text: 'Docs', url: '/docs', active: 'nested-url' },
+    { text: 'API', url: '/docs/api-reference/mcp-tools' },
+    { text: 'Guides', url: '/docs/guides/first-component' },
+    { text: 'Platform', url: 'https://siza.dev', external: true },
+    { text: 'GitHub', url: 'https://github.com/Forge-Space', external: true },
   ],
 };
