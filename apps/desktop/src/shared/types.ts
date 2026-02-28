@@ -27,6 +27,20 @@ export interface FileEntry {
   children?: FileEntry[];
 }
 
+export interface OllamaGenerateRequest {
+  model: string;
+  framework: string;
+  componentName: string;
+  description: string;
+  registryExamples?: string;
+}
+
+export interface OllamaGenerateResult {
+  code: string;
+  model: string;
+  duration?: number;
+}
+
 export interface AppPreferences {
   ollamaBaseUrl: string;
   ollamaModel: string;
@@ -42,6 +56,7 @@ export interface SizaApi {
 
   checkOllama: () => Promise<OllamaStatus>;
   listOllamaModels: () => Promise<OllamaModel[]>;
+  generateWithOllama: (request: OllamaGenerateRequest) => Promise<OllamaGenerateResult>;
 
   selectDirectory: () => Promise<string | null>;
   readFile: (path: string) => Promise<string>;
