@@ -1,25 +1,19 @@
-"use client";
+'use client';
 
-import { useState, useMemo } from "react";
-import {
-  RefreshCwIcon,
-  MaximizeIcon,
-  Smartphone,
-  Tablet,
-  Monitor,
-} from "lucide-react";
+import { useState, useMemo } from 'react';
+import { RefreshCwIcon, MaximizeIcon, Smartphone, Tablet, Monitor } from 'lucide-react';
 
 interface LivePreviewProps {
   code: string;
   framework: string;
 }
 
-type Viewport = "mobile" | "tablet" | "desktop";
+type Viewport = 'mobile' | 'tablet' | 'desktop';
 
 const VIEWPORT_WIDTHS: Record<Viewport, string> = {
-  mobile: "375px",
-  tablet: "768px",
-  desktop: "100%",
+  mobile: '375px',
+  tablet: '768px',
+  desktop: '100%',
 };
 
 const SHADCN_CSS_VARS = `
@@ -732,12 +726,12 @@ const LIBRARY_SHIMS = `
 export default function LivePreview({ code, framework }: LivePreviewProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
-  const [viewport, setViewport] = useState<Viewport>("desktop");
+  const [viewport, setViewport] = useState<Viewport>('desktop');
 
   const previewHTML = useMemo(() => {
-    if (!code) return "";
-    if (framework === "react") return createReactPreviewHTML(code);
-    if (framework === "vue") return createVuePreviewHTML(code);
+    if (!code) return '';
+    if (framework === 'react') return createReactPreviewHTML(code);
+    if (framework === 'vue') return createVuePreviewHTML(code);
     return createFallbackHTML(code, framework);
   }, [code, framework]);
 
@@ -752,9 +746,9 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
     icon: typeof Smartphone;
     label: string;
   }> = [
-    { key: "mobile", icon: Smartphone, label: "Mobile" },
-    { key: "tablet", icon: Tablet, label: "Tablet" },
-    { key: "desktop", icon: Monitor, label: "Desktop" },
+    { key: 'mobile', icon: Smartphone, label: 'Mobile' },
+    { key: 'tablet', icon: Tablet, label: 'Tablet' },
+    { key: 'desktop', icon: Monitor, label: 'Desktop' },
   ];
 
   return (
@@ -768,8 +762,8 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
               onClick={() => setViewport(key)}
               className={`inline-flex items-center px-2 py-1 text-xs rounded ${
                 viewport === key
-                  ? "bg-primary text-primary-foreground"
-                  : "text-text-secondary hover:bg-surface-2"
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-text-secondary hover:bg-surface-2'
               }`}
               aria-label={label}
               title={label}
@@ -786,9 +780,7 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
             className="inline-flex items-center px-3 py-1 text-xs font-medium text-text-primary bg-surface-1 border border-surface-3 rounded hover:bg-surface-0 disabled:opacity-50"
             aria-label="Refresh preview"
           >
-            <RefreshCwIcon
-              className={`h-3 w-3 mr-1 ${isRefreshing ? "animate-spin" : ""}`}
-            />
+            <RefreshCwIcon className={`h-3 w-3 mr-1 ${isRefreshing ? 'animate-spin' : ''}`} />
             Refresh
           </button>
         </div>
@@ -805,7 +797,7 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
           <div
             className="h-full flex justify-center"
             style={{
-              padding: viewport !== "desktop" ? "0 16px" : undefined,
+              padding: viewport !== 'desktop' ? '0 16px' : undefined,
             }}
           >
             <iframe
@@ -814,11 +806,8 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
               className="h-full border-0 bg-surface-1 transition-all duration-200"
               style={{
                 width: VIEWPORT_WIDTHS[viewport],
-                maxWidth: "100%",
-                boxShadow:
-                  viewport !== "desktop"
-                    ? "0 0 0 1px rgba(0,0,0,0.1)"
-                    : undefined,
+                maxWidth: '100%',
+                boxShadow: viewport !== 'desktop' ? '0 0 0 1px rgba(0,0,0,0.1)' : undefined,
               }}
               sandbox="allow-scripts"
               title="Component Preview"
@@ -832,15 +821,13 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
 
 function stripImportsAndExports(code: string): string {
   return code
-    .replace(/^import\s+.*$/gm, "")
-    .replace(/^export\s+default\s+/gm, "const __DefaultExport__ = ")
-    .replace(/^export\s+/gm, "");
+    .replace(/^import\s+.*$/gm, '')
+    .replace(/^export\s+default\s+/gm, 'const __DefaultExport__ = ')
+    .replace(/^export\s+/gm, '');
 }
 
 function extractComponentName(code: string): string | null {
-  const defaultExport = code.match(
-    /export\s+default\s+(?:function\s+)?(\w+)/,
-  );
+  const defaultExport = code.match(/export\s+default\s+(?:function\s+)?(\w+)/);
   if (defaultExport) return defaultExport[1];
 
   const namedFunction = code.match(/(?:function|const|class)\s+([A-Z]\w+)/);
@@ -848,7 +835,7 @@ function extractComponentName(code: string): string | null {
 }
 
 function createReactPreviewHTML(code: string): string {
-  const componentName = extractComponentName(code) || "__DefaultExport__";
+  const componentName = extractComponentName(code) || '__DefaultExport__';
   const strippedCode = stripImportsAndExports(code);
 
   return `<!DOCTYPE html>
@@ -907,8 +894,8 @@ ${LIBRARY_SHIMS}
 
 function createVuePreviewHTML(code: string): string {
   const processed = code
-    .replace(/^import\s+.*$/gm, "")
-    .replace(/export\s+default\s+/gm, "const __VueComponent__ = ");
+    .replace(/^import\s+.*$/gm, '')
+    .replace(/export\s+default\s+/gm, 'const __VueComponent__ = ');
 
   return `<!DOCTYPE html>
 <html>
@@ -967,10 +954,7 @@ function createVuePreviewHTML(code: string): string {
 }
 
 function createFallbackHTML(code: string, framework: string): string {
-  const escaped = code
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+  const escaped = code.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
   return `<!DOCTYPE html>
 <html>
