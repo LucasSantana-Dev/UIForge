@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.13.0] - 2026-02-28
+
 ### Changed
 - **Custom domain**: Migrate from `siza-web.uiforge.workers.dev` to `siza.dev`
   - Updated Supabase auth redirect URLs
