@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **@siza/ui component extraction**: Pure UI versions of QualityPanel, GenerationProgress, and NavigationSidebar for cross-platform reuse
+  - `NavigationSidebar` with headless `renderLink` pattern for platform-agnostic routing
+  - `GenerationProgress` with configurable multi-step indicators
+  - `QualityPanel` with SVG score gauge and expandable gate details
+  - Shared `GenerationEvent`, `QualityReport`, `NavigationItem` types
+- **Desktop NavigationSidebar**: Desktop app uses shared NavigationSidebar from @siza/ui with labels and icons
+- **Responsive generator layout**: Mobile-first `flex-col lg:flex-row` with Code/Preview tab switcher on small screens
+- **Focus-visible styles**: Global focus ring using brand color for keyboard navigation
+- **ARIA attributes**: `aria-describedby`, `aria-invalid`, `role="alert"` on generator form fields and errors
+
+### Changed
+- **Docs landing page**: Animations (hero glow, fade-up, shimmer, pulse-ring), glassmorphism cards, gradient text, staggered entrance, `prefers-reduced-motion` support
+- **Design system tokens**: `--transition-fast/default/smooth`, `--radius-card`, `--border-subtle/hover`, `--ease-siza` in web globals
+- **Card hover states**: Consistent `hover:-translate-y-0.5` lift, border glow, and shadow transition across all cards
+- **Button states**: `active:scale-[0.98]`, enhanced hover shadows, consistent disabled opacity
+- **Sidebar active indicator**: Left border accent on active nav items in both desktop and mobile nav
+- **Landing hero CTA**: Shimmer effect, hover lift with purple shadow, arrow indicator
+- **Capability cards**: Per-capability accent colors (purple/blue/indigo/emerald/amber/rose), icon scale on hover
+- **Ecosystem section**: Animated SVG connector lines between nodes
+- **Landing nav**: Transparent-to-blur background on scroll
+- **Generator loading**: Skeleton loading state with `animate-pulse` replacing text-based loader
+- **Generation progress**: 4-step multi-phase indicators (Analyzing → Generating → Quality check → Complete)
+- **Quality panel**: SVG circular score gauge, expandable issue details with chevron toggle
+- **Mobile nav**: Consistent left-border active indicator matching desktop sidebar
+- **Desktop generate page**: Branded header with gradient and SparklesIcon
+
 ## [0.14.0] - 2026-02-28
 
 ### Added
