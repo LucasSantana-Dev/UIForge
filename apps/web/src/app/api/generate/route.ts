@@ -70,7 +70,7 @@ async function getConversationDepth(
   let currentId: string | null = generationId;
 
   while (currentId && depth < MAX_CONVERSATION_DEPTH) {
-    const { data } = await supabase
+    const { data }: { data: { parent_generation_id: string | null } | null } = await supabase
       .from('generations')
       .select('parent_generation_id')
       .eq('id', currentId)
