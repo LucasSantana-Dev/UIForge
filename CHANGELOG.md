@@ -9,13 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.18.0] - 2026-03-01
 
+### Added
+- **AI generation v2 wiring**: Conversation mode, generation history panel, design analysis integration
+  - Conversation chaining with `parentGenerationId` and 10-turn max
+  - GenerationHistory Sheet sidebar for browsing/forking past generations
+  - `ENABLE_DESIGN_ANALYSIS` and `ENABLE_CONVERSATION_MODE` feature flags enabled
+- **create-siza-app framework configs**: Generated projects include framework-specific config files
+  - Next.js, React/Vite, Vue/Vite, SvelteKit entry points and config templates
+
 ### Security
-- **Encryption hardening**: Explicit AES key/IV derivation with PBKDF2 hashing, replacing implicit key handling
-- **CodeQL fixes**: Logger sanitization, quality gates regex, sanitize library improvements, theme store safety
+- **Encryption hardening**: PBKDF2 key derivation (600K iterations) with explicit AES IV, replacing implicit EVP_BytesToKey
+- **CodeQL fixes**: Logger output sanitization, iterative HTML sanitizer, PBKDF2 for API key fingerprinting
+- AES encryption false positive dismissed (BYOK needs reversible encryption)
 
 ### Fixed
-- **Docs site**: Navigation links, CSS overhaul (globals.css), installation/quality-gates/templates content updates
-- **Docs deployment**: Updated wrangler.jsonc configuration
+- **Docs site**: Navigation links, CSS overhaul, content updates
 - **E2E tests**: Billing page strict mode selectors, about page content
 - **Prettier**: Normalize create-siza-app package.json formatting
 
