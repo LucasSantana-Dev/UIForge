@@ -4,6 +4,6 @@ export async function GET() {
   return NextResponse.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '0.7.0',
+    version: process.env.APP_VERSION || '0.0.0',
   });
 }

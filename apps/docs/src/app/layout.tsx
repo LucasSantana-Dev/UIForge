@@ -20,11 +20,19 @@ export const metadata: Metadata = {
     default: 'Siza Documentation',
   },
   description: 'The Open Full-Stack AI Workspace — documentation',
+  icons: {
+    icon: '/siza-icon.png',
+  },
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${geist.variable} ${geistMono.variable}`} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{
+          __html: 'if(typeof __name==="undefined")globalThis.__name=function(fn){return fn}'
+        }} />
+      </head>
       <body>
         <RootProvider>{children}</RootProvider>
       </body>
