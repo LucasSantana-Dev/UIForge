@@ -4,10 +4,7 @@
   "private": true,
   "license": "MIT",
   "description": "The open full-stack AI workspace — generate, integrate, ship",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
@@ -34,9 +31,7 @@
       "eslint --fix --max-warnings 0 --no-warn-ignored",
       "prettier --write"
     ],
-    "*.{json,md,yml,yaml}": [
-      "prettier --write"
-    ]
+    "*.{json,md,yml,yaml}": ["prettier --write"]
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.1",
