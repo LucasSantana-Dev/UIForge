@@ -2,10 +2,7 @@
 
 import { useState } from 'react';
 import { cn } from '../../lib/utils';
-import type {
-  QualityReport,
-  QualityResult,
-} from '../../lib/generation-types';
+import type { QualityReport, QualityResult } from '../../lib/generation-types';
 
 interface QualityPanelProps {
   report: QualityReport;
@@ -32,10 +29,7 @@ function GateRow({
       <button
         type="button"
         onClick={() => hasIssues && setExpanded(!expanded)}
-        className={cn(
-          'flex items-center gap-3 w-full text-left',
-          hasIssues && 'cursor-pointer'
-        )}
+        className={cn('flex items-center gap-3 w-full text-left', hasIssues && 'cursor-pointer')}
       >
         <span
           className={cn(
@@ -50,21 +44,15 @@ function GateRow({
           {icon || result.gate.charAt(0).toUpperCase()}
         </span>
         <div className="flex-1 min-w-0">
-          <span className="text-sm font-medium">
-            {label || result.gate}
-          </span>
+          <span className="text-sm font-medium">{label || result.gate}</span>
         </div>
         {result.passed ? (
-          <span className="text-xs text-emerald-400">
-            Pass
-          </span>
+          <span className="text-xs text-emerald-400">Pass</span>
         ) : (
           <span
             className={cn(
               'text-xs',
-              result.severity === 'error'
-                ? 'text-red-400'
-                : 'text-amber-400'
+              result.severity === 'error' ? 'text-red-400' : 'text-amber-400'
             )}
           >
             {result.severity === 'error' ? 'Fail' : 'Warn'}
@@ -74,10 +62,7 @@ function GateRow({
       {expanded && hasIssues && (
         <ul className="mt-2 ml-10 space-y-1">
           {result.issues.map((issue, i) => (
-            <li
-              key={i}
-              className="text-xs opacity-60 leading-relaxed"
-            >
+            <li key={i} className="text-xs opacity-60 leading-relaxed">
               {issue}
             </li>
           ))}
@@ -90,21 +75,12 @@ function GateRow({
 function ScoreGauge({ score }: { score: number }) {
   const percent = Math.round(score * 100);
   const circumference = 2 * Math.PI * 20;
-  const offset =
-    circumference - (percent / 100) * circumference;
-  const color =
-    percent >= 80
-      ? '#10b981'
-      : percent >= 50
-        ? '#f59e0b'
-        : '#ef4444';
+  const offset = circumference - (percent / 100) * circumference;
+  const color = percent >= 80 ? '#10b981' : percent >= 50 ? '#f59e0b' : '#ef4444';
 
   return (
     <div className="relative w-14 h-14">
-      <svg
-        className="w-14 h-14 -rotate-90"
-        viewBox="0 0 48 48"
-      >
+      <svg className="w-14 h-14 -rotate-90" viewBox="0 0 48 48">
         <circle
           cx="24"
           cy="24"
@@ -154,15 +130,9 @@ export function QualityPanel({
         <div className="flex items-center gap-3">
           <ScoreGauge score={report.score} />
           <div>
-            <h3 className="text-sm font-semibold">
-              Quality Gates
-            </h3>
+            <h3 className="text-sm font-semibold">Quality Gates</h3>
             <p className="text-xs opacity-60">
-              {
-                report.results.filter((r) => r.passed)
-                  .length
-              }
-              /{report.results.length} checks passed
+              {report.results.filter((r) => r.passed).length}/{report.results.length} checks passed
             </p>
           </div>
         </div>

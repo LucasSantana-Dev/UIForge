@@ -39,13 +39,9 @@ function LoadingSkeleton() {
   );
 }
 
-export default function ComponentGenerator({
-  projectId,
-}: ComponentGeneratorProps) {
-  const { data: project, isLoading } =
-    useProject(projectId);
-  const [currentComponentName, setCurrentComponentName] =
-    useState('');
+export default function ComponentGenerator({ projectId }: ComponentGeneratorProps) {
+  const { data: project, isLoading } = useProject(projectId);
+  const [currentComponentName, setCurrentComponentName] = useState('');
   const [currentSettings, setCurrentSettings] = useState({
     componentLibrary: '',
     style: '',
@@ -53,9 +49,7 @@ export default function ComponentGenerator({
   });
   const [editedCode, setEditedCode] = useState('');
   const [isEdited, setIsEdited] = useState(false);
-  const [activeTab, setActiveTab] = useState<
-    'code' | 'preview'
-  >('code');
+  const [activeTab, setActiveTab] = useState<'code' | 'preview'>('code');
 
   const generation = useGeneration(projectId);
 
@@ -69,19 +63,13 @@ export default function ComponentGenerator({
         <div className="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center mb-4">
           <SparklesIcon className="h-6 w-6 text-error" />
         </div>
-        <p className="text-error font-medium">
-          Project not found
-        </p>
-        <p className="text-sm text-text-muted mt-1">
-          This project may have been deleted
-        </p>
+        <p className="text-error font-medium">Project not found</p>
+        <p className="text-sm text-text-muted mt-1">This project may have been deleted</p>
       </div>
     );
   }
 
-  const displayCode = isEdited
-    ? editedCode
-    : generation.code;
+  const displayCode = isEdited ? editedCode : generation.code;
 
   return (
     <div className="flex-1 flex flex-col bg-surface-1 rounded-xl border border-surface-3 overflow-hidden shadow-card">
@@ -95,8 +83,7 @@ export default function ComponentGenerator({
               Component Generator
             </h1>
             <p className="text-sm text-text-secondary truncate">
-              Generate {project.framework} components with
-              AI
+              Generate {project.framework} components with AI
             </p>
           </div>
         </div>
@@ -108,12 +95,9 @@ export default function ComponentGenerator({
             projectId={projectId}
             framework={project.framework}
             onGenerate={(code: string, settings: any) => {
-              setCurrentComponentName(
-                settings.componentName
-              );
+              setCurrentComponentName(settings.componentName);
               setCurrentSettings({
-                componentLibrary:
-                  settings.componentLibrary,
+                componentLibrary: settings.componentLibrary,
                 style: settings.style,
                 typescript: settings.typescript,
               });
@@ -162,21 +146,14 @@ export default function ComponentGenerator({
                 setEditedCode(code);
                 setIsEdited(true);
               }}
-              language={
-                project.framework === 'vue'
-                  ? 'vue'
-                  : 'typescript'
-              }
+              language={project.framework === 'vue' ? 'vue' : 'typescript'}
             />
           </div>
 
           <div
             className={`flex-1 border-b border-surface-3 ${activeTab !== 'preview' ? 'hidden lg:block' : ''}`}
           >
-            <LivePreview
-              code={displayCode}
-              framework={project.framework}
-            />
+            <LivePreview code={displayCode} framework={project.framework} />
           </div>
 
           <div className="h-48">
@@ -193,14 +170,9 @@ export default function ComponentGenerator({
             <SaveToProject
               projectId={projectId}
               code={displayCode}
-              componentName={
-                currentComponentName ||
-                'GeneratedComponent'
-              }
+              componentName={currentComponentName || 'GeneratedComponent'}
               framework={project.framework}
-              componentLibrary={
-                currentSettings.componentLibrary
-              }
+              componentLibrary={currentSettings.componentLibrary}
               style={currentSettings.style}
               typescript={currentSettings.typescript}
             />

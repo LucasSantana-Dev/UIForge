@@ -1,8 +1,4 @@
-import {
-  useState,
-  useCallback,
-  useEffect,
-} from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {
   Button,
   Textarea,
@@ -18,12 +14,7 @@ import {
   Card,
   CardContent,
 } from '@siza/ui';
-import {
-  SparklesIcon,
-  SaveIcon,
-  CpuIcon,
-  CloudIcon,
-} from 'lucide-react';
+import { SparklesIcon, SaveIcon, CpuIcon, CloudIcon } from 'lucide-react';
 import { useMcp } from '../hooks/use-mcp';
 import { useOllama } from '../hooks/use-ollama';
 
@@ -32,37 +23,23 @@ type GenerationSource = 'mcp' | 'ollama';
 export function Generate() {
   const [prompt, setPrompt] = useState('');
   const [componentName, setComponentName] = useState('');
-  const [framework, setFramework] = useState<
-    'react' | 'vue'
-  >('react');
+  const [framework, setFramework] = useState<'react' | 'vue'>('react');
   const [generatedCode, setGeneratedCode] = useState('');
-  const [source, setSource] =
-    useState<GenerationSource>('mcp');
+  const [source, setSource] = useState<GenerationSource>('mcp');
   const [ollamaModel, setOllamaModel] = useState('');
-  const [generationTime, setGenerationTime] = useState<
-    number | null
-  >(null);
-  const {
-    callTool,
-    isLoading: mcpLoading,
-    error: mcpError,
-  } = useMcp();
+  const [generationTime, setGenerationTime] = useState<number | null>(null);
+  const { callTool, isLoading: mcpLoading, error: mcpError } = useMcp();
   const { running: ollamaRunning, models } = useOllama();
   const [ollamaLoading, setOllamaLoading] = useState(false);
-  const [ollamaError, setOllamaError] = useState<
-    string | null
-  >(null);
+  const [ollamaError, setOllamaError] = useState<string | null>(null);
 
-  const isLoading =
-    source === 'mcp' ? mcpLoading : ollamaLoading;
+  const isLoading = source === 'mcp' ? mcpLoading : ollamaLoading;
   const error = source === 'mcp' ? mcpError : ollamaError;
 
   useEffect(() => {
-    window.siza
-      .getPreference('ollamaModel')
-      .then((model) => {
-        if (model) setOllamaModel(model);
-      });
+    window.siza.getPreference('ollamaModel').then((model) => {
+      if (model) setOllamaModel(model);
+    });
   }, []);
 
   useEffect(() => {
@@ -81,23 +58,16 @@ export function Generate() {
       setOllamaError(null);
       const start = Date.now();
       try {
-        const result =
-          await window.siza.generateWithOllama({
-            model: ollamaModel,
-            framework,
-            componentName,
-            description: prompt,
-          });
+        const result = await window.siza.generateWithOllama({
+          model: ollamaModel,
+          framework,
+          componentName,
+          description: prompt,
+        });
         setGeneratedCode(result.code);
-        setGenerationTime(
-          result.duration || Date.now() - start
-        );
+        setGenerationTime(result.duration || Date.now() - start);
       } catch (err) {
-        setOllamaError(
-          err instanceof Error
-            ? err.message
-            : 'Ollama generation failed'
-        );
+        setOllamaError(err instanceof Error ? err.message : 'Ollama generation failed');
       } finally {
         setOllamaLoading(false);
       }
@@ -106,57 +76,39 @@ export function Generate() {
 
     try {
       const start = Date.now();
-      const result = await callTool(
-        'generate_ui_component',
-        {
-          component_type: componentName
-            .toLowerCase()
-            .replace(/([A-Z])/g, ' $1')
-            .trim(),
-          description: prompt,
-          framework,
-          component_library: 'shadcn',
-        }
-      );
+      const result = await callTool('generate_ui_component', {
+        component_type: componentName
+          .toLowerCase()
+          .replace(/([A-Z])/g, ' $1')
+          .trim(),
+        description: prompt,
+        framework,
+        component_library: 'shadcn',
+      });
       setGenerationTime(Date.now() - start);
-      const text = result.content?.find(
-        (c) => c.type === 'text'
-      )?.text;
+      const text = result.content?.find((c) => c.type === 'text')?.text;
       if (text) setGeneratedCode(text);
     } catch {
       // error is set in useMcp hook
     }
-  }, [
-    prompt,
-    componentName,
-    framework,
-    source,
-    ollamaModel,
-    callTool,
-  ]);
+  }, [prompt, componentName, framework, source, ollamaModel, callTool]);
 
   const handleSave = useCallback(async () => {
     if (!generatedCode) return;
     const dir = await window.siza.selectDirectory();
     if (!dir) return;
-    const safeName = componentName
-      .replace(/[^a-zA-Z0-9_-]/g, '_')
-      .trim();
+    const safeName = componentName.replace(/[^a-zA-Z0-9_-]/g, '_').trim();
     if (!safeName) return;
     const ext = framework === 'react' ? 'tsx' : 'vue';
     const fileName = `${safeName}.${ext}`;
-    await window.siza.writeFile(
-      `${dir}/${fileName}`,
-      generatedCode
-    );
+    await window.siza.writeFile(`${dir}/${fileName}`, generatedCode);
   }, [generatedCode, componentName, framework]);
 
   const canGenerate =
     prompt.trim() &&
     componentName.trim() &&
     !isLoading &&
-    (source === 'mcp' ||
-      (ollamaRunning && ollamaModel));
+    (source === 'mcp' || (ollamaRunning && ollamaModel));
 
   return (
     <div className="flex h-full">
@@ -166,23 +118,15 @@ export function Generate() {
             <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center">
               <SparklesIcon className="h-4 w-4 text-brand" />
             </div>
-            <h2 className="text-lg font-semibold">
-              Generate
-            </h2>
+            <h2 className="text-lg font-semibold">Generate</h2>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div>
-            <Label className="text-xs text-text-muted mb-1.5 block">
-              Source
-            </Label>
+            <Label className="text-xs text-text-muted mb-1.5 block">Source</Label>
             <div className="flex gap-2">
               <Button
-                variant={
-                  source === 'mcp'
-                    ? 'default'
-                    : 'outline'
-                }
+                variant={source === 'mcp' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSource('mcp')}
               >
@@ -190,19 +134,11 @@ export function Generate() {
                 MCP Registry
               </Button>
               <Button
-                variant={
-                  source === 'ollama'
-                    ? 'default'
-                    : 'outline'
-                }
+                variant={source === 'ollama' ? 'default' : 'outline'}
                 size="sm"
                 onClick={() => setSource('ollama')}
                 disabled={!ollamaRunning}
-                title={
-                  ollamaRunning
-                    ? 'Generate with local Ollama model'
-                    : 'Ollama not running'
-                }
+                title={ollamaRunning ? 'Generate with local Ollama model' : 'Ollama not running'}
               >
                 <CpuIcon className="w-3.5 h-3.5 mr-1.5" />
                 Ollama
@@ -213,39 +149,30 @@ export function Generate() {
             </div>
           </div>
 
-          {source === 'ollama' &&
-            ollamaRunning &&
-            models.length > 0 && (
-              <div>
-                <Label htmlFor="ollama-model">
-                  Model
-                </Label>
-                <select
-                  id="ollama-model"
-                  value={ollamaModel}
-                  onChange={(e) =>
-                    setOllamaModel(e.target.value)
-                  }
-                  className="mt-1 w-full px-3 py-2 bg-surface-1 border border-surface-3 rounded-md text-text-primary text-sm"
-                >
-                  {models.map((m) => (
-                    <option key={m.name} value={m.name}>
-                      {m.name} (
-                      {(m.size / 1e9).toFixed(1)}GB)
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+          {source === 'ollama' && ollamaRunning && models.length > 0 && (
+            <div>
+              <Label htmlFor="ollama-model">Model</Label>
+              <select
+                id="ollama-model"
+                value={ollamaModel}
+                onChange={(e) => setOllamaModel(e.target.value)}
+                className="mt-1 w-full px-3 py-2 bg-surface-1 border border-surface-3 rounded-md text-text-primary text-sm"
+              >
+                {models.map((m) => (
+                  <option key={m.name} value={m.name}>
+                    {m.name} ({(m.size / 1e9).toFixed(1)}GB)
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div>
             <Label htmlFor="name">Component Name</Label>
             <Input
               id="name"
               value={componentName}
-              onChange={(e) =>
-                setComponentName(e.target.value)
-              }
+              onChange={(e) => setComponentName(e.target.value)}
               placeholder="MyComponent"
               className="mt-1"
             />
@@ -255,9 +182,7 @@ export function Generate() {
             <Textarea
               id="prompt"
               value={prompt}
-              onChange={(e) =>
-                setPrompt(e.target.value)
-              }
+              onChange={(e) => setPrompt(e.target.value)}
               placeholder="A modern card component with hover effects..."
               rows={6}
               className="mt-1"
@@ -265,22 +190,14 @@ export function Generate() {
           </div>
           <div className="flex gap-2">
             <Button
-              variant={
-                framework === 'react'
-                  ? 'default'
-                  : 'outline'
-              }
+              variant={framework === 'react' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setFramework('react')}
             >
               React
             </Button>
             <Button
-              variant={
-                framework === 'vue'
-                  ? 'default'
-                  : 'outline'
-              }
+              variant={framework === 'vue' ? 'default' : 'outline'}
               size="sm"
               onClick={() => setFramework('vue')}
             >
@@ -289,16 +206,10 @@ export function Generate() {
           </div>
           {error && (
             <Card className="border-error/30 bg-error/5">
-              <CardContent className="p-3 text-sm text-error">
-                {error}
-              </CardContent>
+              <CardContent className="p-3 text-sm text-error">{error}</CardContent>
             </Card>
           )}
-          <Button
-            onClick={handleGenerate}
-            disabled={!canGenerate}
-            className="w-full"
-          >
+          <Button onClick={handleGenerate} disabled={!canGenerate} className="w-full">
             <SparklesIcon className="w-4 h-4 mr-2" />
             {isLoading ? 'Generating...' : 'Generate'}
           </Button>
@@ -306,25 +217,15 @@ export function Generate() {
       </div>
 
       <div className="flex-1 flex flex-col">
-        <Tabs
-          defaultValue="code"
-          className="flex-1 flex flex-col"
-        >
+        <Tabs defaultValue="code" className="flex-1 flex flex-col">
           <div className="flex items-center justify-between px-4 py-2 border-b border-surface-3">
             <div className="flex items-center gap-3">
               <TabsList>
-                <TabsTrigger value="code">
-                  Code
-                </TabsTrigger>
-                <TabsTrigger value="preview">
-                  Preview
-                </TabsTrigger>
+                <TabsTrigger value="code">Code</TabsTrigger>
+                <TabsTrigger value="preview">Preview</TabsTrigger>
               </TabsList>
               {generationTime !== null && (
-                <Badge
-                  variant="outline"
-                  className="text-xs"
-                >
+                <Badge variant="outline" className="text-xs">
                   {generationTime >= 1000
                     ? `${(generationTime / 1000).toFixed(1)}s`
                     : `${generationTime}ms`}
@@ -332,34 +233,17 @@ export function Generate() {
               )}
             </div>
             {generatedCode && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleSave}
-              >
+              <Button variant="outline" size="sm" onClick={handleSave}>
                 <SaveIcon className="w-4 h-4 mr-1" />
                 Save to Project
               </Button>
             )}
           </div>
-          <TabsContent
-            value="code"
-            className="flex-1 m-0"
-          >
-            <CodeEditor
-              code={generatedCode}
-              onChange={setGeneratedCode}
-              language="typescript"
-            />
+          <TabsContent value="code" className="flex-1 m-0">
+            <CodeEditor code={generatedCode} onChange={setGeneratedCode} language="typescript" />
           </TabsContent>
-          <TabsContent
-            value="preview"
-            className="flex-1 m-0"
-          >
-            <LivePreview
-              code={generatedCode}
-              framework={framework}
-            />
+          <TabsContent value="preview" className="flex-1 m-0">
+            <LivePreview code={generatedCode} framework={framework} />
           </TabsContent>
         </Tabs>
       </div>

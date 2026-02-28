@@ -32,10 +32,7 @@ const repos = [
 
 export function EcosystemSection() {
   return (
-    <section
-      id="ecosystem"
-      className={`${SECTION_PADDING} border-t border-[#27272A]`}
-    >
+    <section id="ecosystem" className={`${SECTION_PADDING} border-t border-[#27272A]`}>
       <div className={CONTAINER}>
         <div className="text-center">
           <FadeIn>
@@ -50,17 +47,13 @@ export function EcosystemSection() {
           </FadeIn>
           <FadeIn delay={0.16}>
             <p className="text-lg text-[#A1A1AA] max-w-2xl mx-auto">
-              Each repository is independent and MIT-licensed.
-              Use one or compose them all.
+              Each repository is independent and MIT-licensed. Use one or compose them all.
             </p>
           </FadeIn>
         </div>
 
         <div className="hidden lg:block relative h-20 w-full mt-12">
-          <svg
-            className="absolute inset-0 w-full h-full"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+          <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
             {[12.5, 37.5, 62.5, 87.5].map((x) => (
               <line
                 key={x}
@@ -86,10 +79,7 @@ export function EcosystemSection() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-14">
           {repos.map((repo, i) => (
-            <FadeIn
-              key={repo.name}
-              delay={0.24 + i * 0.08}
-            >
+            <FadeIn key={repo.name} delay={0.24 + i * 0.08}>
               <a
                 href={repo.href}
                 target="_blank"
@@ -102,9 +92,7 @@ export function EcosystemSection() {
                 <h3 className="text-base font-semibold text-[#FAFAFA] mb-2 group-hover:text-[#8B5CF6] transition-colors">
                   {repo.name}
                 </h3>
-                <p className="text-sm text-[#A1A1AA] leading-relaxed">
-                  {repo.desc}
-                </p>
+                <p className="text-sm text-[#A1A1AA] leading-relaxed">{repo.desc}</p>
               </a>
             </FadeIn>
           ))}

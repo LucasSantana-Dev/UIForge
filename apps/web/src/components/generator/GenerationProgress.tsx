@@ -1,15 +1,7 @@
 'use client';
 
 import { useGenerationProgress } from '@/hooks/use-generation';
-import {
-  CheckCircle2,
-  Loader2,
-  AlertCircle,
-  Brain,
-  Code2,
-  Shield,
-  Sparkles,
-} from 'lucide-react';
+import { CheckCircle2, Loader2, AlertCircle, Brain, Code2, Shield, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface GenerationProgressProps {
@@ -48,18 +40,15 @@ export default function GenerationProgress({
   events,
   error,
 }: GenerationProgressProps) {
-  const { statusMessage, getEventIcon } =
-    useGenerationProgress({
-      isGenerating,
-      progress,
-      events,
-      error,
-    });
+  const { statusMessage, getEventIcon } = useGenerationProgress({
+    isGenerating,
+    progress,
+    events,
+    error,
+  });
 
   const activeStep = STEPS.findIndex(
-    (s, i) =>
-      i === STEPS.length - 1 ||
-      progress < STEPS[i + 1].threshold
+    (s, i) => i === STEPS.length - 1 || progress < STEPS[i + 1].threshold
   );
 
   return (
@@ -88,17 +77,13 @@ export default function GenerationProgress({
                 ) : (
                   <Icon className="h-3 w-3" />
                 )}
-                <span className="hidden sm:inline">
-                  {step.label}
-                </span>
+                <span className="hidden sm:inline">{step.label}</span>
               </div>
               {i < STEPS.length - 1 && (
                 <div
                   className={cn(
                     'flex-1 h-px transition-colors duration-300',
-                    progress >= STEPS[i + 1].threshold
-                      ? 'bg-success/30'
-                      : 'bg-surface-3'
+                    progress >= STEPS[i + 1].threshold ? 'bg-success/30' : 'bg-surface-3'
                   )}
                 />
               )}
@@ -121,11 +106,7 @@ export default function GenerationProgress({
         <span
           className={cn(
             'text-sm font-medium',
-            error
-              ? 'text-error'
-              : progress === 100
-                ? 'text-success'
-                : 'text-text-secondary'
+            error ? 'text-error' : progress === 100 ? 'text-success' : 'text-text-secondary'
           )}
         >
           {statusMessage}
@@ -156,9 +137,7 @@ export default function GenerationProgress({
 
       {events.length > 0 && (
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-text-primary">
-            Activity Log
-          </h4>
+          <h4 className="text-sm font-medium text-text-primary">Activity Log</h4>
           <div className="max-h-32 overflow-y-auto space-y-1">
             {events.slice(-5).map((event, index) => (
               <div
@@ -183,14 +162,11 @@ export default function GenerationProgress({
                         : event.type === 'quality'
                           ? `Quality: ${Math.round((event.report?.score ?? 0) * 100)}%`
                           : event.type === 'error'
-                            ? event.message ||
-                              'Error occurred'
+                            ? event.message || 'Error occurred'
                             : 'Processing...'}
                 </span>
                 <span className="text-text-muted">
-                  {new Date(
-                    event.timestamp
-                  ).toLocaleTimeString()}
+                  {new Date(event.timestamp).toLocaleTimeString()}
                 </span>
               </div>
             ))}
@@ -200,9 +176,7 @@ export default function GenerationProgress({
 
       {error && (
         <div className="bg-error/10 border border-error/30 text-error p-3 rounded-lg">
-          <p className="text-sm font-medium">
-            Error Details
-          </p>
+          <p className="text-sm font-medium">Error Details</p>
           <p className="text-xs mt-1 opacity-80">{error}</p>
         </div>
       )}

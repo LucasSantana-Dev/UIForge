@@ -103,17 +103,11 @@ export function CodeShowcase() {
   };
 
   return (
-    <section
-      className={`${SECTION_PADDING} border-t border-[#27272A]`}
-    >
-      <div
-        className={`${CONTAINER} grid grid-cols-1 lg:grid-cols-2 gap-12 items-center`}
-      >
+    <section className={`${SECTION_PADDING} border-t border-[#27272A]`}>
+      <div className={`${CONTAINER} grid grid-cols-1 lg:grid-cols-2 gap-12 items-center`}>
         <FadeIn delay={0}>
           <div>
-            <div className="text-sm font-mono text-[#7C3AED] mb-4">
-              {'// TypeScript SDK'}
-            </div>
+            <div className="text-sm font-mono text-[#7C3AED] mb-4">{'// TypeScript SDK'}</div>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-6">
               One gateway.
               <br />
@@ -121,14 +115,9 @@ export function CodeShowcase() {
             </h2>
             <div>
               {FEATURES.map((feature) => (
-                <div
-                  key={feature}
-                  className="flex items-start gap-3 mb-4"
-                >
+                <div key={feature} className="flex items-start gap-3 mb-4">
                   <Check className="w-5 h-5 text-[#22C55E] mt-0.5 flex-shrink-0" />
-                  <p className="text-[#A1A1AA] text-sm leading-relaxed">
-                    {feature}
-                  </p>
+                  <p className="text-[#A1A1AA] text-sm leading-relaxed">{feature}</p>
                 </div>
               ))}
             </div>
@@ -138,15 +127,11 @@ export function CodeShowcase() {
         <FadeIn delay={0.15}>
           <div className="rounded-xl border border-[#27272A] bg-[#18181B] overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272A]">
-              <span className="text-[13px] font-mono text-[#71717A]">
-                gateway.config.ts
-              </span>
+              <span className="text-[13px] font-mono text-[#71717A]">gateway.config.ts</span>
               <button
                 onClick={handleCopy}
                 className="text-[#71717A] hover:text-[#FAFAFA] transition-colors p-1 rounded hover:bg-[#27272A]"
-                aria-label={
-                  copied ? 'Copied' : 'Copy code'
-                }
+                aria-label={copied ? 'Copied' : 'Copy code'}
               >
                 {copied ? (
                   <Check className="w-4 h-4 text-[#22C55E]" />

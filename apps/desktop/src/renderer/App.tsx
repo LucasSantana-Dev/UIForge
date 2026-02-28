@@ -1,18 +1,10 @@
 import { useState } from 'react';
-import {
-  SizaBackground,
-  NavigationSidebar,
-  type NavigationItem,
-} from '@siza/ui';
+import { SizaBackground, NavigationSidebar, type NavigationItem } from '@siza/ui';
 import { Generate } from './pages/Generate';
 import { Projects } from './pages/Projects';
 import { Settings } from './pages/Settings';
 import { OllamaStatus } from './components/OllamaStatus';
-import {
-  CodeIcon,
-  FolderOpenIcon,
-  SettingsIcon,
-} from 'lucide-react';
+import { CodeIcon, FolderOpenIcon, SettingsIcon } from 'lucide-react';
 
 type Page = 'generate' | 'projects' | 'settings';
 
@@ -42,24 +34,12 @@ export function App() {
             activeId={page}
             header={
               <div className="flex items-center gap-2">
-                <img
-                  src="/siza-icon.png"
-                  alt="Siza"
-                  width={24}
-                  height={24}
-                />
-                <span className="font-bold text-lg">
-                  Siza
-                </span>
+                <img src="/siza-icon.png" alt="Siza" width={24} height={24} />
+                <span className="font-bold text-lg">Siza</span>
               </div>
             }
             renderLink={(item, _isActive, children) => (
-              <button
-                onClick={() =>
-                  setPage(item.id as Page)
-                }
-                className="w-full text-left"
-              >
+              <button onClick={() => setPage(item.id as Page)} className="w-full text-left">
                 {children}
               </button>
             )}

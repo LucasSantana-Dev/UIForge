@@ -1,20 +1,17 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import type { Database } from "@/lib/supabase/database.types";
-import { formatDistanceToNow } from "date-fns";
-import ProjectActions from "./ProjectActions";
+import Link from 'next/link';
+import type { Database } from '@/lib/supabase/database.types';
+import { formatDistanceToNow } from 'date-fns';
+import ProjectActions from './ProjectActions';
 
-type Project =
-  Database["public"]["Tables"]["projects"]["Row"];
+type Project = Database['public']['Tables']['projects']['Row'];
 
 interface ProjectCardProps {
   project: Project;
 }
 
-export default function ProjectCard({
-  project,
-}: ProjectCardProps) {
+export default function ProjectCard({ project }: ProjectCardProps) {
   return (
     <div className="bg-surface-1 rounded-xl border border-surface-3 shadow-card transition-all duration-200 ease-siza hover:shadow-card-hover hover:-translate-y-0.5 hover:border-[var(--border-hover)] overflow-hidden group">
       <Link href={`/projects/${project.id}`}>
@@ -34,34 +31,20 @@ export default function ProjectCard({
       </Link>
       <div className="p-4">
         <div className="flex items-start justify-between">
-          <Link
-            href={`/projects/${project.id}`}
-            className="flex-1"
-          >
+          <Link href={`/projects/${project.id}`} className="flex-1">
             <h3 className="text-lg font-semibold text-text-primary hover:text-brand-light transition-colors">
               {project.name}
             </h3>
             {project.description && (
-              <p className="mt-1 text-sm text-text-secondary line-clamp-2">
-                {project.description}
-              </p>
+              <p className="mt-1 text-sm text-text-secondary line-clamp-2">{project.description}</p>
             )}
           </Link>
-          <ProjectActions
-            projectId={project.id}
-            projectName={project.name}
-          />
+          <ProjectActions projectId={project.id} projectName={project.name} />
         </div>
         <div className="mt-4 flex items-center justify-between text-xs text-text-muted">
-          <span className="capitalize">
-            {project.framework}
-          </span>
+          <span className="capitalize">{project.framework}</span>
           <span>
-            Updated{" "}
-            {formatDistanceToNow(
-              new Date(project.updated_at),
-              { addSuffix: true }
-            )}
+            Updated {formatDistanceToNow(new Date(project.updated_at), { addSuffix: true })}
           </span>
         </div>
       </div>

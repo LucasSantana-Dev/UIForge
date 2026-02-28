@@ -31,24 +31,17 @@ export function GenerationProgress({
   error,
 }: GenerationProgressProps) {
   const activeStep = steps.findIndex(
-    (s, i) =>
-      i === steps.length - 1 ||
-      progress < steps[i + 1].threshold
+    (s, i) => i === steps.length - 1 || progress < steps[i + 1].threshold
   );
 
   return (
     <div className="flex flex-col space-y-4 p-4 bg-zinc-800 rounded-lg">
       <div className="flex items-center gap-1">
         {steps.map((step, i) => {
-          const isComplete =
-            progress >= step.threshold;
-          const isActive =
-            i === activeStep && isGenerating;
+          const isComplete = progress >= step.threshold;
+          const isActive = i === activeStep && isGenerating;
           return (
-            <div
-              key={step.label}
-              className="flex items-center gap-1 flex-1"
-            >
+            <div key={step.label} className="flex items-center gap-1 flex-1">
               <div
                 className={cn(
                   'flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-all duration-300',
@@ -60,18 +53,13 @@ export function GenerationProgress({
                 )}
               >
                 {step.icon}
-                <span className="hidden sm:inline">
-                  {step.label}
-                </span>
+                <span className="hidden sm:inline">{step.label}</span>
               </div>
               {i < steps.length - 1 && (
                 <div
                   className={cn(
                     'flex-1 h-px transition-colors duration-300',
-                    progress >=
-                      steps[i + 1].threshold
-                      ? 'bg-emerald-500/30'
-                      : 'bg-zinc-700'
+                    progress >= steps[i + 1].threshold ? 'bg-emerald-500/30' : 'bg-zinc-700'
                   )}
                 />
               )}
@@ -80,9 +68,7 @@ export function GenerationProgress({
         })}
       </div>
 
-      <div className="text-sm font-medium opacity-80">
-        {statusMessage}
-      </div>
+      <div className="text-sm font-medium opacity-80">{statusMessage}</div>
 
       <div className="space-y-2">
         <div className="flex justify-between text-xs opacity-60">
@@ -106,12 +92,8 @@ export function GenerationProgress({
 
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-lg">
-          <p className="text-sm font-medium">
-            Error Details
-          </p>
-          <p className="text-xs mt-1 opacity-80">
-            {error}
-          </p>
+          <p className="text-sm font-medium">Error Details</p>
+          <p className="text-xs mt-1 opacity-80">{error}</p>
         </div>
       )}
     </div>

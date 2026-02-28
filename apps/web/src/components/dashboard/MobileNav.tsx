@@ -2,14 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import {
-  XIcon,
-  FolderIcon,
-  FileTextIcon,
-  SettingsIcon,
-  PlusIcon,
-  Github,
-} from 'lucide-react';
+import { XIcon, FolderIcon, FileTextIcon, SettingsIcon, PlusIcon, Github } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 interface MobileNavProps {
@@ -40,10 +33,7 @@ const navigation = [
   },
 ];
 
-export default function MobileNav({
-  open,
-  onClose,
-}: MobileNavProps) {
+export default function MobileNav({ open, onClose }: MobileNavProps) {
   const pathname = usePathname();
   const panelRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -60,24 +50,16 @@ export default function MobileNav({
     const handleFocusTrap = (e: KeyboardEvent) => {
       if (e.key !== 'Tab' || !panelRef.current) return;
 
-      const focusableElements =
-        panelRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
+      const focusableElements = panelRef.current.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
       const firstElement = focusableElements[0];
-      const lastElement =
-        focusableElements[focusableElements.length - 1];
+      const lastElement = focusableElements[focusableElements.length - 1];
 
-      if (
-        e.shiftKey &&
-        document.activeElement === firstElement
-      ) {
+      if (e.shiftKey && document.activeElement === firstElement) {
         e.preventDefault();
         lastElement?.focus();
-      } else if (
-        !e.shiftKey &&
-        document.activeElement === lastElement
-      ) {
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
         e.preventDefault();
         firstElement?.focus();
       }
@@ -89,14 +71,8 @@ export default function MobileNav({
     closeButtonRef.current?.focus();
 
     return () => {
-      document.removeEventListener(
-        'keydown',
-        handleEscape
-      );
-      document.removeEventListener(
-        'keydown',
-        handleFocusTrap
-      );
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleFocusTrap);
     };
   }, [open, onClose]);
 
@@ -106,9 +82,7 @@ export default function MobileNav({
     onClose();
   };
 
-  const handleBackdropKeyDown = (
-    e: React.KeyboardEvent<HTMLDivElement>
-  ) => {
+  const handleBackdropKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
       onClose();
@@ -133,9 +107,7 @@ export default function MobileNav({
         aria-label="Mobile navigation"
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-surface-3">
-          <h1 className="text-xl font-display font-bold text-brand">
-            Siza
-          </h1>
+          <h1 className="text-xl font-display font-bold text-brand">Siza</h1>
           <button
             ref={closeButtonRef}
             type="button"
@@ -156,9 +128,7 @@ export default function MobileNav({
             Generate Component
           </Link>
           {navigation.map((item) => {
-            const isActive = pathname.startsWith(
-              item.href
-            );
+            const isActive = pathname.startsWith(item.href);
             return (
               <Link
                 key={item.name}

@@ -26,20 +26,12 @@ export function NavigationSidebar({
 }: NavigationSidebarProps) {
   return (
     <div className={cn('flex flex-col h-full', className)}>
-      {header && (
-        <div className="flex-shrink-0 px-4 pt-5">
-          {header}
-        </div>
-      )}
+      {header && <div className="flex-shrink-0 px-4 pt-5">{header}</div>}
       <div className="mt-8 flex-grow flex flex-col">
         <nav className="flex-1 px-2 space-y-1">
-          {primaryAction && (
-            <div className="mb-4">{primaryAction}</div>
-          )}
+          {primaryAction && <div className="mb-4">{primaryAction}</div>}
           {items.map((item) => {
-            const isActive = activeId.startsWith(
-              item.id
-            );
+            const isActive = activeId.startsWith(item.id);
             const Icon = item.icon;
             return (
               <div key={item.id}>
@@ -54,9 +46,7 @@ export function NavigationSidebar({
                         : 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
                     )}
                   >
-                    {Icon && (
-                      <Icon className="mr-2 h-4 w-4" />
-                    )}
+                    {Icon && <Icon className="mr-2 h-4 w-4" />}
                     {item.label}
                   </span>
                 )}

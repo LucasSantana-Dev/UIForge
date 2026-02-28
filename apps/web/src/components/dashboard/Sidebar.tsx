@@ -45,16 +45,8 @@ export default function Sidebar() {
           href="/dashboard"
           className="flex items-center flex-shrink-0 px-4 gap-3 hover:opacity-80 transition-opacity"
         >
-          <Image
-            src="/siza-icon.png"
-            alt="Siza"
-            width={32}
-            height={32}
-            className="flex-shrink-0"
-          />
-          <h1 className="text-xl font-display font-bold text-text-primary">
-            Siza
-          </h1>
+          <Image src="/siza-icon.png" alt="Siza" width={32} height={32} className="flex-shrink-0" />
+          <h1 className="text-xl font-display font-bold text-text-primary">Siza</h1>
         </Link>
         <div className="mt-8 flex-grow flex flex-col">
           <nav className="flex-1 px-2 space-y-1">

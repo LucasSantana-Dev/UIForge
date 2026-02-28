@@ -12,10 +12,7 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { useState } from 'react';
-import type {
-  QualityReport,
-  QualityResult,
-} from '@/lib/quality/gates';
+import type { QualityReport, QualityResult } from '@/lib/quality/gates';
 import { cn } from '@/lib/utils';
 
 interface QualityPanelProps {
@@ -49,10 +46,7 @@ function GateRow({ result }: { result: QualityResult }) {
       <button
         type="button"
         onClick={() => hasIssues && setExpanded(!expanded)}
-        className={cn(
-          'flex items-center gap-3 w-full text-left',
-          hasIssues && 'cursor-pointer'
-        )}
+        className={cn('flex items-center gap-3 w-full text-left', hasIssues && 'cursor-pointer')}
       >
         <span
           className={cn(
@@ -64,9 +58,7 @@ function GateRow({ result }: { result: QualityResult }) {
                 : 'bg-warning/10 text-warning'
           )}
         >
-          {GATE_ICONS[result.gate] || (
-            <Code2 className="h-4 w-4" />
-          )}
+          {GATE_ICONS[result.gate] || <Code2 className="h-4 w-4" />}
         </span>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
@@ -79,9 +71,7 @@ function GateRow({ result }: { result: QualityResult }) {
               <XCircle
                 className={cn(
                   'h-3.5 w-3.5',
-                  result.severity === 'error'
-                    ? 'text-error'
-                    : 'text-warning'
+                  result.severity === 'error' ? 'text-error' : 'text-warning'
                 )}
               />
             )}
@@ -99,10 +89,7 @@ function GateRow({ result }: { result: QualityResult }) {
       {expanded && hasIssues && (
         <ul className="mt-2 ml-10 space-y-1">
           {result.issues.map((issue, i) => (
-            <li
-              key={i}
-              className="text-xs text-text-muted leading-relaxed"
-            >
+            <li key={i} className="text-xs text-text-muted leading-relaxed">
               {issue}
             </li>
           ))}
@@ -115,27 +102,13 @@ function GateRow({ result }: { result: QualityResult }) {
 function ScoreGauge({ score }: { score: number }) {
   const percent = Math.round(score * 100);
   const circumference = 2 * Math.PI * 20;
-  const offset =
-    circumference - (percent / 100) * circumference;
-  const color =
-    percent >= 80
-      ? 'text-success'
-      : percent >= 50
-        ? 'text-warning'
-        : 'text-error';
-  const strokeColor =
-    percent >= 80
-      ? '#10b981'
-      : percent >= 50
-        ? '#f59e0b'
-        : '#ef4444';
+  const offset = circumference - (percent / 100) * circumference;
+  const color = percent >= 80 ? 'text-success' : percent >= 50 ? 'text-warning' : 'text-error';
+  const strokeColor = percent >= 80 ? '#10b981' : percent >= 50 ? '#f59e0b' : '#ef4444';
 
   return (
     <div className="relative w-14 h-14">
-      <svg
-        className="w-14 h-14 -rotate-90"
-        viewBox="0 0 48 48"
-      >
+      <svg className="w-14 h-14 -rotate-90" viewBox="0 0 48 48">
         <circle
           cx="24"
           cy="24"
@@ -159,10 +132,7 @@ function ScoreGauge({ score }: { score: number }) {
         />
       </svg>
       <span
-        className={cn(
-          'absolute inset-0 flex items-center justify-center text-sm font-bold',
-          color
-        )}
+        className={cn('absolute inset-0 flex items-center justify-center text-sm font-bold', color)}
       >
         {percent}
       </span>
@@ -170,11 +140,7 @@ function ScoreGauge({ score }: { score: number }) {
   );
 }
 
-export function QualityPanel({
-  report,
-  open,
-  onOpenChange,
-}: QualityPanelProps) {
+export function QualityPanel({ report, open, onOpenChange }: QualityPanelProps) {
   if (!open) return null;
 
   return (
@@ -183,12 +149,9 @@ export function QualityPanel({
         <div className="flex items-center gap-3">
           <ScoreGauge score={report.score} />
           <div>
-            <h3 className="text-sm font-semibold text-text-primary">
-              Quality Gates
-            </h3>
+            <h3 className="text-sm font-semibold text-text-primary">Quality Gates</h3>
             <p className="text-xs text-text-muted">
-              {report.results.filter((r) => r.passed).length}
-              /{report.results.length} checks passed
+              {report.results.filter((r) => r.passed).length}/{report.results.length} checks passed
             </p>
           </div>
         </div>

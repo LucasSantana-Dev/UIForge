@@ -4,12 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Menu } from 'lucide-react';
-import {
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { CONTAINER } from './constants';
 
 interface LandingNavProps {
@@ -18,8 +13,7 @@ interface LandingNavProps {
 
 export function LandingNav({ user }: LandingNavProps) {
   const [isScrolled, setIsScrolled] = useState(
-    () =>
-      typeof window !== 'undefined' && window.scrollY > 0
+    () => typeof window !== 'undefined' && window.scrollY > 0
   );
 
   useEffect(() => {
@@ -56,20 +50,10 @@ export function LandingNav({ user }: LandingNavProps) {
           : 'bg-transparent border-transparent'
       }`}
     >
-      <div
-        className={`${CONTAINER} h-full flex items-center justify-between`}
-      >
+      <div className={`${CONTAINER} h-full flex items-center justify-between`}>
         <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/siza-icon.png"
-            alt="Siza"
-            width={24}
-            height={24}
-            priority
-          />
-          <span className="font-display font-bold text-lg">
-            siza
-          </span>
+          <Image src="/siza-icon.png" alt="Siza" width={24} height={24} priority />
+          <span className="font-display font-bold text-lg">siza</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
@@ -117,9 +101,7 @@ export function LandingNav({ user }: LandingNavProps) {
               <Menu size={20} />
             </SheetTrigger>
             <SheetContent className="bg-[#121214] border-[#27272A]">
-              <SheetTitle className="font-display text-lg mb-6">
-                Menu
-              </SheetTitle>
+              <SheetTitle className="font-display text-lg mb-6">Menu</SheetTitle>
               <div className="flex flex-col gap-4">
                 {navLinks.map((link) => (
                   <Link

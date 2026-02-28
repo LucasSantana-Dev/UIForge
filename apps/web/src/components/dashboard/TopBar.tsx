@@ -11,15 +11,11 @@ interface TopBarProps {
 }
 
 export default function TopBar({ user }: TopBarProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] =
-    useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
     <>
-      <header
-        className="bg-surface-0 border-b border-surface-3"
-        role="banner"
-      >
+      <header className="bg-surface-0 border-b border-surface-3" role="banner">
         <div className="px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
@@ -27,19 +23,13 @@ export default function TopBar({ user }: TopBarProps) {
                 type="button"
                 className="md:hidden -ml-2 mr-2 inline-flex items-center justify-center p-2 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface-2 transition-colors focus-visible:shadow-glow-focus"
                 onClick={() => setMobileMenuOpen(true)}
-                aria-label={
-                  mobileMenuOpen
-                    ? 'Close main menu'
-                    : 'Open main menu'
-                }
+                aria-label={mobileMenuOpen ? 'Close main menu' : 'Open main menu'}
                 aria-expanded={mobileMenuOpen}
               >
                 <MenuIcon className="h-6 w-6" />
               </button>
               <div className="flex items-center space-x-4">
-                <h2 className="text-lg sm:text-xl font-semibold text-text-primary">
-                  Dashboard
-                </h2>
+                <h2 className="text-lg sm:text-xl font-semibold text-text-primary">Dashboard</h2>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -48,10 +38,7 @@ export default function TopBar({ user }: TopBarProps) {
           </div>
         </div>
       </header>
-      <MobileNav
-        open={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-      />
+      <MobileNav open={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </>
   );
 }

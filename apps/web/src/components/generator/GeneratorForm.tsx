@@ -367,7 +367,9 @@ export default function GeneratorForm({
               placeholder="MyButton"
             />
             {errors.componentName && (
-              <p id="componentName-error" role="alert" className="mt-1 text-sm text-error">{errors.componentName.message}</p>
+              <p id="componentName-error" role="alert" className="mt-1 text-sm text-error">
+                {errors.componentName.message}
+              </p>
             )}
           </div>
 
@@ -399,7 +401,11 @@ export default function GeneratorForm({
                 placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
               />
             )}
-            {errors.prompt && <p id="prompt-error" role="alert" className="mt-1 text-sm text-error">{errors.prompt.message}</p>}
+            {errors.prompt && (
+              <p id="prompt-error" role="alert" className="mt-1 text-sm text-error">
+                {errors.prompt.message}
+              </p>
+            )}
           </div>
 
           <div>

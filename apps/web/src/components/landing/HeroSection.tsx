@@ -13,8 +13,7 @@ interface HeroSectionProps {
 export function HeroSection({ user }: HeroSectionProps) {
   const particles = useMemo(() => {
     const seed = (i: number) => {
-      const x =
-        Math.sin(i * 12.9898 + 78.233) * 43758.5453;
+      const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
       return x - Math.floor(x);
     };
     return Array.from({ length: 8 }, (_, i) => ({
@@ -44,8 +43,7 @@ export function HeroSection({ user }: HeroSectionProps) {
       <div
         className="absolute inset-0 opacity-[0.6]"
         style={{
-          backgroundImage:
-            'radial-gradient(circle, #27272A 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(circle, #27272A 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }}
       />
@@ -74,8 +72,7 @@ export function HeroSection({ user }: HeroSectionProps) {
       <div
         className="absolute w-[600px] h-[400px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{
-          background:
-            'radial-gradient(ellipse, rgba(124,58,237,0.20), transparent 70%)',
+          background: 'radial-gradient(ellipse, rgba(124,58,237,0.20), transparent 70%)',
           animation: 'pulse-glow 4s ease-in-out infinite',
         }}
       />
@@ -117,9 +114,8 @@ export function HeroSection({ user }: HeroSectionProps) {
           }}
           className="text-lg text-[#A1A1AA] max-w-xl mx-auto mt-6"
         >
-          From zero to production. AI-powered generation,
-          intelligent routing, and edge deployment — all open
-          source.
+          From zero to production. AI-powered generation, intelligent routing, and edge deployment —
+          all open source.
         </motion.p>
 
         <motion.div
@@ -137,9 +133,7 @@ export function HeroSection({ user }: HeroSectionProps) {
             className="group relative inline-flex items-center gap-2 bg-[#7C3AED] text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-[#8B5CF6] hover:shadow-[0_8px_24px_rgba(124,58,237,0.4)] hover:-translate-y-0.5 overflow-hidden"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-            <span className="relative">
-              {user ? 'Go to Dashboard' : 'Get Started Free'}
-            </span>
+            <span className="relative">{user ? 'Go to Dashboard' : 'Get Started Free'}</span>
             <ArrowRight className="relative w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
           <Link
@@ -171,28 +165,21 @@ export function HeroSection({ user }: HeroSectionProps) {
           <div className="p-5 font-mono text-[13px] leading-relaxed">
             <div>
               <span className="text-[#71717A]">$</span>{' '}
-              <span className="text-[#FAFAFA]">
-                npx siza generate
-              </span>
+              <span className="text-[#FAFAFA]">npx siza generate</span>
             </div>
             <div>
               <span className="text-[#22C55E]">&#10003;</span>{' '}
-              <span className="text-[#A1A1AA]">
-                Dashboard layout generated (2.3s)
-              </span>
+              <span className="text-[#A1A1AA]">Dashboard layout generated (2.3s)</span>
             </div>
             <div>
               <span className="text-[#22C55E]">&#10003;</span>{' '}
-              <span className="text-[#A1A1AA]">
-                12 components scaffolded
-              </span>
+              <span className="text-[#A1A1AA]">12 components scaffolded</span>
             </div>
             <div>
               <span
                 className="inline-block w-2 h-4 bg-[#7C3AED]"
                 style={{
-                  animation:
-                    'cursor-blink 1s step-end infinite',
+                  animation: 'cursor-blink 1s step-end infinite',
                 }}
               />
             </div>
