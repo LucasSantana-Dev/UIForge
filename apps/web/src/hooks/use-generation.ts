@@ -167,18 +167,14 @@ export function useGeneration(projectId?: string) {
         prompt: string;
       }
     ) => {
-      const currentState = stateRef.current;
-      if (!currentState.parentGenerationId || !currentState.code) return;
-      if (currentState.conversationTurn >= MAX_CONVERSATION_TURNS) return;
-
       await startGeneration({
         ...options,
-        parentGenerationId: currentState.parentGenerationId,
-        previousCode: currentState.code,
+        parentGenerationId: state.parentGenerationId ?? undefined,
+        previousCode: state.code,
         refinementPrompt,
       });
     },
-    [startGeneration]
+    [startGeneration, state.parentGenerationId, state.code]
   );
 
   return {
@@ -217,5 +213,20 @@ export function useGenerationProgress({
     return 'Processing...';
   };
 
-  return { latestEvent, statusMessage: getStatusMessage() };
+  const getEventIcon = (eventType: string) => {
+    switch (eventType) {
+      case 'start':
+        return '\u{1F680}';
+      case 'chunk':
+        return '\u{26A1}';
+      case 'complete':
+        return '\u{2705}';
+      case 'error':
+        return '\u{274C}';
+      default:
+        return '\u{1F4DD}';
+    }
+  };
+
+  return { latestEvent, statusMessage: getStatusMessage(), getEventIcon };
 }
