@@ -63,13 +63,27 @@ export function deriveEncryptionKey(userKey: string, salt: string = 'siza-salt')
 export function encryptApiKey(apiKey: string, encryptionKey: string): string {
   if (apiKey === null || apiKey === undefined) throw new Error('API key is required');
   if (!apiKey) throw new Error('API key cannot be empty');
-  return CryptoJS.AES.encrypt(apiKey, encryptionKey).toString();
+  const key = CryptoJS.enc.Hex.parse(encryptionKey);
+  const iv = CryptoJS.lib.WordArray.random(16);
+  const encrypted = CryptoJS.AES.encrypt(apiKey, key, { iv });
+  return iv.toString() + ':' + encrypted.toString();
 }
 
 export function decryptApiKey(encryptedKey: string, encryptionKey: string): string {
   if (encryptedKey === null || encryptedKey === undefined)
     throw new Error('Encrypted key is required');
   try {
+    if (encryptedKey.includes(':')) {
+      const colonIdx = encryptedKey.indexOf(':');
+      const ivHex = encryptedKey.slice(0, colonIdx);
+      const ciphertext = encryptedKey.slice(colonIdx + 1);
+      const key = CryptoJS.enc.Hex.parse(encryptionKey);
+      const iv = CryptoJS.enc.Hex.parse(ivHex);
+      const bytes = CryptoJS.AES.decrypt(ciphertext, key, { iv });
+      const result = bytes.toString(CryptoJS.enc.Utf8);
+      if (!result) throw new Error('Failed to decrypt API key. Invalid encryption key.');
+      return result;
+    }
     const bytes = CryptoJS.AES.decrypt(encryptedKey, encryptionKey);
     const result = bytes.toString(CryptoJS.enc.Utf8);
     if (!result) throw new Error('Failed to decrypt API key. Invalid encryption key.');
@@ -103,7 +117,7 @@ export function generateKeyId(): string {
 
 export function hashApiKey(apiKey: string): string {
   if (apiKey === null || apiKey === undefined) throw new Error('API key is required for hashing');
-  return CryptoJS.SHA256(apiKey).toString();
+  return CryptoJS.HmacSHA256(apiKey, 'siza-api-key-fingerprint').toString();
 }
 
 export function createEncryptedApiKey(

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- **Encryption hardening**: Use explicit AES key/IV instead of weak EVP_BytesToKey derivation for API key encryption
+- **HMAC hashing**: Replace unsalted SHA-256 with HMAC-SHA256 for API key fingerprinting
+- Backward-compatible decryption supports both new (iv:ciphertext) and legacy formats
+
 ## [0.16.0] - 2026-02-28
 
 ### Added
