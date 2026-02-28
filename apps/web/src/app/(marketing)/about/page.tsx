@@ -162,7 +162,7 @@ export default function AboutPage() {
           <FadeIn className="text-center mb-10">
             <h2 className="text-3xl font-bold tracking-tight mb-3">The Forge Space Ecosystem</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
-              Siza is part of Forge Space — an open-source developer workspace. Five repositories,
+              Siza is part of Forge Space — an open-source developer workspace. Six repositories,
               MCP-native architecture, zero lock-in.
             </p>
           </FadeIn>
