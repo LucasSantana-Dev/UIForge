@@ -23,7 +23,7 @@ const XSS_PATTERN_STRINGS = [
 const INJECTION_PATTERN_STRINGS = [
   '\\$\\{.*\\}.*exec',
   'child_' + 'process',
-  'require\\s*\\(\\s*[\'\""]fs[\'\""]\\s*\\)',
+  `require\\s*\\(\\s*['"]fs['"]\\s*\\)`,
 ];
 
 export function runSecurityScan(code: string): QualityResult {
@@ -77,7 +77,7 @@ export function runTypeCheck(code: string): QualityResult {
 
   const hasHooks = /useState|useEffect|useRef/.test(code);
   const hasJsx = /<[A-Z]/.test(code);
-  const hasDirective = /^['\"]use client['\"]/.test(code);
+  const hasDirective = /^['"]use client['"]/.test(code);
 
   if (hasJsx && hasHooks && !hasDirective) {
     issues.push('Component uses hooks but missing "use client" directive');
