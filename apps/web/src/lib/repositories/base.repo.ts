@@ -32,6 +32,6 @@ export function handleRepoError(
   error: unknown,
   context: string
 ): never {
-  captureServerError(error, { context: 'repository:' + context });
+  captureServerError(error, { extra: { repository: context } });
   throw error;
 }
