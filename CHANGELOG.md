@@ -53,6 +53,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - API: `api.forgespace.co`
   - Email: `noreply@forgespace.co` (transactional), `support@forgespace.co` (reply-to)
 
+## [0.13.1] - 2026-02-28
+
+### Added
+- **Test coverage boost**: 63 new unit tests across 4 new suites (#138)
+  - Quality gates validation, template validation, auth email helpers, usage limits
+- **HTTPS dev server**: `npm run dev:https` with mkcert certificates for local development (#143)
+
+### Changed
+- **Domain migration**: All URLs migrated to `forgespace.co` subdomains (#141, #142)
+  - Production: `siza.forgespace.co`, Docs: `docs.forgespace.co`, Dev: `dev.forgespace.co`
+  - Support email and Cloudflare custom domain configuration
+- **Repo cleanup**: Improved .gitignore, removed stale docs, relocated test fixtures (#140)
+
 
 ## [0.13.0] - 2026-02-28
 
