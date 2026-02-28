@@ -71,6 +71,7 @@ describe('ComponentGenerator Component', () => {
     reset: jest.fn(),
     parentGenerationId: null,
     conversationTurn: 0,
+    maxConversationTurns: 10,
   };
 
   beforeEach(() => {

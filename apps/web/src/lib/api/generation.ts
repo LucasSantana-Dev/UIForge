@@ -29,6 +29,9 @@ export interface GenerationOptions {
     error: string;
     info: string;
   };
+  parentGenerationId?: string;
+  previousCode?: string;
+  refinementPrompt?: string;
 }
 
 export interface GenerationEvent {
@@ -37,6 +40,9 @@ export interface GenerationEvent {
   totalLength?: number;
   message?: string;
   provider?: string;
+  generationId?: string;
+  parentGenerationId?: string | null;
+  ragEnriched?: boolean;
   report?: {
     passed: boolean;
     results: Array<{

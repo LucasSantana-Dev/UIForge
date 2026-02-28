@@ -153,6 +153,17 @@ export default function GeneratorForm({
       onGenerate(generation.code, {
         ...currentSettings,
         qualityReport: generation.qualityReport,
+        formOptions: {
+          framework: framework as 'react' | 'vue' | 'angular' | 'svelte',
+          componentLibrary: currentSettings.componentLibrary || 'none',
+          description: promptValue,
+          style: currentSettings.style,
+          typescript: currentSettings.typescript,
+          componentName: currentSettings.componentName,
+          prompt: promptValue,
+          provider: selectedProvider,
+          model: selectedModel,
+        },
       });
     }
   }, [
@@ -162,6 +173,10 @@ export default function GeneratorForm({
     generation.qualityReport,
     onGenerate,
     currentSettings,
+    framework,
+    promptValue,
+    selectedProvider,
+    selectedModel,
   ]);
 
   useEffect(() => {

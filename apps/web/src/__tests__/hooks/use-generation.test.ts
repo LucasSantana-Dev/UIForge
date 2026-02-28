@@ -5,44 +5,18 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { useGeneration } from '@/hooks/use-generation';
-import { useCreateGeneration } from '@/hooks/use-generations';
 
 // Mock dependencies
-jest.mock('@/hooks/use-generations');
 jest.mock('@/lib/api/generation', () => ({
   streamGeneration: jest.fn(),
 }));
 
-const mockUseCreateGeneration = useCreateGeneration as jest.MockedFunction<
-  typeof useCreateGeneration
->;
 const mockStreamGeneration = require('@/lib/api/generation').streamGeneration;
 
 // TODO: Enable when feature is implemented
 describe('useGeneration', () => {
-  const mockCreateGeneration = {
-    mutateAsync: jest.fn().mockResolvedValue({}),
-    data: undefined,
-    error: null,
-    isError: false,
-    isPending: false,
-    isSuccess: false,
-    isIdle: true,
-    mutate: jest.fn(),
-    reset: jest.fn(),
-    status: 'idle' as const,
-    failureCount: 0,
-    failureReason: null,
-    errorUpdatedAt: 0,
-    isPaused: false,
-    submittedAt: 0,
-    variables: undefined,
-    context: undefined,
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseCreateGeneration.mockReturnValue(mockCreateGeneration as any);
 
     // Reset stream generation mock
     mockStreamGeneration.mockImplementation(async function* () {
@@ -119,39 +93,6 @@ describe('useGeneration', () => {
       expect(result.current.isGenerating).toBe(false);
       expect(result.current.error).toBe('Generation failed');
       expect(result.current.code).toBe('');
-    });
-
-    it('should save to database when project ID is provided', async () => {
-      const { result } = renderHook(() => useGeneration('test-project-id'));
-
-      const options = {
-        framework: 'react' as const,
-        componentLibrary: 'tailwind' as const,
-        description: 'Create a button component',
-        style: 'modern' as const,
-        typescript: false,
-      };
-
-      await act(async () => {
-        await result.current.startGeneration({
-          ...options,
-          componentName: 'Button',
-          prompt: 'Create a button component',
-        });
-      });
-
-      expect(mockCreateGeneration.mutateAsync).toHaveBeenCalledWith({
-        project_id: 'test-project-id',
-        prompt: 'Create a button component',
-        component_name: 'Button',
-        generated_code: 'export default function Button() { return <button>Click me</button>; }',
-        framework: 'react',
-        component_library: 'tailwind',
-        style: 'modern',
-        typescript: false,
-        tokens_used: 0,
-        generation_time_ms: expect.any(Number),
-      });
     });
 
     it('should update progress during generation', async () => {
@@ -314,33 +255,6 @@ describe('useGeneration', () => {
   });
 
   describe('error handling', () => {
-    it('should handle database save errors gracefully', async () => {
-      const { result } = renderHook(() => useGeneration('test-project-id'));
-
-      mockCreateGeneration.mutateAsync.mockRejectedValue(new Error('Database error'));
-
-      const options = {
-        framework: 'react' as const,
-        componentLibrary: 'tailwind' as const,
-        description: 'Create a button component',
-        style: 'modern' as const,
-        typescript: false,
-      };
-
-      await act(async () => {
-        await result.current.startGeneration({
-          ...options,
-          componentName: 'Button',
-          prompt: 'Create a button component',
-        });
-      });
-
-      // Generation should still complete despite database error
-      expect(result.current.isGenerating).toBe(false);
-      expect(result.current.code).toContain('Button');
-      expect(result.current.error).toBe(null);
-    });
-
     it('should handle stream interruption', async () => {
       const { result } = renderHook(() => useGeneration());
 
@@ -424,6 +338,188 @@ describe('useGeneration', () => {
       expect(result.current.events).toHaveLength(2); // start + error
       expect(result.current.events[0].type).toBe('start');
       expect(result.current.events[1].type).toBe('error');
+    });
+  });
+
+  describe('conversation state', () => {
+    it('should update parentGenerationId from SSE complete event', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'code' };
+        yield {
+          type: 'complete',
+          generationId: 'gen-123',
+          parentGenerationId: null,
+        };
+      });
+
+      const options = {
+        framework: 'react' as const,
+        componentLibrary: 'tailwind' as const,
+        description: 'Create a button',
+        style: 'modern' as const,
+        typescript: false,
+      };
+
+      await act(async () => {
+        await result.current.startGeneration({
+          ...options,
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-123');
+      expect(result.current.conversationTurn).toBe(0);
+    });
+
+    it('should increment conversationTurn on refinement', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'initial code' };
+        yield { type: 'complete', generationId: 'gen-1' };
+      });
+
+      await act(async () => {
+        await result.current.startGeneration({
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-1');
+      expect(result.current.conversationTurn).toBe(0);
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'refined code' };
+        yield { type: 'complete', generationId: 'gen-2' };
+      });
+
+      await act(async () => {
+        await result.current.startRefinement('make it darker', {
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-2');
+      expect(result.current.conversationTurn).toBe(1);
+    });
+
+    it('should pass conversation fields in startRefinement', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'const Button = () => <button />' };
+        yield { type: 'complete', generationId: 'gen-abc' };
+      });
+
+      await act(async () => {
+        await result.current.startGeneration({
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'refined' };
+        yield { type: 'complete', generationId: 'gen-def' };
+      });
+
+      await act(async () => {
+        await result.current.startRefinement('add hover state', {
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      const lastCall =
+        mockStreamGeneration.mock.calls[mockStreamGeneration.mock.calls.length - 1][0];
+      expect(lastCall.parentGenerationId).toBe('gen-abc');
+      expect(lastCall.previousCode).toBe('const Button = () => <button />');
+      expect(lastCall.refinementPrompt).toBe('add hover state');
+    });
+
+    it('should clear conversation state on reset', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'code' };
+        yield { type: 'complete', generationId: 'gen-123' };
+      });
+
+      await act(async () => {
+        await result.current.startGeneration({
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-123');
+
+      act(() => {
+        result.current.reset();
+      });
+
+      expect(result.current.parentGenerationId).toBeNull();
+      expect(result.current.conversationTurn).toBe(0);
+    });
+
+    it('should reset conversation state on fresh generation', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'code' };
+        yield { type: 'complete', generationId: 'gen-1' };
+      });
+
+      await act(async () => {
+        await result.current.startGeneration({
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-1');
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'new code' };
+        yield { type: 'complete', generationId: 'gen-2' };
+      });
+
+      await act(async () => {
+        await result.current.startGeneration({
+          framework: 'react' as const,
+          description: 'Create a card',
+          componentName: 'Card',
+          prompt: 'Create a card',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-2');
+      expect(result.current.conversationTurn).toBe(0);
     });
   });
 

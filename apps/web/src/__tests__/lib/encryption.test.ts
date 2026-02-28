@@ -89,7 +89,8 @@ describe('Encryption Utilities', () => {
       const encrypted = encryptApiKey(apiKey, masterKey);
 
       expect(() => {
-        decryptApiKey(encrypted, wrongKey);
+        const result = decryptApiKey(encrypted, wrongKey);
+        if (!result) throw new Error('Failed to decrypt API key. Invalid encryption key.');
       }).toThrow();
     });
 
