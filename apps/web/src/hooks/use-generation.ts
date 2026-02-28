@@ -14,23 +14,29 @@ export interface UseGenerationState {
   error: string | null;
   events: GenerationEvent[];
   qualityReport: QualityReport | null;
+  generationId: string | null;
   parentGenerationId: string | null;
   conversationTurn: number;
 }
 
+const INITIAL_STATE: UseGenerationState = {
+  isGenerating: false,
+  progress: 0,
+  code: '',
+  error: null,
+  events: [],
+  qualityReport: null,
+  generationId: null,
+  parentGenerationId: null,
+  conversationTurn: 0,
+};
+
 export function useGeneration(projectId?: string) {
-  const [state, setState] = useState<UseGenerationState>({
-    isGenerating: false,
-    progress: 0,
-    code: '',
-    error: null,
-    events: [],
-    qualityReport: null,
-    parentGenerationId: null,
-    conversationTurn: 0,
-  });
+  const [state, setState] = useState<UseGenerationState>(INITIAL_STATE);
 
   const abortControllerRef = useRef<AbortController | null>(null);
+  const stateRef = useRef(state);
+  stateRef.current = state;
   const createGeneration = useCreateGeneration();
 
   const startGeneration = useCallback(
@@ -45,16 +51,19 @@ export function useGeneration(projectId?: string) {
           abortControllerRef.current.abort();
         }
 
-        setState({
+        const isRefinement = !!options.parentGenerationId;
+
+        setState((prev) => ({
           isGenerating: true,
           progress: 0,
           code: '',
           error: null,
           events: [],
           qualityReport: null,
-          parentGenerationId: null,
-          conversationTurn: 0,
-        });
+          generationId: null,
+          parentGenerationId: isRefinement ? prev.parentGenerationId : null,
+          conversationTurn: isRefinement ? prev.conversationTurn : 0,
+        }));
 
         abortControllerRef.current = new AbortController();
 
@@ -94,8 +103,18 @@ export function useGeneration(projectId?: string) {
               }));
               break;
 
-            case 'complete':
-              setState((prev) => ({ ...prev, code, progress: 100, isGenerating: false }));
+            case 'complete': {
+              const evt = event as Record<string, unknown>;
+              const genId = (evt.generationId as string) || null;
+              setState((prev) => ({
+                ...prev,
+                code,
+                progress: 100,
+                isGenerating: false,
+                generationId: genId,
+                parentGenerationId: genId,
+                conversationTurn: prev.conversationTurn + 1,
+              }));
 
               if (projectId && code) {
                 try {
@@ -116,6 +135,7 @@ export function useGeneration(projectId?: string) {
                 }
               }
               break;
+            }
 
             case 'error':
               setState((prev) => ({
@@ -145,22 +165,17 @@ export function useGeneration(projectId?: string) {
   const stopGeneration = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
-      setState((prev) => ({ ...prev, isGenerating: false, error: 'Generation cancelled' }));
+      setState((prev) => ({
+        ...prev,
+        isGenerating: false,
+        error: 'Generation cancelled',
+      }));
     }
   }, []);
 
   const reset = useCallback(() => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
-    setState({
-      isGenerating: false,
-      progress: 0,
-      code: '',
-      error: null,
-      events: [],
-      qualityReport: null,
-      parentGenerationId: null,
-      conversationTurn: 0,
-    });
+    setState(INITIAL_STATE);
   }, []);
 
   const startRefinement = useCallback(
@@ -169,14 +184,15 @@ export function useGeneration(projectId?: string) {
       options: GenerationOptions & {
         componentName: string;
         prompt: string;
-        provider?: string;
-        model?: string;
-        apiKey?: string;
       }
     ) => {
+      const current = stateRef.current;
       await startGeneration({
         ...options,
-        prompt: `Refine this component: ${refinementPrompt}\n\nOriginal: ${options.prompt}`,
+        parentGenerationId:
+          current.generationId || current.parentGenerationId || undefined,
+        previousCode: current.code || undefined,
+        refinementPrompt,
       });
     },
     [startGeneration]
@@ -214,15 +230,15 @@ export function useGenerationProgress({
   const getEventIcon = (eventType: GenerationEvent['type']) => {
     switch (eventType) {
       case 'start':
-        return '🚀';
+        return '\u{1F680}';
       case 'chunk':
-        return '⚡';
+        return '\u{26A1}';
       case 'complete':
-        return '✅';
+        return '\u{2705}';
       case 'error':
-        return '❌';
+        return '\u{274C}';
       default:
-        return '📝';
+        return '\u{1F4DD}';
     }
   };
 

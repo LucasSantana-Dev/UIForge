@@ -21,6 +21,9 @@ export interface GenerationOptions {
   spacing?: 'compact' | 'default' | 'spacious';
   borderRadius?: 'none' | 'small' | 'medium' | 'large' | 'full';
   typography?: 'system' | 'sans' | 'serif' | 'mono';
+  parentGenerationId?: string;
+  previousCode?: string;
+  refinementPrompt?: string;
 }
 
 export interface GenerationEvent {

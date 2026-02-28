@@ -17,6 +17,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { ImageUpload, type ImageState } from './ImageUpload';
 import { ProviderSelector } from './ProviderSelector';
 import { QuotaGuard } from './QuotaGuard';
+import RefinementInput from './RefinementInput';
 
 const generatorSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters').max(1000),
@@ -35,6 +36,7 @@ interface GeneratorFormProps {
   onGenerating: () => void;
   isGenerating: boolean;
   initialDescription?: string;
+  onReset?: () => void;
 }
 
 export default function GeneratorForm({
@@ -44,6 +46,7 @@ export default function GeneratorForm({
   onGenerating,
   isGenerating,
   initialDescription,
+  onReset,
 }: GeneratorFormProps) {
   const generation = useGeneration(projectId);
   const encryptionKey = useAIKeyStore((s) => s.encryptionKey);
@@ -71,6 +74,7 @@ export default function GeneratorForm({
     typescript: false,
   });
   const designContextEnabled = isFeatureEnabled('ENABLE_DESIGN_CONTEXT');
+  const conversationEnabled = isFeatureEnabled('ENABLE_CONVERSATION_MODE');
   const autocompleteEnabled = isFeatureEnabled('ENABLE_PROMPT_AUTOCOMPLETE');
   const [designContext, setDesignContext] = useState<DesignContextValues>(DESIGN_DEFAULTS);
   const [promptValue, setPromptValue] = useState(initialDescription || '');
@@ -81,6 +85,7 @@ export default function GeneratorForm({
     handleSubmit,
     formState: { errors },
     setValue,
+    getValues,
   } = useForm<GeneratorFormData>({
     resolver: zodResolver(generatorSchema),
     defaultValues: {
@@ -146,6 +151,7 @@ export default function GeneratorForm({
       onGenerate(generation.code, {
         ...currentSettings,
         qualityReport: generation.qualityReport,
+        generationId: generation.generationId,
       });
     }
   }, [
@@ -153,6 +159,7 @@ export default function GeneratorForm({
     generation.isGenerating,
     generation.error,
     generation.qualityReport,
+    generation.generationId,
     onGenerate,
     currentSettings,
   ]);
@@ -317,6 +324,37 @@ export default function GeneratorForm({
           />
         </div>
       )}
+
+
+      {conversationEnabled &&
+        generation.conversationTurn > 0 &&
+        !generation.isGenerating &&
+        generation.code && (
+          <div className="border-t border-surface-3 p-4">
+            <RefinementInput
+              onRefine={(prompt) => {
+                onGenerating();
+                const data = getValues();
+                generation.startRefinement(prompt, {
+                  framework: framework as 'react' | 'vue' | 'angular' | 'svelte',
+                  componentLibrary: data.componentLibrary,
+                  description: data.prompt,
+                  style: data.style,
+                  typescript: data.typescript,
+                  componentName: data.componentName,
+                  prompt: data.prompt,
+                });
+              }}
+              onNewGeneration={() => {
+                generation.reset();
+                onReset?.();
+              }}
+              isGenerating={generation.isGenerating}
+              conversationTurn={generation.conversationTurn}
+              maxTurns={10}
+            />
+          </div>
+        )}
 
       <div className="border-t border-surface-3 p-4 bg-surface-0">
         <div className="text-xs text-text-secondary">

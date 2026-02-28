@@ -163,6 +163,13 @@ export default function TemplateComponent() {
     window.history.replaceState({}, '', url.toString());
   };
 
+  const handleReset = () => {
+    setGeneratedCode('');
+    setIsGenerating(false);
+    setGenerationId(null);
+    setQualityReport(null);
+  };
+
   if (!projectId) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -229,6 +236,7 @@ export default function TemplateComponent() {
               onGenerating={handleGenerating}
               isGenerating={isGenerating}
               initialDescription={isTemplateMode ? description || undefined : undefined}
+              onReset={handleReset}
             />
           </Card>
         </div>
