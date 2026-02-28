@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { useThemeStore } from '@/stores/theme-store';
+import { useThemeStore, parseBrandIdentity } from '@/stores/theme-store';
 import { BUILT_IN_THEMES } from '@/lib/themes/defaults';
 
 describe('Theme Store', () => {
@@ -321,6 +321,163 @@ describe('Theme Store', () => {
 
       const imported = result.current.getThemes().find((t) => t.id === id!);
       expect(imported!.name).toHaveLength(50);
+    });
+  });
+
+  describe('parseBrandIdentity', () => {
+    const validBrand = {
+      brandName: 'Acme Corp',
+      colors: {
+        primary: { hex: '#E11D48' },
+        secondary: { hex: '#7C3AED' },
+        accent: { hex: '#F59E0B' },
+        success: { hex: '#10B981' },
+        warning: { hex: '#F59E0B' },
+        error: { hex: '#EF4444' },
+        info: { hex: '#3B82F6' },
+        neutrals: { 50: { hex: '#FAFAFA' }, 900: { hex: '#171717' } },
+      },
+      typography: {
+        headingFont: 'Playfair Display',
+        bodyFont: 'Inter',
+      },
+      spacing: { unit: 8 },
+      borders: { radii: { md: 6 } },
+    };
+
+    it('parses valid brand identity JSON', () => {
+      const result = parseBrandIdentity(JSON.stringify(validBrand));
+      expect(result).not.toBeNull();
+      expect(result!.name).toBe('Acme Corp');
+      expect(result!.primaryColor).toBe('#E11D48');
+      expect(result!.secondaryColor).toBe('#7C3AED');
+      expect(result!.accentColor).toBe('#F59E0B');
+      expect(result!.typography).toBe('sans');
+      expect(result!.spacing).toBe('default');
+      expect(result!.borderRadius).toBe('medium');
+    });
+
+    it('returns null for invalid JSON string', () => {
+      expect(parseBrandIdentity('not json')).toBeNull();
+    });
+
+    it('returns null when colors.primary.hex is missing', () => {
+      expect(parseBrandIdentity(JSON.stringify({ name: 'test' }))).toBeNull();
+      expect(parseBrandIdentity(JSON.stringify({ colors: {} }))).toBeNull();
+      expect(parseBrandIdentity(JSON.stringify({ colors: { primary: {} } }))).toBeNull();
+    });
+
+    it('populates brandMeta with font names and semantic colors', () => {
+      const result = parseBrandIdentity(JSON.stringify(validBrand));
+      expect(result!.brandMeta).toBeDefined();
+      expect(result!.brandMeta!.headingFont).toBe('Playfair Display');
+      expect(result!.brandMeta!.bodyFont).toBe('Inter');
+      expect(result!.brandMeta!.semanticColors.success).toBe('#10B981');
+      expect(result!.brandMeta!.neutrals).toHaveLength(2);
+    });
+
+    it('maps mono font to mono typography', () => {
+      const brand = {
+        ...validBrand,
+        typography: { headingFont: 'Fira Code', bodyFont: 'JetBrains Mono' },
+      };
+      const result = parseBrandIdentity(JSON.stringify(brand));
+      expect(result!.typography).toBe('mono');
+    });
+
+    it('maps serif font to serif typography', () => {
+      const brand = {
+        ...validBrand,
+        typography: { headingFont: 'Merriweather', bodyFont: 'Georgia Serif' },
+      };
+      const result = parseBrandIdentity(JSON.stringify(brand));
+      expect(result!.typography).toBe('serif');
+    });
+
+    it('maps compact spacing for small units', () => {
+      const brand = { ...validBrand, spacing: { unit: 4 } };
+      const result = parseBrandIdentity(JSON.stringify(brand));
+      expect(result!.spacing).toBe('compact');
+    });
+
+    it('maps spacious spacing for large units', () => {
+      const brand = { ...validBrand, spacing: { unit: 16 } };
+      const result = parseBrandIdentity(JSON.stringify(brand));
+      expect(result!.spacing).toBe('spacious');
+    });
+
+    it('maps border radius levels correctly', () => {
+      const none = { ...validBrand, borders: { radii: { md: 0 } } };
+      expect(parseBrandIdentity(JSON.stringify(none))!.borderRadius).toBe('none');
+
+      const small = { ...validBrand, borders: { radii: { md: 4 } } };
+      expect(parseBrandIdentity(JSON.stringify(small))!.borderRadius).toBe('small');
+
+      const large = { ...validBrand, borders: { radii: { md: 16 } } };
+      expect(parseBrandIdentity(JSON.stringify(large))!.borderRadius).toBe('large');
+
+      const full = { ...validBrand, borders: { radii: { md: 20 } } };
+      expect(parseBrandIdentity(JSON.stringify(full))!.borderRadius).toBe('full');
+    });
+
+    it('falls back to defaults for missing optional fields', () => {
+      const minimal = { colors: { primary: { hex: '#FF0000' } } };
+      const result = parseBrandIdentity(JSON.stringify(minimal));
+      expect(result).not.toBeNull();
+      expect(result!.name).toBe('Imported Brand');
+      expect(result!.secondaryColor).toBe('#FF0000');
+      expect(result!.brandMeta!.headingFont).toBe('System');
+    });
+  });
+
+  describe('importBrand', () => {
+    const validBrand = JSON.stringify({
+      brandName: 'Test Brand',
+      colors: {
+        primary: { hex: '#FF6600' },
+        secondary: { hex: '#0066FF' },
+      },
+      typography: { headingFont: 'Roboto', bodyFont: 'Open Sans' },
+      spacing: { unit: 8 },
+      borders: { radii: { md: 8 } },
+    });
+
+    it('creates a theme from valid brand identity JSON', () => {
+      const { result } = renderHook(() => useThemeStore());
+
+      let id: string | null;
+      act(() => {
+        id = result.current.importBrand(validBrand);
+      });
+
+      expect(id!).toBeDefined();
+      const theme = result.current.getThemes().find((t) => t.id === id!);
+      expect(theme!.name).toBe('Test Brand');
+      expect(theme!.primaryColor).toBe('#FF6600');
+      expect(theme!.brandMeta).toBeDefined();
+      expect(theme!.brandMeta!.headingFont).toBe('Roboto');
+    });
+
+    it('returns null for non-brand JSON', () => {
+      const { result } = renderHook(() => useThemeStore());
+
+      let id: string | null;
+      act(() => {
+        id = result.current.importBrand(JSON.stringify({ name: 'theme', primaryColor: '#000' }));
+      });
+
+      expect(id!).toBeNull();
+    });
+
+    it('returns null for invalid JSON', () => {
+      const { result } = renderHook(() => useThemeStore());
+
+      let id: string | null;
+      act(() => {
+        id = result.current.importBrand('garbage');
+      });
+
+      expect(id!).toBeNull();
     });
   });
 });
