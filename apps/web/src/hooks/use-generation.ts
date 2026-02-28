@@ -5,7 +5,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { streamGeneration, GenerationOptions, GenerationEvent } from '@/lib/api/generation';
 import type { QualityReport } from '@/lib/quality/gates';
-import { useCreateGeneration } from './use-generations';
 
 export interface UseGenerationState {
   isGenerating: boolean;
@@ -17,6 +16,8 @@ export interface UseGenerationState {
   parentGenerationId: string | null;
   conversationTurn: number;
 }
+
+const MAX_CONVERSATION_TURNS = 10;
 
 export function useGeneration(projectId?: string) {
   const [state, setState] = useState<UseGenerationState>({
@@ -31,7 +32,8 @@ export function useGeneration(projectId?: string) {
   });
 
   const abortControllerRef = useRef<AbortController | null>(null);
-  const createGeneration = useCreateGeneration();
+  const stateRef = useRef(state);
+  stateRef.current = state;
 
   const startGeneration = useCallback(
     async (
@@ -45,23 +47,23 @@ export function useGeneration(projectId?: string) {
           abortControllerRef.current.abort();
         }
 
-        setState({
+        const isRefinement = !!(options.parentGenerationId && options.refinementPrompt);
+
+        setState((prev) => ({
           isGenerating: true,
           progress: 0,
           code: '',
           error: null,
           events: [],
           qualityReport: null,
-          parentGenerationId: null,
-          conversationTurn: 0,
-        });
+          parentGenerationId: isRefinement ? prev.parentGenerationId : null,
+          conversationTurn: isRefinement ? prev.conversationTurn : 0,
+        }));
 
         abortControllerRef.current = new AbortController();
 
-        const startTime = Date.now();
         let chunkCount = 0;
         let code = '';
-        let tokensUsed = 0;
 
         for await (const event of streamGeneration(options)) {
           if (abortControllerRef.current?.signal.aborted) break;
@@ -72,7 +74,6 @@ export function useGeneration(projectId?: string) {
             case 'start':
               chunkCount = 0;
               code = '';
-              tokensUsed = 0;
               break;
 
             case 'chunk':
@@ -98,26 +99,14 @@ export function useGeneration(projectId?: string) {
               break;
 
             case 'complete':
-              setState((prev) => ({ ...prev, code, progress: 100, isGenerating: false }));
-
-              if (projectId && code) {
-                try {
-                  await createGeneration.mutateAsync({
-                    project_id: projectId,
-                    prompt: options.prompt,
-                    component_name: options.componentName,
-                    generated_code: code,
-                    framework: options.framework,
-                    component_library: options.componentLibrary,
-                    style: options.style,
-                    typescript: options.typescript || false,
-                    tokens_used: tokensUsed,
-                    generation_time_ms: Date.now() - startTime,
-                  });
-                } catch (saveError) {
-                  console.error('Failed to save generation:', saveError);
-                }
-              }
+              setState((prev) => ({
+                ...prev,
+                code,
+                progress: 100,
+                isGenerating: false,
+                parentGenerationId: event.generationId ?? prev.parentGenerationId,
+                conversationTurn: prev.conversationTurn + 1,
+              }));
               break;
 
             case 'error':
@@ -142,13 +131,17 @@ export function useGeneration(projectId?: string) {
         }));
       }
     },
-    [projectId, createGeneration]
+    []
   );
 
   const stopGeneration = useCallback(() => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
-      setState((prev) => ({ ...prev, isGenerating: false, error: 'Generation cancelled' }));
+      setState((prev) => ({
+        ...prev,
+        isGenerating: false,
+        error: 'Generation cancelled',
+      }));
     }
   }, []);
 
@@ -172,20 +165,30 @@ export function useGeneration(projectId?: string) {
       options: GenerationOptions & {
         componentName: string;
         prompt: string;
-        provider?: string;
-        model?: string;
-        apiKey?: string;
       }
     ) => {
+      const currentState = stateRef.current;
+      if (!currentState.parentGenerationId || !currentState.code) return;
+      if (currentState.conversationTurn >= MAX_CONVERSATION_TURNS) return;
+
       await startGeneration({
         ...options,
-        prompt: `Refine this component: ${refinementPrompt}\n\nOriginal: ${options.prompt}`,
+        parentGenerationId: currentState.parentGenerationId,
+        previousCode: currentState.code,
+        refinementPrompt,
       });
     },
     [startGeneration]
   );
 
-  return { ...state, startGeneration, startRefinement, stopGeneration, reset };
+  return {
+    ...state,
+    maxConversationTurns: MAX_CONVERSATION_TURNS,
+    startGeneration,
+    startRefinement,
+    stopGeneration,
+    reset,
+  };
 }
 
 export interface UseGenerationProgressProps {
@@ -214,20 +217,5 @@ export function useGenerationProgress({
     return 'Processing...';
   };
 
-  const getEventIcon = (eventType: GenerationEvent['type']) => {
-    switch (eventType) {
-      case 'start':
-        return '🚀';
-      case 'chunk':
-        return '⚡';
-      case 'complete':
-        return '✅';
-      case 'error':
-        return '❌';
-      default:
-        return '📝';
-    }
-  };
-
-  return { latestEvent, statusMessage: getStatusMessage(), getEventIcon };
+  return { latestEvent, statusMessage: getStatusMessage() };
 }
