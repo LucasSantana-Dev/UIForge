@@ -74,8 +74,10 @@ test.describe('Billing Page (authenticated)', () => {
   test('should show usage charts', async ({ authenticatedPage }) => {
     await authenticatedPage.goto('/billing');
 
-    await expect(authenticatedPage.getByText('AI Generations').first()).toBeVisible();
-    await expect(authenticatedPage.getByText('Projects').first()).toBeVisible();
+    await expect(authenticatedPage.getByText('AI Generations', { exact: true })).toBeVisible();
+    await expect(
+      authenticatedPage.locator('#main-content').getByText('Projects', { exact: true })
+    ).toBeVisible();
   });
 
   test('should link to pricing page from upgrade button', async ({ authenticatedPage }) => {
@@ -213,11 +215,11 @@ test.describe('Billing Page for Subscribed User', () => {
     await seedUsageTracking(testUser.id, 42, 500);
 
     await authenticatedPage.goto('/billing');
-    await authenticatedPage.waitForLoadState('networkidle');
+    await authenticatedPage.waitForLoadState('domcontentloaded');
 
     await expect(authenticatedPage.getByText(/pro/i).first()).toBeVisible();
 
-    await expect(authenticatedPage.getByText('AI Generations').first()).toBeVisible();
+    await expect(authenticatedPage.getByText('AI Generations', { exact: true })).toBeVisible();
 
     const manageButton = authenticatedPage.getByRole('button', {
       name: /manage/i,
