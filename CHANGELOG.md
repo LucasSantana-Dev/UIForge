@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- Fix minimatch ReDoS vulnerability via `npm audit fix` (GHSA-7r86-cg39-jmmj, GHSA-23c5-xmqv-rm74)
+- Add CodeQL security analysis workflow (push/PR/weekly schedule)
+
 ## [0.10.0] - 2026-02-26
 
 ### Added
