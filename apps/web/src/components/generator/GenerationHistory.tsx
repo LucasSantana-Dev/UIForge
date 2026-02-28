@@ -87,12 +87,12 @@ export default function GenerationHistory({
               <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
                 {gen.framework}
               </Badge>
-              {gen.quality_score != null && (
+              {(gen as any).quality_score != null && (
                 <Badge
-                  variant={gen.quality_score >= 80 ? 'default' : 'secondary'}
+                  variant={(gen as any).quality_score >= 80 ? 'default' : 'secondary'}
                   className="text-[10px] px-1.5 py-0"
                 >
-                  {gen.quality_score}%
+                  {(gen as any).quality_score}%
                 </Badge>
               )}
             </div>
@@ -103,7 +103,7 @@ export default function GenerationHistory({
             {gen.prompt.length > 100 && '...'}
           </p>
 
-          {gen.parent_generation_id && (
+          {(gen as any).parent_generation_id && (
             <div className="flex items-center gap-1 mb-2 text-[10px] text-text-muted">
               <GitBranchIcon className="h-3 w-3" />
               Refinement
