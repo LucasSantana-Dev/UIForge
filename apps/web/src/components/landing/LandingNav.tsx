@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Menu } from 'lucide-react';
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { CONTAINER } from './constants';
 
 interface LandingNavProps {
@@ -13,7 +18,8 @@ interface LandingNavProps {
 
 export function LandingNav({ user }: LandingNavProps) {
   const [isScrolled, setIsScrolled] = useState(
-    () => typeof window !== 'undefined' && window.scrollY > 0
+    () =>
+      typeof window !== 'undefined' && window.scrollY > 0
   );
 
   useEffect(() => {
@@ -26,7 +32,9 @@ export function LandingNav({ user }: LandingNavProps) {
         });
       }
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll, {
+      passive: true,
+    });
     return () => {
       window.removeEventListener('scroll', handleScroll);
       cancelAnimationFrame(rafId);
@@ -42,14 +50,26 @@ export function LandingNav({ user }: LandingNavProps) {
 
   return (
     <nav
-      className={`sticky top-0 z-50 h-16 border-b border-[#27272A] transition-all duration-200 ${
-        isScrolled ? 'backdrop-blur-xl bg-[#121214]/80' : 'bg-transparent'
+      className={`sticky top-0 z-50 h-16 border-b transition-all duration-300 ${
+        isScrolled
+          ? 'backdrop-blur-xl bg-[#121214]/80 border-[#27272A] shadow-[0_1px_3px_rgba(0,0,0,0.3)]'
+          : 'bg-transparent border-transparent'
       }`}
     >
-      <div className={`${CONTAINER} h-full flex items-center justify-between`}>
+      <div
+        className={`${CONTAINER} h-full flex items-center justify-between`}
+      >
         <Link href="/" className="flex items-center gap-2">
-          <Image src="/siza-icon.png" alt="Siza" width={24} height={24} priority />
-          <span className="font-display font-bold text-lg">siza</span>
+          <Image
+            src="/siza-icon.png"
+            alt="Siza"
+            width={24}
+            height={24}
+            priority
+          />
+          <span className="font-display font-bold text-lg">
+            siza
+          </span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
@@ -97,7 +117,9 @@ export function LandingNav({ user }: LandingNavProps) {
               <Menu size={20} />
             </SheetTrigger>
             <SheetContent className="bg-[#121214] border-[#27272A]">
-              <SheetTitle className="font-display text-lg mb-6">Menu</SheetTitle>
+              <SheetTitle className="font-display text-lg mb-6">
+                Menu
+              </SheetTitle>
               <div className="flex flex-col gap-4">
                 {navLinks.map((link) => (
                   <Link

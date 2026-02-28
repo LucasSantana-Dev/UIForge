@@ -32,7 +32,10 @@ const repos = [
 
 export function EcosystemSection() {
   return (
-    <section id="ecosystem" className={`${SECTION_PADDING} border-t border-[#27272A]`}>
+    <section
+      id="ecosystem"
+      className={`${SECTION_PADDING} border-t border-[#27272A]`}
+    >
       <div className={CONTAINER}>
         <div className="text-center">
           <FadeIn>
@@ -47,60 +50,51 @@ export function EcosystemSection() {
           </FadeIn>
           <FadeIn delay={0.16}>
             <p className="text-lg text-[#A1A1AA] max-w-2xl mx-auto">
-              Each repository is independent and MIT-licensed. Use one or compose them all.
+              Each repository is independent and MIT-licensed.
+              Use one or compose them all.
             </p>
           </FadeIn>
         </div>
 
         <div className="hidden lg:block relative h-20 w-full mt-12">
-          <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <line
-              x1="12.5%"
-              y1="0"
-              x2="12.5%"
-              y2="100%"
-              stroke="rgba(124,58,237,0.3)"
-              strokeWidth="1"
-              strokeDasharray="4 4"
-            />
-            <line
-              x1="37.5%"
-              y1="0"
-              x2="37.5%"
-              y2="100%"
-              stroke="rgba(124,58,237,0.3)"
-              strokeWidth="1"
-              strokeDasharray="4 4"
-            />
-            <line
-              x1="62.5%"
-              y1="0"
-              x2="62.5%"
-              y2="100%"
-              stroke="rgba(124,58,237,0.3)"
-              strokeWidth="1"
-              strokeDasharray="4 4"
-            />
-            <line
-              x1="87.5%"
-              y1="0"
-              x2="87.5%"
-              y2="100%"
-              stroke="rgba(124,58,237,0.3)"
-              strokeWidth="1"
-              strokeDasharray="4 4"
-            />
+          <svg
+            className="absolute inset-0 w-full h-full"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            {[12.5, 37.5, 62.5, 87.5].map((x) => (
+              <line
+                key={x}
+                x1={`${x}%`}
+                y1="0"
+                x2={`${x}%`}
+                y2="100%"
+                stroke="rgba(124,58,237,0.3)"
+                strokeWidth="1"
+                strokeDasharray="4 4"
+              >
+                <animate
+                  attributeName="stroke-dashoffset"
+                  from="0"
+                  to="-8"
+                  dur="1.5s"
+                  repeatCount="indefinite"
+                />
+              </line>
+            ))}
           </svg>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-14">
           {repos.map((repo, i) => (
-            <FadeIn key={repo.name} delay={0.24 + i * 0.08}>
+            <FadeIn
+              key={repo.name}
+              delay={0.24 + i * 0.08}
+            >
               <a
                 href={repo.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block rounded-xl border border-[#27272A] bg-[#18181B] p-6 transition-all duration-300 hover:border-[rgba(124,58,237,0.35)] hover:shadow-card-hover group"
+                className="block rounded-xl border border-[#27272A] bg-[#18181B] p-6 transition-all duration-200 ease-siza hover:border-[var(--border-hover)] hover:shadow-card-hover hover:-translate-y-0.5 group"
               >
                 <span className="inline-flex items-center rounded-md bg-[rgba(124,58,237,0.1)] px-2.5 py-0.5 text-xs font-medium text-[#8B5CF6] mb-3">
                   {repo.badge}
@@ -108,7 +102,9 @@ export function EcosystemSection() {
                 <h3 className="text-base font-semibold text-[#FAFAFA] mb-2 group-hover:text-[#8B5CF6] transition-colors">
                   {repo.name}
                 </h3>
-                <p className="text-sm text-[#A1A1AA] leading-relaxed">{repo.desc}</p>
+                <p className="text-sm text-[#A1A1AA] leading-relaxed">
+                  {repo.desc}
+                </p>
               </a>
             </FadeIn>
           ))}
