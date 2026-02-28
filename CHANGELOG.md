@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **LivePreview Library Shims**: Generated code using lucide-react icons and shadcn/ui components now renders correctly in the preview iframe
+  - `cn()` utility for Tailwind class joining
+  - 25+ lucide-react icon SVG shims with Proxy fallback for unknown icons
+  - 30+ shadcn/ui component stubs (Button, Card, Badge, Input, Label, Alert, Dialog, Table, Tabs, Select, etc.)
+  - shadcn dark theme CSS custom properties and Tailwind color config
+  - Zero server bundle cost — all shims are inline template strings in the iframe HTML
+
 ## [desktop-v0.2.0] - 2026-02-27
 
 ### Added
