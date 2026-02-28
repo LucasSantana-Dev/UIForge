@@ -427,6 +427,188 @@ describe('useGeneration', () => {
     });
   });
 
+  describe('conversation state', () => {
+    it('should update parentGenerationId from SSE complete event', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'code' };
+        yield {
+          type: 'complete',
+          generationId: 'gen-123',
+          parentGenerationId: null,
+        };
+      });
+
+      const options = {
+        framework: 'react' as const,
+        componentLibrary: 'tailwind' as const,
+        description: 'Create a button',
+        style: 'modern' as const,
+        typescript: false,
+      };
+
+      await act(async () => {
+        await result.current.startGeneration({
+          ...options,
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-123');
+      expect(result.current.conversationTurn).toBe(0);
+    });
+
+    it('should increment conversationTurn on refinement', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'initial code' };
+        yield { type: 'complete', generationId: 'gen-1' };
+      });
+
+      await act(async () => {
+        await result.current.startGeneration({
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-1');
+      expect(result.current.conversationTurn).toBe(0);
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'refined code' };
+        yield { type: 'complete', generationId: 'gen-2' };
+      });
+
+      await act(async () => {
+        await result.current.startRefinement('make it darker', {
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-2');
+      expect(result.current.conversationTurn).toBe(1);
+    });
+
+    it('should pass conversation fields in startRefinement', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'const Button = () => <button />' };
+        yield { type: 'complete', generationId: 'gen-abc' };
+      });
+
+      await act(async () => {
+        await result.current.startGeneration({
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'refined' };
+        yield { type: 'complete', generationId: 'gen-def' };
+      });
+
+      await act(async () => {
+        await result.current.startRefinement('add hover state', {
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      const lastCall =
+        mockStreamGeneration.mock.calls[mockStreamGeneration.mock.calls.length - 1][0];
+      expect(lastCall.parentGenerationId).toBe('gen-abc');
+      expect(lastCall.previousCode).toBe('const Button = () => <button />');
+      expect(lastCall.refinementPrompt).toBe('add hover state');
+    });
+
+    it('should clear conversation state on reset', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'code' };
+        yield { type: 'complete', generationId: 'gen-123' };
+      });
+
+      await act(async () => {
+        await result.current.startGeneration({
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-123');
+
+      act(() => {
+        result.current.reset();
+      });
+
+      expect(result.current.parentGenerationId).toBeNull();
+      expect(result.current.conversationTurn).toBe(0);
+    });
+
+    it('should reset conversation state on fresh generation', async () => {
+      const { result } = renderHook(() => useGeneration());
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'code' };
+        yield { type: 'complete', generationId: 'gen-1' };
+      });
+
+      await act(async () => {
+        await result.current.startGeneration({
+          framework: 'react' as const,
+          description: 'Create a button',
+          componentName: 'Button',
+          prompt: 'Create a button',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-1');
+
+      mockStreamGeneration.mockImplementation(async function* () {
+        yield { type: 'start' };
+        yield { type: 'chunk', content: 'new code' };
+        yield { type: 'complete', generationId: 'gen-2' };
+      });
+
+      await act(async () => {
+        await result.current.startGeneration({
+          framework: 'react' as const,
+          description: 'Create a card',
+          componentName: 'Card',
+          prompt: 'Create a card',
+        });
+      });
+
+      expect(result.current.parentGenerationId).toBe('gen-2');
+      expect(result.current.conversationTurn).toBe(0);
+    });
+  });
+
   describe('quota handling', () => {
     it('should show quota exceeded message on 429 response', async () => {
       const { result } = renderHook(() => useGeneration());

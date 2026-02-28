@@ -19,7 +19,7 @@ export interface UseGenerationState {
 
 const MAX_CONVERSATION_TURNS = 10;
 
-export function useGeneration(projectId?: string) {
+export function useGeneration(_projectId?: string) {
   const [state, setState] = useState<UseGenerationState>({
     isGenerating: false,
     progress: 0,
