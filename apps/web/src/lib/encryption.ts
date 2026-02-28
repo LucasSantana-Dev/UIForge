@@ -1,8 +1,3 @@
-/**
- * Client-side encryption utilities for BYOK (Bring Your Own Key) system
- * Uses AES-256 encryption for secure API key storage
- */
-
 import CryptoJS from 'crypto-js';
 
 export interface EncryptedApiKey {
@@ -24,6 +19,8 @@ export interface AIProviderConfig {
   rateLimitPerMinute: number;
   requiresOrganization?: boolean;
 }
+
+const KDF_ITERATIONS = 600000;
 
 export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
   openai: {
@@ -57,7 +54,7 @@ export function generateUserEncryptionKey(): string {
 }
 
 export function deriveEncryptionKey(userKey: string, salt: string = 'siza-salt'): string {
-  return CryptoJS.PBKDF2(userKey, salt, { keySize: 256 / 32, iterations: 10000 }).toString();
+  return CryptoJS.PBKDF2(userKey, salt, { keySize: 256 / 32, iterations: KDF_ITERATIONS }).toString();
 }
 
 export function encryptApiKey(apiKey: string, encryptionKey: string): string {
@@ -65,7 +62,7 @@ export function encryptApiKey(apiKey: string, encryptionKey: string): string {
   if (!apiKey) throw new Error('API key cannot be empty');
   const key = CryptoJS.PBKDF2(encryptionKey, 'siza-aes-salt', {
     keySize: 256 / 32,
-    iterations: 10000,
+    iterations: KDF_ITERATIONS,
   });
   const iv = CryptoJS.lib.WordArray.random(16);
   const encrypted = CryptoJS.AES.encrypt(apiKey, key, { iv });
@@ -80,7 +77,7 @@ export function decryptApiKey(encryptedKey: string, encryptionKey: string): stri
       const [ivHex, ciphertext] = encryptedKey.split(':');
       const key = CryptoJS.PBKDF2(encryptionKey, 'siza-aes-salt', {
         keySize: 256 / 32,
-        iterations: 10000,
+        iterations: KDF_ITERATIONS,
       });
       const iv = CryptoJS.enc.Hex.parse(ivHex);
       const bytes = CryptoJS.AES.decrypt(ciphertext, key, { iv });
@@ -121,7 +118,10 @@ export function generateKeyId(): string {
 
 export function hashApiKey(apiKey: string): string {
   if (apiKey === null || apiKey === undefined) throw new Error('API key is required for hashing');
-  return CryptoJS.HmacSHA256(apiKey, 'siza-key-hash').toString();
+  return CryptoJS.PBKDF2(apiKey, 'siza-key-hash', {
+    keySize: 256 / 32,
+    iterations: KDF_ITERATIONS,
+  }).toString();
 }
 
 export function createEncryptedApiKey(
