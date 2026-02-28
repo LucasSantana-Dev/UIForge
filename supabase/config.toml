@@ -68,7 +68,6 @@ enable_confirmations = true
 # port = 587
 # user = "resend"
 # pass = "env(RESEND_API_KEY)"
-admin_email = "support@forgespace.co"
 # sender_name = "Siza"
 
 [auth.external.google]
