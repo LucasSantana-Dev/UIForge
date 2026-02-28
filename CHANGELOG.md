@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Test coverage boost**: 63 new unit tests across 4 new test suites
+  - Quality gates: security scan, lint check, type check, accessibility, responsive, scoring (34 tests)
+  - Template validation: Zod schema validation for create + query (16 tests)
+  - Auth emails: feature-gated email sending for welcome, verification, reset, change (8 tests)
+  - Usage limits: generation quota checks with feature flag gating (6 tests)
+- Expanded `collectCoverageFrom` to include quality, usage, email, and auth modules
+
 ## [0.13.0] - 2026-02-28
 
 ### Changed
