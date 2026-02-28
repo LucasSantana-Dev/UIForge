@@ -115,7 +115,7 @@ describe('IndexedDB Storage', () => {
       await storage.updateApiKeyUsage('key_test_123');
       const result = await storage.getApiKey('key_test_123');
       expect(result?.lastUsed).not.toBe('2026-02-17T12:00:00.000Z');
-      expect(new Date(result!.lastUsed).getTime()).toBeGreaterThan(0);
+      expect(new Date(result!.lastUsed!).getTime()).toBeGreaterThan(0);
     });
 
     it('should reject for non-existent key', async () => {

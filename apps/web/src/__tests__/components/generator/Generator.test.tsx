@@ -66,8 +66,11 @@ describe('ComponentGenerator Component', () => {
     events: [],
     qualityReport: null,
     startGeneration: jest.fn(),
+    startRefinement: jest.fn(),
     stopGeneration: jest.fn(),
     reset: jest.fn(),
+    parentGenerationId: null,
+    conversationTurn: 0,
   };
 
   beforeEach(() => {

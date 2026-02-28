@@ -20,7 +20,8 @@ export type FeatureFlagName =
   | 'ENABLE_DESIGN_CONTEXT'
   | 'ENABLE_PROMPT_AUTOCOMPLETE'
   | 'ENABLE_CODE_INTELLISENSE'
-  | 'ENABLE_CONVERSATION_MODE';
+  | 'ENABLE_CONVERSATION_MODE'
+  | 'ENABLE_DESIGN_ANALYSIS';
 
 export type FeatureFlagCategory =
   | 'auth'

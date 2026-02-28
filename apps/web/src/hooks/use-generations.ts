@@ -21,6 +21,8 @@ export interface Generation {
   tokens_used?: number;
   generation_time_ms?: number;
   error_message?: string;
+  quality_score?: number;
+  parent_generation_id?: string;
   created_at: string;
   updated_at: string;
 }
