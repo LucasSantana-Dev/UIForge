@@ -282,7 +282,7 @@ export async function POST(request: NextRequest) {
 
             if (!fullCode) {
               const streamPrompt = conversationContext
-                ? \`Previous code:\n\\`\\`\\`\n\${conversationContext.previousCode}\n\\`\\`\\`\n\nRefinement: \${conversationContext.refinementPrompt}\`
+                ? `Previous code:\n\`\`\`\n${conversationContext.previousCode}\n\`\`\`\n\nRefinement: ${conversationContext.refinementPrompt}`
                 : enrichedDescription;
 
               for await (const event of generateComponentStream({
@@ -319,7 +319,7 @@ export async function POST(request: NextRequest) {
             }
           } else {
             const providerPrompt = conversationContext
-              ? \`Previous code:\n\\`\\`\\`\n\${conversationContext.previousCode}\n\\`\\`\\`\n\nRefinement: \${conversationContext.refinementPrompt}\`
+              ? `Previous code:\n\`\`\`\n${conversationContext.previousCode}\n\`\`\`\n\nRefinement: ${conversationContext.refinementPrompt}`
               : enrichedDescription;
 
             for await (const event of generateWithProvider({
