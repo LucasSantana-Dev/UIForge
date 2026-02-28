@@ -17,31 +17,35 @@ import {
 import { AIProvider } from '@/lib/encryption';
 import { TEST_CONFIG } from '../__fixtures__/test-config';
 
-// Mock crypto-js for testing with improved key validation
 jest.mock('crypto-js', () => {
   const keyStorage = new Map<string, string>();
 
+  const mockWordArray = (val: string) => ({
+    toString: jest.fn(() => val),
+    _value: val,
+  });
+
   return {
     AES: {
-      encrypt: jest.fn((text: string, key: string) => {
-        const encrypted = `encrypted_${text}_${key}`;
-        keyStorage.set(encrypted, key);
+      encrypt: jest.fn((text: string, key: any, opts?: any) => {
+        const keyStr = typeof key === 'string' ? key : key._value || 'parsed';
+        const ivStr = opts?.iv?._value || 'noiv';
+        const encrypted = `enc_${text}_${keyStr}_${ivStr}`;
+        keyStorage.set(encrypted, keyStr + ':' + ivStr);
         return { toString: () => encrypted };
       }),
-      decrypt: jest.fn((encrypted: string, key: string) => ({
-        toString: jest.fn((_enc: any) => {
-          // Check if the key matches the one used for encryption
-          const originalKey = keyStorage.get(encrypted);
-          if (originalKey && originalKey !== key) {
-            // Wrong key - return empty string to trigger error
-            return '';
-          }
-          if (encrypted.startsWith('encrypted_')) {
-            // Extract the original text from the encrypted string
-            const parts = encrypted.substring('encrypted_'.length).split('_');
-            // Remove the last part which is the key
-            parts.pop();
-            return parts.join('_');
+      decrypt: jest.fn((encrypted: string, key: any, opts?: any) => ({
+        toString: jest.fn(() => {
+          const keyStr = typeof key === 'string' ? key : key._value || 'parsed';
+          const ivStr = opts?.iv?._value || 'noiv';
+          const storedMeta = keyStorage.get(encrypted);
+          if (storedMeta && storedMeta !== keyStr + ':' + ivStr) return '';
+          if (encrypted.startsWith('enc_')) {
+            const inner = encrypted.substring('enc_'.length);
+            const lastUnderscore2 = inner.lastIndexOf('_');
+            const beforeIv = inner.substring(0, lastUnderscore2);
+            const lastUnderscore1 = beforeIv.lastIndexOf('_');
+            return beforeIv.substring(0, lastUnderscore1);
           }
           return '';
         }),
@@ -49,6 +53,7 @@ jest.mock('crypto-js', () => {
     },
     enc: {
       Utf8: 'utf8',
+      Hex: { parse: jest.fn((hex: string) => mockWordArray(hex)) },
     },
     PBKDF2: jest.fn((password: string, salt: string) => ({
       toString: () => `derived_${password}_${salt}`,
@@ -58,9 +63,7 @@ jest.mock('crypto-js', () => {
     })),
     lib: {
       WordArray: {
-        random: jest.fn(() => ({
-          toString: jest.fn(() => 'random_bytes'),
-        })),
+        random: jest.fn(() => mockWordArray('a1b2c3d4e5f6a7b8a1b2c3d4e5f6a7b8')),
       },
     },
   };
