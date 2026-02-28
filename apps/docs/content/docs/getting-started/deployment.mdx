@@ -47,32 +47,32 @@ npx wrangler secret put GEMINI_API_KEY
 
 ### Required secrets
 
-| Secret                         | Purpose              |
-| ------------------------------ | -------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`     | Supabase project URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`| Supabase anon key    |
-| `SUPABASE_SERVICE_ROLE_KEY`    | Supabase admin ops   |
-| `GEMINI_API_KEY`               | Default AI provider  |
-| `NEXT_PUBLIC_BASE_URL`         | Production URL       |
+| Secret                          | Purpose              |
+| ------------------------------- | -------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key    |
+| `SUPABASE_SERVICE_ROLE_KEY`     | Supabase admin ops   |
+| `GEMINI_API_KEY`                | Default AI provider  |
+| `NEXT_PUBLIC_BASE_URL`          | Production URL       |
 
 ### Optional secrets
 
-| Secret                 | Feature              |
-| ---------------------- | -------------------- |
-| `STRIPE_SECRET_KEY`    | Billing              |
-| `STRIPE_WEBHOOK_SECRET`| Stripe webhooks      |
-| `RESEND_API_KEY`       | Transactional emails |
-| `GITHUB_APP_ID`        | GitHub integration   |
+| Secret                  | Feature              |
+| ----------------------- | -------------------- |
+| `STRIPE_SECRET_KEY`     | Billing              |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhooks      |
+| `RESEND_API_KEY`        | Transactional emails |
+| `GITHUB_APP_ID`         | GitHub integration   |
 
 ## CI/CD Pipeline
 
 GitHub Actions handles automated deployments:
 
-| Workflow           | Trigger                     | Target                                       |
-| ------------------ | --------------------------- | -------------------------------------------- |
-| `deploy-web.yml`   | Push to `main`              | Production (`siza.forgespace.co`)  |
-| `deploy-docs.yml`  | Push to `main` (docs)       | Docs site                                    |
-| `ci.yml`           | All PRs                     | Lint, type-check, build, test, security      |
+| Workflow          | Trigger               | Target                                  |
+| ----------------- | --------------------- | --------------------------------------- |
+| `deploy-web.yml`  | Push to `main`        | Production (`siza.forgespace.co`)       |
+| `deploy-docs.yml` | Push to `main` (docs) | Docs site                               |
+| `ci.yml`          | All PRs               | Lint, type-check, build, test, security |
 
 ### Dev environment
 
@@ -87,13 +87,13 @@ git push origin dev
 
 Cloudflare Workers is not Node.js. Key differences:
 
-| Feature          | Status                                    |
-| ---------------- | ----------------------------------------- |
-| `setInterval`    | Not available — use bounded lazy cleanup  |
-| `fs` module      | Not available — use Workers KV or R2      |
-| WASM modules     | Must be under size limit                  |
-| `process.env`    | Use `env` parameter from handler          |
-| Long-running     | 30s CPU (free), 15min (paid)              |
+| Feature       | Status                                   |
+| ------------- | ---------------------------------------- |
+| `setInterval` | Not available — use bounded lazy cleanup |
+| `fs` module   | Not available — use Workers KV or R2     |
+| WASM modules  | Must be under size limit                 |
+| `process.env` | Use `env` parameter from handler         |
+| Long-running  | 30s CPU (free), 15min (paid)             |
 
 ## Monitoring
 

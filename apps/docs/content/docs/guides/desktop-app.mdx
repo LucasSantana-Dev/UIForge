@@ -61,11 +61,11 @@ The main process handles file system operations and MCP communication. The rende
 The desktop app connects to siza-mcp as a child process:
 
 ```typescript
-import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
 const transport = new StdioClientTransport({
-  command: "npx",
-  args: ["@forgespace/ui-mcp"],
+  command: 'npx',
+  args: ['@forgespace/ui-mcp'],
 });
 ```
 
@@ -82,11 +82,11 @@ To use local models instead of cloud APIs:
 
 Supported models include any Ollama-compatible model. Recommended:
 
-| Model       | Best for                 | Size   |
-| ----------- | ------------------------ | ------ |
-| `llama3.2`  | General generation       | 4.7 GB |
-| `codellama` | Code-focused generation  | 3.8 GB |
-| `mistral`   | Balanced quality/speed   | 4.1 GB |
+| Model       | Best for                | Size   |
+| ----------- | ----------------------- | ------ |
+| `llama3.2`  | General generation      | 4.7 GB |
+| `codellama` | Code-focused generation | 3.8 GB |
+| `mistral`   | Balanced quality/speed  | 4.1 GB |
 
 ## Project Sync
 
@@ -97,12 +97,12 @@ Desktop projects are stored locally in your filesystem. To sync with the web app
 
 ## Keyboard Shortcuts
 
-| Shortcut        | Action                |
-| --------------- | --------------------- |
-| `Cmd/Ctrl + N`  | New project           |
-| `Cmd/Ctrl + G`  | Generate component    |
-| `Cmd/Ctrl + P`  | Open project switcher |
-| `Cmd/Ctrl + ,`  | Settings              |
+| Shortcut       | Action                |
+| -------------- | --------------------- |
+| `Cmd/Ctrl + N` | New project           |
+| `Cmd/Ctrl + G` | Generate component    |
+| `Cmd/Ctrl + P` | Open project switcher |
+| `Cmd/Ctrl + ,` | Settings              |
 
 ## Next steps
 

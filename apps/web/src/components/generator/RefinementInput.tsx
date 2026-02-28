@@ -54,12 +54,7 @@ export default function RefinementInput({
             Turn {conversationTurn}/{maxTurns}
           </Badge>
         </div>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onNewGeneration}
-          className="text-xs"
-        >
+        <Button variant="ghost" size="sm" onClick={onNewGeneration} className="text-xs">
           <PlusCircleIcon className="h-3.5 w-3.5 mr-1" />
           New Generation
         </Button>
