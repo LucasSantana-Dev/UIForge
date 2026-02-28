@@ -165,9 +165,9 @@ export function buildStreamPrompt(
 ): string {
   if (ctx) {
     return (
-      'Previous code:\n\`\`\`\n' +
+      'Previous code:\n```\n' +
       ctx.previousCode +
-      '\n\`\`\`\n\nRefinement: ' +
+      '\n```\n\nRefinement: ' +
       ctx.refinementPrompt
     );
   }
