@@ -9,10 +9,6 @@ interface LogContext {
 class Logger {
   private isDevelopment = env.NODE_ENV === 'development';
 
-  private sanitize(msg: string): string {
-    return msg.replace(/[\r\n]+/g, ' ');
-  }
-
   private formatMessage(level: LogLevel, message: string, context?: LogContext): string {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
@@ -33,19 +29,16 @@ class Logger {
 
   debug(message: string, context?: LogContext): void {
     if (this.isDevelopment) {
-      const output = this.formatMessage('debug', message, context);
-      console.debug(this.sanitize(output));
+      console.debug(this.formatMessage('debug', message, context).replace(/[\r\n]+/g, ' '));
     }
   }
 
   info(message: string, context?: LogContext): void {
-    const output = this.formatMessage('info', message, context);
-    console.info(this.sanitize(output));
+    console.info(this.formatMessage('info', message, context).replace(/[\r\n]+/g, ' '));
   }
 
   warn(message: string, context?: LogContext): void {
-    const output = this.formatMessage('warn', message, context);
-    console.warn(this.sanitize(output));
+    console.warn(this.formatMessage('warn', message, context).replace(/[\r\n]+/g, ' '));
   }
 
   error(message: string, error?: Error | unknown, context?: LogContext): void {
@@ -59,8 +52,7 @@ class Logger {
         },
       }),
     };
-    const output = this.formatMessage('error', message, errorContext);
-    console.error(this.sanitize(output));
+    console.error(this.formatMessage('error', message, errorContext).replace(/[\r\n]+/g, ' '));
   }
 }
 
