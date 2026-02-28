@@ -104,8 +104,9 @@ export function useGeneration(projectId?: string) {
               break;
 
             case 'complete': {
-              const evt = event as Record<string, unknown>;
-              const genId = (evt.generationId as string) || null;
+              const genId =
+                (event as unknown as { generationId?: string }).generationId ||
+                null;
               setState((prev) => ({
                 ...prev,
                 code,
