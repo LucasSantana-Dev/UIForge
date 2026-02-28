@@ -117,9 +117,14 @@ function GeneratePageClient() {
   const handleRefine = useCallback(
     async (refinementPrompt: string) => {
       if (!lastFormOptions) return;
-      generation.startRefinement(refinementPrompt, lastFormOptions);
+      generation.startGeneration({
+        ...lastFormOptions,
+        parentGenerationId: generationId ?? undefined,
+        previousCode: generatedCode,
+        refinementPrompt,
+      });
     },
-    [generation, lastFormOptions]
+    [generation, lastFormOptions, generationId, generatedCode]
   );
 
   const handleNewGeneration = useCallback(() => {
@@ -145,6 +150,19 @@ function GeneratePageClient() {
     },
     [generation]
   );
+
+  useEffect(() => {
+    if (
+      generation.code &&
+      !generation.isGenerating &&
+      !generation.error &&
+      generation.parentGenerationId
+    ) {
+      setGeneratedCode(generation.code);
+      setGenerationId(generation.parentGenerationId);
+      setIsGenerating(false);
+    }
+  }, [generation.code, generation.isGenerating, generation.error, generation.parentGenerationId]);
 
   const handlePushToGitHub = async () => {
     if (!generatedCode || !projectId) return;
