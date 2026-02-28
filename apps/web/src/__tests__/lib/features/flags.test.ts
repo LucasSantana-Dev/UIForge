@@ -19,7 +19,7 @@ describe('Feature Flags', () => {
   });
 
   describe('DEFAULT_FEATURE_FLAGS', () => {
-    it('should have all 21 flags defined', () => {
+    it('should have all 23 flags defined', () => {
       expect(Object.keys(DEFAULT_FEATURE_FLAGS)).toHaveLength(23);
     });
 
