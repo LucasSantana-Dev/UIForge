@@ -16,6 +16,8 @@ import { useThemeStore } from '@/stores/theme-store';
 import { PromptAutocomplete } from './PromptAutocomplete';
 import { useSubscription } from '@/hooks/use-subscription';
 import { ImageUpload, type ImageState } from './ImageUpload';
+import DesignAnalysisPanel from './DesignAnalysisPanel';
+import type { DesignAnalysis } from '@/lib/services/image-analysis';
 import { ProviderSelector } from './ProviderSelector';
 import { QuotaGuard } from './QuotaGuard';
 
@@ -77,6 +79,22 @@ export default function GeneratorForm({
   const activeTheme = useThemeStore((s) => s.getActiveTheme)(projectId);
   const [promptValue, setPromptValue] = useState(initialDescription || '');
   const [image, setImage] = useState<ImageState | null>(null);
+  const designAnalysisEnabled = isFeatureEnabled('ENABLE_DESIGN_ANALYSIS');
+
+  const handleApplyAnalysis = (analysis: DesignAnalysis) => {
+    if (analysis.colors.length >= 1) {
+      setDesignContext((prev) => ({
+        ...prev,
+        primaryColor: analysis.colors[0],
+        ...(analysis.colors[1] && { secondaryColor: analysis.colors[1] }),
+        ...(analysis.colors[2] && { accentColor: analysis.colors[2] }),
+      }));
+    }
+    if (analysis.suggestedPrompt) {
+      setPromptValue(analysis.suggestedPrompt);
+      setValue('prompt', analysis.suggestedPrompt, { shouldValidate: true });
+    }
+  };
 
   const {
     register,
@@ -256,6 +274,14 @@ export default function GeneratorForm({
           </div>
 
           <ImageUpload image={image} onImageChange={setImage} />
+
+          {designAnalysisEnabled && image && (
+            <DesignAnalysisPanel
+              imageBase64={image.base64}
+              imageMimeType={image.mimeType}
+              onApply={handleApplyAnalysis}
+            />
+          )}
 
           {designContextEnabled && (
             <DesignContext
