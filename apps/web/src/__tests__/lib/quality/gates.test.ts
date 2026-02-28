@@ -92,13 +92,15 @@ describe('runTypeCheck', () => {
   });
 
   it('passes with use client directive', () => {
-    const code = '"use client"\nimport { useState } from "react";\nconst [c, s] = useState(0);\nreturn <Button>{c}</Button>;';
+    const code =
+      '"use client"\nimport { useState } from "react";\nconst [c, s] = useState(0);\nreturn <Button>{c}</Button>;';
     const result = runTypeCheck(code);
     expect(result.passed).toBe(true);
   });
 
   it('fails for hooks + JSX without use client', () => {
-    const code = 'import { useState } from "react";\nconst [c, s] = useState(0);\nreturn <Button>{c}</Button>;';
+    const code =
+      'import { useState } from "react";\nconst [c, s] = useState(0);\nreturn <Button>{c}</Button>;';
     const result = runTypeCheck(code);
     expect(result.passed).toBe(false);
   });
@@ -197,7 +199,11 @@ describe('runAllGates', () => {
     const report = runAllGates('const x = 1;');
     expect(report.results).toHaveLength(5);
     expect(report.results.map((r) => r.gate)).toEqual([
-      'security', 'lint', 'type-check', 'accessibility', 'responsive',
+      'security',
+      'lint',
+      'type-check',
+      'accessibility',
+      'responsive',
     ]);
     expect(report.timestamp).toBeDefined();
   });

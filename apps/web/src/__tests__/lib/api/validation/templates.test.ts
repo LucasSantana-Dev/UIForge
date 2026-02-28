@@ -43,7 +43,16 @@ describe('createTemplateSchema', () => {
   });
 
   it('accepts all valid categories', () => {
-    const categories = ['landing', 'dashboard', 'auth', 'ecommerce', 'blog', 'portfolio', 'admin', 'other'];
+    const categories = [
+      'landing',
+      'dashboard',
+      'auth',
+      'ecommerce',
+      'blog',
+      'portfolio',
+      'admin',
+      'other',
+    ];
     for (const category of categories) {
       const result = createTemplateSchema.safeParse({ ...validTemplate, category });
       expect(result.success).toBe(true);
