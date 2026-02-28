@@ -8,15 +8,16 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS",
   },
-  "env": {
-    "dev": {
-      "name": "siza-web-dev",
-    },
-  },
   "routes": [
     {
       "pattern": "siza.forgespace.co/*",
       "custom_domain": true,
     },
   ],
+  "env": {
+    "dev": {
+      "name": "siza-web-dev",
+      "routes": [],
+    },
+  },
 }
