@@ -9,7 +9,7 @@ if (typeof globalThis.ReadableStream === 'undefined') {
 
 const mockCheckRateLimit = jest.fn();
 const mockVerifySession = jest.fn();
-const mockGenerateComponentStream = jest.fn();
+const mockRouteGeneration = jest.fn();
 
 jest.mock('@/lib/api/rate-limit', () => ({
   checkRateLimit: (...args) => mockCheckRateLimit(...args),
@@ -21,8 +21,24 @@ jest.mock('@/lib/api/auth', () => ({
   getSession: jest.fn().mockResolvedValue(null),
 }));
 
-jest.mock('@/lib/services/gemini', () => ({
-  generateComponentStream: (...args) => mockGenerateComponentStream(...args),
+jest.mock('@/lib/services/provider-router', () => ({
+  routeGeneration: (...args: any[]) => mockRouteGeneration(...args),
+}));
+
+jest.mock('@/lib/services/generation.service', () => ({
+  buildDesignContext: jest.fn().mockReturnValue(''),
+  enrichWithRag: jest.fn().mockResolvedValue(''),
+  createGenerationRecord: jest.fn().mockResolvedValue('gen-1'),
+  completeGeneration: jest.fn().mockResolvedValue(undefined),
+  failGeneration: jest.fn().mockResolvedValue(undefined),
+  runQualityGates: jest.fn().mockReturnValue({ passed: true, score: 100, gates: [] }),
+  postGenerationTasks: jest.fn().mockResolvedValue(undefined),
+  createSseEvent: jest.fn((data: any) => 'data: ' + JSON.stringify(data) + '\n\n'),
+  buildStreamPrompt: jest.fn((desc: string) => desc),
+}));
+
+jest.mock('@/lib/services/conversation.service', () => ({
+  validateConversation: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('@/lib/usage/limits', () => ({
@@ -38,34 +54,9 @@ jest.mock('@/lib/usage/tracker', () => ({
   incrementGenerationCount: jest.fn().mockResolvedValue(undefined),
 }));
 
-jest.mock('@/lib/supabase/server', () => ({
-  createClient: jest.fn().mockResolvedValue({
-    from: jest.fn().mockReturnValue({
-      insert: jest.fn().mockReturnValue({
-        select: jest.fn().mockReturnValue({
-          single: jest.fn().mockResolvedValue({ data: { id: 'gen-1' } }),
-        }),
-      }),
-      update: jest.fn().mockReturnValue({
-        eq: jest.fn().mockResolvedValue({ data: null }),
-      }),
-    }),
-  }),
-}));
 
-jest.mock('@/lib/services/context-enrichment', () => ({
-  enrichPromptWithContext: jest.fn().mockResolvedValue({
-    systemPromptAddition: '',
-  }),
-}));
 
-jest.mock('@/lib/services/embeddings', () => ({
-  storeGenerationEmbedding: jest.fn().mockResolvedValue(undefined),
-}));
 
-jest.mock('@/lib/quality/gates', () => ({
-  runAllGates: jest.fn().mockReturnValue({ passed: true, gates: [] }),
-}));
 
 function createRequest(body: any): NextRequest {
   return new NextRequest('http://localhost/api/generate', {
@@ -119,7 +110,7 @@ describe('POST /api/generate', () => {
   });
 
   it('returns SSE stream for valid request', async () => {
-    mockGenerateComponentStream.mockReturnValue(
+    mockRouteGeneration.mockReturnValue(
       (async function* () {
         yield { type: 'start', timestamp: 1 };
         yield { type: 'complete', timestamp: 2 };
@@ -131,8 +122,8 @@ describe('POST /api/generate', () => {
     expect(response.headers.get('Content-Type')).toBe('text/event-stream');
   });
 
-  it('calls Gemini service with correct params', async () => {
-    mockGenerateComponentStream.mockReturnValue(
+  it('calls provider router with correct params', async () => {
+    mockRouteGeneration.mockReturnValue(
       (async function* () {
         yield { type: 'complete', timestamp: 1 };
       })()
@@ -141,18 +132,19 @@ describe('POST /api/generate', () => {
     const response = await POST(createRequest(validBody));
     await response.text();
 
-    expect(mockGenerateComponentStream).toHaveBeenCalledWith(
+    expect(mockRouteGeneration).toHaveBeenCalledWith(
       expect.objectContaining({
         prompt: validBody.description,
         framework: 'react',
         componentLibrary: 'tailwind',
         typescript: true,
+        provider: 'google',
       })
     );
   });
 
-  it('passes BYOK apiKey to Gemini service', async () => {
-    mockGenerateComponentStream.mockReturnValue(
+  it('passes BYOK userApiKey to provider router', async () => {
+    mockRouteGeneration.mockReturnValue(
       (async function* () {
         yield { type: 'complete', timestamp: 1 };
       })()
@@ -166,8 +158,8 @@ describe('POST /api/generate', () => {
     );
     await response.text();
 
-    expect(mockGenerateComponentStream).toHaveBeenCalledWith(
-      expect.objectContaining({ apiKey: 'user-key-123' })
+    expect(mockRouteGeneration).toHaveBeenCalledWith(
+      expect.objectContaining({ userApiKey: 'user-key-123' })
     );
   });
 });

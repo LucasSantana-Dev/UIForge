@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, createdResponse, errorResponse } from '@/lib/api/response';
-import { UnauthorizedError, ForbiddenError, ValidationError } from '@/lib/api/errors';
+import { UnauthorizedError, ForbiddenError, NotFoundError, ValidationError } from '@/lib/api/errors';
 import { captureServerError } from '@/lib/sentry/server';
 import {
   createComponentSchema,
@@ -51,6 +51,7 @@ export async function GET(request: NextRequest) {
     if (
       error instanceof UnauthorizedError ||
       error instanceof ForbiddenError ||
+      error instanceof NotFoundError ||
       error instanceof ValidationError
     ) {
       return errorResponse(error.message, error.statusCode);
@@ -140,6 +141,7 @@ export async function POST(request: NextRequest) {
     if (
       error instanceof UnauthorizedError ||
       error instanceof ForbiddenError ||
+      error instanceof NotFoundError ||
       error instanceof ValidationError
     ) {
       return errorResponse(error.message, error.statusCode);

@@ -1,14 +1,13 @@
 import type { NextRequest } from 'next/server';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
-import { generateComponentStream } from '@/lib/services/gemini';
-import { generateWithProvider } from '@/lib/services/generation';
-import type { AIProvider } from '@/lib/encryption';
 import { checkGenerationQuota } from '@/lib/usage/limits';
 import { captureServerError } from '@/lib/sentry/server';
 import { getFeatureFlag } from '@/lib/features/flags';
-import { isMcpConfigured, generateComponent } from '@/lib/mcp/client';
+import { isMcpConfigured } from '@/lib/mcp/client';
 import { generateSchema } from '@/lib/api/validation/generate';
+import { APIError } from '@/lib/api/errors';
+import { validateConversation } from '@/lib/services/conversation.service';
 import {
   buildDesignContext,
   enrichWithRag,
@@ -19,8 +18,9 @@ import {
   postGenerationTasks,
   createSseEvent,
   buildStreamPrompt,
+  type ConversationContext,
 } from '@/lib/services/generation.service';
-import { validateConversation } from '@/lib/services/conversation.service';
+import { routeGeneration } from '@/lib/services/provider-router';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,7 +45,11 @@ export async function POST(request: NextRequest) {
       return new Response(
         JSON.stringify({
           error: 'Generation quota exceeded',
-          quota: { current: quota.current, limit: quota.limit, remaining: quota.remaining },
+          quota: {
+            current: quota.current,
+            limit: quota.limit,
+            remaining: quota.remaining,
+          },
         }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
       );
@@ -55,126 +59,113 @@ export async function POST(request: NextRequest) {
     const parsed = generateSchema.safeParse(body);
     if (!parsed.success) {
       return new Response(
-        JSON.stringify({ error: parsed.error.issues[0]?.message || 'Invalid request' }),
+        JSON.stringify({
+          error: parsed.error.issues[0]?.message || 'Invalid request',
+        }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    const data = parsed.data;
-    const isRefinement = !!(data.parentGenerationId && data.refinementPrompt);
+    const input = parsed.data;
+    const isRefinement = !!(
+      input.parentGenerationId && input.refinementPrompt
+    );
 
     if (isRefinement) {
-      await validateConversation(data.parentGenerationId!);
+      await validateConversation(input.parentGenerationId!);
     }
 
-    const designContext = buildDesignContext(data);
-    const enrichedDescription = data.description + designContext;
+    const designContext = buildDesignContext(input);
+    const enrichedDescription = input.description + designContext;
     const contextAddition =
-      data.useRag !== false
+      input.useRag !== false
         ? await enrichWithRag(enrichedDescription, {
-            framework: data.framework,
-            apiKey: data.userApiKey,
+            framework: input.framework,
+            apiKey: input.userApiKey,
           })
         : '';
 
     const mcpEnabled = shouldUseMcpGateway();
-    const activeProvider = mcpEnabled ? 'mcp-gateway' : data.provider;
-    const activeModel = mcpEnabled ? 'mcp-specialist' : data.model || 'gemini-2.0-flash';
-
-    const conversationCtx =
-      isRefinement && data.previousCode
-        ? { previousCode: data.previousCode, refinementPrompt: data.refinementPrompt! }
+    const activeProvider = mcpEnabled ? 'mcp-gateway' : input.provider;
+    const activeModel = mcpEnabled
+      ? 'mcp-specialist'
+      : input.model || 'gemini-2.0-flash';
+    const conversationCtx: ConversationContext | undefined =
+      isRefinement && input.previousCode
+        ? {
+            previousCode: input.previousCode,
+            refinementPrompt: input.refinementPrompt!,
+          }
         : undefined;
-    const streamPrompt = buildStreamPrompt(enrichedDescription, conversationCtx);
-
-    const generationOpts = {
-      framework: data.framework,
-      componentLibrary: data.componentLibrary,
-      style: data.style,
-      typescript: data.typescript,
-      apiKey: data.userApiKey,
-      contextAddition,
-      imageBase64: data.imageBase64,
-      imageMimeType: data.imageMimeType,
-    };
 
     const encoder = new TextEncoder();
+    const streamPrompt = buildStreamPrompt(
+      enrichedDescription,
+      conversationCtx
+    );
+
     const stream = new ReadableStream({
       async start(controller) {
         let generationId: string | null = null;
         try {
           generationId = await createGenerationRecord({
             userId: user.id,
-            prompt: isRefinement ? data.refinementPrompt! : data.description,
-            framework: data.framework,
+            prompt: isRefinement
+              ? input.refinementPrompt!
+              : input.description,
+            framework: input.framework,
             provider: activeProvider,
             model: activeModel,
-            parentGenerationId: data.parentGenerationId,
+            parentGenerationId: input.parentGenerationId,
           });
 
           let fullCode = '';
-
-          if (mcpEnabled) {
+          for await (const event of routeGeneration({
+            mcpEnabled,
+            prompt: streamPrompt,
+            framework: input.framework,
+            componentLibrary: input.componentLibrary,
+            style: input.style,
+            typescript: input.typescript,
+            userApiKey: input.userApiKey,
+            contextAddition,
+            imageBase64: input.imageBase64,
+            imageMimeType: input.imageMimeType,
+            provider: input.provider,
+            model: input.model || 'gemini-2.0-flash',
+          })) {
+            if (event.type === 'chunk' && event.content) {
+              fullCode += event.content;
+            }
             controller.enqueue(
-              encoder.encode(createSseEvent({ type: 'start', timestamp: Date.now() }))
+              encoder.encode(createSseEvent(event))
             );
-            try {
-              fullCode = await generateComponent({ prompt: streamPrompt, ...generationOpts });
-            } catch (mcpError) {
-              captureServerError(mcpError, {
-                route: '/api/generate',
-                extra: { fallback: 'mcp-to-gemini' },
-              });
-              fullCode = '';
-            }
-
-            if (fullCode) {
-              const chunkSize = 200;
-              for (let i = 0; i < fullCode.length; i += chunkSize) {
-                controller.enqueue(
-                  encoder.encode(
-                    createSseEvent({
-                      type: 'chunk',
-                      content: fullCode.slice(i, i + chunkSize),
-                      timestamp: Date.now(),
-                    })
-                  )
-                );
-              }
-            }
-          }
-
-          if (!mcpEnabled || !fullCode) {
-            const generator = mcpEnabled
-              ? generateComponentStream({ prompt: streamPrompt, ...generationOpts })
-              : generateWithProvider({
-                  provider: data.provider as AIProvider,
-                  model: data.model || 'gemini-2.0-flash',
-                  prompt: streamPrompt,
-                  ...generationOpts,
-                });
-
-            for await (const event of generator) {
-              if (event.type === 'chunk' && event.content) {
-                fullCode += event.content;
-              }
-              if (event.type === 'complete') break;
-              controller.enqueue(encoder.encode(createSseEvent(event)));
-            }
           }
 
           const qualityReport = runQualityGates(fullCode);
           controller.enqueue(
             encoder.encode(
-              createSseEvent({ type: 'quality', report: qualityReport, timestamp: Date.now() })
+              createSseEvent({
+                type: 'quality',
+                report: qualityReport,
+                timestamp: Date.now(),
+              })
             )
           );
 
           if (generationId) {
             await completeGeneration(
-              generationId, fullCode, activeProvider, qualityReport.score
+              generationId,
+              fullCode,
+              activeProvider,
+              qualityReport.score
             );
-            postGenerationTasks(generationId, data.description, user.id, data.userApiKey);
+            void postGenerationTasks(
+              generationId,
+              input.description,
+              user.id,
+              input.userApiKey
+            );
           }
 
           controller.enqueue(
@@ -187,7 +178,8 @@ export async function POST(request: NextRequest) {
                 qualityPassed: qualityReport.passed,
                 ragEnriched: contextAddition.length > 0,
                 provider: activeProvider,
-                parentGenerationId: data.parentGenerationId || null,
+                parentGenerationId:
+                  input.parentGenerationId || null,
                 timestamp: Date.now(),
               })
             )
@@ -196,15 +188,23 @@ export async function POST(request: NextRequest) {
           if (generationId) {
             await failGeneration(
               generationId,
-              error instanceof Error ? error.message : 'Generation failed'
+              error instanceof Error
+                ? error.message
+                : 'Generation failed'
             );
           }
-          captureServerError(error, { route: '/api/generate', userId: user.id });
+          captureServerError(error, {
+            route: '/api/generate',
+            userId: user.id,
+          });
           controller.enqueue(
             encoder.encode(
               createSseEvent({
                 type: 'error',
-                message: error instanceof Error ? error.message : 'Stream failed',
+                message:
+                  error instanceof Error
+                    ? error.message
+                    : 'Stream failed',
                 timestamp: Date.now(),
               })
             )
@@ -224,9 +224,22 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    if (error instanceof APIError) {
+      return new Response(
+        JSON.stringify({ error: error.message }),
+        {
+          status: error.statusCode,
+          headers: { 'Content-Type': 'application/json' },
+        }
+      );
+    }
     captureServerError(error, { route: '/api/generate' });
-    const message = error instanceof Error ? error.message : 'Internal server error';
-    const status = message === 'Authentication required' ? 401 : 500;
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Internal server error';
+    const status =
+      message === 'Authentication required' ? 401 : 500;
     return new Response(JSON.stringify({ error: message }), {
       status,
       headers: { 'Content-Type': 'application/json' },
@@ -236,7 +249,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   const mcpEnabled = shouldUseMcpGateway();
-  const conversationEnabled = getFeatureFlag('ENABLE_CONVERSATION_MODE');
+  const conversationEnabled = getFeatureFlag(
+    'ENABLE_CONVERSATION_MODE'
+  );
   return new Response(
     JSON.stringify({
       message: 'UI Generation API',
