@@ -50,9 +50,7 @@ export async function listProjects(
   let query = supabase
     .from('projects')
     .select('*', { count: 'exact' })
-    .eq('user_id', userId)
-    .order('updated_at', { ascending: false })
-    .range(from, to);
+    .eq('user_id', userId) as any;
 
   if (search) {
     query = query.ilike('name', '%' + search + '%');
@@ -60,6 +58,10 @@ export async function listProjects(
   if (framework) {
     query = query.eq('framework', framework);
   }
+
+  query = query
+    .order('updated_at', { ascending: false })
+    .range(from, to);
 
   const { data, error, count } = await query;
   if (error) {
