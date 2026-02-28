@@ -2,6 +2,7 @@
 
 import { ArrowLeftIcon } from 'lucide-react';
 import Link from 'next/link';
+import CreateProjectForm from '@/components/projects/CreateProjectForm';
 
 export function NewProjectClient() {
   return (
@@ -18,7 +19,7 @@ export function NewProjectClient() {
 
       <div className="bg-surface-1 rounded-lg border border-surface-3 p-6">
         <h1 className="text-2xl font-bold text-text-primary mb-6">Create New Project</h1>
-        <p>Project form temporarily disabled for build</p>
+        <CreateProjectForm />
       </div>
     </div>
   );
