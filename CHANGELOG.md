@@ -9,15 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.18.0] - 2026-03-01
 
+### Added
+- **AI generation v2 wiring**: Conversation mode, generation history panel, design analysis integration
+- **create-siza-app framework configs**: Framework-specific config files and entry points
+- **Supabase SMTP via Resend**: Branded email templates for auth flows
+
 ### Security
-- **Encryption hardening**: Explicit AES key/IV derivation with PBKDF2 hashing, replacing implicit key handling
-- **CodeQL fixes**: Logger sanitization, quality gates regex, sanitize library improvements, theme store safety
+- **Encryption hardening**: PBKDF2 key derivation (600K iterations) with explicit AES IV
+- **CodeQL fixes**: Logger sanitization, iterative HTML sanitizer, PBKDF2 API key fingerprinting
 
 ### Fixed
-- **Docs site**: Navigation links, CSS overhaul (globals.css), installation/quality-gates/templates content updates
-- **Docs deployment**: Updated wrangler.jsonc configuration
+- **Docs site**: Navigation links, CSS overhaul, content updates
 - **E2E tests**: Billing page strict mode selectors, about page content
-- **Prettier**: Normalize create-siza-app package.json formatting
+- **Prettier**: Normalize package.json formatting
 
 ## [0.17.0] - 2026-03-01
 
