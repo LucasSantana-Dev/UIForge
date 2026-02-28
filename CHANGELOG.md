@@ -13,6 +13,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated Cloudflare Workers custom domain routing
   - Updated documentation references
 
+## [0.12.1] - 2026-02-28
+
+### Fixed
+- Force dark theme on docs site to prevent invisible text on light-mode systems
+- Add navigation bar to docs landing page via Fumadocs HomeLayout wrapper
+
 ## [0.12.0] - 2026-02-28
 
 ### Added
