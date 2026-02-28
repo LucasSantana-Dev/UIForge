@@ -85,8 +85,8 @@ describe('ComponentGenerator Component', () => {
       isLoading: true,
     } as any);
 
-    render(<ComponentGenerator projectId="test-project" />);
-    expect(screen.getByText('Loading project...')).toBeInTheDocument();
+    const { container } = render(<ComponentGenerator projectId="test-project" />);
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('should render project not found', () => {

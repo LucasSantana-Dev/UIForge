@@ -14,9 +14,38 @@ interface ComponentGeneratorProps {
   projectId: string;
 }
 
-export default function ComponentGenerator({ projectId }: ComponentGeneratorProps) {
-  const { data: project, isLoading } = useProject(projectId);
-  const [currentComponentName, setCurrentComponentName] = useState('');
+function LoadingSkeleton() {
+  return (
+    <div className="flex-1 flex flex-col bg-surface-1 rounded-xl border border-surface-3 overflow-hidden animate-pulse">
+      <div className="px-6 py-4 border-b border-surface-3">
+        <div className="flex items-center space-x-3">
+          <div className="h-6 w-6 rounded bg-surface-3" />
+          <div className="space-y-2">
+            <div className="h-5 w-48 rounded bg-surface-3" />
+            <div className="h-3 w-64 rounded bg-surface-3" />
+          </div>
+        </div>
+      </div>
+      <div className="flex-1 flex">
+        <div className="w-96 border-r border-surface-3 p-6 space-y-4">
+          <div className="h-10 rounded bg-surface-2" />
+          <div className="h-32 rounded bg-surface-2" />
+          <div className="h-10 rounded bg-surface-2" />
+          <div className="h-10 rounded bg-surface-2" />
+        </div>
+        <div className="flex-1 bg-surface-0" />
+      </div>
+    </div>
+  );
+}
+
+export default function ComponentGenerator({
+  projectId,
+}: ComponentGeneratorProps) {
+  const { data: project, isLoading } =
+    useProject(projectId);
+  const [currentComponentName, setCurrentComponentName] =
+    useState('');
   const [currentSettings, setCurrentSettings] = useState({
     componentLibrary: '',
     style: '',
@@ -25,33 +54,39 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
   const [editedCode, setEditedCode] = useState('');
   const [isEdited, setIsEdited] = useState(false);
 
-  // Initialize generation hook with projectId
   const generation = useGeneration(projectId);
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-text-secondary">Loading project...</div>
-      </div>
-    );
+    return <LoadingSkeleton />;
   }
 
   if (!project) {
     return (
-      <div className="text-center py-12">
-        <p className="text-error">Project not found</p>
+      <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="w-12 h-12 rounded-xl bg-error/10 flex items-center justify-center mb-4">
+          <SparklesIcon className="h-6 w-6 text-error" />
+        </div>
+        <p className="text-error font-medium">
+          Project not found
+        </p>
+        <p className="text-sm text-text-muted mt-1">
+          This project may have been deleted
+        </p>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-surface-1 rounded-lg border border-surface-3 overflow-hidden">
-      {/* Header */}
-      <div className="px-6 py-4 border-b border-surface-3 bg-gradient-to-r from-brand/5 to-indigo/5">
+    <div className="flex-1 flex flex-col bg-surface-1 rounded-xl border border-surface-3 overflow-hidden shadow-card">
+      <div className="px-6 py-4 border-b border-surface-3 bg-gradient-to-r from-brand/5 to-transparent">
         <div className="flex items-center space-x-3">
-          <SparklesIcon className="h-6 w-6 text-brand" />
+          <div className="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center">
+            <SparklesIcon className="h-5 w-5 text-brand" />
+          </div>
           <div>
-            <h1 className="text-xl font-bold text-text-primary">Component Generator</h1>
+            <h1 className="text-xl font-bold text-text-primary">
+              Component Generator
+            </h1>
             <p className="text-sm text-text-secondary">
               Generate {project.framework} components with AI
             </p>
@@ -59,52 +94,54 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Generator Form */}
         <div className="w-96 border-r border-surface-3 flex flex-col">
           <GeneratorForm
             projectId={projectId}
             framework={project.framework}
             onGenerate={(code: string, settings: any) => {
-              // Update current settings for save functionality
-              setCurrentComponentName(settings.componentName);
+              setCurrentComponentName(
+                settings.componentName
+              );
               setCurrentSettings({
-                componentLibrary: settings.componentLibrary,
+                componentLibrary:
+                  settings.componentLibrary,
                 style: settings.style,
                 typescript: settings.typescript,
               });
             }}
-            onGenerating={() => {
-              // Generation state is handled by the hook
-            }}
+            onGenerating={() => {}}
             isGenerating={generation.isGenerating}
           />
         </div>
 
-        {/* Right Panel - Split View */}
         <div className="flex-1 flex flex-col">
-          {/* Code Editor */}
           <div className="flex-1 border-b border-surface-3">
             <CodeEditor
-              code={isEdited ? editedCode : generation.code}
+              code={
+                isEdited ? editedCode : generation.code
+              }
               onChange={(code) => {
                 setEditedCode(code);
                 setIsEdited(true);
               }}
-              language={project.framework === 'vue' ? 'vue' : 'typescript'}
+              language={
+                project.framework === 'vue'
+                  ? 'vue'
+                  : 'typescript'
+              }
             />
           </div>
 
-          {/* Live Preview */}
           <div className="flex-1 border-b border-surface-3">
             <LivePreview
-              code={isEdited ? editedCode : generation.code}
+              code={
+                isEdited ? editedCode : generation.code
+              }
               framework={project.framework}
             />
           </div>
 
-          {/* Generation History */}
           <div className="h-48">
             <GenerationHistory
               projectId={projectId}
@@ -115,14 +152,20 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
             />
           </div>
 
-          {/* Save to Project */}
           {generation.code && (
             <SaveToProject
               projectId={projectId}
-              code={isEdited ? editedCode : generation.code}
-              componentName={currentComponentName || 'GeneratedComponent'}
+              code={
+                isEdited ? editedCode : generation.code
+              }
+              componentName={
+                currentComponentName ||
+                'GeneratedComponent'
+              }
               framework={project.framework}
-              componentLibrary={currentSettings.componentLibrary}
+              componentLibrary={
+                currentSettings.componentLibrary
+              }
               style={currentSettings.style}
               typescript={currentSettings.typescript}
             />
