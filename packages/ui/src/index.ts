@@ -100,3 +100,18 @@ export { useToast, toast } from './hooks/use-toast';
 // Generator Components
 export { default as CodeEditor } from './components/generator/CodeEditor';
 export { default as LivePreview } from './components/generator/LivePreview';
+
+// Generation types
+export type {
+  GenerationEvent,
+  QualityResult,
+  QualityReport,
+  NavigationItem,
+} from './lib/generation-types';
+
+// Generator components (shared)
+export { QualityPanel } from './components/generator/QualityPanel';
+export { GenerationProgress } from './components/generator/GenerationProgress';
+
+// Layout components (shared)
+export { NavigationSidebar } from './components/layout/NavigationSidebar';
