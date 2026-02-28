@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
+import { mkdtempSync } from 'fs';
 
 vi.mock('electron', () => ({
   dialog: {
@@ -14,7 +15,7 @@ vi.mock('electron', () => ({
 }));
 
 describe('File System Operations', () => {
-  const testDir = join(tmpdir(), 'siza-test-' + Date.now());
+  const testDir = mkdtempSync(join(tmpdir(), 'siza-test-'));
 
   beforeEach(async () => {
     await mkdir(testDir, { recursive: true });
