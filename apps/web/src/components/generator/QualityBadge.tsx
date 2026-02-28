@@ -14,12 +14,8 @@ export function QualityBadge({ report }: QualityBadgeProps) {
 
   if (!report) return null;
 
-  const errorCount = report.results.filter(
-    (r) => !r.passed && r.severity === 'error'
-  ).length;
-  const warningCount = report.results.filter(
-    (r) => !r.passed && r.severity === 'warning'
-  ).length;
+  const errorCount = report.results.filter((r) => !r.passed && r.severity === 'error').length;
+  const warningCount = report.results.filter((r) => !r.passed && r.severity === 'warning').length;
 
   let icon: React.ReactNode;
   let label: string;
@@ -28,18 +24,15 @@ export function QualityBadge({ report }: QualityBadgeProps) {
   if (errorCount > 0) {
     icon = <XCircle className="h-4 w-4" />;
     label = 'Failed';
-    className =
-      'text-red-400 border-red-800 bg-red-900/30 hover:bg-red-900/50';
+    className = 'text-red-400 border-red-800 bg-red-900/30 hover:bg-red-900/50';
   } else if (warningCount > 0) {
     icon = <AlertTriangle className="h-4 w-4" />;
     label = `${warningCount} warning${warningCount > 1 ? 's' : ''}`;
-    className =
-      'text-yellow-400 border-yellow-800 bg-yellow-900/30 hover:bg-yellow-900/50';
+    className = 'text-yellow-400 border-yellow-800 bg-yellow-900/30 hover:bg-yellow-900/50';
   } else {
     icon = <ShieldCheck className="h-4 w-4" />;
     label = 'Passed';
-    className =
-      'text-green-400 border-green-800 bg-green-900/30 hover:bg-green-900/50';
+    className = 'text-green-400 border-green-800 bg-green-900/30 hover:bg-green-900/50';
   }
 
   return (
@@ -51,13 +44,7 @@ export function QualityBadge({ report }: QualityBadgeProps) {
         {icon}
         {label}
       </button>
-      {panelOpen && (
-        <QualityPanel
-          report={report}
-          open={panelOpen}
-          onOpenChange={setPanelOpen}
-        />
-      )}
+      {panelOpen && <QualityPanel report={report} open={panelOpen} onOpenChange={setPanelOpen} />}
     </>
   );
 }

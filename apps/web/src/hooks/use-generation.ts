@@ -41,7 +41,14 @@ export function useGeneration(projectId?: string) {
           abortControllerRef.current.abort();
         }
 
-        setState({ isGenerating: true, progress: 0, code: '', error: null, events: [], qualityReport: null });
+        setState({
+          isGenerating: true,
+          progress: 0,
+          code: '',
+          error: null,
+          events: [],
+          qualityReport: null,
+        });
 
         abortControllerRef.current = new AbortController();
 
@@ -138,7 +145,14 @@ export function useGeneration(projectId?: string) {
 
   const reset = useCallback(() => {
     if (abortControllerRef.current) abortControllerRef.current.abort();
-    setState({ isGenerating: false, progress: 0, code: '', error: null, events: [], qualityReport: null });
+    setState({
+      isGenerating: false,
+      progress: 0,
+      code: '',
+      error: null,
+      events: [],
+      qualityReport: null,
+    });
   }, []);
 
   return { ...state, startGeneration, stopGeneration, reset };

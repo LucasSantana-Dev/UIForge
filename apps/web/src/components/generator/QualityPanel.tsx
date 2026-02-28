@@ -53,9 +53,7 @@ function GateRow({ result }: { result: QualityResult }) {
           ) : (
             <span
               className={`inline-flex items-center gap-1 text-xs ${
-                result.severity === 'error'
-                  ? 'text-red-400'
-                  : 'text-yellow-400'
+                result.severity === 'error' ? 'text-red-400' : 'text-yellow-400'
               }`}
             >
               <XCircle className="h-3 w-3" />
@@ -86,9 +84,7 @@ export function QualityPanel({ report, open, onOpenChange }: QualityPanelProps) 
     <div className="absolute bottom-full left-0 right-0 mb-2 mx-3 bg-surface-1 border border-surface-3 rounded-lg p-4 shadow-lg z-10">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-text-primary">
-            Quality Gates
-          </h3>
+          <h3 className="text-sm font-semibold text-text-primary">Quality Gates</h3>
           <span
             className={`text-xs font-medium px-1.5 py-0.5 rounded ${
               scorePercent >= 80
