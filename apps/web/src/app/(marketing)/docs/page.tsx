@@ -17,7 +17,7 @@ import {
 import { FadeIn } from '@/components/landing/FadeIn';
 import { CopyButton } from '@/components/docs/CopyButton';
 
-const DOCS_BASE = 'https://docs.siza.dev/docs';
+const DOCS_BASE = 'https://docs.forgespace.co/docs';
 
 const categories = [
   {
