@@ -20,6 +20,7 @@ import { PROVIDER_MODELS } from '@/lib/services/generation';
 import { isFeatureEnabled } from '@/lib/features/flags';
 import GenerationProgress from './GenerationProgress';
 import { DesignContext, DESIGN_DEFAULTS, type DesignContextValues } from './DesignContext';
+import { useThemeStore } from '@/stores/theme-store';
 import { PromptAutocomplete } from './PromptAutocomplete';
 import { UpgradePrompt } from '@/components/billing/UpgradePrompt';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -113,6 +114,7 @@ export default function GeneratorForm({
   const designContextEnabled = isFeatureEnabled('ENABLE_DESIGN_CONTEXT');
   const autocompleteEnabled = isFeatureEnabled('ENABLE_PROMPT_AUTOCOMPLETE');
   const [designContext, setDesignContext] = useState<DesignContextValues>(DESIGN_DEFAULTS);
+  const activeTheme = useThemeStore((s) => s.getActiveTheme)(projectId);
   const [promptValue, setPromptValue] = useState(initialDescription || '');
   const [image, setImage] = useState<ImageState | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
@@ -232,6 +234,11 @@ export default function GeneratorForm({
           spacing: designContext.spacing,
           borderRadius: designContext.borderRadius,
           typography: designContext.typography,
+          ...(activeTheme?.brandMeta && {
+            brandHeadingFont: activeTheme.brandMeta.headingFont,
+            brandBodyFont: activeTheme.brandMeta.bodyFont,
+            brandSemanticColors: activeTheme.brandMeta.semanticColors,
+          }),
         }),
       });
     } catch (err) {

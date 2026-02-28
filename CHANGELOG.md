@@ -29,6 +29,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Generator UX Polish**: Loading skeletons, responsive layout, focus-visible states, aria attributes
 - **Test coverage boost**: 63 new unit tests across 4 new test suites
   - Template validation, auth emails, usage limits
+- **Conversation mode**: Multi-turn AI generation — iteratively refine components with natural language ("make it darker", "add hover states")
+  - Max 10 conversation turns with depth tracking via `parent_generation_id`
+  - Provider support: Gemini (startChat), OpenAI, Anthropic conversation messages
+  - RefinementInput component with turn counter and keyboard shortcuts
+- **Smart design-to-code**: Upload screenshots/wireframes for automatic design analysis
+  - `/api/generate/analyze` endpoint wrapping Gemini vision API
+  - DesignAnalysisPanel: color swatches, component detection, suggested prompts
+  - Auto-fill design context from analysis results
+- **Generation history panel**: Browse, re-use, and fork past generations
+  - Sheet drawer with quality score badges and conversation chain indicators
+  - Load, Fork, Copy, Delete actions per generation
+- **New feature flags**: `ENABLE_CONVERSATION_MODE`, `ENABLE_DESIGN_ANALYSIS`
+- **Database migration**: `parent_generation_id` column for conversation threading
 
 ### Changed
 - **Docs landing page**: Animations (hero glow, fade-up, shimmer, pulse-ring), glassmorphism cards, gradient text, staggered entrance, `prefers-reduced-motion` support

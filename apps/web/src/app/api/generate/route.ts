@@ -49,6 +49,16 @@ const generateSchema = z.object({
   spacing: z.enum(['compact', 'default', 'spacious']).optional(),
   borderRadius: z.enum(['none', 'small', 'medium', 'large', 'full']).optional(),
   typography: z.enum(['system', 'sans', 'serif', 'mono']).optional(),
+  brandHeadingFont: z.string().max(100).optional(),
+  brandBodyFont: z.string().max(100).optional(),
+  brandSemanticColors: z
+    .object({
+      success: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      warning: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      error: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+      info: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
+    })
+    .optional(),
   parentGenerationId: z.string().uuid().optional(),
   previousCode: z.string().max(50000).optional(),
   refinementPrompt: z.string().min(3).max(1000).optional(),
@@ -145,6 +155,9 @@ export async function POST(request: NextRequest) {
       spacing,
       borderRadius,
       typography,
+      brandHeadingFont,
+      brandBodyFont,
+      brandSemanticColors,
       parentGenerationId,
       previousCode,
       refinementPrompt,
@@ -197,6 +210,20 @@ export async function POST(request: NextRequest) {
       if (spacing && spacing !== 'default') parts.push(spacing + ' spacing');
       if (borderRadius) parts.push('border-radius ' + (BORDER_RADIUS_PX[borderRadius] || '8px'));
       if (typography && typography !== 'system') parts.push(typography + ' typography');
+      if (brandHeadingFont) parts.push('heading font: ' + brandHeadingFont);
+      if (brandBodyFont) parts.push('body font: ' + brandBodyFont);
+      if (brandSemanticColors) {
+        parts.push(
+          'semantic colors: success ' +
+            brandSemanticColors.success +
+            ', warning ' +
+            brandSemanticColors.warning +
+            ', error ' +
+            brandSemanticColors.error +
+            ', info ' +
+            brandSemanticColors.info
+        );
+      }
       designContextBlock = '\nDesign context: ' + parts.join(', ') + '.';
     }
 
