@@ -15,6 +15,7 @@ interface GenerationCardProps {
     ai_provider?: string;
     model_used?: string;
     generation_time_ms?: number;
+    quality_score?: number;
     created_at: string;
     status: string;
   };
@@ -93,6 +94,26 @@ export function GenerationCard({ generation, onReusePrompt, onCopyCode }: Genera
           <>
             <span className="text-surface-3">|</span>
             <span>{(generation.generation_time_ms / 1000).toFixed(1)}s</span>
+          </>
+        )}
+        {generation.quality_score != null && (
+          <>
+            <span className="text-surface-3">|</span>
+            <span
+              className={
+                generation.quality_score > 0.8
+                  ? 'text-green-400'
+                  : generation.quality_score >= 0.5
+                    ? 'text-yellow-400'
+                    : 'text-red-400'
+              }
+            >
+              {generation.quality_score > 0.8
+                ? 'Good'
+                : generation.quality_score >= 0.5
+                  ? 'Fair'
+                  : 'Poor'}
+            </span>
           </>
         )}
       </div>

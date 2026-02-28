@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Quality Gates UI**: Visual quality feedback for generated code
+  - SSE `quality` event wired to frontend with `QualityReport` state in `useGeneration` hook
+  - `QualityBadge` component: pass/warn/fail indicator in bottom bar after generation
+  - `QualityPanel` component: expandable gate results with per-gate status and issue details
+  - Quality score badge (Good/Fair/Poor) in generation history cards
+  - Accessibility gate: checks `<img>` alt, `<button>` content, `<input>` labels, positive tabIndex
+  - Responsive gate: warns when layout classes lack responsive breakpoints
+  - Weighted quality score (0-1): security=3, a11y=2, lint=1, type-check=1, responsive=0.5
+  - `quality_score` persisted to Supabase `generations` table on each generation
+
 ### Security
 - Fix minimatch ReDoS vulnerability via `npm audit fix` (GHSA-7r86-cg39-jmmj, GHSA-23c5-xmqv-rm74)
 - Add CodeQL security analysis workflow (push/PR/weekly schedule)

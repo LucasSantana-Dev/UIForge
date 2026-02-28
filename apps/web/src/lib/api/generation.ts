@@ -24,10 +24,22 @@ export interface GenerationOptions {
 }
 
 export interface GenerationEvent {
-  type: 'start' | 'chunk' | 'complete' | 'error';
+  type: 'start' | 'chunk' | 'complete' | 'error' | 'quality';
   content?: string;
   totalLength?: number;
   message?: string;
+  report?: {
+    passed: boolean;
+    results: Array<{
+      gate: string;
+      passed: boolean;
+      issues: string[];
+      severity: string;
+    }>;
+    score: number;
+    timestamp: string;
+  };
+  qualityPassed?: boolean;
   timestamp: number;
 }
 

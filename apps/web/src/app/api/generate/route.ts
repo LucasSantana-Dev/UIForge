@@ -287,6 +287,7 @@ export async function POST(request: NextRequest) {
                 status: 'completed',
                 generated_code: fullCode,
                 ai_provider: fullCode ? activeProvider : 'google',
+                quality_score: qualityReport.score,
               })
               .eq('id', generationId);
 

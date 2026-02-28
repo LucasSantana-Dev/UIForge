@@ -64,6 +64,7 @@ describe('ComponentGenerator Component', () => {
     code: '',
     error: null,
     events: [],
+    qualityReport: null,
     startGeneration: jest.fn(),
     stopGeneration: jest.fn(),
     reset: jest.fn(),
