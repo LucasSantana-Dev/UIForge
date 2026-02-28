@@ -107,8 +107,8 @@ This document outlines the security measures and configurations implemented for 
 
 ## 📞 Security Contacts
 
-- **Security Team**: [security@siza.dev]
-- **Vulnerability Reporting**: [security@siza.dev]
+- **Security Team**: [security@forgespace.co](mailto:security@forgespace.co)
+- **Vulnerability Reporting**: [security@forgespace.co](mailto:security@forgespace.co)
 - **Snyk Organization**: Configured in Snyk dashboard
 
 ## 🛠️ Security Commands
