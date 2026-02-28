@@ -281,8 +281,12 @@ export async function POST(request: NextRequest) {
             }
 
             if (!fullCode) {
+              const streamPrompt = conversationContext
+                ? \`Previous code:\n\\`\\`\\`\n\${conversationContext.previousCode}\n\\`\\`\\`\n\nRefinement: \${conversationContext.refinementPrompt}\`
+                : enrichedDescription;
+
               for await (const event of generateComponentStream({
-                prompt: enrichedDescription,
+                prompt: streamPrompt,
                 framework,
                 componentLibrary,
                 style,
@@ -291,7 +295,6 @@ export async function POST(request: NextRequest) {
                 contextAddition,
                 imageBase64,
                 imageMimeType,
-                conversationContext,
               })) {
                 if (event.type === 'chunk' && event.content) {
                   fullCode += event.content;
@@ -315,10 +318,14 @@ export async function POST(request: NextRequest) {
               }
             }
           } else {
+            const providerPrompt = conversationContext
+              ? \`Previous code:\n\\`\\`\\`\n\${conversationContext.previousCode}\n\\`\\`\\`\n\nRefinement: \${conversationContext.refinementPrompt}\`
+              : enrichedDescription;
+
             for await (const event of generateWithProvider({
               provider: requestedProvider as AIProvider,
               model: requestedModel || 'gemini-2.0-flash',
-              prompt: enrichedDescription,
+              prompt: providerPrompt,
               framework,
               componentLibrary,
               style,
@@ -327,7 +334,6 @@ export async function POST(request: NextRequest) {
               contextAddition,
               imageBase64,
               imageMimeType,
-              conversationContext,
             })) {
               if (event.type === 'chunk' && event.content) {
                 fullCode += event.content;
