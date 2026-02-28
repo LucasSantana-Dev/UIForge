@@ -12,7 +12,7 @@ const mockVerifySession = jest.fn();
 const mockRouteGeneration = jest.fn();
 
 jest.mock('@/lib/api/rate-limit', () => ({
-  checkRateLimit: (...args) => mockCheckRateLimit(...args),
+  checkRateLimit: (...args: any[]) => mockCheckRateLimit(...args),
   setRateLimitHeaders: jest.fn(),
 }));
 
