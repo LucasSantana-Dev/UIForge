@@ -4,21 +4,16 @@
  */
 
 export const TEST_CONFIG = {
-  // Mock API keys for testing (these are not real keys)
   API_KEYS: {
     OPENAI: 'sk-test-openai-key-1234567890abcdef',
     ANTHROPIC: 'sk-ant-test-anthropic-key-1234567890abcdef',
     GEMINI: 'test-gemini-key-1234567890abcdef',
   },
-
-  // Test passwords (these are not real passwords - for testing only)
   PASSWORDS: {
-    USER: 'TestPassword123!', // Test password - not a real secret
-    ADMIN: 'AdminPassword456!', // Test password - not a real secret
-    WEAK: 'password123', // Test password - not a real secret
+    USER: 'TestPassword123!',
+    ADMIN: 'AdminPassword456!',
+    WEAK: 'password123',
   },
-
-  // Test user data
   USERS: {
     VALID: {
       email: 'test@example.com',
@@ -29,15 +24,12 @@ export const TEST_CONFIG = {
       name: 'Admin User',
     },
   },
-
-  // Encryption test vectors
   ENCRYPTION: {
     TEST_DATA: 'This is test data for encryption',
     TEST_KEY: 'test-encryption-key-32-chars',
   },
 } as const;
 
-// Helper functions for tests
 export const createMockApiKey = (provider: 'openai' | 'anthropic' | 'google'): string => {
   switch (provider) {
     case 'openai':

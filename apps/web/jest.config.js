@@ -15,6 +15,7 @@ const customJestConfig = {
     '<rootDir>/src/__tests__/setup/',
     '<rootDir>/e2e/',
     '<rootDir>/src/__tests__/integration/',
+    '<rootDir>/src/__tests__/__fixtures__/',
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',

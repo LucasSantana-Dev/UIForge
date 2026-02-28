@@ -5,7 +5,7 @@
 
 import request from 'supertest';
 import app from '../../src/app';
-import { TEST_CONFIG } from '../../../../test-config';
+import { TEST_CONFIG } from '../test-config';
 
 describe('/api/generate', () => {
   const validRequestData = {
