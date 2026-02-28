@@ -189,7 +189,7 @@ function createComponentWithVariants(
     componentProperties: {},
   };
 
-  if (createVariants && elements.length > 1) {
+  if (elements.length > 1) {
     // Create variants for different states
     const variants = createComponentVariants(elements);
     baseComponent.children = variants;

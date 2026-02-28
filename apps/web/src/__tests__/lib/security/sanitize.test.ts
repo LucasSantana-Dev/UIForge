@@ -1,16 +1,20 @@
 import { sanitizeText, sanitizeHtml, escapeForAttribute } from '@/lib/security/sanitize';
 
 describe('sanitizeText', () => {
-  it('strips HTML tags', () => {
-    expect(sanitizeText('<b>bold</b>')).toBe('bold');
+  it('encodes HTML tags as entities', () => {
+    expect(sanitizeText('<b>bold</b>')).toBe('&lt;b&gt;bold&lt;/b&gt;');
   });
 
-  it('strips script tags with content', () => {
-    expect(sanitizeText('hello<script>alert("xss")</script>world')).toBe('helloworld');
+  it('encodes script tags', () => {
+    expect(sanitizeText('hello<script>alert("xss")</script>world')).toBe(
+      'hello&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;world'
+    );
   });
 
-  it('strips event handlers', () => {
-    expect(sanitizeText('<div onload="alert(1)">content</div>')).toBe('content');
+  it('encodes event handler attributes', () => {
+    expect(sanitizeText('<div onload="alert(1)">content</div>')).toBe(
+      '&lt;div onload=&quot;alert(1)&quot;&gt;content&lt;/div&gt;'
+    );
   });
 
   it('preserves plain text', () => {
@@ -21,26 +25,28 @@ describe('sanitizeText', () => {
     expect(sanitizeText('  hello  ')).toBe('hello');
   });
 
-  it('handles nested tags', () => {
-    expect(sanitizeText('<div><span>text</span></div>')).toBe('text');
+  it('encodes nested tags', () => {
+    expect(sanitizeText('<div><span>text</span></div>')).toBe(
+      '&lt;div&gt;&lt;span&gt;text&lt;/span&gt;&lt;/div&gt;'
+    );
   });
 
   it('handles empty string', () => {
     expect(sanitizeText('')).toBe('');
   });
 
-  it('strips multiple script tags', () => {
-    expect(sanitizeText('<script>a</script>safe<script>b</script>')).toBe('safe');
+  it('encodes ampersands in text', () => {
+    expect(sanitizeText('a & b')).toBe('a &amp; b');
   });
 });
 
 describe('sanitizeHtml', () => {
-  it('removes script tags but keeps other HTML', () => {
-    expect(sanitizeHtml('<b>bold</b><script>xss</script>')).toBe('<b>bold</b>');
+  it('encodes all HTML entities', () => {
+    expect(sanitizeHtml('<b>bold</b>')).toBe('&lt;b&gt;bold&lt;/b&gt;');
   });
 
-  it('removes event handlers', () => {
-    expect(sanitizeHtml('<div onclick="alert(1)">click</div>')).toBe('<div >click</div>');
+  it('encodes script tags', () => {
+    expect(sanitizeHtml('<script>xss</script>')).toBe('&lt;script&gt;xss&lt;/script&gt;');
   });
 });
 

@@ -821,7 +821,7 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
 
 function stripImportsAndExports(code: string): string {
   return code
-    .replace(/^import\b[^\n]*$/gm, '')
+    .replace(/^import\s[^\n]*$/gm, '')
     .replace(/^export\s+default\s+/gm, 'const __DefaultExport__ = ')
     .replace(/^export\s+/gm, '');
 }
@@ -894,7 +894,7 @@ ${LIBRARY_SHIMS}
 
 function createVuePreviewHTML(code: string): string {
   const processed = code
-    .replace(/^import\b[^\n]*$/gm, '')
+    .replace(/^import\s[^\n]*$/gm, '')
     .replace(/export\s+default\s+/gm, 'const __VueComponent__ = ');
 
   return `<!DOCTYPE html>
