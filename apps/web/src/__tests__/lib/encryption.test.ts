@@ -28,12 +28,6 @@ jest.mock('crypto-js', () => {
     sigBytes: 16,
   });
 
-  const mockWordArray = (val: string) => ({
-    toString: jest.fn(() => val),
-    words: [1, 2, 3],
-    sigBytes: 16,
-  });
-
   return {
     AES: {
       encrypt: jest.fn((text: string, key: any, opts?: any) => {

@@ -105,7 +105,7 @@ export function useGeneration(_projectId?: string) {
                 progress: 100,
                 isGenerating: false,
                 parentGenerationId: event.generationId ?? prev.parentGenerationId,
-                conversationTurn: prev.conversationTurn + 1,
+                conversationTurn: isRefinement ? prev.conversationTurn + 1 : prev.conversationTurn,
               }));
               break;
 
