@@ -11,6 +11,12 @@
   "env": {
     "dev": {
       "name": "siza-web-dev",
+      "routes": [
+        {
+          "pattern": "dev.forgespace.co/*",
+          "custom_domain": true,
+        },
+      ],
     },
   },
   "routes": [
