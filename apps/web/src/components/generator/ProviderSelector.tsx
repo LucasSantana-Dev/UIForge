@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import { CpuIcon, KeyIcon } from 'lucide-react';
-import { useApiKeyForProvider, useHasApiKey } from '@/stores/ai-keys';
+import { useHasApiKey } from '@/stores/ai-keys';
 import { PROVIDER_MODELS } from '@/lib/services/generation';
 import type { AIProvider } from '@/lib/encryption';
 

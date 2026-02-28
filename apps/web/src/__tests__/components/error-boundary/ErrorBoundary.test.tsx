@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { ErrorBoundary } from '@/components/error-boundary/ErrorBoundary';
 import { RouteErrorBoundary } from '@/components/error-boundary/RouteErrorBoundary';
 

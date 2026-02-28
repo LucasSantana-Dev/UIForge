@@ -1,4 +1,4 @@
-import { getClient, handleRepoError } from './base.repo';
+import { getClient } from './base.repo';
 
 export interface GenerationInsert {
   user_id: string;
