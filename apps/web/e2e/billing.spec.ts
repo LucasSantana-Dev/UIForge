@@ -75,7 +75,7 @@ test.describe('Billing Page (authenticated)', () => {
     await authenticatedPage.goto('/billing');
 
     await expect(authenticatedPage.getByText('AI Generations', { exact: true })).toBeVisible();
-    await expect(authenticatedPage.getByText('Projects')).toBeVisible();
+    await expect(authenticatedPage.getByText('Projects', { exact: true })).toBeVisible();
   });
 
   test('should link to pricing page from upgrade button', async ({ authenticatedPage }) => {
