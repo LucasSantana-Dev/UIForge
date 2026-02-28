@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { ChevronDownIcon, PaletteIcon } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { ThemeSelector } from './ThemeSelector';
+import { useThemeStore } from '@/stores/theme-store';
 
 export type ColorMode = 'dark' | 'light' | 'both';
 export type AnimationLevel = 'none' | 'subtle' | 'standard' | 'rich';
@@ -77,6 +78,17 @@ const TYPOGRAPHY_OPTIONS: { value: TypographyStyle; label: string }[] = [
   { value: 'mono', label: 'Monospace' },
 ];
 
+function BrandInfo({ projectId }: { projectId: string }) {
+  const activeTheme = useThemeStore((s) => s.getActiveTheme)(projectId);
+  if (!activeTheme?.brandMeta) return null;
+  const { brandName, headingFont, bodyFont } = activeTheme.brandMeta;
+  return (
+    <p className="text-xs text-text-secondary">
+      Brand: {brandName} &middot; {headingFont} / {bodyFont}
+    </p>
+  );
+}
+
 export function DesignContext({ projectId, values, onChange }: DesignContextProps) {
   const [expanded, setExpanded] = useState(true);
 
@@ -119,6 +131,8 @@ export function DesignContext({ projectId, values, onChange }: DesignContextProp
       {expanded && (
         <div className="px-4 pb-4 space-y-4 border-t border-surface-3 pt-4">
           <ThemeSelector projectId={projectId} currentValues={values} onSelectTheme={onChange} />
+
+          <BrandInfo projectId={projectId} />
 
           <fieldset>
             <legend className="block text-sm font-medium text-text-primary mb-2">Color Mode</legend>

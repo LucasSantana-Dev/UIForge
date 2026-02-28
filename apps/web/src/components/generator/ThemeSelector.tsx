@@ -52,6 +52,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
     duplicateTheme,
     exportTheme,
     importTheme,
+    importBrand,
   } = useThemeStore();
 
   const themes = getThemes();
@@ -133,6 +134,16 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
 
   const handleImportSubmit = () => {
     setImportError('');
+    const brandResult = importBrand(importJson);
+    if (brandResult) {
+      setImporting(false);
+      setImportJson('');
+      setActiveTheme(projectId, brandResult);
+      const newTheme = getThemes().find((t) => t.id === brandResult);
+      if (newTheme) onSelectTheme(themeToValues(newTheme));
+      setOpen(false);
+      return;
+    }
     const id = importTheme(importJson);
     if (id) {
       setImporting(false);
@@ -142,7 +153,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
       if (newTheme) onSelectTheme(themeToValues(newTheme));
       setOpen(false);
     } else {
-      setImportError('Invalid theme JSON');
+      setImportError('Invalid theme or brand identity JSON');
     }
   };
 
@@ -194,6 +205,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
                   {theme.builtIn && (
                     <span className="text-xs text-text-muted shrink-0">built-in</span>
                   )}
+                  {theme.brandMeta && <span className="text-xs text-brand shrink-0">brand</span>}
                 </span>
                 <span className="flex items-center gap-1 shrink-0 ml-2">
                   <span
@@ -311,7 +323,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
                   className="flex items-center gap-2 w-full px-3 py-1.5 text-sm text-text-secondary hover:text-text-primary hover:bg-surface-0 rounded-md transition-colors"
                 >
                   <UploadIcon className="h-3.5 w-3.5" />
-                  Import Theme
+                  Import Theme / Brand
                 </button>
               </div>
             )}
@@ -321,7 +333,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
                 <textarea
                   value={importJson}
                   onChange={(e) => setImportJson(e.target.value)}
-                  placeholder="Paste theme JSON here..."
+                  placeholder="Paste theme JSON or brand identity JSON..."
                   rows={4}
                   className="w-full px-2 py-1.5 text-xs font-mono border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
                 />
