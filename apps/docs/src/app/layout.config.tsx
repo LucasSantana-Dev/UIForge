@@ -13,7 +13,7 @@ export const baseOptions: BaseLayoutProps = {
   links: [
     {
       text: 'Platform',
-      url: 'https://siza.dev',
+      url: 'https://siza.forgespace.co',
     },
     {
       text: 'GitHub',

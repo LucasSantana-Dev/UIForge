@@ -7,7 +7,7 @@ const stats = [
   { end: 12, suffix: '+', label: 'AI Providers' },
   { end: 200, suffix: '+', label: 'UI Components' },
   { end: 4, suffix: '', label: 'Core Repositories' },
-  { end: 50, suffix: 'k+', label: 'Weekly Downloads' },
+  { end: 6, suffix: '', label: 'Open Repositories' },
 ];
 
 function StatItem({ end, suffix, label }: { end: number; suffix: string; label: string }) {
