@@ -153,6 +153,7 @@ export default function GeneratorForm({
       onGenerate(generation.code, {
         ...currentSettings,
         qualityReport: generation.qualityReport,
+        generationId: generation.parentGenerationId,
         formOptions: {
           framework: framework as 'react' | 'vue' | 'angular' | 'svelte',
           componentLibrary: currentSettings.componentLibrary || 'none',
@@ -171,6 +172,7 @@ export default function GeneratorForm({
     generation.isGenerating,
     generation.error,
     generation.qualityReport,
+    generation.parentGenerationId,
     onGenerate,
     currentSettings,
     framework,
