@@ -4,6 +4,7 @@ import { generateComponentStream } from './gemini';
 import { generateWithProvider } from './generation';
 import { generateComponent } from '@/lib/mcp/client';
 import { captureServerError } from '@/lib/sentry/server';
+import { canUseFallback, recordFallback } from './fallback-limiter';
 
 export interface RouteGenerationOptions {
   mcpEnabled: boolean;
@@ -120,10 +121,13 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
 
   if (!quotaError) return;
 
-  if (opts.provider === 'anthropic' || !process.env.ANTHROPIC_API_KEY) {
+  const serverKeyAvailable = opts.provider !== 'anthropic' && !!process.env.ANTHROPIC_API_KEY;
+  if (!serverKeyAvailable || !canUseFallback()) {
     yield quotaError;
     return;
   }
+
+  recordFallback();
 
   captureServerError(new Error(quotaError.message), {
     route: '/api/generate',
@@ -139,7 +143,7 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
 
   for await (const event of generateWithProvider({
     provider: 'anthropic',
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-haiku-4-5-20251001',
     prompt: opts.prompt,
     framework: opts.framework,
     componentLibrary: opts.componentLibrary,
