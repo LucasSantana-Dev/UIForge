@@ -7,13 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-02-28
+
 ### Added
+- **Quality Gates**: Enable quality scoring for generated components with inline score display
+  - 5 gates: security (XSS/injection), lint, type-check, accessibility, responsive
+  - Weighted scoring (0-100%) shown inline on QualityBadge
+  - Expandable QualityPanel with per-gate pass/fail details
+  - Quality check step in generation progress indicator
+  - 34 unit tests covering all gate functions
+- **Generator UX Polish**: Loading skeletons, responsive layout, focus-visible states, aria attributes
 - **Test coverage boost**: 63 new unit tests across 4 new test suites
-  - Quality gates: security scan, lint check, type check, accessibility, responsive, scoring (34 tests)
-  - Template validation: Zod schema validation for create + query (16 tests)
-  - Auth emails: feature-gated email sending for welcome, verification, reset, change (8 tests)
-  - Usage limits: generation quota checks with feature flag gating (6 tests)
-- Expanded `collectCoverageFrom` to include quality, usage, email, and auth modules
+  - Template validation, auth emails, usage limits
 
 ### Changed
 
