@@ -78,10 +78,7 @@ export default function PrivacyPage() {
           <p>
             You can request access to, correction of, or deletion of your personal data at any time
             by contacting{' '}
-            <a
-              href="mailto:support@forgespace.co"
-              className="text-[#8B5CF6] hover:underline"
-            >
+            <a href="mailto:support@forgespace.co" className="text-[#8B5CF6] hover:underline">
               support@forgespace.co
             </a>
             .
@@ -109,10 +106,7 @@ export default function PrivacyPage() {
           <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">Contact</h2>
           <p>
             Questions about this policy? Email{' '}
-            <a
-              href="mailto:support@forgespace.co"
-              className="text-[#8B5CF6] hover:underline"
-            >
+            <a href="mailto:support@forgespace.co" className="text-[#8B5CF6] hover:underline">
               support@forgespace.co
             </a>
             .

@@ -40,9 +40,7 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">
-            4. Generated code ownership
-          </h2>
+          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">4. Generated code ownership</h2>
           <p>
             Code generated through Siza belongs to you. You may use, modify, and distribute
             generated code without restriction. We claim no intellectual property rights over your
@@ -57,7 +55,9 @@ export default function TermsPage() {
               The free tier includes limited generations per month as described on the pricing page
             </li>
             <li>Paid subscriptions are billed monthly via Stripe</li>
-            <li>You may cancel at any time; access continues until the end of the billing period</li>
+            <li>
+              You may cancel at any time; access continues until the end of the billing period
+            </li>
             <li>Refunds are handled on a case-by-case basis</li>
           </ul>
         </section>
@@ -74,13 +74,12 @@ export default function TermsPage() {
         </section>
 
         <section>
-          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">
-            7. Limitation of liability
-          </h2>
+          <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">7. Limitation of liability</h2>
           <p>
             The Service is provided &quot;as is&quot; without warranty of any kind. Siza is not
-            liable for any damages arising from the use of generated code in production environments.
-            You are responsible for reviewing and testing all generated code before deployment.
+            liable for any damages arising from the use of generated code in production
+            environments. You are responsible for reviewing and testing all generated code before
+            deployment.
           </p>
         </section>
 
@@ -105,10 +104,7 @@ export default function TermsPage() {
           <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">10. Contact</h2>
           <p>
             Questions? Email{' '}
-            <a
-              href="mailto:support@forgespace.co"
-              className="text-[#8B5CF6] hover:underline"
-            >
+            <a href="mailto:support@forgespace.co" className="text-[#8B5CF6] hover:underline">
               support@forgespace.co
             </a>
             .
