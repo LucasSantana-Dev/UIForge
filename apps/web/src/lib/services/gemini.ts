@@ -17,6 +17,11 @@ export interface GeminiGenerateOptions {
   contextAddition?: string;
   imageBase64?: string;
   imageMimeType?: string;
+  conversationContext?: {
+    previousCode: string;
+    refinementPrompt: string;
+    originalPrompt: string;
+  };
 }
 
 const SYSTEM_PROMPT = `You are a UI component generator. Generate a single, self-contained React component.
