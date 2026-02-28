@@ -78,7 +78,6 @@ const TYPOGRAPHY_OPTIONS: { value: TypographyStyle; label: string }[] = [
   { value: 'mono', label: 'Monospace' },
 ];
 
-
 function BrandInfo({ projectId }: { projectId: string }) {
   const activeTheme = useThemeStore((s) => s.getActiveTheme)(projectId);
   if (!activeTheme?.brandMeta) return null;

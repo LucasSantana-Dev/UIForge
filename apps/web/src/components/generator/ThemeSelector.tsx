@@ -205,9 +205,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
                   {theme.builtIn && (
                     <span className="text-xs text-text-muted shrink-0">built-in</span>
                   )}
-                  {theme.brandMeta && (
-                    <span className="text-xs text-brand shrink-0">brand</span>
-                  )}
+                  {theme.brandMeta && <span className="text-xs text-brand shrink-0">brand</span>}
                 </span>
                 <span className="flex items-center gap-1 shrink-0 ml-2">
                   <span

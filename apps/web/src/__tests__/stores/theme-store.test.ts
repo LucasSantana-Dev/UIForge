@@ -364,9 +364,7 @@ describe('Theme Store', () => {
     it('returns null when colors.primary.hex is missing', () => {
       expect(parseBrandIdentity(JSON.stringify({ name: 'test' }))).toBeNull();
       expect(parseBrandIdentity(JSON.stringify({ colors: {} }))).toBeNull();
-      expect(
-        parseBrandIdentity(JSON.stringify({ colors: { primary: {} } }))
-      ).toBeNull();
+      expect(parseBrandIdentity(JSON.stringify({ colors: { primary: {} } }))).toBeNull();
     });
 
     it('populates brandMeta with font names and semantic colors', () => {

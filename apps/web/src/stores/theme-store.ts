@@ -9,7 +9,6 @@ import type {
 } from '@/components/generator/DesignContext';
 import { BUILT_IN_THEMES } from '@/lib/themes/defaults';
 
-
 export interface BrandMeta {
   brandName: string;
   headingFont: string;
@@ -75,10 +74,8 @@ export function parseBrandIdentity(
     const bodyFont = (data.typography?.bodyFont || '').toLowerCase();
     let typography: SizaTheme['typography'] = 'system';
     if (/mono/i.test(bodyFont)) typography = 'mono';
-    else if (/serif/i.test(bodyFont) && !/sans/i.test(bodyFont))
-      typography = 'serif';
-    else if (/sans|inter|roboto|open|lato|poppins|nunito/i.test(bodyFont))
-      typography = 'sans';
+    else if (/serif/i.test(bodyFont) && !/sans/i.test(bodyFont)) typography = 'serif';
+    else if (/sans|inter|roboto|open|lato|poppins|nunito/i.test(bodyFont)) typography = 'sans';
 
     const spacingUnit = data.spacing?.unit ?? 8;
     let spacing: SizaTheme['spacing'] = 'default';
@@ -93,8 +90,7 @@ export function parseBrandIdentity(
     else if (radiusMd <= 16) borderRadius = 'large';
     else borderRadius = 'full';
 
-    const brandName =
-      data.brandName || data.name || 'Imported Brand';
+    const brandName = data.brandName || data.name || 'Imported Brand';
 
     const semanticColors = {
       success: data.colors?.success?.hex || '#22C55E',
@@ -107,8 +103,7 @@ export function parseBrandIdentity(
     if (data.colors?.neutrals) {
       for (const n of Object.values(data.colors.neutrals)) {
         if (typeof n === 'string') neutrals.push(n);
-        else if (n && typeof (n as any).hex === 'string')
-          neutrals.push((n as any).hex);
+        else if (n && typeof (n as any).hex === 'string') neutrals.push((n as any).hex);
       }
     }
 
