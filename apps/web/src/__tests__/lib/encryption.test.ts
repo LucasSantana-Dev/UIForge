@@ -303,5 +303,19 @@ describe('Encryption Utilities', () => {
 
       expect(decrypted).toBe(specialKey);
     });
+
+    it('should produce iv:ciphertext format from encryptApiKey', () => {
+      const encrypted = encryptApiKey('sk-test1234567890abcdef', 'abcd1234');
+      expect(encrypted).toContain(':');
+    });
+
+    it('should decrypt legacy format without colon (backward compat)', () => {
+      const CryptoJS = require('crypto-js');
+      CryptoJS.AES.decrypt.mockImplementationOnce(() => ({
+        toString: jest.fn(() => 'sk-decrypted-key'),
+      }));
+      const result = decryptApiKey('U2FsdGVkX1_legacy_data', 'some-key');
+      expect(result).toBe('sk-decrypted-key');
+    });
   });
 });

@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-03-01
+
+### Added
+- **Anthropic server-side fallback**: Automatic failover to Anthropic when primary provider (Gemini) hits quota or rate-limit errors
+  - Quota error detection with pattern matching for 429 and RESOURCE_EXHAUSTED responses
+  - New `fallback` SSE event type for client-side awareness of provider switch
+  - Tracks actual provider used in DB `generations.ai_provider` column
+  - Uses `ANTHROPIC_API_KEY` server-side env var (no user key needed)
+
+### Fixed
+- **Supabase database advisor warnings**: RLS initplan optimization (`(select auth.uid())`), permissive policy consolidation, `function_search_path_mutable`, foreign key indexes
+- **E2E tests**: Landing page ecosystem count updated (five to six repos), billing page strict mode selectors
+- **Docs URL**: Footer link updated from siza.dev to forgespace.co
+- **Prettier formatting**: Normalize package.json array formatting across monorepo
+
 ## [0.16.0] - 2026-02-28
 
 ### Added
