@@ -22,7 +22,14 @@ function stripScriptContent(input: string): string {
 }
 
 function stripEventHandlers(input: string): string {
-  return input.replace(/\bon\w+=\s*["'][^"']*["']/gi, '');
+  const re = /\bon\w+=\s*["'][^"']*["']/gi;
+  let result = input;
+  let prev: string;
+  do {
+    prev = result;
+    result = result.replace(re, '');
+  } while (result !== prev);
+  return result;
 }
 
 function stripAllTags(input: string): string {
