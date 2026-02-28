@@ -9,6 +9,7 @@ const api: SizaApi = {
 
   checkOllama: () => ipcRenderer.invoke(IPC.OLLAMA_CHECK),
   listOllamaModels: () => ipcRenderer.invoke(IPC.OLLAMA_LIST_MODELS),
+  generateWithOllama: (request) => ipcRenderer.invoke(IPC.OLLAMA_GENERATE, request),
 
   selectDirectory: () => ipcRenderer.invoke(IPC.FS_SELECT_DIRECTORY),
   readFile: (path) => ipcRenderer.invoke(IPC.FS_READ_FILE, path),

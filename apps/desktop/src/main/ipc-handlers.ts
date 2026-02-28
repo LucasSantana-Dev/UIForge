@@ -7,8 +7,15 @@ import {
   writeProjectFile,
   listDirectoryRecursive,
 } from './file-system';
+import { getOllamaClient } from './ollama-client';
+import { buildComponentPrompt } from './ollama-prompts';
 import { resolve, normalize, relative } from 'path';
-import type { OllamaStatus, OllamaModel } from '../shared/types';
+import type {
+  OllamaStatus,
+  OllamaModel,
+  OllamaGenerateRequest,
+  OllamaGenerateResult,
+} from '../shared/types';
 
 function validateFilePath(filePath: string): string {
   const normalized = normalize(resolve(filePath));
@@ -87,6 +94,35 @@ export function registerIpcHandlers(mainWindow: BrowserWindow) {
       return [];
     }
   });
+
+  ipcMain.handle(
+    IPC.OLLAMA_GENERATE,
+    async (_e, request: OllamaGenerateRequest): Promise<OllamaGenerateResult> => {
+      const client = getOllamaClient(OLLAMA_BASE);
+      const { system, user } = buildComponentPrompt(
+        request.framework,
+        request.description,
+        request.componentName,
+        request.registryExamples
+      );
+      const response = await client.chat({
+        model: request.model,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user },
+        ],
+        options: { temperature: 0.3 },
+      });
+      let code = response.message.content;
+      const fenceMatch = code.match(/```(?:tsx?|jsx?|vue|html|svelte)?\n([\s\S]*?)```/);
+      if (fenceMatch) code = fenceMatch[1].trim();
+      return {
+        code,
+        model: response.model,
+        duration: response.total_duration ? Math.round(response.total_duration / 1e6) : undefined,
+      };
+    }
+  );
 
   ipcMain.handle(IPC.FS_SELECT_DIRECTORY, async () => {
     return selectDirectory(mainWindow);

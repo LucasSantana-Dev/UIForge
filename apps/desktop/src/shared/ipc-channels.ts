@@ -5,6 +5,7 @@ export const IPC = {
 
   OLLAMA_CHECK: 'ollama:check',
   OLLAMA_LIST_MODELS: 'ollama:list-models',
+  OLLAMA_GENERATE: 'ollama:generate',
 
   FS_SELECT_DIRECTORY: 'fs:select-directory',
   FS_READ_FILE: 'fs:read-file',
