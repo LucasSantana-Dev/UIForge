@@ -89,7 +89,7 @@ function AppError({ error, reset }: { error: Error & { digest?: string }; reset:
 
         <p className="text-sm text-muted-foreground">
           If this problem persists, please{' '}
-          <a href="mailto:support@siza.dev" className="text-primary hover:underline">
+          <a href="mailto:support@forgespace.co" className="text-primary hover:underline">
             contact support
           </a>
           .

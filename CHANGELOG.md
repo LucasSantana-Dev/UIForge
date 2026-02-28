@@ -9,12 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - **Brand identity import**: Connect branding-mcp output to the siza webapp generation pipeline
-  - Smart detection: auto-detect BrandIdentity JSON by `colors.primary.hex`, falls back to standard theme format
-  - Full mapping: brand colors, typography, spacing, border radius → SizaTheme values
-  - BrandMeta storage: font names, semantic colors, neutrals for richer AI prompt context
-  - Brand themes show "brand" badge in ThemeSelector, font info in DesignContext panel
-  - API extension: `brandHeadingFont`, `brandBodyFont`, `brandSemanticColors` in generation API
-  - 13 new tests for `parseBrandIdentity()` and `importBrand()` (33 total in theme-store)
+  - Smart detection: auto-detect BrandIdentity JSON by `colors.primary.hex`
+  - Full mapping: brand colors, typography, spacing, border radius to SizaTheme values
+  - BrandMeta storage: font names, semantic colors, neutrals for AI prompt context
+  - Brand themes show "brand" badge in ThemeSelector
+  - 13 new tests for `parseBrandIdentity()` and `importBrand()`
+
+## [0.15.0] - 2026-02-28
+
+### Added
+- **Service layer**: Extract business logic from API route handlers into dedicated service files (conversation, project, component, generation)
+- **Repository layer**: Thin Supabase data access layer (base, project, component, generation, feedback repos) with pagination and error handling
+- **Security headers**: CSP, HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy added to all responses via middleware
+- **CORS allowlist**: Origin validation replacing wildcard `*` — forgespace.co subdomains + localhost in dev
+- **XSS sanitization**: Zod `.transform(sanitizeText)` on all user text fields (projects, components)
+- **Request tracing**: X-Request-ID header (crypto.randomUUID) on every response
+- **Route-based rate limits**: Per-endpoint rate limit configuration (15/min generate, 60/min CRUD, 10/min auth)
+- **Error boundaries**: Generic ErrorBoundary and RouteErrorBoundary components
+- **TTLCache utility**: Generic in-memory cache with LRU eviction for server-side caching
+- **29 service layer tests**: Full unit test coverage for conversation, project, and component services
+
+### Changed
+- **GeneratorForm refactored**: 578 → 313 lines via ImageUpload, ProviderSelector, QuotaGuard extraction
+- **Structured error logging**: console.error replaced with captureServerError (Sentry) across all API routes
+- **Templates routes**: Fixed variable name mismatches in error handlers (dbError/deleteError)
+- **.env.example**: Completed with all missing environment variables
 
 ## [0.14.0] - 2026-02-28
 
@@ -37,19 +56,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Generator UX Polish**: Loading skeletons, responsive layout, focus-visible states, aria attributes
 - **Test coverage boost**: 63 new unit tests across 4 new test suites
   - Template validation, auth emails, usage limits
-- **Conversation mode**: Multi-turn AI generation — iteratively refine components with natural language ("make it darker", "add hover states")
-  - Max 10 conversation turns with depth tracking via `parent_generation_id`
-  - Provider support: Gemini (startChat), OpenAI, Anthropic conversation messages
-  - RefinementInput component with turn counter and keyboard shortcuts
-- **Smart design-to-code**: Upload screenshots/wireframes for automatic design analysis
-  - `/api/generate/analyze` endpoint wrapping Gemini vision API
-  - DesignAnalysisPanel: color swatches, component detection, suggested prompts
-  - Auto-fill design context from analysis results
-- **Generation history panel**: Browse, re-use, and fork past generations
-  - Sheet drawer with quality score badges and conversation chain indicators
-  - Load, Fork, Copy, Delete actions per generation
-- **New feature flags**: `ENABLE_CONVERSATION_MODE`, `ENABLE_DESIGN_ANALYSIS`
-- **Database migration**: `parent_generation_id` column for conversation threading
 
 ### Changed
 - **Docs landing page**: Animations (hero glow, fade-up, shimmer, pulse-ring), glassmorphism cards, gradient text, staggered entrance, `prefers-reduced-motion` support

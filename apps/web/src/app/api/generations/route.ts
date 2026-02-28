@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, errorResponse } from '@/lib/api/response';
+import { captureServerError } from '@/lib/sentry/server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -51,13 +52,13 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Failed to fetch generations:', error);
+      captureServerError(error, { route: '/api/generations' });
       return errorResponse('Failed to fetch generations', 500);
     }
 
     return successResponse({ generations });
   } catch (error) {
-    console.error('Generations GET error:', error);
+    captureServerError(error, { route: '/api/generations' });
     return errorResponse('Internal server error', 500);
   }
 }
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Failed to create generation:', error);
+      captureServerError(error, { route: '/api/generations' });
       return errorResponse('Failed to create generation', 500);
     }
 
@@ -145,7 +146,7 @@ export async function POST(request: NextRequest) {
       '201'
     );
   } catch (error) {
-    console.error('Generations POST error:', error);
+    captureServerError(error, { route: '/api/generations' });
     return errorResponse('Internal server error', 500);
   }
 }

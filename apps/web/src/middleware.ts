@@ -2,6 +2,7 @@ export const runtime = 'experimental-edge';
 
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { securityHeaders } from '@/lib/security/headers';
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
@@ -66,6 +67,14 @@ export async function middleware(request: NextRequest) {
 
   if (user && (request.nextUrl.pathname === '/signin' || request.nextUrl.pathname === '/signup')) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  const requestId = crypto.randomUUID();
+  response.headers.set('X-Request-ID', requestId);
+
+  const headers = securityHeaders();
+  for (const [key, value] of Object.entries(headers)) {
+    response.headers.set(key, value);
   }
 
   return response;
