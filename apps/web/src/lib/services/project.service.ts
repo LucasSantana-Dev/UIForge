@@ -4,12 +4,8 @@ import {
   type ProjectListParams,
 } from '@/lib/repositories/project.repo';
 import { ForbiddenError, NotFoundError } from '@/lib/api/errors';
-import type { PaginatedResult } from '@/lib/repositories/base.repo';
-
-export type { PaginatedResult };
 
 export interface ProjectListQuery {
-  userId: string;
   search?: string;
   framework?: string;
   page?: number;
@@ -34,14 +30,27 @@ export async function verifyProjectOwnership(
 }
 
 export async function listProjects(
-  query: ProjectListQuery
-): Promise<PaginatedResult<any>> {
+  userId: string,
+  query: ProjectListQuery = {}
+): Promise<{
+  data: any[];
+  pagination: { page: number; limit: number; total: number; pages: number };
+}> {
   const params: ProjectListParams = {
-    userId: query.userId,
+    userId,
     search: query.search,
     framework: query.framework,
-    page: query.page,
-    limit: query.limit,
+    page: query.page || 1,
+    limit: query.limit || 10,
   };
-  return repoListProjects(params);
+  const result = await repoListProjects(params);
+  return {
+    data: result.data,
+    pagination: {
+      page: result.page,
+      limit: result.limit,
+      total: result.total,
+      pages: Math.max(1, Math.ceil(result.total / result.limit)),
+    },
+  };
 }
