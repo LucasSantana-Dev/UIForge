@@ -12,7 +12,7 @@ const mockVerifySession = jest.fn();
 const mockGenerateComponentStream = jest.fn();
 
 jest.mock('@/lib/api/rate-limit', () => ({
-  checkRateLimit: (...args: any[]) => mockCheckRateLimit(...args),
+  checkRateLimit: (...args) => mockCheckRateLimit(...args),
   setRateLimitHeaders: jest.fn(),
 }));
 
@@ -22,7 +22,7 @@ jest.mock('@/lib/api/auth', () => ({
 }));
 
 jest.mock('@/lib/services/gemini', () => ({
-  generateComponentStream: (...args: any[]) => mockGenerateComponentStream(...args),
+  generateComponentStream: (...args) => mockGenerateComponentStream(...args),
 }));
 
 jest.mock('@/lib/usage/limits', () => ({
