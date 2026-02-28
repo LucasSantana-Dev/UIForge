@@ -19,11 +19,7 @@ describe('buildComponentPrompt', () => {
   });
 
   it('builds Vue prompt correctly', () => {
-    const { system, user } = buildComponentPrompt(
-      'vue',
-      'A data table',
-      'DataTable'
-    );
+    const { system, user } = buildComponentPrompt('vue', 'A data table', 'DataTable');
 
     expect(system).toContain('Vue 3 with Composition API');
     expect(user).toContain('vue');
@@ -32,33 +28,20 @@ describe('buildComponentPrompt', () => {
 
   it('includes registry examples when provided', () => {
     const examples = 'function ExampleButton() { return <button>Click</button> }';
-    const { system } = buildComponentPrompt(
-      'react',
-      'A button',
-      'FancyButton',
-      examples
-    );
+    const { system } = buildComponentPrompt('react', 'A button', 'FancyButton', examples);
 
     expect(system).toContain('similar components for reference');
     expect(system).toContain(examples);
   });
 
   it('excludes registry section when no examples', () => {
-    const { system } = buildComponentPrompt(
-      'react',
-      'A card',
-      'InfoCard'
-    );
+    const { system } = buildComponentPrompt('react', 'A card', 'InfoCard');
 
     expect(system).not.toContain('similar components for reference');
   });
 
   it('falls back to React for unknown framework', () => {
-    const { system } = buildComponentPrompt(
-      'unknown-fw',
-      'A widget',
-      'Widget'
-    );
+    const { system } = buildComponentPrompt('unknown-fw', 'A widget', 'Widget');
 
     expect(system).toContain('React with TypeScript and Tailwind CSS');
   });

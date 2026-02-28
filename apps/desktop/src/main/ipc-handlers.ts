@@ -119,9 +119,7 @@ export function registerIpcHandlers(mainWindow: BrowserWindow) {
       return {
         code,
         model: response.model,
-        duration: response.total_duration
-          ? Math.round(response.total_duration / 1e6)
-          : undefined,
+        duration: response.total_duration ? Math.round(response.total_duration / 1e6) : undefined,
       };
     }
   );

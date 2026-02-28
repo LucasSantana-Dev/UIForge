@@ -65,9 +65,7 @@ export function Generate() {
         setGeneratedCode(result.code);
         setGenerationTime(result.duration || Date.now() - start);
       } catch (err) {
-        setOllamaError(
-          err instanceof Error ? err.message : 'Ollama generation failed'
-        );
+        setOllamaError(err instanceof Error ? err.message : 'Ollama generation failed');
       } finally {
         setOllamaLoading(false);
       }
@@ -118,9 +116,7 @@ export function Generate() {
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div>
-            <Label className="text-xs text-text-muted mb-1.5 block">
-              Source
-            </Label>
+            <Label className="text-xs text-text-muted mb-1.5 block">Source</Label>
             <div className="flex gap-2">
               <Button
                 variant={source === 'mcp' ? 'default' : 'outline'}
@@ -135,11 +131,7 @@ export function Generate() {
                 size="sm"
                 onClick={() => setSource('ollama')}
                 disabled={!ollamaRunning}
-                title={
-                  ollamaRunning
-                    ? 'Generate with local Ollama model'
-                    : 'Ollama not running'
-                }
+                title={ollamaRunning ? 'Generate with local Ollama model' : 'Ollama not running'}
               >
                 <CpuIcon className="w-3.5 h-3.5 mr-1.5" />
                 Ollama
@@ -206,11 +198,7 @@ export function Generate() {
             </Button>
           </div>
           {error && <p className="text-sm text-error">{error}</p>}
-          <Button
-            onClick={handleGenerate}
-            disabled={!canGenerate}
-            className="w-full"
-          >
+          <Button onClick={handleGenerate} disabled={!canGenerate} className="w-full">
             <SparklesIcon className="w-4 h-4 mr-2" />
             {isLoading ? 'Generating...' : 'Generate'}
           </Button>
@@ -241,11 +229,7 @@ export function Generate() {
             )}
           </div>
           <TabsContent value="code" className="flex-1 m-0">
-            <CodeEditor
-              code={generatedCode}
-              onChange={setGeneratedCode}
-              language="typescript"
-            />
+            <CodeEditor code={generatedCode} onChange={setGeneratedCode} language="typescript" />
           </TabsContent>
           <TabsContent value="preview" className="flex-1 m-0">
             <LivePreview code={generatedCode} framework={framework} />

@@ -86,10 +86,7 @@ describe('OllamaClient', () => {
       client.setBaseUrl('http://custom:1234/');
       mockFetch.mockResolvedValueOnce({ ok: true });
       client.checkConnection();
-      expect(mockFetch).toHaveBeenCalledWith(
-        'http://custom:1234/api/version',
-        expect.anything()
-      );
+      expect(mockFetch).toHaveBeenCalledWith('http://custom:1234/api/version', expect.anything());
     });
   });
 });
