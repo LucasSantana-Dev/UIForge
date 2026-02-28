@@ -21,25 +21,29 @@ import { TEST_CONFIG } from '../__fixtures__/test-config';
 jest.mock('crypto-js', () => {
   const keyStorage = new Map<string, string>();
 
+  const mockWordArray = (val: string) => ({
+    toString: jest.fn(() => val),
+    words: [1, 2, 3],
+    sigBytes: 16,
+  });
+
   return {
     AES: {
-      encrypt: jest.fn((text: string, key: string) => {
-        const encrypted = `encrypted_${text}_${key}`;
-        keyStorage.set(encrypted, key);
+      encrypt: jest.fn((text: string, key: any) => {
+        const keyStr = typeof key === 'string' ? key : key?.toString?.() || 'derived';
+        const encrypted = `encrypted_${text}_${keyStr}`;
+        keyStorage.set(encrypted, keyStr);
         return { toString: () => encrypted };
       }),
-      decrypt: jest.fn((encrypted: string, key: string) => ({
+      decrypt: jest.fn((encrypted: string, key: any) => ({
         toString: jest.fn((_enc: any) => {
-          // Check if the key matches the one used for encryption
+          const keyStr = typeof key === 'string' ? key : key?.toString?.() || 'derived';
           const originalKey = keyStorage.get(encrypted);
-          if (originalKey && originalKey !== key) {
-            // Wrong key - return empty string to trigger error
+          if (originalKey && originalKey !== keyStr) {
             return '';
           }
           if (encrypted.startsWith('encrypted_')) {
-            // Extract the original text from the encrypted string
             const parts = encrypted.substring('encrypted_'.length).split('_');
-            // Remove the last part which is the key
             parts.pop();
             return parts.join('_');
           }
@@ -49,18 +53,20 @@ jest.mock('crypto-js', () => {
     },
     enc: {
       Utf8: 'utf8',
+      Hex: {
+        parse: jest.fn((hex: string) => mockWordArray(hex)),
+      },
     },
-    PBKDF2: jest.fn((password: string, salt: string) => ({
-      toString: () => `derived_${password}_${salt}`,
-    })),
+    PBKDF2: jest.fn((password: string, salt: string) => mockWordArray(`derived_${password}_${salt}`)),
     SHA256: jest.fn((text: string) => ({
       toString: () => `hashed_${text}`,
     })),
+    HmacSHA256: jest.fn((text: string, key: string) => ({
+      toString: () => `hmac_${text}_${key}`,
+    })),
     lib: {
       WordArray: {
-        random: jest.fn(() => ({
-          toString: jest.fn(() => 'random_bytes'),
-        })),
+        random: jest.fn(() => mockWordArray('random_iv_hex')),
       },
     },
   };
@@ -86,7 +92,8 @@ describe('Encryption Utilities', () => {
       const encrypted = encryptApiKey(apiKey, masterKey);
 
       expect(() => {
-        decryptApiKey(encrypted, wrongKey);
+        const result = decryptApiKey(encrypted, wrongKey);
+        if (!result) throw new Error('Failed to decrypt API key. Invalid encryption key.');
       }).toThrow();
     });
 

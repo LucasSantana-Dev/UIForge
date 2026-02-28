@@ -46,19 +46,20 @@ class Logger {
 
   debug(message: string, context?: LogContext): void {
     if (this.isDevelopment) {
-      console.debug(this.formatMessage('debug', message, context));
+      console.debug(this.formatMessage('debug', sanitizeLogMessage(message), context));
     }
   }
 
   info(message: string, context?: LogContext): void {
-    console.info(this.formatMessage('info', message, context));
+    console.info(this.formatMessage('info', sanitizeLogMessage(message), context));
   }
 
   warn(message: string, context?: LogContext): void {
-    console.warn(this.formatMessage('warn', message, context));
+    console.warn(this.formatMessage('warn', sanitizeLogMessage(message), context));
   }
 
   error(message: string, error?: Error | unknown, context?: LogContext): void {
+    const safeMessage = sanitizeLogMessage(message);
     const errorContext = {
       ...context,
       ...(error instanceof Error && {
@@ -70,7 +71,7 @@ class Logger {
       }),
     };
 
-    console.error(this.formatMessage('error', message, errorContext));
+    console.error(this.formatMessage('error', safeMessage, errorContext));
   }
 }
 
