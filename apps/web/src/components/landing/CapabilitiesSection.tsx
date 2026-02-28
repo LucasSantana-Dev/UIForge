@@ -23,7 +23,7 @@ const capabilities = [
     icon: Network,
     title: 'Repository Ecosystem',
     description:
-      'Five interconnected open-source repositories. Use one or all \u2014 zero lock-in.',
+      'Six interconnected open-source repositories. Use one or all \u2014 zero lock-in.',
     accent: 'from-indigo-500/20 to-indigo-600/5',
   },
   {
