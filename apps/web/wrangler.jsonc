@@ -10,7 +10,7 @@
   },
   "routes": [
     {
-      "pattern": "forgespace.co",
+      "pattern": "siza.forgespace.co",
       "custom_domain": true,
     },
   ],

@@ -5,22 +5,34 @@ import { FadeIn } from './FadeIn';
 
 const repos = [
   {
-    name: 'siza-mcp',
-    badge: 'MCP Server',
-    desc: '12 AI-powered tools for UI generation via Model Context Protocol',
-    href: 'https://github.com/Forge-Space/ui-mcp',
-  },
-  {
     name: 'siza',
     badge: 'Web App',
     desc: 'Full-stack Next.js workspace with AI generation, auth, and billing',
     href: 'https://github.com/Forge-Space/siza',
   },
   {
+    name: 'siza-gen',
+    badge: 'Engine',
+    desc: 'Multi-framework code generation engine with 502-snippet registry',
+    href: 'https://github.com/Forge-Space/siza-gen',
+  },
+  {
+    name: 'siza-mcp',
+    badge: 'MCP Server',
+    desc: '21 AI-powered tools for UI generation via Model Context Protocol',
+    href: 'https://github.com/Forge-Space/ui-mcp',
+  },
+  {
     name: 'mcp-gateway',
     badge: 'Gateway',
     desc: 'Intelligent routing hub for 12+ AI providers with failover',
     href: 'https://github.com/Forge-Space/mcp-gateway',
+  },
+  {
+    name: 'branding-mcp',
+    badge: 'Branding',
+    desc: 'AI-powered brand identity generation with 9 MCP tools',
+    href: 'https://github.com/Forge-Space/branding-mcp',
   },
   {
     name: 'forge-patterns',
@@ -42,7 +54,7 @@ export function EcosystemSection() {
           </FadeIn>
           <FadeIn delay={0.08}>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-4">
-              Five repos. One vision.
+              Six repos. One vision.
             </h2>
           </FadeIn>
           <FadeIn delay={0.16}>
@@ -54,7 +66,7 @@ export function EcosystemSection() {
 
         <div className="hidden lg:block relative h-20 w-full mt-12">
           <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            {[12.5, 37.5, 62.5, 87.5].map((x) => (
+            {[16.7, 50, 83.3].map((x) => (
               <line
                 key={x}
                 x1={`${x}%`}
@@ -77,7 +89,7 @@ export function EcosystemSection() {
           </svg>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-14">
           {repos.map((repo, i) => (
             <FadeIn key={repo.name} delay={0.24 + i * 0.08}>
               <a

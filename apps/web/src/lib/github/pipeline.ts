@@ -73,7 +73,7 @@ export async function generateAndCreatePR(params: GeneratePRParams): Promise<PRR
     `**Prompt:** ${params.prompt}`,
     '',
     `---`,
-    `*This PR was automatically created by [Siza](https://siza.dev)*`,
+    `*This PR was automatically created by [Siza](https://siza.forgespace.co)*`,
   ].join('\n');
 
   const pr = await createPR(installationId, {

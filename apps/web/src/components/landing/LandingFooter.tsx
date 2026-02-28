@@ -106,7 +106,9 @@ export function LandingFooter() {
               Roadmap
             </Link>
             <Link
-              href="#"
+              href="https://github.com/orgs/Forge-Space/discussions"
+              target="_blank"
+              rel="noopener noreferrer"
               className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
             >
               Blog
@@ -122,19 +124,21 @@ export function LandingFooter() {
           <div>
             <h3 className="text-sm font-medium text-[#FAFAFA] mb-4">Legal</h3>
             <Link
-              href="#"
+              href="/legal/privacy"
               className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
             >
               Privacy
             </Link>
             <Link
-              href="#"
+              href="/legal/terms"
               className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
             >
               Terms
             </Link>
             <Link
-              href="#"
+              href="https://github.com/Forge-Space/siza/blob/main/LICENSE"
+              target="_blank"
+              rel="noopener noreferrer"
               className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
             >
               License
