@@ -33,7 +33,9 @@ export function DashboardPreview() {
                 <div className="w-2.5 h-2.5 rounded-full bg-[#3F3F46]" />
                 <div className="w-2.5 h-2.5 rounded-full bg-[#3F3F46]" />
               </div>
-              <div className="text-xs text-[#71717A] font-mono mx-auto">siza.dev/generate</div>
+              <div className="text-xs text-[#71717A] font-mono mx-auto">
+                siza.forgespace.co/generate
+              </div>
             </div>
 
             <div className="flex min-h-[400px] bg-[#121214]">

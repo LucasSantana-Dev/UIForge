@@ -36,7 +36,7 @@ export const phases: Phase[] = [
     status: 'planned',
     estimatedDate: 'Q2 2026',
     items: [
-      { label: 'Documentation site (docs.siza.dev)', status: 'planned' },
+      { label: 'Documentation site (docs.forgespace.co)', status: 'planned' },
       { label: 'Public roadmap (GitHub Projects)', status: 'planned' },
       { label: 'Discord community launch', status: 'planned' },
       { label: 'CONTRIBUTING.md in all repos', status: 'done' },
