@@ -161,10 +161,10 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (!parentGen) {
-        return new Response(
-          JSON.stringify({ error: 'Parent generation not found' }),
-          { status: 404, headers: { 'Content-Type': 'application/json' } }
-        );
+        return new Response(JSON.stringify({ error: 'Parent generation not found' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        });
       }
 
       const depth = await getConversationDepth(supabaseCheck, parentGenerationId);
@@ -243,13 +243,14 @@ export async function POST(request: NextRequest) {
 
           let fullCode = '';
 
-          const conversationContext = isRefinement && previousCode
-            ? {
-                previousCode,
-                refinementPrompt: refinementPrompt!,
-                originalPrompt: description,
-              }
-            : undefined;
+          const conversationContext =
+            isRefinement && previousCode
+              ? {
+                  previousCode,
+                  refinementPrompt: refinementPrompt!,
+                  originalPrompt: description,
+                }
+              : undefined;
 
           if (mcpEnabled) {
             controller.enqueue(
