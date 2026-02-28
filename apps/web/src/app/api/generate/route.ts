@@ -1,87 +1,31 @@
 import type { NextRequest } from 'next/server';
-import { z } from 'zod';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit } from '@/lib/api/rate-limit';
 import { generateComponentStream } from '@/lib/services/gemini';
 import { generateWithProvider } from '@/lib/services/generation';
 import type { AIProvider } from '@/lib/encryption';
-import { runAllGates } from '@/lib/quality/gates';
-import { enrichPromptWithContext } from '@/lib/services/context-enrichment';
-import { storeGenerationEmbedding } from '@/lib/services/embeddings';
-import { createClient } from '@/lib/supabase/server';
 import { checkGenerationQuota } from '@/lib/usage/limits';
-import { incrementGenerationCount } from '@/lib/usage/tracker';
 import { captureServerError } from '@/lib/sentry/server';
 import { getFeatureFlag } from '@/lib/features/flags';
 import { isMcpConfigured, generateComponent } from '@/lib/mcp/client';
+import { generateSchema } from '@/lib/api/validation/generate';
+import {
+  buildDesignContext,
+  enrichWithRag,
+  createGenerationRecord,
+  completeGeneration,
+  failGeneration,
+  runQualityGates,
+  postGenerationTasks,
+  createSseEvent,
+  buildStreamPrompt,
+} from '@/lib/services/generation.service';
+import { validateConversation } from '@/lib/services/conversation.service';
 
 export const dynamic = 'force-dynamic';
 
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
-const MAX_CONVERSATION_DEPTH = 10;
-
-const generateSchema = z.object({
-  description: z.string().min(10).max(2000),
-  framework: z.enum(['react', 'vue', 'angular', 'svelte']).default('react'),
-  componentLibrary: z.enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none']).optional(),
-  style: z.enum(['modern', 'minimal', 'colorful']).optional(),
-  typescript: z.boolean().optional(),
-  userApiKey: z.string().min(1).optional(),
-  provider: z.enum(['google', 'openai', 'anthropic']).default('google'),
-  model: z.string().min(1).optional(),
-  useRag: z.boolean().optional(),
-  imageBase64: z.string().max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)').optional(),
-  imageMimeType: z.enum(['image/png', 'image/jpeg', 'image/webp']).optional(),
-  colorMode: z.enum(['dark', 'light', 'both']).optional(),
-  primaryColor: z
-    .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/)
-    .optional(),
-  secondaryColor: z
-    .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/)
-    .optional(),
-  accentColor: z
-    .string()
-    .regex(/^#[0-9A-Fa-f]{6}$/)
-    .optional(),
-  animation: z.enum(['none', 'subtle', 'standard', 'rich']).optional(),
-  spacing: z.enum(['compact', 'default', 'spacious']).optional(),
-  borderRadius: z.enum(['none', 'small', 'medium', 'large', 'full']).optional(),
-  typography: z.enum(['system', 'sans', 'serif', 'mono']).optional(),
-  parentGenerationId: z.string().uuid().optional(),
-  previousCode: z.string().max(50000).optional(),
-  refinementPrompt: z.string().min(3).max(1000).optional(),
-});
-
 function shouldUseMcpGateway(): boolean {
   return getFeatureFlag('ENABLE_MCP_GATEWAY') && isMcpConfigured();
-}
-
-function createSseEvent(data: object): string {
-  return `data: ${JSON.stringify(data)}\n\n`;
-}
-
-async function getConversationDepth(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  generationId: string
-): Promise<number> {
-  let depth = 0;
-  let currentId: string | null = generationId;
-
-  while (currentId && depth < MAX_CONVERSATION_DEPTH) {
-    const { data }: { data: { parent_generation_id: string | null } | null } = await supabase
-      .from('generations')
-      .select('parent_generation_id')
-      .eq('id', currentId)
-      .single();
-
-    if (!data?.parent_generation_id) break;
-    currentId = data.parent_generation_id;
-    depth++;
-  }
-
-  return depth;
 }
 
 export async function POST(request: NextRequest) {
@@ -89,9 +33,7 @@ export async function POST(request: NextRequest) {
     const rateLimitResult = await checkRateLimit(request, 15, 60000);
     if (!rateLimitResult.allowed) {
       return new Response(
-        JSON.stringify({
-          error: 'Rate limit exceeded. Try again shortly.',
-        }),
+        JSON.stringify({ error: 'Rate limit exceeded. Try again shortly.' }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -103,11 +45,7 @@ export async function POST(request: NextRequest) {
       return new Response(
         JSON.stringify({
           error: 'Generation quota exceeded',
-          quota: {
-            current: quota.current,
-            limit: quota.limit,
-            remaining: quota.remaining,
-          },
+          quota: { current: quota.current, limit: quota.limit, remaining: quota.remaining },
         }),
         { status: 429, headers: { 'Content-Type': 'application/json' } }
       );
@@ -115,163 +53,73 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const parsed = generateSchema.safeParse(body);
-
     if (!parsed.success) {
       return new Response(
-        JSON.stringify({
-          error: parsed.error.issues[0]?.message || 'Invalid request',
-        }),
+        JSON.stringify({ error: parsed.error.issues[0]?.message || 'Invalid request' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
-    const {
-      description,
-      framework,
-      componentLibrary,
-      style,
-      typescript,
-      userApiKey,
-      provider: requestedProvider,
-      model: requestedModel,
-      useRag,
-      imageBase64,
-      imageMimeType,
-      colorMode,
-      primaryColor,
-      secondaryColor,
-      accentColor,
-      animation,
-      spacing,
-      borderRadius,
-      typography,
-      parentGenerationId,
-      previousCode,
-      refinementPrompt,
-    } = parsed.data;
-
-    const isRefinement = !!(parentGenerationId && refinementPrompt);
+    const data = parsed.data;
+    const isRefinement = !!(data.parentGenerationId && data.refinementPrompt);
 
     if (isRefinement) {
-      const supabaseCheck = await createClient();
-      const { data: parentGen } = await supabaseCheck
-        .from('generations')
-        .select('id')
-        .eq('id', parentGenerationId)
-        .single();
-
-      if (!parentGen) {
-        return new Response(JSON.stringify({ error: 'Parent generation not found' }), {
-          status: 404,
-          headers: { 'Content-Type': 'application/json' },
-        });
-      }
-
-      const depth = await getConversationDepth(supabaseCheck, parentGenerationId);
-      if (depth >= MAX_CONVERSATION_DEPTH) {
-        return new Response(
-          JSON.stringify({
-            error: `Conversation limit reached (max ${MAX_CONVERSATION_DEPTH} turns). Start a new generation.`,
-          }),
-          { status: 400, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
+      await validateConversation(data.parentGenerationId!);
     }
 
-    const BORDER_RADIUS_PX: Record<string, string> = {
-      none: '0',
-      small: '4px',
-      medium: '8px',
-      large: '12px',
-      full: '9999px',
+    const designContext = buildDesignContext(data);
+    const enrichedDescription = data.description + designContext;
+    const contextAddition =
+      data.useRag !== false
+        ? await enrichWithRag(enrichedDescription, {
+            framework: data.framework,
+            apiKey: data.userApiKey,
+          })
+        : '';
+
+    const mcpEnabled = shouldUseMcpGateway();
+    const activeProvider = mcpEnabled ? 'mcp-gateway' : data.provider;
+    const activeModel = mcpEnabled ? 'mcp-specialist' : data.model || 'gemini-2.0-flash';
+
+    const conversationCtx =
+      isRefinement && data.previousCode
+        ? { previousCode: data.previousCode, refinementPrompt: data.refinementPrompt! }
+        : undefined;
+    const streamPrompt = buildStreamPrompt(enrichedDescription, conversationCtx);
+
+    const generationOpts = {
+      framework: data.framework,
+      componentLibrary: data.componentLibrary,
+      style: data.style,
+      typescript: data.typescript,
+      apiKey: data.userApiKey,
+      contextAddition,
+      imageBase64: data.imageBase64,
+      imageMimeType: data.imageMimeType,
     };
 
-    let designContextBlock = '';
-    if (colorMode || primaryColor) {
-      const parts: string[] = [];
-      if (colorMode) parts.push(colorMode + ' mode');
-      if (primaryColor) parts.push('primary ' + primaryColor);
-      if (secondaryColor) parts.push('secondary ' + secondaryColor);
-      if (accentColor) parts.push('accent ' + accentColor);
-      if (animation) parts.push(animation + ' animations');
-      if (spacing && spacing !== 'default') parts.push(spacing + ' spacing');
-      if (borderRadius) parts.push('border-radius ' + (BORDER_RADIUS_PX[borderRadius] || '8px'));
-      if (typography && typography !== 'system') parts.push(typography + ' typography');
-      designContextBlock = '\nDesign context: ' + parts.join(', ') + '.';
-    }
-
-    const enrichedDescription = description + designContextBlock;
-
-    let contextAddition = '';
-    if (useRag !== false) {
-      try {
-        const enrichment = await enrichPromptWithContext(enrichedDescription, {
-          framework,
-          apiKey: userApiKey,
-        });
-        contextAddition = enrichment.systemPromptAddition;
-      } catch {
-        // RAG enrichment is best-effort
-      }
-    }
-
     const encoder = new TextEncoder();
-    const mcpEnabled = shouldUseMcpGateway();
-
     const stream = new ReadableStream({
       async start(controller) {
         let generationId: string | null = null;
-        const activeProvider = mcpEnabled ? 'mcp-gateway' : requestedProvider;
-        const activeModel = mcpEnabled ? 'mcp-specialist' : requestedModel || 'gemini-2.0-flash';
-
         try {
-          const supabase = await createClient();
-          const { data: gen } = await supabase
-            .from('generations')
-            .insert({
-              user_id: user.id,
-              prompt: isRefinement ? refinementPrompt : description,
-              framework,
-              status: 'processing',
-              ai_provider: activeProvider,
-              model_used: activeModel,
-              parent_generation_id: parentGenerationId || null,
-            })
-            .select('id')
-            .single();
-          generationId = gen?.id ?? null;
+          generationId = await createGenerationRecord({
+            userId: user.id,
+            prompt: isRefinement ? data.refinementPrompt! : data.description,
+            framework: data.framework,
+            provider: activeProvider,
+            model: activeModel,
+            parentGenerationId: data.parentGenerationId,
+          });
 
           let fullCode = '';
-
-          const conversationContext =
-            isRefinement && previousCode
-              ? {
-                  previousCode,
-                  refinementPrompt: refinementPrompt!,
-                  originalPrompt: description,
-                }
-              : undefined;
 
           if (mcpEnabled) {
             controller.enqueue(
               encoder.encode(createSseEvent({ type: 'start', timestamp: Date.now() }))
             );
-
             try {
-              const mcpPrompt = conversationContext
-                ? `Previous code:\n\`\`\`\n${conversationContext.previousCode}\n\`\`\`\n\nRefinement: ${conversationContext.refinementPrompt}`
-                : enrichedDescription;
-
-              fullCode = await generateComponent({
-                prompt: mcpPrompt,
-                framework,
-                componentLibrary,
-                style,
-                typescript,
-                imageBase64,
-                imageMimeType,
-                contextAddition,
-              });
+              fullCode = await generateComponent({ prompt: streamPrompt, ...generationOpts });
             } catch (mcpError) {
               captureServerError(mcpError, {
                 route: '/api/generate',
@@ -280,30 +128,7 @@ export async function POST(request: NextRequest) {
               fullCode = '';
             }
 
-            if (!fullCode) {
-              const streamPrompt = conversationContext
-                ? `Previous code:\n\`\`\`\n${conversationContext.previousCode}\n\`\`\`\n\nRefinement: ${conversationContext.refinementPrompt}`
-                : enrichedDescription;
-
-              for await (const event of generateComponentStream({
-                prompt: streamPrompt,
-                framework,
-                componentLibrary,
-                style,
-                typescript,
-                apiKey: userApiKey,
-                contextAddition,
-                imageBase64,
-                imageMimeType,
-              })) {
-                if (event.type === 'chunk' && event.content) {
-                  fullCode += event.content;
-                }
-                if (event.type !== 'complete') {
-                  controller.enqueue(encoder.encode(createSseEvent(event)));
-                }
-              }
-            } else {
+            if (fullCode) {
               const chunkSize = 200;
               for (let i = 0; i < fullCode.length; i += chunkSize) {
                 controller.enqueue(
@@ -317,61 +142,39 @@ export async function POST(request: NextRequest) {
                 );
               }
             }
-          } else {
-            const providerPrompt = conversationContext
-              ? `Previous code:\n\`\`\`\n${conversationContext.previousCode}\n\`\`\`\n\nRefinement: ${conversationContext.refinementPrompt}`
-              : enrichedDescription;
+          }
 
-            for await (const event of generateWithProvider({
-              provider: requestedProvider as AIProvider,
-              model: requestedModel || 'gemini-2.0-flash',
-              prompt: providerPrompt,
-              framework,
-              componentLibrary,
-              style,
-              typescript,
-              apiKey: userApiKey,
-              contextAddition,
-              imageBase64,
-              imageMimeType,
-            })) {
+          if (!mcpEnabled || !fullCode) {
+            const generator = mcpEnabled
+              ? generateComponentStream({ prompt: streamPrompt, ...generationOpts })
+              : generateWithProvider({
+                  provider: data.provider as AIProvider,
+                  model: data.model || 'gemini-2.0-flash',
+                  prompt: streamPrompt,
+                  ...generationOpts,
+                });
+
+            for await (const event of generator) {
               if (event.type === 'chunk' && event.content) {
                 fullCode += event.content;
               }
-
-              if (event.type === 'complete') {
-                break;
-              }
-
-              controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
+              if (event.type === 'complete') break;
+              controller.enqueue(encoder.encode(createSseEvent(event)));
             }
           }
 
-          const qualityReport = runAllGates(fullCode);
+          const qualityReport = runQualityGates(fullCode);
           controller.enqueue(
             encoder.encode(
-              createSseEvent({
-                type: 'quality',
-                report: qualityReport,
-                timestamp: Date.now(),
-              })
+              createSseEvent({ type: 'quality', report: qualityReport, timestamp: Date.now() })
             )
           );
 
           if (generationId) {
-            const supabase2 = await createClient();
-            await supabase2
-              .from('generations')
-              .update({
-                status: 'completed',
-                generated_code: fullCode,
-                ai_provider: fullCode ? activeProvider : 'google',
-                quality_score: qualityReport.score,
-              })
-              .eq('id', generationId);
-
-            storeGenerationEmbedding(generationId, description, userApiKey).catch(() => {});
-            incrementGenerationCount(user.id).catch(() => {});
+            await completeGeneration(
+              generationId, fullCode, activeProvider, qualityReport.score
+            );
+            postGenerationTasks(generationId, data.description, user.id, data.userApiKey);
           }
 
           controller.enqueue(
@@ -384,26 +187,19 @@ export async function POST(request: NextRequest) {
                 qualityPassed: qualityReport.passed,
                 ragEnriched: contextAddition.length > 0,
                 provider: activeProvider,
-                parentGenerationId: parentGenerationId || null,
+                parentGenerationId: data.parentGenerationId || null,
                 timestamp: Date.now(),
               })
             )
           );
         } catch (error) {
           if (generationId) {
-            const supabase = await createClient();
-            await supabase
-              .from('generations')
-              .update({
-                status: 'failed',
-                error_message: error instanceof Error ? error.message : 'Generation failed',
-              })
-              .eq('id', generationId);
+            await failGeneration(
+              generationId,
+              error instanceof Error ? error.message : 'Generation failed'
+            );
           }
-          captureServerError(error, {
-            route: '/api/generate',
-            userId: user.id,
-          });
+          captureServerError(error, { route: '/api/generate', userId: user.id });
           controller.enqueue(
             encoder.encode(
               createSseEvent({
