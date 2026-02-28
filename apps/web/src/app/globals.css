@@ -173,6 +173,23 @@
   }
 }
 
+
+/* ── Focus & Accessibility ── */
+@layer base {
+  :focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--surface-0),
+      0 0 0 4px var(--brand);
+    border-radius: 0.25rem;
+  }
+
+  ::selection {
+    background-color: rgba(124, 58, 237, 0.3);
+    color: #fafafa;
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

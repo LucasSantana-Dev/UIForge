@@ -361,11 +361,13 @@ export default function GeneratorForm({
               {...register('componentName')}
               type="text"
               id="componentName"
+              aria-describedby={errors.componentName ? 'componentName-error' : undefined}
+              aria-invalid={!!errors.componentName}
               className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
               placeholder="MyButton"
             />
             {errors.componentName && (
-              <p className="mt-1 text-sm text-red-600">{errors.componentName.message}</p>
+              <p id="componentName-error" role="alert" className="mt-1 text-sm text-error">{errors.componentName.message}</p>
             )}
           </div>
 
@@ -391,11 +393,13 @@ export default function GeneratorForm({
                 {...register('prompt')}
                 id="prompt"
                 rows={6}
+                aria-describedby={errors.prompt ? 'prompt-error' : undefined}
+                aria-invalid={!!errors.prompt}
                 className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
                 placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
               />
             )}
-            {errors.prompt && <p className="mt-1 text-sm text-red-600">{errors.prompt.message}</p>}
+            {errors.prompt && <p id="prompt-error" role="alert" className="mt-1 text-sm text-error">{errors.prompt.message}</p>}
           </div>
 
           <div>

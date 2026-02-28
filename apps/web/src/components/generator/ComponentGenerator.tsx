@@ -8,7 +8,7 @@ import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
 import GenerationHistory from './GenerationHistory';
 import SaveToProject from './SaveToProject';
-import { SparklesIcon } from 'lucide-react';
+import { SparklesIcon, Code2, Eye } from 'lucide-react';
 
 interface ComponentGeneratorProps {
   projectId: string;
@@ -26,8 +26,8 @@ function LoadingSkeleton() {
           </div>
         </div>
       </div>
-      <div className="flex-1 flex">
-        <div className="w-96 border-r border-surface-3 p-6 space-y-4">
+      <div className="flex-1 flex flex-col lg:flex-row">
+        <div className="lg:w-96 border-b lg:border-b-0 lg:border-r border-surface-3 p-6 space-y-4">
           <div className="h-10 rounded bg-surface-2" />
           <div className="h-32 rounded bg-surface-2" />
           <div className="h-10 rounded bg-surface-2" />
@@ -53,6 +53,9 @@ export default function ComponentGenerator({
   });
   const [editedCode, setEditedCode] = useState('');
   const [isEdited, setIsEdited] = useState(false);
+  const [activeTab, setActiveTab] = useState<
+    'code' | 'preview'
+  >('code');
 
   const generation = useGeneration(projectId);
 
@@ -76,26 +79,31 @@ export default function ComponentGenerator({
     );
   }
 
+  const displayCode = isEdited
+    ? editedCode
+    : generation.code;
+
   return (
     <div className="flex-1 flex flex-col bg-surface-1 rounded-xl border border-surface-3 overflow-hidden shadow-card">
-      <div className="px-6 py-4 border-b border-surface-3 bg-gradient-to-r from-brand/5 to-transparent">
+      <div className="px-4 sm:px-6 py-4 border-b border-surface-3 bg-gradient-to-r from-brand/5 to-transparent">
         <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
             <SparklesIcon className="h-5 w-5 text-brand" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold text-text-primary">
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold text-text-primary truncate">
               Component Generator
             </h1>
-            <p className="text-sm text-text-secondary">
-              Generate {project.framework} components with AI
+            <p className="text-sm text-text-secondary truncate">
+              Generate {project.framework} components with
+              AI
             </p>
           </div>
         </div>
       </div>
 
-      <div className="flex-1 flex overflow-hidden">
-        <div className="w-96 border-r border-surface-3 flex flex-col">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+        <div className="lg:w-96 border-b lg:border-b-0 lg:border-r border-surface-3 flex flex-col max-h-[50vh] lg:max-h-none">
           <GeneratorForm
             projectId={projectId}
             framework={project.framework}
@@ -115,12 +123,41 @@ export default function ComponentGenerator({
           />
         </div>
 
-        <div className="flex-1 flex flex-col">
-          <div className="flex-1 border-b border-surface-3">
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="flex border-b border-surface-3 lg:hidden">
+            <button
+              type="button"
+              onClick={() => setActiveTab('code')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                activeTab === 'code'
+                  ? 'text-brand-light border-b-2 border-brand'
+                  : 'text-text-muted hover:text-text-primary'
+              }`}
+              aria-label="View code"
+            >
+              <Code2 className="h-4 w-4" />
+              Code
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('preview')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                activeTab === 'preview'
+                  ? 'text-brand-light border-b-2 border-brand'
+                  : 'text-text-muted hover:text-text-primary'
+              }`}
+              aria-label="View preview"
+            >
+              <Eye className="h-4 w-4" />
+              Preview
+            </button>
+          </div>
+
+          <div
+            className={`flex-1 border-b border-surface-3 ${activeTab !== 'code' ? 'hidden lg:block' : ''}`}
+          >
             <CodeEditor
-              code={
-                isEdited ? editedCode : generation.code
-              }
+              code={displayCode}
               onChange={(code) => {
                 setEditedCode(code);
                 setIsEdited(true);
@@ -133,11 +170,11 @@ export default function ComponentGenerator({
             />
           </div>
 
-          <div className="flex-1 border-b border-surface-3">
+          <div
+            className={`flex-1 border-b border-surface-3 ${activeTab !== 'preview' ? 'hidden lg:block' : ''}`}
+          >
             <LivePreview
-              code={
-                isEdited ? editedCode : generation.code
-              }
+              code={displayCode}
               framework={project.framework}
             />
           </div>
@@ -155,9 +192,7 @@ export default function ComponentGenerator({
           {generation.code && (
             <SaveToProject
               projectId={projectId}
-              code={
-                isEdited ? editedCode : generation.code
-              }
+              code={displayCode}
               componentName={
                 currentComponentName ||
                 'GeneratedComponent'
