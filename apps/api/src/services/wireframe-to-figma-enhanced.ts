@@ -106,7 +106,7 @@ function createComponentLibrary(
     optimizeForPrototype: boolean;
   }
 ) {
-  const { useAutoLayout, createVariants, optimizeForPrototype } = options;
+  const { useAutoLayout, optimizeForPrototype } = options;
   const components: any[] = [];
   const componentMap = new Map();
 
@@ -179,7 +179,7 @@ function createComponentWithVariants(
     optimizeForPrototype: boolean;
   }
 ) {
-  const { useAutoLayout, createVariants, optimizeForPrototype } = options;
+  const { useAutoLayout, optimizeForPrototype } = options;
 
   const baseComponent: any = {
     id: `component-${type}`,
@@ -189,7 +189,7 @@ function createComponentWithVariants(
     componentProperties: {},
   };
 
-  if (createVariants && elements.length > 1) {
+  if (elements.length > 1) {
     // Create variants for different states
     const variants = createComponentVariants(elements);
     baseComponent.children = variants;
