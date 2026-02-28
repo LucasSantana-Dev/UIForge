@@ -17,10 +17,7 @@ import { verifyProjectOwnership } from '@/lib/services/project.service';
 const RATE_LIMIT = 120;
 const RATE_WINDOW = 60000;
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const rateResult = await checkRateLimit(request, RATE_LIMIT, RATE_WINDOW);
@@ -54,10 +51,7 @@ export async function GET(
   }
 }
 
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
     const rateResult = await checkRateLimit(request, RATE_LIMIT, RATE_WINDOW);

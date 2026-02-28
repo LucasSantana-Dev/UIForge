@@ -7,22 +7,15 @@ const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
 export const generateSchema = z.object({
   description: z.string().min(10).max(2000),
   framework: z.enum(['react', 'vue', 'angular', 'svelte']).default('react'),
-  componentLibrary: z
-    .enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none'])
-    .optional(),
+  componentLibrary: z.enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none']).optional(),
   style: z.enum(['modern', 'minimal', 'colorful']).optional(),
   typescript: z.boolean().optional(),
   userApiKey: z.string().min(1).optional(),
   provider: z.enum(['google', 'openai', 'anthropic']).default('google'),
   model: z.string().min(1).optional(),
   useRag: z.boolean().optional(),
-  imageBase64: z
-    .string()
-    .max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)')
-    .optional(),
-  imageMimeType: z
-    .enum(['image/png', 'image/jpeg', 'image/webp'])
-    .optional(),
+  imageBase64: z.string().max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)').optional(),
+  imageMimeType: z.enum(['image/png', 'image/jpeg', 'image/webp']).optional(),
   colorMode: z.enum(['dark', 'light', 'both']).optional(),
   primaryColor: z.string().regex(hexColorRegex).optional(),
   secondaryColor: z.string().regex(hexColorRegex).optional(),

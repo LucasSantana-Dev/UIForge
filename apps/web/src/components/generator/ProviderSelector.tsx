@@ -28,10 +28,7 @@ export function ProviderSelector({
   multiLlmEnabled,
 }: ProviderSelectorProps) {
   const hasProviderKey = useHasApiKey(selectedProvider);
-  const models = useMemo(
-    () => PROVIDER_MODELS[selectedProvider] || [],
-    [selectedProvider]
-  );
+  const models = useMemo(() => PROVIDER_MODELS[selectedProvider] || [], [selectedProvider]);
 
   return (
     <>
@@ -63,7 +60,9 @@ export function ProviderSelector({
             className="w-full px-3 py-2 border border-surface-3 rounded-md text-sm focus:ring-brand focus:border-brand"
           >
             {models.map((m) => (
-              <option key={m.id} value={m.id}>{m.name}</option>
+              <option key={m.id} value={m.id}>
+                {m.name}
+              </option>
             ))}
           </select>
         </div>
@@ -78,7 +77,9 @@ export function ProviderSelector({
         ) : selectedProvider === 'google' ? (
           <span className="text-amber-700">
             Using server API key &mdash;{' '}
-            <a href="/ai-keys" className="underline">add your own</a>
+            <a href="/ai-keys" className="underline">
+              add your own
+            </a>
           </span>
         ) : (
           <span className="text-red-700">

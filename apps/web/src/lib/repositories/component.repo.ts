@@ -28,9 +28,7 @@ export async function findComponentWithProject(
   return data as unknown as ComponentWithProject;
 }
 
-export async function findComponentsByProject(
-  projectId: string
-): Promise<any[]> {
+export async function findComponentsByProject(projectId: string): Promise<any[]> {
   const supabase = await getClient();
   const { data, error } = await supabase
     .from('components')
@@ -43,9 +41,7 @@ export async function findComponentsByProject(
   return data || [];
 }
 
-export async function insertComponent(
-  data: Record<string, unknown>
-): Promise<any> {
+export async function insertComponent(data: Record<string, unknown>): Promise<any> {
   const supabase = await getClient();
   const { data: component, error } = await supabase
     .from('components')
@@ -58,10 +54,7 @@ export async function insertComponent(
   return component;
 }
 
-export async function updateComponent(
-  id: string,
-  data: Record<string, unknown>
-): Promise<any> {
+export async function updateComponent(id: string, data: Record<string, unknown>): Promise<any> {
   const supabase = await getClient();
   const { data: updated, error } = await supabase
     .from('components')
@@ -77,10 +70,7 @@ export async function updateComponent(
 
 export async function deleteComponent(id: string): Promise<void> {
   const supabase = await getClient();
-  const { error } = await supabase
-    .from('components')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabase.from('components').delete().eq('id', id);
   if (error) {
     handleRepoError(error, 'deleteComponent');
   }

@@ -12,10 +12,7 @@ export interface ProjectListQuery {
   limit?: number;
 }
 
-export async function verifyProjectOwnership(
-  projectId: string,
-  userId: string
-): Promise<any> {
+export async function verifyProjectOwnership(projectId: string, userId: string): Promise<any> {
   const project = await findProjectById(projectId);
 
   if (!project) {

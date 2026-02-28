@@ -148,7 +148,14 @@ export default function GeneratorForm({
         qualityReport: generation.qualityReport,
       });
     }
-  }, [generation.code, generation.isGenerating, generation.error, generation.qualityReport, onGenerate, currentSettings]);
+  }, [
+    generation.code,
+    generation.isGenerating,
+    generation.error,
+    generation.qualityReport,
+    onGenerate,
+    currentSettings,
+  ]);
 
   useEffect(() => {
     if (generation.isGenerating && !isGenerating) onGenerating();
@@ -169,7 +176,10 @@ export default function GeneratorForm({
           />
 
           <div>
-            <label htmlFor="componentName" className="block text-sm font-medium text-text-primary mb-2">
+            <label
+              htmlFor="componentName"
+              className="block text-sm font-medium text-text-primary mb-2"
+            >
               Component Name *
             </label>
             <input
@@ -226,12 +236,19 @@ export default function GeneratorForm({
           <ImageUpload image={image} onImageChange={setImage} />
 
           {designContextEnabled && (
-            <DesignContext projectId={projectId} values={designContext} onChange={setDesignContext} />
+            <DesignContext
+              projectId={projectId}
+              values={designContext}
+              onChange={setDesignContext}
+            />
           )}
 
           <div className="space-y-4">
             <div>
-              <label htmlFor="componentLibrary" className="block text-sm font-medium text-text-primary mb-2">
+              <label
+                htmlFor="componentLibrary"
+                className="block text-sm font-medium text-text-primary mb-2"
+              >
                 Component Library
               </label>
               <select
@@ -261,7 +278,11 @@ export default function GeneratorForm({
               </select>
             </div>
             <label className="flex items-center">
-              <input {...register('typescript')} type="checkbox" className="rounded border-surface-3 text-brand focus:ring-brand" />
+              <input
+                {...register('typescript')}
+                type="checkbox"
+                className="rounded border-surface-3 text-brand focus:ring-brand"
+              />
               <span className="ml-2 text-sm text-text-primary">Use TypeScript</span>
             </label>
           </div>

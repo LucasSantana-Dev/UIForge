@@ -3,20 +3,13 @@ import {
   validateConversation,
   MAX_CONVERSATION_DEPTH,
 } from '@/lib/services/conversation.service';
-import {
-  findGenerationById,
-  getParentGenerationId,
-} from '@/lib/repositories/generation.repo';
+import { findGenerationById, getParentGenerationId } from '@/lib/repositories/generation.repo';
 import { NotFoundError, ValidationError } from '@/lib/api/errors';
 
 jest.mock('@/lib/repositories/generation.repo');
 
-const mockFindGeneration = findGenerationById as jest.MockedFunction<
-  typeof findGenerationById
->;
-const mockGetParent = getParentGenerationId as jest.MockedFunction<
-  typeof getParentGenerationId
->;
+const mockFindGeneration = findGenerationById as jest.MockedFunction<typeof findGenerationById>;
+const mockGetParent = getParentGenerationId as jest.MockedFunction<typeof getParentGenerationId>;
 
 beforeEach(() => jest.clearAllMocks());
 
@@ -57,9 +50,7 @@ describe('validateConversation', () => {
 
   it('throws NotFoundError when parent does not exist', async () => {
     mockFindGeneration.mockResolvedValueOnce(null);
-    await expect(validateConversation('missing')).rejects.toThrow(
-      NotFoundError
-    );
+    await expect(validateConversation('missing')).rejects.toThrow(NotFoundError);
   });
 
   it('throws ValidationError when depth limit exceeded', async () => {
@@ -70,8 +61,6 @@ describe('validateConversation', () => {
     for (let i = 0; i < MAX_CONVERSATION_DEPTH + 2; i++) {
       mockGetParent.mockResolvedValueOnce('gen-' + i);
     }
-    await expect(validateConversation('gen-deep')).rejects.toThrow(
-      ValidationError
-    );
+    await expect(validateConversation('gen-deep')).rejects.toThrow(ValidationError);
   });
 });

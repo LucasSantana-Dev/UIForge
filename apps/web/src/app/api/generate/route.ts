@@ -32,10 +32,10 @@ export async function POST(request: NextRequest) {
   try {
     const rateLimitResult = await checkRateLimit(request, 15, 60000);
     if (!rateLimitResult.allowed) {
-      return new Response(
-        JSON.stringify({ error: 'Rate limit exceeded. Try again shortly.' }),
-        { status: 429, headers: { 'Content-Type': 'application/json' } }
-      );
+      return new Response(JSON.stringify({ error: 'Rate limit exceeded. Try again shortly.' }), {
+        status: 429,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
 
     const { user } = await verifySession();
@@ -67,9 +67,7 @@ export async function POST(request: NextRequest) {
     }
 
     const input = parsed.data;
-    const isRefinement = !!(
-      input.parentGenerationId && input.refinementPrompt
-    );
+    const isRefinement = !!(input.parentGenerationId && input.refinementPrompt);
 
     if (isRefinement) {
       await validateConversation(input.parentGenerationId!);
@@ -87,9 +85,7 @@ export async function POST(request: NextRequest) {
 
     const mcpEnabled = shouldUseMcpGateway();
     const activeProvider = mcpEnabled ? 'mcp-gateway' : input.provider;
-    const activeModel = mcpEnabled
-      ? 'mcp-specialist'
-      : input.model || 'gemini-2.0-flash';
+    const activeModel = mcpEnabled ? 'mcp-specialist' : input.model || 'gemini-2.0-flash';
     const conversationCtx: ConversationContext | undefined =
       isRefinement && input.previousCode
         ? {
@@ -99,10 +95,7 @@ export async function POST(request: NextRequest) {
         : undefined;
 
     const encoder = new TextEncoder();
-    const streamPrompt = buildStreamPrompt(
-      enrichedDescription,
-      conversationCtx
-    );
+    const streamPrompt = buildStreamPrompt(enrichedDescription, conversationCtx);
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -110,9 +103,7 @@ export async function POST(request: NextRequest) {
         try {
           generationId = await createGenerationRecord({
             userId: user.id,
-            prompt: isRefinement
-              ? input.refinementPrompt!
-              : input.description,
+            prompt: isRefinement ? input.refinementPrompt! : input.description,
             framework: input.framework,
             provider: activeProvider,
             model: activeModel,
@@ -137,9 +128,7 @@ export async function POST(request: NextRequest) {
             if (event.type === 'chunk' && event.content) {
               fullCode += event.content;
             }
-            controller.enqueue(
-              encoder.encode(createSseEvent(event))
-            );
+            controller.enqueue(encoder.encode(createSseEvent(event)));
           }
 
           const qualityReport = runQualityGates(fullCode);
@@ -154,18 +143,8 @@ export async function POST(request: NextRequest) {
           );
 
           if (generationId) {
-            await completeGeneration(
-              generationId,
-              fullCode,
-              activeProvider,
-              qualityReport.score
-            );
-            void postGenerationTasks(
-              generationId,
-              input.description,
-              user.id,
-              input.userApiKey
-            );
+            await completeGeneration(generationId, fullCode, activeProvider, qualityReport.score);
+            void postGenerationTasks(generationId, input.description, user.id, input.userApiKey);
           }
 
           controller.enqueue(
@@ -178,8 +157,7 @@ export async function POST(request: NextRequest) {
                 qualityPassed: qualityReport.passed,
                 ragEnriched: contextAddition.length > 0,
                 provider: activeProvider,
-                parentGenerationId:
-                  input.parentGenerationId || null,
+                parentGenerationId: input.parentGenerationId || null,
                 timestamp: Date.now(),
               })
             )
@@ -188,9 +166,7 @@ export async function POST(request: NextRequest) {
           if (generationId) {
             await failGeneration(
               generationId,
-              error instanceof Error
-                ? error.message
-                : 'Generation failed'
+              error instanceof Error ? error.message : 'Generation failed'
             );
           }
           captureServerError(error, {
@@ -201,10 +177,7 @@ export async function POST(request: NextRequest) {
             encoder.encode(
               createSseEvent({
                 type: 'error',
-                message:
-                  error instanceof Error
-                    ? error.message
-                    : 'Stream failed',
+                message: error instanceof Error ? error.message : 'Stream failed',
                 timestamp: Date.now(),
               })
             )
@@ -225,21 +198,14 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     if (error instanceof APIError) {
-      return new Response(
-        JSON.stringify({ error: error.message }),
-        {
-          status: error.statusCode,
-          headers: { 'Content-Type': 'application/json' },
-        }
-      );
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: error.statusCode,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
     captureServerError(error, { route: '/api/generate' });
-    const message =
-      error instanceof Error
-        ? error.message
-        : 'Internal server error';
-    const status =
-      message === 'Authentication required' ? 401 : 500;
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    const status = message === 'Authentication required' ? 401 : 500;
     return new Response(JSON.stringify({ error: message }), {
       status,
       headers: { 'Content-Type': 'application/json' },
@@ -249,9 +215,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   const mcpEnabled = shouldUseMcpGateway();
-  const conversationEnabled = getFeatureFlag(
-    'ENABLE_CONVERSATION_MODE'
-  );
+  const conversationEnabled = getFeatureFlag('ENABLE_CONVERSATION_MODE');
   return new Response(
     JSON.stringify({
       message: 'UI Generation API',

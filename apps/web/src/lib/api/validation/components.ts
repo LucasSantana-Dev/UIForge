@@ -22,8 +22,11 @@ export const componentTypeEnum = z.enum([
 export const createComponentSchema = z.object({
   project_id: z.string().uuid(),
   name: z.string().min(1).max(100).transform(sanitizeText),
-  description: z.string().max(500).optional()
-    .transform((v) => v ? sanitizeText(v) : v),
+  description: z
+    .string()
+    .max(500)
+    .optional()
+    .transform((v) => (v ? sanitizeText(v) : v)),
   component_type: componentTypeEnum,
   framework: frameworkEnum,
   code_content: z.string(),

@@ -1,21 +1,11 @@
-import {
-  verifyProjectOwnership,
-  listProjects,
-} from '@/lib/services/project.service';
-import {
-  findProjectById,
-  listProjects as repoListProjects,
-} from '@/lib/repositories/project.repo';
+import { verifyProjectOwnership, listProjects } from '@/lib/services/project.service';
+import { findProjectById, listProjects as repoListProjects } from '@/lib/repositories/project.repo';
 import { ForbiddenError, NotFoundError } from '@/lib/api/errors';
 
 jest.mock('@/lib/repositories/project.repo');
 
-const mockFindProject = findProjectById as jest.MockedFunction<
-  typeof findProjectById
->;
-const mockListProjects = repoListProjects as jest.MockedFunction<
-  typeof repoListProjects
->;
+const mockFindProject = findProjectById as jest.MockedFunction<typeof findProjectById>;
+const mockListProjects = repoListProjects as jest.MockedFunction<typeof repoListProjects>;
 
 beforeEach(() => jest.clearAllMocks());
 
@@ -41,9 +31,7 @@ describe('verifyProjectOwnership', () => {
 
   it('throws NotFoundError when project missing', async () => {
     mockFindProject.mockResolvedValueOnce(null);
-    await expect(
-      verifyProjectOwnership('missing', 'user-1')
-    ).rejects.toThrow(NotFoundError);
+    await expect(verifyProjectOwnership('missing', 'user-1')).rejects.toThrow(NotFoundError);
   });
 
   it('throws ForbiddenError when user is not owner', async () => {
@@ -60,9 +48,7 @@ describe('verifyProjectOwnership', () => {
       created_at: '2026-01-01',
       updated_at: '2026-01-01',
     });
-    await expect(
-      verifyProjectOwnership('proj-1', 'user-1')
-    ).rejects.toThrow(ForbiddenError);
+    await expect(verifyProjectOwnership('proj-1', 'user-1')).rejects.toThrow(ForbiddenError);
   });
 });
 

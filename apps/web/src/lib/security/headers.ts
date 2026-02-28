@@ -27,13 +27,11 @@ function buildCSP(): string {
 export function securityHeaders(): Record<string, string> {
   return {
     'Content-Security-Policy': buildCSP(),
-    'Strict-Transport-Security':
-      'max-age=31536000; includeSubDomains; preload',
+    'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
     'X-Frame-Options': 'DENY',
     'X-Content-Type-Options': 'nosniff',
     'X-DNS-Prefetch-Control': 'off',
     'Referrer-Policy': 'strict-origin-when-cross-origin',
-    'Permissions-Policy':
-      'camera=(), microphone=(), geolocation=(), interest-cohort=()',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), interest-cohort=()',
   };
 }

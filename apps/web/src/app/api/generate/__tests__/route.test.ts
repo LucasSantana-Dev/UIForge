@@ -54,10 +54,6 @@ jest.mock('@/lib/usage/tracker', () => ({
   incrementGenerationCount: jest.fn().mockResolvedValue(undefined),
 }));
 
-
-
-
-
 function createRequest(body: any): NextRequest {
   return new NextRequest('http://localhost/api/generate', {
     method: 'POST',

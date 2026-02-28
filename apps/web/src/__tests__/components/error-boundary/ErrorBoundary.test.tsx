@@ -85,9 +85,7 @@ describe('RouteErrorBoundary', () => {
         <ThrowingChild shouldThrow={true} />
       </RouteErrorBoundary>
     );
-    expect(
-      screen.getByText(/The Generate page encountered an error/)
-    ).toBeDefined();
+    expect(screen.getByText(/The Generate page encountered an error/)).toBeDefined();
   });
 
   it('shows refresh and dashboard buttons', () => {

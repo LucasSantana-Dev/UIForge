@@ -18,9 +18,7 @@ export interface GenerationUpdate {
   error_message?: string;
 }
 
-export async function createGeneration(
-  data: GenerationInsert
-): Promise<string | null> {
+export async function createGeneration(data: GenerationInsert): Promise<string | null> {
   const supabase = await getClient();
   const { data: gen } = await supabase
     .from('generations')
@@ -33,10 +31,7 @@ export async function createGeneration(
   return gen?.id ?? null;
 }
 
-export async function updateGeneration(
-  id: string,
-  data: GenerationUpdate
-): Promise<void> {
+export async function updateGeneration(id: string, data: GenerationUpdate): Promise<void> {
   const supabase = await getClient();
   await supabase
     .from('generations')
@@ -56,15 +51,12 @@ export async function findGenerationById(
   return data as any;
 }
 
-export async function getParentGenerationId(
-  id: string
-): Promise<string | null> {
+export async function getParentGenerationId(id: string): Promise<string | null> {
   const supabase = await getClient();
-  const { data }: { data: { parent_generation_id: string | null } | null } =
-    await supabase
-      .from('generations')
-      .select('parent_generation_id' as any)
-      .eq('id', id)
-      .single();
+  const { data }: { data: { parent_generation_id: string | null } | null } = await supabase
+    .from('generations')
+    .select('parent_generation_id' as any)
+    .eq('id', id)
+    .single();
   return data?.parent_generation_id ?? null;
 }

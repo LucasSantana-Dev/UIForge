@@ -1,8 +1,4 @@
-import {
-  getAllowedOrigins,
-  isOriginAllowed,
-  corsHeaders,
-} from '@/lib/security/cors';
+import { getAllowedOrigins, isOriginAllowed, corsHeaders } from '@/lib/security/cors';
 
 describe('getAllowedOrigins', () => {
   const originalEnv = process.env;
@@ -16,21 +12,28 @@ describe('getAllowedOrigins', () => {
   });
 
   it('includes production origins', () => {
-    Object.defineProperty(process.env, 'NODE_ENV', { value: 'production', writable: true, configurable: true });
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'production',
+      writable: true,
+      configurable: true,
+    });
     const origins = getAllowedOrigins();
     expect(origins).toContain('https://siza.forgespace.co');
     expect(origins).toContain('https://dev.forgespace.co');
   });
 
   it('includes localhost in development', () => {
-    Object.defineProperty(process.env, 'NODE_ENV', { value: 'development', writable: true, configurable: true });
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'development',
+      writable: true,
+      configurable: true,
+    });
     const origins = getAllowedOrigins();
     expect(origins).toContain('http://localhost:3000');
   });
 
   it('includes custom origins from env', () => {
-    process.env.CORS_ALLOWED_ORIGINS =
-      'https://custom.example.com, https://other.example.com';
+    process.env.CORS_ALLOWED_ORIGINS = 'https://custom.example.com, https://other.example.com';
     const origins = getAllowedOrigins();
     expect(origins).toContain('https://custom.example.com');
     expect(origins).toContain('https://other.example.com');
@@ -43,15 +46,11 @@ describe('isOriginAllowed', () => {
   });
 
   it('returns true for production origin', () => {
-    expect(
-      isOriginAllowed('https://siza.forgespace.co')
-    ).toBe(true);
+    expect(isOriginAllowed('https://siza.forgespace.co')).toBe(true);
   });
 
   it('returns false for unknown origin', () => {
-    expect(
-      isOriginAllowed('https://evil.example.com')
-    ).toBe(false);
+    expect(isOriginAllowed('https://evil.example.com')).toBe(false);
   });
 });
 
@@ -61,9 +60,7 @@ describe('corsHeaders', () => {
       headers: { origin: 'https://siza.forgespace.co' },
     });
     const headers = corsHeaders(request);
-    expect(headers['Access-Control-Allow-Origin']).toBe(
-      'https://siza.forgespace.co'
-    );
+    expect(headers['Access-Control-Allow-Origin']).toBe('https://siza.forgespace.co');
     expect(headers['Vary']).toBe('Origin');
   });
 
@@ -80,11 +77,7 @@ describe('corsHeaders', () => {
       headers: { origin: 'https://siza.forgespace.co' },
     });
     const headers = corsHeaders(request);
-    expect(headers['Access-Control-Allow-Methods']).toContain(
-      'POST'
-    );
-    expect(headers['Access-Control-Allow-Methods']).toContain(
-      'GET'
-    );
+    expect(headers['Access-Control-Allow-Methods']).toContain('POST');
+    expect(headers['Access-Control-Allow-Methods']).toContain('GET');
   });
 });

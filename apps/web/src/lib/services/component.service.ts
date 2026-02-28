@@ -1,6 +1,4 @@
-import {
-  findComponentWithProject,
-} from '@/lib/repositories/component.repo';
+import { findComponentWithProject } from '@/lib/repositories/component.repo';
 import { ForbiddenError, NotFoundError } from '@/lib/api/errors';
 import {
   uploadToStorage,
@@ -15,9 +13,7 @@ export async function verifyProjectAccess(
   userId: string,
   requireOwnership = false
 ): Promise<any> {
-  const { findProjectById } = await import(
-    '@/lib/repositories/project.repo'
-  );
+  const { findProjectById } = await import('@/lib/repositories/project.repo');
   const project = await findProjectById(projectId);
 
   if (!project) {
@@ -28,14 +24,8 @@ export async function verifyProjectAccess(
     throw new ForbiddenError('You do not own this project');
   }
 
-  if (
-    !requireOwnership &&
-    project.user_id !== userId &&
-    !project.is_public
-  ) {
-    throw new ForbiddenError(
-      'You do not have access to this project'
-    );
+  if (!requireOwnership && project.user_id !== userId && !project.is_public) {
+    throw new ForbiddenError('You do not have access to this project');
   }
 
   return project;
@@ -57,29 +47,17 @@ export async function verifyComponentAccess(
     throw new ForbiddenError('You do not own this component');
   }
 
-  if (
-    !requireOwnership &&
-    project.user_id !== userId &&
-    !project.is_public
-  ) {
-    throw new ForbiddenError(
-      'You do not have access to this component'
-    );
+  if (!requireOwnership && project.user_id !== userId && !project.is_public) {
+    throw new ForbiddenError('You do not have access to this component');
   }
 
   return component;
 }
 
-export async function getComponentCode(
-  storagePath: string | null
-): Promise<string> {
+export async function getComponentCode(storagePath: string | null): Promise<string> {
   if (!storagePath) return '';
   try {
-    return (await downloadFromStorage(
-      STORAGE_BUCKETS.PROJECT_FILES,
-      storagePath,
-      true
-    )) as string;
+    return (await downloadFromStorage(STORAGE_BUCKETS.PROJECT_FILES, storagePath, true)) as string;
   } catch {
     return '';
   }
@@ -93,22 +71,14 @@ export async function storeComponentCode(
   existingPath?: string | null
 ): Promise<string> {
   const storagePath =
-    existingPath ||
-    generateComponentStoragePath(projectId, componentId, framework);
+    existingPath || generateComponentStoragePath(projectId, componentId, framework);
 
-  await uploadToStorage(
-    STORAGE_BUCKETS.PROJECT_FILES,
-    storagePath,
-    codeContent,
-    'text/plain'
-  );
+  await uploadToStorage(STORAGE_BUCKETS.PROJECT_FILES, storagePath, codeContent, 'text/plain');
 
   return storagePath;
 }
 
-export async function deleteComponentCode(
-  storagePath: string | null
-): Promise<void> {
+export async function deleteComponentCode(storagePath: string | null): Promise<void> {
   if (!storagePath) return;
   try {
     await deleteFromStorage(STORAGE_BUCKETS.PROJECT_FILES, storagePath);

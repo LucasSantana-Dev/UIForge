@@ -1,9 +1,4 @@
-import {
-  getClient,
-  paginationRange,
-  handleRepoError,
-  type PaginatedResult,
-} from './base.repo';
+import { getClient, paginationRange, handleRepoError, type PaginatedResult } from './base.repo';
 
 export interface ProjectRow {
   id: string;
@@ -19,13 +14,13 @@ export interface ProjectRow {
   updated_at: string;
 }
 
-export async function findProjectById(
-  projectId: string
-): Promise<ProjectRow | null> {
+export async function findProjectById(projectId: string): Promise<ProjectRow | null> {
   const supabase = await getClient();
   const { data, error } = await supabase
     .from('projects')
-    .select('id, user_id, is_public, framework, name, description, component_library, is_template, thumbnail_url, created_at, updated_at')
+    .select(
+      'id, user_id, is_public, framework, name, description, component_library, is_template, thumbnail_url, created_at, updated_at'
+    )
     .eq('id', projectId)
     .single();
   if (error || !data) return null;
@@ -59,9 +54,7 @@ export async function listProjects(
     query = query.eq('framework', framework);
   }
 
-  query = query
-    .order('updated_at', { ascending: false })
-    .range(from, to);
+  query = query.order('updated_at', { ascending: false }).range(from, to);
 
   const { data, error, count } = await query;
   if (error) {
@@ -78,9 +71,7 @@ export async function listProjects(
   };
 }
 
-export async function insertProject(
-  data: Record<string, unknown>
-): Promise<ProjectRow> {
+export async function insertProject(data: Record<string, unknown>): Promise<ProjectRow> {
   const supabase = await getClient();
   const { data: project, error } = await supabase
     .from('projects')
@@ -112,10 +103,7 @@ export async function updateProject(
 
 export async function deleteProject(id: string): Promise<void> {
   const supabase = await getClient();
-  const { error } = await supabase
-    .from('projects')
-    .delete()
-    .eq('id', id);
+  const { error } = await supabase.from('projects').delete().eq('id', id);
   if (error) {
     handleRepoError(error, 'deleteProject');
   }

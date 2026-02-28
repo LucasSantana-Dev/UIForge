@@ -17,8 +17,7 @@ export function QuotaGuard({ error, usage, isQuotaExceeded }: QuotaGuardProps) {
   return (
     <>
       {error &&
-        (error.toLowerCase().includes('quota') ||
-        error.toLowerCase().includes('limit reached') ? (
+        (error.toLowerCase().includes('quota') || error.toLowerCase().includes('limit reached') ? (
           <UpgradePrompt resource="Generation" />
         ) : (
           <div className="rounded-md border border-red-800 bg-red-900/20 px-4 py-3 text-sm text-red-400">

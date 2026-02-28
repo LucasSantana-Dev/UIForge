@@ -20,18 +20,12 @@ export interface PaginatedResult<T> {
   hasMore: boolean;
 }
 
-export function paginationRange(
-  page = 1,
-  limit = 20
-): { from: number; to: number } {
+export function paginationRange(page = 1, limit = 20): { from: number; to: number } {
   const from = (page - 1) * limit;
   return { from, to: from + limit - 1 };
 }
 
-export function handleRepoError(
-  error: unknown,
-  context: string
-): never {
+export function handleRepoError(error: unknown, context: string): never {
   captureServerError(error, { extra: { repository: context } });
   throw error;
 }

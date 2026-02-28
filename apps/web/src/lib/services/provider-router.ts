@@ -30,9 +30,7 @@ export async function* routeGeneration(
   }
 }
 
-async function* routeViaMcp(
-  opts: RouteGenerationOptions
-): AsyncGenerator<GenerationEvent> {
+async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
   yield { type: 'start', timestamp: Date.now() };
 
   let mcpCode = '';
@@ -82,9 +80,7 @@ async function* routeViaMcp(
   }
 }
 
-async function* routeViaProvider(
-  opts: RouteGenerationOptions
-): AsyncGenerator<GenerationEvent> {
+async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
   for await (const event of generateWithProvider({
     provider: opts.provider as AIProvider,
     model: opts.model,

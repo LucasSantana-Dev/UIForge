@@ -10,31 +10,17 @@ jest.mock('@/components/billing/UpgradePrompt', () => ({
 
 describe('QuotaGuard', () => {
   it('renders nothing when no error and not exceeded', () => {
-    const { container } = render(
-      <QuotaGuard error={null} usage={null} isQuotaExceeded={false} />
-    );
+    const { container } = render(<QuotaGuard error={null} usage={null} isQuotaExceeded={false} />);
     expect(container.textContent).toBe('');
   });
 
   it('shows upgrade prompt for quota errors', () => {
-    render(
-      <QuotaGuard
-        error="Generation quota exceeded"
-        usage={null}
-        isQuotaExceeded={false}
-      />
-    );
+    render(<QuotaGuard error="Generation quota exceeded" usage={null} isQuotaExceeded={false} />);
     expect(screen.getByTestId('upgrade-prompt')).toBeDefined();
   });
 
   it('shows error message for non-quota errors', () => {
-    render(
-      <QuotaGuard
-        error="Network error"
-        usage={null}
-        isQuotaExceeded={false}
-      />
-    );
+    render(<QuotaGuard error="Network error" usage={null} isQuotaExceeded={false} />);
     expect(screen.getByText('Network error')).toBeDefined();
   });
 

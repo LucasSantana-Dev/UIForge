@@ -111,7 +111,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       .single();
 
     if (error) {
-    captureServerError(error, { route: '/api/generations/[id]' });
+      captureServerError(error, { route: '/api/generations/[id]' });
       return errorResponse('Failed to update generation', 500);
     }
 
@@ -161,7 +161,7 @@ export async function DELETE(
     const { error } = await supabase.from('generations').delete().eq('id', generationId);
 
     if (error) {
-    captureServerError(error, { route: '/api/generations/[id]' });
+      captureServerError(error, { route: '/api/generations/[id]' });
       return errorResponse('Failed to delete generation', 500);
     }
 

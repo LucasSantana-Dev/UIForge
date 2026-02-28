@@ -1,14 +1,9 @@
-import {
-  findGenerationById,
-  getParentGenerationId,
-} from '@/lib/repositories/generation.repo';
+import { findGenerationById, getParentGenerationId } from '@/lib/repositories/generation.repo';
 import { NotFoundError, ValidationError } from '@/lib/api/errors';
 
 export const MAX_CONVERSATION_DEPTH = 10;
 
-export async function getConversationDepth(
-  parentId: string
-): Promise<number> {
+export async function getConversationDepth(parentId: string): Promise<number> {
   let depth = 0;
   let currentId: string | null = parentId;
 
@@ -22,9 +17,7 @@ export async function getConversationDepth(
   return depth;
 }
 
-export async function validateConversation(
-  parentGenerationId: string
-): Promise<void> {
+export async function validateConversation(parentGenerationId: string): Promise<void> {
   const parentGen = await findGenerationById(parentGenerationId);
 
   if (!parentGen) {

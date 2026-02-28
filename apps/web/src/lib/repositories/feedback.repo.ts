@@ -17,9 +17,7 @@ export interface FeedbackInsert {
   metadata?: Record<string, unknown>;
 }
 
-export async function insertFeedback(
-  data: FeedbackInsert
-): Promise<string> {
+export async function insertFeedback(data: FeedbackInsert): Promise<string> {
   const supabase = await getClient();
   const { data: row, error } = await supabase
     .from('ml_feedback')
@@ -27,17 +25,12 @@ export async function insertFeedback(
     .select('id')
     .single();
   if (error || !row) {
-    handleRepoError(
-      error || new Error('Insert returned no data'),
-      'insertFeedback'
-    );
+    handleRepoError(error || new Error('Insert returned no data'), 'insertFeedback');
   }
   return (row as any).id;
 }
 
-export async function findFeedbackByGeneration(
-  generationId: string
-): Promise<any[]> {
+export async function findFeedbackByGeneration(generationId: string): Promise<any[]> {
   const supabase = await getClient();
   const { data, error } = await supabase
     .from('ml_feedback')
@@ -50,10 +43,7 @@ export async function findFeedbackByGeneration(
   return data || [];
 }
 
-export async function findFeedbackByUser(
-  userId: string,
-  limit = 50
-): Promise<any[]> {
+export async function findFeedbackByUser(userId: string, limit = 50): Promise<any[]> {
   const supabase = await getClient();
   const { data, error } = await supabase
     .from('ml_feedback')

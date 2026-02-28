@@ -3,17 +3,16 @@ import { createClient } from '@/lib/supabase/server';
 import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, createdResponse, errorResponse } from '@/lib/api/response';
-import { UnauthorizedError, ForbiddenError, NotFoundError, ValidationError } from '@/lib/api/errors';
+import {
+  UnauthorizedError,
+  ForbiddenError,
+  NotFoundError,
+  ValidationError,
+} from '@/lib/api/errors';
 import { captureServerError } from '@/lib/sentry/server';
-import {
-  createComponentSchema,
-  componentQuerySchema,
-} from '@/lib/api/validation/components';
+import { createComponentSchema, componentQuerySchema } from '@/lib/api/validation/components';
 import { validateFileSize, STORAGE_LIMITS } from '@/lib/api/storage';
-import {
-  verifyProjectAccess,
-  storeComponentCode,
-} from '@/lib/services/component.service';
+import { verifyProjectAccess, storeComponentCode } from '@/lib/services/component.service';
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,9 +25,7 @@ export async function GET(request: NextRequest) {
 
     const { user } = await verifySession();
     const { searchParams } = new URL(request.url);
-    const validated = componentQuerySchema.parse(
-      Object.fromEntries(searchParams.entries())
-    );
+    const validated = componentQuerySchema.parse(Object.fromEntries(searchParams.entries()));
 
     await verifyProjectAccess(validated.project_id, user.id);
 
@@ -113,7 +110,10 @@ export async function POST(request: NextRequest) {
 
     try {
       const storagePath = await storeComponentCode(
-        validated.project_id, component.id, validated.framework, code_content
+        validated.project_id,
+        component.id,
+        validated.framework,
+        code_content
       );
 
       const { error: updateError } = await supabase

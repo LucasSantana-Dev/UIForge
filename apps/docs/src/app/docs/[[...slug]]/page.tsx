@@ -11,20 +11,19 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
   const Mdx = page.data.body;
 
   return (
-    <DocsPage
-      toc={page.data.toc}
-      full={page.data.full}
-    >
+    <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsBody>
         <div className="prose-docs" style={{ maxWidth: '65ch' }}>
           <h1>{page.data.title}</h1>
           {page.data.description && (
-            <p style={{
-              color: 'rgb(var(--color-fd-muted-foreground))',
-              fontSize: '1.125rem',
-              lineHeight: 1.7,
-              marginBottom: '2rem',
-            }}>
+            <p
+              style={{
+                color: 'rgb(var(--color-fd-muted-foreground))',
+                fontSize: '1.125rem',
+                lineHeight: 1.7,
+                marginBottom: '2rem',
+              }}
+            >
               {page.data.description}
             </p>
           )}

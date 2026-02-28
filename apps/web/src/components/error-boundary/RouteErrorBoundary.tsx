@@ -14,14 +14,12 @@ export function RouteErrorBoundary({ children, routeName }: RouteErrorBoundaryPr
       fallback={
         <div className="flex flex-col items-center justify-center min-h-[400px] gap-6 p-8">
           <div className="text-center max-w-md">
-            <h2 className="text-2xl font-bold text-text-primary mb-2">
-              Oops! Something broke
-            </h2>
+            <h2 className="text-2xl font-bold text-text-primary mb-2">Oops! Something broke</h2>
             <p className="text-text-secondary">
               {routeName
                 ? `The ${routeName} page encountered an error.`
-                : 'This page encountered an error.'}
-              {' '}Please try refreshing, or go back to the dashboard.
+                : 'This page encountered an error.'}{' '}
+              Please try refreshing, or go back to the dashboard.
             </p>
           </div>
           <div className="flex gap-3">

@@ -1,7 +1,4 @@
-import {
-  createGeneration,
-  updateGeneration,
-} from '@/lib/repositories/generation.repo';
+import { createGeneration, updateGeneration } from '@/lib/repositories/generation.repo';
 import { enrichPromptWithContext } from './context-enrichment';
 import { storeGenerationEmbedding } from './embeddings';
 import { runAllGates, type QualityReport } from '@/lib/quality/gates';
@@ -47,9 +44,7 @@ export function buildDesignContext(params: DesignContextParams): string {
     parts.push(params.spacing + ' spacing');
   }
   if (params.borderRadius) {
-    parts.push(
-      'border-radius ' + (BORDER_RADIUS_MAP[params.borderRadius] || '8px')
-    );
+    parts.push('border-radius ' + (BORDER_RADIUS_MAP[params.borderRadius] || '8px'));
   }
   if (params.typography && params.typography !== 'system') {
     parts.push(params.typography + ' typography');
@@ -126,10 +121,7 @@ export async function completeGeneration(
   });
 }
 
-export async function failGeneration(
-  generationId: string,
-  errorMessage: string
-): Promise<void> {
+export async function failGeneration(generationId: string, errorMessage: string): Promise<void> {
   await updateGeneration(generationId, {
     status: 'failed',
     error_message: errorMessage,
@@ -159,16 +151,10 @@ export interface ConversationContext {
   refinementPrompt: string;
 }
 
-export function buildStreamPrompt(
-  description: string,
-  ctx?: ConversationContext
-): string {
+export function buildStreamPrompt(description: string, ctx?: ConversationContext): string {
   if (ctx) {
     return (
-      'Previous code:\n```\n' +
-      ctx.previousCode +
-      '\n```\n\nRefinement: ' +
-      ctx.refinementPrompt
+      'Previous code:\n```\n' + ctx.previousCode + '\n```\n\nRefinement: ' + ctx.refinementPrompt
     );
   }
   return description;

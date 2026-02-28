@@ -24,15 +24,9 @@ jest.mock('@/lib/api/storage');
 const mockFindComponent = findComponentWithProject as jest.MockedFunction<
   typeof findComponentWithProject
 >;
-const mockDownload = downloadFromStorage as jest.MockedFunction<
-  typeof downloadFromStorage
->;
-const mockUpload = uploadToStorage as jest.MockedFunction<
-  typeof uploadToStorage
->;
-const mockDelete = deleteFromStorage as jest.MockedFunction<
-  typeof deleteFromStorage
->;
+const mockDownload = downloadFromStorage as jest.MockedFunction<typeof downloadFromStorage>;
+const mockUpload = uploadToStorage as jest.MockedFunction<typeof uploadToStorage>;
+const mockDelete = deleteFromStorage as jest.MockedFunction<typeof deleteFromStorage>;
 const mockGenPath = generateComponentStoragePath as jest.MockedFunction<
   typeof generateComponentStoragePath
 >;
@@ -40,9 +34,7 @@ const mockGenPath = generateComponentStoragePath as jest.MockedFunction<
 beforeEach(() => jest.clearAllMocks());
 
 async function getMockFindProject() {
-  const { findProjectById } = await import(
-    '@/lib/repositories/project.repo'
-  );
+  const { findProjectById } = await import('@/lib/repositories/project.repo');
   return findProjectById as jest.MockedFunction<typeof findProjectById>;
 }
 
@@ -61,9 +53,7 @@ describe('verifyProjectAccess', () => {
   it('throws NotFoundError when project missing', async () => {
     const mockFind = await getMockFindProject();
     mockFind.mockResolvedValueOnce(null);
-    await expect(
-      verifyProjectAccess('missing', 'user-1')
-    ).rejects.toThrow(NotFoundError);
+    await expect(verifyProjectAccess('missing', 'user-1')).rejects.toThrow(NotFoundError);
   });
 
   it('throws ForbiddenError when ownership required and not owner', async () => {
@@ -73,9 +63,7 @@ describe('verifyProjectAccess', () => {
       user_id: 'other',
       is_public: true,
     } as any);
-    await expect(
-      verifyProjectAccess('proj-1', 'user-1', true)
-    ).rejects.toThrow(ForbiddenError);
+    await expect(verifyProjectAccess('proj-1', 'user-1', true)).rejects.toThrow(ForbiddenError);
   });
 
   it('allows non-owner access to public project', async () => {
@@ -96,9 +84,7 @@ describe('verifyProjectAccess', () => {
       user_id: 'other',
       is_public: false,
     } as any);
-    await expect(
-      verifyProjectAccess('proj-1', 'user-1', false)
-    ).rejects.toThrow(ForbiddenError);
+    await expect(verifyProjectAccess('proj-1', 'user-1', false)).rejects.toThrow(ForbiddenError);
   });
 });
 
@@ -120,9 +106,7 @@ describe('verifyComponentAccess', () => {
 
   it('throws NotFoundError when component missing', async () => {
     mockFindComponent.mockResolvedValueOnce(null);
-    await expect(
-      verifyComponentAccess('missing', 'user-1')
-    ).rejects.toThrow(NotFoundError);
+    await expect(verifyComponentAccess('missing', 'user-1')).rejects.toThrow(NotFoundError);
   });
 
   it('throws ForbiddenError when ownership required and not owner', async () => {
@@ -136,9 +120,7 @@ describe('verifyComponentAccess', () => {
       description: null,
       projects: { user_id: 'other', is_public: false, framework: 'react' },
     });
-    await expect(
-      verifyComponentAccess('comp-1', 'user-1', true)
-    ).rejects.toThrow(ForbiddenError);
+    await expect(verifyComponentAccess('comp-1', 'user-1', true)).rejects.toThrow(ForbiddenError);
   });
 });
 
@@ -187,13 +169,7 @@ describe('storeComponentCode', () => {
 
   it('uses existing path when provided', async () => {
     mockUpload.mockResolvedValueOnce({ path: 'projects/p1/components/c1/code.tsx' });
-    const path = await storeComponentCode(
-      'p1',
-      'c1',
-      'react',
-      'code',
-      'existing/path.tsx'
-    );
+    const path = await storeComponentCode('p1', 'c1', 'react', 'code', 'existing/path.tsx');
     expect(path).toBe('existing/path.tsx');
     expect(mockGenPath).not.toHaveBeenCalled();
   });
@@ -208,16 +184,11 @@ describe('deleteComponentCode', () => {
   it('deletes from storage', async () => {
     mockDelete.mockResolvedValueOnce(undefined);
     await deleteComponentCode('path/to/code.tsx');
-    expect(mockDelete).toHaveBeenCalledWith(
-      STORAGE_BUCKETS.PROJECT_FILES,
-      'path/to/code.tsx'
-    );
+    expect(mockDelete).toHaveBeenCalledWith(STORAGE_BUCKETS.PROJECT_FILES, 'path/to/code.tsx');
   });
 
   it('swallows deletion errors gracefully', async () => {
     mockDelete.mockRejectedValueOnce(new Error('Storage unavailable'));
-    await expect(
-      deleteComponentCode('path/to/code.tsx')
-    ).resolves.toBeUndefined();
+    await expect(deleteComponentCode('path/to/code.tsx')).resolves.toBeUndefined();
   });
 });

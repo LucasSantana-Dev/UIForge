@@ -1,8 +1,4 @@
-import {
-  sanitizeText,
-  sanitizeHtml,
-  escapeForAttribute,
-} from '@/lib/security/sanitize';
+import { sanitizeText, sanitizeHtml, escapeForAttribute } from '@/lib/security/sanitize';
 
 describe('sanitizeText', () => {
   it('strips HTML tags', () => {
@@ -10,15 +6,11 @@ describe('sanitizeText', () => {
   });
 
   it('strips script tags with content', () => {
-    expect(
-      sanitizeText('hello<script>alert("xss")</script>world')
-    ).toBe('helloworld');
+    expect(sanitizeText('hello<script>alert("xss")</script>world')).toBe('helloworld');
   });
 
   it('strips event handlers', () => {
-    expect(
-      sanitizeText('<div onload="alert(1)">content</div>')
-    ).toBe('content');
+    expect(sanitizeText('<div onload="alert(1)">content</div>')).toBe('content');
   });
 
   it('preserves plain text', () => {
@@ -30,9 +22,7 @@ describe('sanitizeText', () => {
   });
 
   it('handles nested tags', () => {
-    expect(
-      sanitizeText('<div><span>text</span></div>')
-    ).toBe('text');
+    expect(sanitizeText('<div><span>text</span></div>')).toBe('text');
   });
 
   it('handles empty string', () => {
@@ -40,25 +30,17 @@ describe('sanitizeText', () => {
   });
 
   it('strips multiple script tags', () => {
-    expect(
-      sanitizeText(
-        '<script>a</script>safe<script>b</script>'
-      )
-    ).toBe('safe');
+    expect(sanitizeText('<script>a</script>safe<script>b</script>')).toBe('safe');
   });
 });
 
 describe('sanitizeHtml', () => {
   it('removes script tags but keeps other HTML', () => {
-    expect(
-      sanitizeHtml('<b>bold</b><script>xss</script>')
-    ).toBe('<b>bold</b>');
+    expect(sanitizeHtml('<b>bold</b><script>xss</script>')).toBe('<b>bold</b>');
   });
 
   it('removes event handlers', () => {
-    expect(
-      sanitizeHtml('<div onclick="alert(1)">click</div>')
-    ).toBe('<div >click</div>');
+    expect(sanitizeHtml('<div onclick="alert(1)">click</div>')).toBe('<div >click</div>');
   });
 });
 
@@ -72,9 +54,7 @@ describe('escapeForAttribute', () => {
   });
 
   it('escapes angle brackets', () => {
-    expect(escapeForAttribute('<script>')).toBe(
-      '&lt;script&gt;'
-    );
+    expect(escapeForAttribute('<script>')).toBe('&lt;script&gt;');
   });
 
   it('escapes single quotes', () => {
