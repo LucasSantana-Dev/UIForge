@@ -10,7 +10,7 @@ const ALLOWED_CONNECT_DOMAINS = [
 function buildCSP(): string {
   const directives = [
     "default-src 'self'",
-    "script-src 'self' https://js.stripe.com",
+    "script-src 'self' 'unsafe-inline' https://js.stripe.com",
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https://*.supabase.co",
     "font-src 'self' data:",
