@@ -843,13 +843,13 @@ function createReactPreviewHTML(code: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"><\/script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
   ${TAILWIND_SHADCN_CONFIG}
-  <\/script>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin><\/script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin><\/script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"><\/script>
+  </script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     ${SHADCN_CSS_VARS}
     * { margin: 0; box-sizing: border-box; }
@@ -869,16 +869,16 @@ function createReactPreviewHTML(code: string): string {
       document.getElementById('root').style.display = 'none';
       return true;
     };
-  <\/script>
+  </script>
   <script type="text/babel" data-type="module">
     try {
       const { useState, useEffect, useRef, useCallback, useMemo, useContext, createContext, forwardRef, memo, Fragment } = React;
 
 ${LIBRARY_SHIMS}
 
-      \${strippedCode}
+      ${strippedCode}
 
-      const App = \${componentName};
+      const App = ${componentName};
       const root = ReactDOM.createRoot(document.getElementById('root'));
       root.render(React.createElement(App));
     } catch (err) {
@@ -887,7 +887,7 @@ ${LIBRARY_SHIMS}
       errorDiv.textContent = err.message;
       document.getElementById('root').style.display = 'none';
     }
-  <\/script>
+  </script>
 </body>
 </html>`;
 }
@@ -902,8 +902,8 @@ function createVuePreviewHTML(code: string): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"><\/script>
-  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"><\/script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
   <style>
     body { margin: 0; padding: 16px; font-family: system-ui, -apple-system, sans-serif; }
     #error-display { color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; padding: 16px; border-radius: 8px; font-size: 13px; font-family: monospace; white-space: pre-wrap; display: none; margin: 16px; }
@@ -925,7 +925,7 @@ function createVuePreviewHTML(code: string): string {
     try {
       const { createApp, ref, reactive, computed, watch, watchEffect, onMounted, onUnmounted, defineComponent, h, toRefs, nextTick } = Vue;
 
-      \${processed}
+      ${processed}
 
       var component = (typeof __VueComponent__ !== 'undefined') ? __VueComponent__ : null;
 
@@ -948,7 +948,7 @@ function createVuePreviewHTML(code: string): string {
       errorDiv.textContent = err.message;
       document.getElementById('app').style.display = 'none';
     }
-  <\/script>
+  </script>
 </body>
 </html>`;
 }
@@ -967,8 +967,8 @@ function createFallbackHTML(code: string, framework: string): string {
   </style>
 </head>
 <body>
-  <span class="badge">\${framework} preview</span>
-  <pre><code>\${escaped}</code></pre>
+  <span class="badge">${framework} preview</span>
+  <pre><code>${escaped}</code></pre>
 </body>
 </html>`;
 }
