@@ -13,7 +13,7 @@ interface ProjectCardProps {
 
 export default function ProjectCard({ project }: ProjectCardProps) {
   return (
-    <div className="bg-surface-1 rounded-lg border border-surface-3 hover:border-brand transition-colors overflow-hidden group">
+    <div className="bg-surface-1 rounded-xl border border-surface-3 shadow-card transition-all duration-200 ease-siza hover:shadow-card-hover hover:-translate-y-0.5 hover:border-[var(--border-hover)] overflow-hidden group">
       <Link href={`/projects/${project.id}`}>
         <div className="aspect-video bg-surface-2 flex items-center justify-center">
           {project.thumbnail_url ? (
@@ -32,7 +32,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
       <div className="p-4">
         <div className="flex items-start justify-between">
           <Link href={`/projects/${project.id}`} className="flex-1">
-            <h3 className="text-lg font-semibold text-text-primary hover:text-brand-light">
+            <h3 className="text-lg font-semibold text-text-primary hover:text-brand-light transition-colors">
               {project.name}
             </h3>
             {project.description && (

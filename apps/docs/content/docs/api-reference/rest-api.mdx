@@ -24,14 +24,14 @@ All endpoints return errors in this format:
 }
 ```
 
-| Status | Meaning                                  |
-| ------ | ---------------------------------------- |
-| `400`  | Invalid request body or parameters       |
-| `401`  | Missing or invalid authentication        |
-| `403`  | Insufficient permissions (RLS policy)    |
-| `404`  | Resource not found                       |
-| `429`  | Rate limit exceeded                      |
-| `500`  | Internal server error                    |
+| Status | Meaning                               |
+| ------ | ------------------------------------- |
+| `400`  | Invalid request body or parameters    |
+| `401`  | Missing or invalid authentication     |
+| `403`  | Insufficient permissions (RLS policy) |
+| `404`  | Resource not found                    |
+| `429`  | Rate limit exceeded                   |
+| `500`  | Internal server error                 |
 
 ## Generation
 
@@ -51,13 +51,13 @@ Generate UI components via AI. Streams the response using Server-Sent Events (SS
 }
 ```
 
-| Field       | Type   | Required | Description                                       |
-| ----------- | ------ | -------- | ------------------------------------------------- |
-| `prompt`    | string | yes      | Natural language description                      |
-| `framework` | string | yes      | `react`, `vue`, `svelte`, `angular`, `html`       |
-| `projectId` | string | yes      | UUID of the project                               |
-| `provider`  | string | no       | `gemini` (default), `anthropic`, `openai`         |
-| `model`     | string | no       | Provider-specific model ID                        |
+| Field       | Type   | Required | Description                                 |
+| ----------- | ------ | -------- | ------------------------------------------- |
+| `prompt`    | string | yes      | Natural language description                |
+| `framework` | string | yes      | `react`, `vue`, `svelte`, `angular`, `html` |
+| `projectId` | string | yes      | UUID of the project                         |
+| `provider`  | string | no       | `gemini` (default), `anthropic`, `openai`   |
+| `model`     | string | no       | Provider-specific model ID                  |
 
 **Response:** SSE stream with events:
 

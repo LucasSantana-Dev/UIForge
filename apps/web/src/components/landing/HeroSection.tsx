@@ -91,7 +91,11 @@ export function HeroSection({ user }: HeroSectionProps) {
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE_SIZA, delay: 0.1 }}
+          transition={{
+            duration: 0.8,
+            ease: EASE_SIZA,
+            delay: 0.1,
+          }}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mt-6"
         >
           An ecosystem that enables{' '}
@@ -103,7 +107,11 @@ export function HeroSection({ user }: HeroSectionProps) {
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE_SIZA, delay: 0.2 }}
+          transition={{
+            duration: 0.8,
+            ease: EASE_SIZA,
+            delay: 0.2,
+          }}
           className="text-lg text-[#A1A1AA] max-w-xl mx-auto mt-6"
         >
           From zero to production. AI-powered generation, intelligent routing, and edge deployment —
@@ -113,21 +121,26 @@ export function HeroSection({ user }: HeroSectionProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE_SIZA, delay: 0.3 }}
+          transition={{
+            duration: 0.8,
+            ease: EASE_SIZA,
+            delay: 0.3,
+          }}
           className="flex flex-col sm:flex-row gap-4 justify-center mt-10"
         >
           <Link
             href={user ? '/generate' : '/signin'}
-            className="inline-flex items-center gap-2 bg-[#7C3AED] hover:bg-[#8B5CF6] text-white rounded-lg px-6 py-3 text-sm font-medium transition-colors"
+            className="group relative inline-flex items-center gap-2 bg-[#7C3AED] text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-[#8B5CF6] hover:shadow-[0_8px_24px_rgba(124,58,237,0.4)] hover:-translate-y-0.5 overflow-hidden"
           >
-            {user ? 'Go to Dashboard' : 'Get Started Free'}
-            <ArrowRight className="w-4 h-4" />
+            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+            <span className="relative">{user ? 'Go to Dashboard' : 'Get Started Free'}</span>
+            <ArrowRight className="relative w-4 h-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
           <Link
             href="https://github.com/Forge-Space"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 border border-[#27272A] rounded-lg px-6 py-3 text-sm font-medium text-[#FAFAFA] hover:bg-[#27272A]/50 transition-colors"
+            className="inline-flex items-center gap-2 border border-[#27272A] rounded-lg px-6 py-3 text-sm font-medium text-[#FAFAFA] hover:bg-[#27272A]/50 hover:border-[var(--border-hover)] transition-all duration-200"
           >
             <Github className="w-4 h-4" />
             View on GitHub
@@ -137,8 +150,12 @@ export function HeroSection({ user }: HeroSectionProps) {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: EASE_SIZA, delay: 0.5 }}
-          className="max-w-2xl mx-auto rounded-xl border border-[#27272A] bg-[#18181B] overflow-hidden mt-16"
+          transition={{
+            duration: 0.8,
+            ease: EASE_SIZA,
+            delay: 0.5,
+          }}
+          className="max-w-2xl mx-auto rounded-xl border border-[#27272A] bg-[#18181B] overflow-hidden mt-16 shadow-card hover:shadow-card-hover transition-all duration-300"
         >
           <div className="flex items-center gap-2 px-4 py-3 border-b border-[#27272A]">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500 opacity-60" />

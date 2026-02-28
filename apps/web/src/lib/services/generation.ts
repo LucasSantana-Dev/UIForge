@@ -23,6 +23,11 @@ export interface MultiProviderOptions {
   contextAddition?: string;
   imageBase64?: string;
   imageMimeType?: string;
+  conversationContext?: {
+    previousCode: string;
+    refinementPrompt: string;
+    originalPrompt: string;
+  };
 }
 
 function buildPrompt(options: MultiProviderOptions): string {

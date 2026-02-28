@@ -27,13 +27,13 @@ graph TB
 
 The main application. A Turborepo monorepo with web, desktop, docs, and shared UI.
 
-| App            | Purpose                                                |
-| -------------- | ------------------------------------------------------ |
-| `apps/web`     | Next.js frontend (dashboard, editor, preview, billing) |
-| `apps/desktop` | Electron desktop app with local MCP + Ollama           |
-| `apps/docs`    | Fumadocs documentation site                            |
-| `apps/api`     | Cloudflare Workers API with AI provider integrations   |
-| `packages/ui`  | Shared `@siza/ui` component library (shadcn/ui + Radix)|
+| App            | Purpose                                                 |
+| -------------- | ------------------------------------------------------- |
+| `apps/web`     | Next.js frontend (dashboard, editor, preview, billing)  |
+| `apps/desktop` | Electron desktop app with local MCP + Ollama            |
+| `apps/docs`    | Fumadocs documentation site                             |
+| `apps/api`     | Cloudflare Workers API with AI provider integrations    |
+| `packages/ui`  | Shared `@siza/ui` component library (shadcn/ui + Radix) |
 
 **Stack:** Next.js 16, React 19, Electron, Supabase, Stripe, Tailwind CSS, shadcn/ui, Monaco Editor
 
@@ -111,7 +111,7 @@ User -> Stripe Checkout -> Webhook -> Supabase sync -> Plan limits enforced
 
 | Layer    | Technology                                               |
 | -------- | -------------------------------------------------------- |
-| Frontend | Next.js 16, React 19, Electron, Tailwind CSS, shadcn/ui |
+| Frontend | Next.js 16, React 19, Electron, Tailwind CSS, shadcn/ui  |
 | Backend  | Cloudflare Workers, Supabase (Postgres + Auth + Storage) |
 | AI       | Google Gemini, Anthropic Claude, OpenAI GPT, Ollama      |
 | MCP      | TypeScript MCP server, SQLite (RAG), vector search       |

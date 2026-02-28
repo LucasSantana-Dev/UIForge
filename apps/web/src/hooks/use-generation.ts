@@ -14,6 +14,8 @@ export interface UseGenerationState {
   error: string | null;
   events: GenerationEvent[];
   qualityReport: QualityReport | null;
+  parentGenerationId: string | null;
+  conversationTurn: number;
 }
 
 export function useGeneration(projectId?: string) {
@@ -24,6 +26,8 @@ export function useGeneration(projectId?: string) {
     error: null,
     events: [],
     qualityReport: null,
+    parentGenerationId: null,
+    conversationTurn: 0,
   });
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -48,6 +52,8 @@ export function useGeneration(projectId?: string) {
           error: null,
           events: [],
           qualityReport: null,
+          parentGenerationId: null,
+          conversationTurn: 0,
         });
 
         abortControllerRef.current = new AbortController();
@@ -152,10 +158,31 @@ export function useGeneration(projectId?: string) {
       error: null,
       events: [],
       qualityReport: null,
+      parentGenerationId: null,
+      conversationTurn: 0,
     });
   }, []);
 
-  return { ...state, startGeneration, stopGeneration, reset };
+  const startRefinement = useCallback(
+    async (
+      refinementPrompt: string,
+      options: GenerationOptions & {
+        componentName: string;
+        prompt: string;
+        provider?: string;
+        model?: string;
+        apiKey?: string;
+      }
+    ) => {
+      await startGeneration({
+        ...options,
+        prompt: `Refine this component: ${refinementPrompt}\n\nOriginal: ${options.prompt}`,
+      });
+    },
+    [startGeneration]
+  );
+
+  return { ...state, startGeneration, startRefinement, stopGeneration, reset };
 }
 
 export interface UseGenerationProgressProps {

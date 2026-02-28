@@ -18,6 +18,7 @@ import { isMcpConfigured, generateComponent } from '@/lib/mcp/client';
 export const dynamic = 'force-dynamic';
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_CONVERSATION_DEPTH = 10;
 
 const generateSchema = z.object({
   description: z.string().min(10).max(2000),
@@ -48,6 +49,9 @@ const generateSchema = z.object({
   spacing: z.enum(['compact', 'default', 'spacious']).optional(),
   borderRadius: z.enum(['none', 'small', 'medium', 'large', 'full']).optional(),
   typography: z.enum(['system', 'sans', 'serif', 'mono']).optional(),
+  parentGenerationId: z.string().uuid().optional(),
+  previousCode: z.string().max(50000).optional(),
+  refinementPrompt: z.string().min(3).max(1000).optional(),
 });
 
 function shouldUseMcpGateway(): boolean {
@@ -56,6 +60,28 @@ function shouldUseMcpGateway(): boolean {
 
 function createSseEvent(data: object): string {
   return `data: ${JSON.stringify(data)}\n\n`;
+}
+
+async function getConversationDepth(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  generationId: string
+): Promise<number> {
+  let depth = 0;
+  let currentId: string | null = generationId;
+
+  while (currentId && depth < MAX_CONVERSATION_DEPTH) {
+    const { data }: { data: { parent_generation_id: string | null } | null } = await supabase
+      .from('generations')
+      .select('parent_generation_id')
+      .eq('id', currentId)
+      .single();
+
+    if (!data?.parent_generation_id) break;
+    currentId = data.parent_generation_id;
+    depth++;
+  }
+
+  return depth;
 }
 
 export async function POST(request: NextRequest) {
@@ -119,7 +145,38 @@ export async function POST(request: NextRequest) {
       spacing,
       borderRadius,
       typography,
+      parentGenerationId,
+      previousCode,
+      refinementPrompt,
     } = parsed.data;
+
+    const isRefinement = !!(parentGenerationId && refinementPrompt);
+
+    if (isRefinement) {
+      const supabaseCheck = await createClient();
+      const { data: parentGen } = await supabaseCheck
+        .from('generations')
+        .select('id')
+        .eq('id', parentGenerationId)
+        .single();
+
+      if (!parentGen) {
+        return new Response(JSON.stringify({ error: 'Parent generation not found' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      const depth = await getConversationDepth(supabaseCheck, parentGenerationId);
+      if (depth >= MAX_CONVERSATION_DEPTH) {
+        return new Response(
+          JSON.stringify({
+            error: `Conversation limit reached (max ${MAX_CONVERSATION_DEPTH} turns). Start a new generation.`,
+          }),
+          { status: 400, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
 
     const BORDER_RADIUS_PX: Record<string, string> = {
       none: '0',
@@ -173,11 +230,12 @@ export async function POST(request: NextRequest) {
             .from('generations')
             .insert({
               user_id: user.id,
-              prompt: description,
+              prompt: isRefinement ? refinementPrompt : description,
               framework,
               status: 'processing',
               ai_provider: activeProvider,
               model_used: activeModel,
+              parent_generation_id: parentGenerationId || null,
             })
             .select('id')
             .single();
@@ -185,14 +243,27 @@ export async function POST(request: NextRequest) {
 
           let fullCode = '';
 
+          const conversationContext =
+            isRefinement && previousCode
+              ? {
+                  previousCode,
+                  refinementPrompt: refinementPrompt!,
+                  originalPrompt: description,
+                }
+              : undefined;
+
           if (mcpEnabled) {
             controller.enqueue(
               encoder.encode(createSseEvent({ type: 'start', timestamp: Date.now() }))
             );
 
             try {
+              const mcpPrompt = conversationContext
+                ? `Previous code:\n\`\`\`\n${conversationContext.previousCode}\n\`\`\`\n\nRefinement: ${conversationContext.refinementPrompt}`
+                : enrichedDescription;
+
               fullCode = await generateComponent({
-                prompt: enrichedDescription,
+                prompt: mcpPrompt,
                 framework,
                 componentLibrary,
                 style,
@@ -210,8 +281,12 @@ export async function POST(request: NextRequest) {
             }
 
             if (!fullCode) {
+              const streamPrompt = conversationContext
+                ? `Previous code:\n\`\`\`\n${conversationContext.previousCode}\n\`\`\`\n\nRefinement: ${conversationContext.refinementPrompt}`
+                : enrichedDescription;
+
               for await (const event of generateComponentStream({
-                prompt: enrichedDescription,
+                prompt: streamPrompt,
                 framework,
                 componentLibrary,
                 style,
@@ -243,10 +318,14 @@ export async function POST(request: NextRequest) {
               }
             }
           } else {
+            const providerPrompt = conversationContext
+              ? `Previous code:\n\`\`\`\n${conversationContext.previousCode}\n\`\`\`\n\nRefinement: ${conversationContext.refinementPrompt}`
+              : enrichedDescription;
+
             for await (const event of generateWithProvider({
               provider: requestedProvider as AIProvider,
               model: requestedModel || 'gemini-2.0-flash',
-              prompt: enrichedDescription,
+              prompt: providerPrompt,
               framework,
               componentLibrary,
               style,
@@ -305,6 +384,7 @@ export async function POST(request: NextRequest) {
                 qualityPassed: qualityReport.passed,
                 ragEnriched: contextAddition.length > 0,
                 provider: activeProvider,
+                parentGenerationId: parentGenerationId || null,
                 timestamp: Date.now(),
               })
             )
@@ -360,10 +440,11 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   const mcpEnabled = shouldUseMcpGateway();
+  const conversationEnabled = getFeatureFlag('ENABLE_CONVERSATION_MODE');
   return new Response(
     JSON.stringify({
       message: 'UI Generation API',
-      version: '3.1.0',
+      version: '4.0.0',
       status: 'active',
       provider: 'gemini-2.0-flash',
       features: [
@@ -372,6 +453,7 @@ export async function GET() {
         'streaming',
         'image-input',
         ...(mcpEnabled ? ['mcp-gateway'] : []),
+        ...(conversationEnabled ? ['conversation-mode'] : []),
       ],
     }),
     {

@@ -65,12 +65,12 @@ Generate a multi-page application from a template pack.
 
 Generate interactive prototypes with component library integration.
 
-| Parameter      | Type     | Required | Description                                    |
-| -------------- | -------- | -------- | ---------------------------------------------- |
-| `description`  | string   | yes      | Prototype description                          |
-| `framework`    | string   | yes      | Target framework                               |
-| `pages`        | string[] | no       | Pages to include in the prototype              |
-| `interactions` | string   | no       | Interaction descriptions (hover, click, etc.)  |
+| Parameter      | Type     | Required | Description                                   |
+| -------------- | -------- | -------- | --------------------------------------------- |
+| `description`  | string   | yes      | Prototype description                         |
+| `framework`    | string   | yes      | Target framework                              |
+| `pages`        | string[] | no       | Pages to include in the prototype             |
+| `interactions` | string   | no       | Interaction descriptions (hover, click, etc.) |
 
 ### `refine_component`
 
@@ -88,21 +88,21 @@ Iteratively improve components based on natural language feedback.
 
 Generate design mockups and visual references using AI image generation.
 
-| Parameter     | Type   | Required | Description                          |
-| ------------- | ------ | -------- | ------------------------------------ |
-| `description` | string | yes      | Design description                   |
-| `style`       | string | no       | Image style (mockup, wireframe, ui)  |
-| `dimensions`  | string | no       | Image dimensions                     |
+| Parameter     | Type   | Required | Description                         |
+| ------------- | ------ | -------- | ----------------------------------- |
+| `description` | string | yes      | Design description                  |
+| `style`       | string | no       | Image style (mockup, wireframe, ui) |
+| `dimensions`  | string | no       | Image dimensions                    |
 
 ### `fetch_design_inspiration`
 
 Fetch design inspiration from curated sources.
 
-| Parameter  | Type   | Required | Description                                |
-| ---------- | ------ | -------- | ------------------------------------------ |
-| `query`    | string | yes      | Search query                               |
-| `category` | string | no       | Category filter (web, mobile, dashboard)   |
-| `limit`    | number | no       | Number of results (default: 10)            |
+| Parameter  | Type   | Required | Description                              |
+| ---------- | ------ | -------- | ---------------------------------------- |
+| `query`    | string | yes      | Search query                             |
+| `category` | string | no       | Category filter (web, mobile, dashboard) |
+| `limit`    | number | no       | Number of results (default: 10)          |
 
 ### `analyze_design_references`
 
@@ -151,9 +151,9 @@ Push design tokens and variables to Figma.
 
 Audit components for WCAG 2.1 accessibility violations.
 
-| Parameter | Type   | Required | Description                             |
-| --------- | ------ | -------- | --------------------------------------- |
-| `code`    | string | yes      | Component code to audit                 |
+| Parameter | Type   | Required | Description                            |
+| --------- | ------ | -------- | -------------------------------------- |
+| `code`    | string | yes      | Component code to audit                |
 | `level`   | string | no       | WCAG level: `A`, `AA` (default), `AAA` |
 
 Returns a detailed report with:
@@ -178,10 +178,10 @@ Submit feedback on generated components for ML self-learning.
 
 Analyze existing component libraries for pattern extraction.
 
-| Parameter    | Type     | Required | Description                      |
-| ------------ | -------- | -------- | -------------------------------- |
-| `library`    | string   | yes      | Library name or URL              |
-| `components` | string[] | no       | Specific components to analyze   |
+| Parameter    | Type     | Required | Description                    |
+| ------------ | -------- | -------- | ------------------------------ |
+| `library`    | string   | yes      | Library name or URL            |
+| `components` | string[] | no       | Specific components to analyze |
 
 ## ML and Training
 

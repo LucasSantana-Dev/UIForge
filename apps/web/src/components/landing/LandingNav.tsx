@@ -26,7 +26,9 @@ export function LandingNav({ user }: LandingNavProps) {
         });
       }
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll, {
+      passive: true,
+    });
     return () => {
       window.removeEventListener('scroll', handleScroll);
       cancelAnimationFrame(rafId);
@@ -42,8 +44,10 @@ export function LandingNav({ user }: LandingNavProps) {
 
   return (
     <nav
-      className={`sticky top-0 z-50 h-16 border-b border-[#27272A] transition-all duration-200 ${
-        isScrolled ? 'backdrop-blur-xl bg-[#121214]/80' : 'bg-transparent'
+      className={`sticky top-0 z-50 h-16 border-b transition-all duration-300 ${
+        isScrolled
+          ? 'backdrop-blur-xl bg-[#121214]/80 border-[#27272A] shadow-[0_1px_3px_rgba(0,0,0,0.3)]'
+          : 'bg-transparent border-transparent'
       }`}
     >
       <div className={`${CONTAINER} h-full flex items-center justify-between`}>

@@ -22,6 +22,8 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_DESIGN_CONTEXT: true,
   ENABLE_PROMPT_AUTOCOMPLETE: true,
   ENABLE_CODE_INTELLISENSE: true,
+  ENABLE_CONVERSATION_MODE: false,
+  ENABLE_DESIGN_ANALYSIS: false,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -149,6 +151,18 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     name: 'ENABLE_CODE_INTELLISENSE',
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_CODE_INTELLISENSE,
     description: 'Framework-aware code snippets in the Monaco editor',
+    category: 'generation',
+  },
+  {
+    name: 'ENABLE_CONVERSATION_MODE',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_CONVERSATION_MODE,
+    description: 'Enable multi-turn conversation mode for AI generation',
+    category: 'generation',
+  },
+  {
+    name: 'ENABLE_DESIGN_ANALYSIS',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_DESIGN_ANALYSIS,
+    description: 'Enable image-based design analysis for code generation',
     category: 'generation',
   },
 ];

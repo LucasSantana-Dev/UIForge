@@ -16,11 +16,23 @@ import { Button } from '@/components/ui/button';
 
 const navigation = [
   { name: 'Projects', href: '/projects', icon: FolderIcon },
-  { name: 'Templates', href: '/templates', icon: FileTextIcon },
+  {
+    name: 'Templates',
+    href: '/templates',
+    icon: FileTextIcon,
+  },
   { name: 'History', href: '/history', icon: ClockIcon },
   { name: 'AI Keys', href: '/ai-keys', icon: KeyIcon },
-  { name: 'Billing', href: '/billing', icon: CreditCardIcon },
-  { name: 'Settings', href: '/settings', icon: SettingsIcon },
+  {
+    name: 'Billing',
+    href: '/billing',
+    icon: CreditCardIcon,
+  },
+  {
+    name: 'Settings',
+    href: '/settings',
+    icon: SettingsIcon,
+  },
 ];
 
 export default function Sidebar() {
@@ -51,7 +63,11 @@ export default function Sidebar() {
                   key={item.name}
                   asChild
                   variant="ghost"
-                  className={`w-full justify-start ${isActive ? 'bg-brand/15 text-brand-light hover:bg-brand/20 hover:text-brand-light' : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'}`}
+                  className={`w-full justify-start relative ${
+                    isActive
+                      ? 'bg-brand/15 text-brand-light hover:bg-brand/20 hover:text-brand-light before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-brand-light'
+                      : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'
+                  }`}
                 >
                   <Link href={item.href}>
                     <item.icon className="mr-2 h-4 w-4" />

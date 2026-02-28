@@ -1,120 +1,146 @@
 'use client';
 
 import { useState } from 'react';
-import { useGenerations } from '@/hooks/use-generations';
-import { ClockIcon, CodeIcon, DownloadIcon } from 'lucide-react';
+import { useGenerations, useDeleteGeneration } from '@/hooks/use-generations';
+import { CodeIcon, CopyIcon, CheckIcon, TrashIcon, GitBranchIcon, InboxIcon } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
-import { cn } from '@/lib/utils';
 
 interface GenerationHistoryProps {
   projectId: string;
-  onSelectGeneration?: (code: string) => void;
+  onSelectGeneration?: (code: string, generationId: string) => void;
+  onForkGeneration?: (code: string, prompt: string) => void;
 }
 
 export default function GenerationHistory({
   projectId,
   onSelectGeneration,
+  onForkGeneration,
 }: GenerationHistoryProps) {
-  const [expanded, setExpanded] = useState(false);
   const { data: generations, isLoading, error } = useGenerations(projectId);
+  const deleteGeneration = useDeleteGeneration();
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopy = async (code: string, id: string) => {
+    await navigator.clipboard.writeText(code);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleDelete = async (generationId: string) => {
+    try {
+      await deleteGeneration.mutateAsync({ generationId, projectId });
+    } catch {
+      // Error handled by React Query
+    }
+  };
 
   if (isLoading) {
-    return <div className="p-4 text-center text-sm text-text-secondary">Loading history...</div>;
+    return <div className="p-6 text-center text-sm text-text-secondary">Loading history...</div>;
   }
 
   if (error) {
-    return <div className="p-4 text-center text-sm text-red-600">Error loading history</div>;
+    return <div className="p-6 text-center text-sm text-red-500">Failed to load history</div>;
   }
 
   if (!generations || generations.length === 0) {
-    return <div className="p-4 text-center text-sm text-text-secondary">No generations yet</div>;
+    return (
+      <div className="p-6 text-center space-y-2">
+        <InboxIcon className="h-8 w-8 mx-auto text-text-muted" />
+        <p className="text-sm text-text-secondary">No generations yet</p>
+        <p className="text-xs text-text-muted">Create your first component!</p>
+      </div>
+    );
   }
 
   return (
-    <div className="border-t border-surface-3">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-3 flex items-center justify-between text-sm font-medium text-text-primary hover:bg-surface-0 transition-colors"
-      >
-        <div className="flex items-center space-x-2">
-          <ClockIcon className="h-4 w-4" />
-          <span>Generation History ({generations.length})</span>
-        </div>
-        <div
-          className={cn(
-            'transform transition-transform duration-200',
-            expanded ? 'rotate-180' : ''
-          )}
-        >
-          ▼
-        </div>
-      </button>
-
-      {expanded && (
-        <div className="max-h-64 overflow-y-auto border-t border-surface-3">
-          {generations.map((generation) => (
-            <div
-              key={generation.id}
-              className="p-3 border-b border-surface-3 last:border-b-0 hover:bg-surface-0 transition-colors"
-            >
-              <div className="flex items-start justify-between space-x-3">
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <span className="text-sm font-medium text-text-primary truncate">
-                      {generation.component_name}
-                    </span>
-                    <span className="text-xs px-2 py-1 bg-brand/10 text-brand rounded-full">
-                      {generation.framework}
-                    </span>
-                    {generation.component_library && (
-                      <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded-full">
-                        {generation.component_library}
-                      </span>
-                    )}
-                  </div>
-
-                  <p className="text-xs text-text-secondary line-clamp-2 mb-2">
-                    {generation.prompt.substring(0, 100)}
-                    {generation.prompt.length > 100 && '...'}
-                  </p>
-
-                  <div className="flex items-center space-x-4 text-xs text-text-secondary">
-                    <span className="flex items-center space-x-1">
-                      <CodeIcon className="h-3 w-3" />
-                      {generation.generated_code.length} chars
-                    </span>
-                    <span>
-                      {formatDistanceToNow(new Date(generation.created_at), {
-                        addSuffix: true,
-                      })}
-                    </span>
-                    {generation.tokens_used && <span>{generation.tokens_used} tokens</span>}
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-1">
-                  <button
-                    onClick={() => onSelectGeneration?.(generation.generated_code)}
-                    className="p-1 text-text-secondary hover:text-brand hover:bg-brand/10 rounded transition-colors"
-                    title="Use this code"
-                  >
-                    <CodeIcon className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(generation.generated_code);
-                    }}
-                    className="p-1 text-text-secondary hover:text-green-600 hover:bg-green-50 rounded transition-colors"
-                    title="Copy code"
-                  >
-                    <DownloadIcon className="h-4 w-4" />
-                  </button>
-                </div>
-              </div>
+    <div className="divide-y divide-surface-3">
+      {generations.map((gen) => (
+        <div key={gen.id} className="p-3 hover:bg-surface-0 transition-colors">
+          <div className="flex items-start justify-between gap-2 mb-1">
+            <span className="text-sm font-medium text-text-primary truncate">
+              {gen.component_name}
+            </span>
+            <div className="flex items-center gap-1 shrink-0">
+              <Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+                {gen.framework}
+              </Badge>
+              {(gen as any).quality_score != null && (
+                <Badge
+                  variant={(gen as any).quality_score >= 80 ? 'default' : 'secondary'}
+                  className="text-[10px] px-1.5 py-0"
+                >
+                  {(gen as any).quality_score}%
+                </Badge>
+              )}
             </div>
-          ))}
+          </div>
+
+          <p className="text-xs text-text-secondary line-clamp-2 mb-2">
+            {gen.prompt.substring(0, 100)}
+            {gen.prompt.length > 100 && '...'}
+          </p>
+
+          {(gen as any).parent_generation_id && (
+            <div className="flex items-center gap-1 mb-2 text-[10px] text-text-muted">
+              <GitBranchIcon className="h-3 w-3" />
+              Refinement
+            </div>
+          )}
+
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-text-muted">
+              {formatDistanceToNow(new Date(gen.created_at), {
+                addSuffix: true,
+              })}
+            </span>
+
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0"
+                title="Load code"
+                onClick={() => onSelectGeneration?.(gen.generated_code, gen.id)}
+              >
+                <CodeIcon className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0"
+                title="Fork as new conversation"
+                onClick={() => onForkGeneration?.(gen.generated_code, gen.prompt)}
+              >
+                <GitBranchIcon className="h-3.5 w-3.5" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0"
+                title="Copy code"
+                onClick={() => handleCopy(gen.generated_code, gen.id)}
+              >
+                {copiedId === gen.id ? (
+                  <CheckIcon className="h-3.5 w-3.5 text-green-500" />
+                ) : (
+                  <CopyIcon className="h-3.5 w-3.5" />
+                )}
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0 text-text-muted hover:text-red-500"
+                title="Delete"
+                onClick={() => handleDelete(gen.id)}
+              >
+                <TrashIcon className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          </div>
         </div>
-      )}
+      ))}
     </div>
   );
 }

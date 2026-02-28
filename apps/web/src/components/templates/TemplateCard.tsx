@@ -35,20 +35,13 @@ interface TemplateCardProps {
   onPreview: (template: Template) => void;
 }
 
-export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCardProps) {
-  const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case 'beginner':
-        return 'bg-green-100 text-green-800';
-      case 'intermediate':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'advanced':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-surface-1 text-text-primary';
-    }
-  };
+const difficultyColors: Record<string, string> = {
+  beginner: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
+  intermediate: 'bg-amber-500/15 text-amber-400 border-amber-500/20',
+  advanced: 'bg-red-500/15 text-red-400 border-red-500/20',
+};
 
+export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCardProps) {
   const templateWithCode = {
     ...template,
     code:
@@ -57,7 +50,7 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
   };
 
   return (
-    <Card className="h-full flex flex-col hover:shadow-lg transition-shadow">
+    <Card className="h-full flex flex-col">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex-1">
@@ -77,8 +70,12 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
           </div>
 
           <div className="flex items-center gap-2">
-            <Badge className={getDifficultyColor(template.difficulty)}>{template.difficulty}</Badge>
-            <span className="text-xs text-muted-foreground">{template.category}</span>
+            <Badge
+              className={difficultyColors[template.difficulty] || 'bg-surface-1 text-text-primary'}
+            >
+              {template.difficulty}
+            </Badge>
+            <span className="text-xs text-text-muted">{template.category}</span>
           </div>
 
           <div className="flex flex-wrap gap-1">
@@ -94,7 +91,7 @@ export function TemplateCard({ template, onUseTemplate, onPreview }: TemplateCar
             )}
           </div>
 
-          <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <div className="flex items-center justify-between text-sm text-text-muted">
             <div className="flex items-center gap-1">
               <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
               <span>{template.rating}</span>

@@ -7,15 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.14.0] - 2026-02-28
+
 ### Added
+- **@siza/ui component extraction**: Pure UI versions of QualityPanel, GenerationProgress, and NavigationSidebar for cross-platform reuse
+  - `NavigationSidebar` with headless `renderLink` pattern for platform-agnostic routing
+  - `GenerationProgress` with configurable multi-step indicators
+  - `QualityPanel` with SVG score gauge and expandable gate details
+  - Shared `GenerationEvent`, `QualityReport`, `NavigationItem` types
+- **Desktop NavigationSidebar**: Desktop app uses shared NavigationSidebar from @siza/ui with labels and icons
+- **Responsive generator layout**: Mobile-first `flex-col lg:flex-row` with Code/Preview tab switcher on small screens
+- **Focus-visible styles**: Global focus ring using brand color for keyboard navigation
+- **ARIA attributes**: `aria-describedby`, `aria-invalid`, `role="alert"` on generator form fields and errors
+- **Quality Gates**: Enable quality scoring for generated components with inline score display
+  - 5 gates: security (XSS/injection), lint, type-check, accessibility, responsive
+  - Weighted scoring (0-100%) shown inline on QualityBadge
+  - Expandable QualityPanel with per-gate pass/fail details
+  - Quality check step in generation progress indicator
+  - 34 unit tests covering all gate functions
+- **Generator UX Polish**: Loading skeletons, responsive layout, focus-visible states, aria attributes
 - **Test coverage boost**: 63 new unit tests across 4 new test suites
-  - Quality gates: security scan, lint check, type check, accessibility, responsive, scoring (34 tests)
-  - Template validation: Zod schema validation for create + query (16 tests)
-  - Auth emails: feature-gated email sending for welcome, verification, reset, change (8 tests)
-  - Usage limits: generation quota checks with feature flag gating (6 tests)
-- Expanded `collectCoverageFrom` to include quality, usage, email, and auth modules
+  - Template validation, auth emails, usage limits
 
 ### Changed
+- **Docs landing page**: Animations (hero glow, fade-up, shimmer, pulse-ring), glassmorphism cards, gradient text, staggered entrance, `prefers-reduced-motion` support
+- **Design system tokens**: `--transition-fast/default/smooth`, `--radius-card`, `--border-subtle/hover`, `--ease-siza` in web globals
+- **Card hover states**: Consistent `hover:-translate-y-0.5` lift, border glow, and shadow transition across all cards
+- **Button states**: `active:scale-[0.98]`, enhanced hover shadows, consistent disabled opacity
+- **Sidebar active indicator**: Left border accent on active nav items in both desktop and mobile nav
+- **Landing hero CTA**: Shimmer effect, hover lift with purple shadow, arrow indicator
+- **Capability cards**: Per-capability accent colors (purple/blue/indigo/emerald/amber/rose), icon scale on hover
+- **Ecosystem section**: Animated SVG connector lines between nodes
+- **Landing nav**: Transparent-to-blur background on scroll
+- **Generator loading**: Skeleton loading state with `animate-pulse` replacing text-based loader
+- **Generation progress**: 4-step multi-phase indicators (Analyzing → Generating → Quality check → Complete)
+- **Quality panel**: SVG circular score gauge, expandable issue details with chevron toggle
+- **Mobile nav**: Consistent left-border active indicator matching desktop sidebar
+- **Desktop generate page**: Branded header with gradient and SparklesIcon
 
 - **Domain migration**: All URLs migrated to `forgespace.co` subdomains
   - Production: `siza.forgespace.co`
@@ -36,6 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Production: `siza.forgespace.co`, Docs: `docs.forgespace.co`, Dev: `dev.forgespace.co`
   - Support email and Cloudflare custom domain configuration
 - **Repo cleanup**: Improved .gitignore, removed stale docs, relocated test fixtures (#140)
+
 
 ## [0.13.0] - 2026-02-28
 

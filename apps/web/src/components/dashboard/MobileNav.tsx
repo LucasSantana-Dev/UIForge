@@ -11,10 +11,26 @@ interface MobileNavProps {
 }
 
 const navigation = [
-  { name: 'Projects', href: '/projects', icon: FolderIcon },
-  { name: 'Templates', href: '/templates', icon: FileTextIcon },
-  { name: 'GitHub', href: '/settings?tab=github', icon: Github },
-  { name: 'Settings', href: '/settings', icon: SettingsIcon },
+  {
+    name: 'Projects',
+    href: '/projects',
+    icon: FolderIcon,
+  },
+  {
+    name: 'Templates',
+    href: '/templates',
+    icon: FileTextIcon,
+  },
+  {
+    name: 'GitHub',
+    href: '/settings?tab=github',
+    icon: Github,
+  },
+  {
+    name: 'Settings',
+    href: '/settings',
+    icon: SettingsIcon,
+  },
 ];
 
 export default function MobileNav({ open, onClose }: MobileNavProps) {
@@ -62,7 +78,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
 
   if (!open) return null;
 
-  const handleBackdropClick = (_e: React.MouseEvent<HTMLDivElement>) => {
+  const handleBackdropClick = () => {
     onClose();
   };
 
@@ -76,7 +92,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
   return (
     <>
       <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+        className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-200"
         onClick={handleBackdropClick}
         onKeyDown={handleBackdropKeyDown}
         tabIndex={0}
@@ -85,28 +101,28 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
       />
       <div
         ref={panelRef}
-        className="fixed inset-y-0 left-0 flex flex-col w-64 bg-surface-1 z-50"
+        className="fixed inset-y-0 left-0 flex flex-col w-64 bg-surface-1 border-r border-surface-3 z-50 transition-transform duration-300 ease-siza"
         role="dialog"
         aria-modal="true"
         aria-label="Mobile navigation"
       >
         <div className="flex items-center justify-between h-16 px-4 border-b border-surface-3">
-          <h1 className="text-2xl font-bold text-brand">Siza</h1>
+          <h1 className="text-xl font-display font-bold text-brand">Siza</h1>
           <button
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
-            className="p-2 rounded-md text-text-muted hover:text-text-secondary hover:bg-surface-1"
+            className="p-2 rounded-md text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors"
             aria-label="Close navigation"
           >
-            <XIcon className="h-6 w-6" />
+            <XIcon className="h-5 w-5" />
           </button>
         </div>
         <nav className="flex-1 px-2 py-4 space-y-1">
           <Link
             href="/generate"
             onClick={onClose}
-            className="group flex items-center px-3 py-2 text-sm font-medium rounded-md bg-brand text-white hover:bg-brand-light mb-4"
+            className="group flex items-center px-3 py-2.5 text-sm font-medium rounded-lg bg-brand text-white hover:bg-brand-light transition-colors mb-4"
           >
             <PlusIcon className="mr-3 h-5 w-5" />
             Generate Component
@@ -118,16 +134,16 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
                 key={item.name}
                 href={item.href}
                 onClick={onClose}
-                className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md ${
+                className={`group relative flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200 ${
                   isActive
-                    ? 'bg-surface-1 text-text-primary'
-                    : 'text-text-secondary hover:bg-surface-0 hover:text-text-primary'
+                    ? 'bg-brand/15 text-brand-light before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-brand-light'
+                    : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary'
                 }`}
               >
                 <item.icon
                   className={`mr-3 h-5 w-5 ${
                     isActive
-                      ? 'text-text-primary'
+                      ? 'text-brand-light'
                       : 'text-text-muted group-hover:text-text-secondary'
                   }`}
                 />

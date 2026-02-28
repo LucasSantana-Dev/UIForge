@@ -66,8 +66,11 @@ describe('ComponentGenerator Component', () => {
     events: [],
     qualityReport: null,
     startGeneration: jest.fn(),
+    startRefinement: jest.fn(),
     stopGeneration: jest.fn(),
     reset: jest.fn(),
+    parentGenerationId: null,
+    conversationTurn: 0,
   };
 
   beforeEach(() => {
@@ -85,8 +88,8 @@ describe('ComponentGenerator Component', () => {
       isLoading: true,
     } as any);
 
-    render(<ComponentGenerator projectId="test-project" />);
-    expect(screen.getByText('Loading project...')).toBeInTheDocument();
+    const { container } = render(<ComponentGenerator projectId="test-project" />);
+    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
   });
 
   it('should render project not found', () => {

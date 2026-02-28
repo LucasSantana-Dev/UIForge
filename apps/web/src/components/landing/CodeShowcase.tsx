@@ -125,22 +125,28 @@ export function CodeShowcase() {
         </FadeIn>
 
         <FadeIn delay={0.15}>
-          <div className="rounded-xl border border-[#27272A] bg-[#18181B] overflow-hidden">
+          <div className="rounded-xl border border-[#27272A] bg-[#18181B] overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272A]">
               <span className="text-[13px] font-mono text-[#71717A]">gateway.config.ts</span>
               <button
                 onClick={handleCopy}
-                className="text-[#71717A] hover:text-[#FAFAFA] transition-colors p-1"
+                className="text-[#71717A] hover:text-[#FAFAFA] transition-colors p-1 rounded hover:bg-[#27272A]"
                 aria-label={copied ? 'Copied' : 'Copy code'}
               >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copied ? (
+                  <Check className="w-4 h-4 text-[#22C55E]" />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </button>
             </div>
             <div className="p-5 overflow-x-auto">
               <pre>
                 <code
                   className="font-mono text-[13px] leading-[1.65]"
-                  dangerouslySetInnerHTML={{ __html: CODE_HTML }}
+                  dangerouslySetInnerHTML={{
+                    __html: CODE_HTML,
+                  }}
                 />
               </pre>
             </div>

@@ -11,6 +11,8 @@ import {
   Badge,
   CodeEditor,
   LivePreview,
+  Card,
+  CardContent,
 } from '@siza/ui';
 import { SparklesIcon, SaveIcon, CpuIcon, CloudIcon } from 'lucide-react';
 import { useMcp } from '../hooks/use-mcp';
@@ -111,8 +113,13 @@ export function Generate() {
   return (
     <div className="flex h-full">
       <div className="w-96 border-r border-surface-3 flex flex-col">
-        <div className="p-4 border-b border-surface-3">
-          <h2 className="text-lg font-semibold">Generate</h2>
+        <div className="px-4 py-4 border-b border-surface-3 bg-gradient-to-r from-brand/5 to-transparent">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-brand/10 flex items-center justify-center">
+              <SparklesIcon className="h-4 w-4 text-brand" />
+            </div>
+            <h2 className="text-lg font-semibold">Generate</h2>
+          </div>
         </div>
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           <div>
@@ -197,7 +204,11 @@ export function Generate() {
               Vue
             </Button>
           </div>
-          {error && <p className="text-sm text-error">{error}</p>}
+          {error && (
+            <Card className="border-error/30 bg-error/5">
+              <CardContent className="p-3 text-sm text-error">{error}</CardContent>
+            </Card>
+          )}
           <Button onClick={handleGenerate} disabled={!canGenerate} className="w-full">
             <SparklesIcon className="w-4 h-4 mr-2" />
             {isLoading ? 'Generating...' : 'Generate'}

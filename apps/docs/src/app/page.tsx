@@ -7,25 +7,25 @@ const quickLinks = [
     title: 'Quick Start',
     description: 'Set up Siza and generate your first component in minutes.',
     href: '/docs',
-    icon: '→',
+    icon: '\u2192',
   },
   {
     title: 'MCP Integration',
     description: 'Connect AI models via the Model Context Protocol.',
     href: '/docs/guides/mcp-integration',
-    icon: '⚡',
+    icon: '\u26A1',
   },
   {
     title: 'Self-Hosting',
     description: 'Deploy your own Siza instance with Cloudflare Workers.',
     href: '/docs/getting-started/self-hosting',
-    icon: '☁',
+    icon: '\u2601',
   },
   {
     title: 'Architecture',
     description: 'Understand how forge-patterns, mcp-gateway, and siza connect.',
     href: '/docs/ecosystem/architecture',
-    icon: '◈',
+    icon: '\u25C8',
   },
 ];
 
@@ -44,12 +44,36 @@ const techStack = [
 ];
 
 const ecosystem = [
-  { name: 'forge-patterns', desc: 'Shared configs & standards', active: false },
-  { name: 'siza-gen', desc: 'AI generation core library', active: false },
-  { name: 'siza-mcp', desc: 'MCP protocol adapter', active: false },
-  { name: 'mcp-gateway', desc: 'AI routing & orchestration', active: false },
-  { name: 'branding-mcp', desc: 'Brand identity generation', active: false },
-  { name: 'siza', desc: 'Full-stack AI workspace', active: true },
+  {
+    name: 'forge-patterns',
+    desc: 'Shared configs & standards',
+    active: false,
+  },
+  {
+    name: 'siza-gen',
+    desc: 'AI generation core library',
+    active: false,
+  },
+  {
+    name: 'siza-mcp',
+    desc: 'MCP protocol adapter',
+    active: false,
+  },
+  {
+    name: 'mcp-gateway',
+    desc: 'AI routing & orchestration',
+    active: false,
+  },
+  {
+    name: 'branding-mcp',
+    desc: 'Brand identity generation',
+    active: false,
+  },
+  {
+    name: 'siza',
+    desc: 'Full-stack AI workspace',
+    active: true,
+  },
 ];
 
 export default function HomePage() {
@@ -63,7 +87,7 @@ export default function HomePage() {
             references, and examples to get you started.
           </p>
           <Link href="/docs" className="docs-cta">
-            Get Started
+            Get Started <span aria-hidden="true">&rarr;</span>
           </Link>
         </div>
 
@@ -102,7 +126,7 @@ export default function HomePage() {
                   <strong>{repo.name}</strong>
                   <span>{repo.desc}</span>
                 </div>
-                {i < ecosystem.length - 1 && <span className="docs-ecosystem-arrow">→</span>}
+                {i < ecosystem.length - 1 && <span className="docs-ecosystem-arrow">&rarr;</span>}
               </div>
             ))}
           </div>
