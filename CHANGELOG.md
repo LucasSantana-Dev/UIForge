@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Brand identity import**: Connect branding-mcp output to the siza webapp generation pipeline
+  - Smart detection: auto-detect BrandIdentity JSON by `colors.primary.hex`, falls back to standard theme format
+  - Full mapping: brand colors, typography, spacing, border radius → SizaTheme values
+  - BrandMeta storage: font names, semantic colors, neutrals for richer AI prompt context
+  - Brand themes show "brand" badge in ThemeSelector, font info in DesignContext panel
+  - API extension: `brandHeadingFont`, `brandBodyFont`, `brandSemanticColors` in generation API
+  - 13 new tests for `parseBrandIdentity()` and `importBrand()` (33 total in theme-store)
 
 ## [0.14.0] - 2026-02-28
 
