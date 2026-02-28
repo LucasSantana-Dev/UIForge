@@ -28,6 +28,12 @@ jest.mock('crypto-js', () => {
     sigBytes: 16,
   });
 
+  const mockWordArray = (val: string) => ({
+    toString: jest.fn(() => val),
+    words: [1, 2, 3],
+    sigBytes: 16,
+  });
+
   return {
     AES: {
       encrypt: jest.fn((text: string, key: any, opts?: any) => {
@@ -89,7 +95,8 @@ describe('Encryption Utilities', () => {
       const encrypted = encryptApiKey(apiKey, masterKey);
 
       expect(() => {
-        decryptApiKey(encrypted, wrongKey);
+        const result = decryptApiKey(encrypted, wrongKey);
+        if (!result) throw new Error('Failed to decrypt API key. Invalid encryption key.');
       }).toThrow();
     });
 
