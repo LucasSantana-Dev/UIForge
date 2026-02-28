@@ -1,4 +1,6 @@
-import { createClient } from '@/lib/supabase/server';
+import {
+  findComponentWithProject,
+} from '@/lib/repositories/component.repo';
 import { ForbiddenError, NotFoundError } from '@/lib/api/errors';
 import {
   uploadToStorage,
@@ -8,26 +10,17 @@ import {
   STORAGE_BUCKETS,
 } from '@/lib/api/storage';
 
-interface ProjectAccess {
-  id: string;
-  user_id: string;
-  is_public?: boolean;
-  framework?: string;
-}
-
 export async function verifyProjectAccess(
   projectId: string,
   userId: string,
   requireOwnership = false
-): Promise<ProjectAccess> {
-  const supabase = await createClient();
-  const { data: project, error } = await supabase
-    .from('projects')
-    .select('id, user_id, is_public, framework')
-    .eq('id', projectId)
-    .single();
+): Promise<any> {
+  const { findProjectById } = await import(
+    '@/lib/repositories/project.repo'
+  );
+  const project = await findProjectById(projectId);
 
-  if (error || !project) {
+  if (!project) {
     throw new NotFoundError('Project not found');
   }
 
@@ -35,8 +28,14 @@ export async function verifyProjectAccess(
     throw new ForbiddenError('You do not own this project');
   }
 
-  if (!requireOwnership && project.user_id !== userId && !project.is_public) {
-    throw new ForbiddenError('You do not have access to this project');
+  if (
+    !requireOwnership &&
+    project.user_id !== userId &&
+    !project.is_public
+  ) {
+    throw new ForbiddenError(
+      'You do not have access to this project'
+    );
   }
 
   return project;
@@ -47,14 +46,9 @@ export async function verifyComponentAccess(
   userId: string,
   requireOwnership = false
 ): Promise<any> {
-  const supabase = await createClient();
-  const { data: component, error } = await supabase
-    .from('components')
-    .select('*, projects!inner(user_id, is_public, framework)')
-    .eq('id', componentId)
-    .single();
+  const component = await findComponentWithProject(componentId);
 
-  if (error || !component) {
+  if (!component) {
     throw new NotFoundError('Component not found');
   }
 
@@ -63,8 +57,14 @@ export async function verifyComponentAccess(
     throw new ForbiddenError('You do not own this component');
   }
 
-  if (!requireOwnership && project.user_id !== userId && !project.is_public) {
-    throw new ForbiddenError('You do not have access to this component');
+  if (
+    !requireOwnership &&
+    project.user_id !== userId &&
+    !project.is_public
+  ) {
+    throw new ForbiddenError(
+      'You do not have access to this component'
+    );
   }
 
   return component;

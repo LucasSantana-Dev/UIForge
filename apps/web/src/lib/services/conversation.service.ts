@@ -1,4 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
+import {
+  findGenerationById,
+  getParentGenerationId,
+} from '@/lib/repositories/generation.repo';
 import { NotFoundError, ValidationError } from '@/lib/api/errors';
 
 export const MAX_CONVERSATION_DEPTH = 10;
@@ -6,20 +9,13 @@ export const MAX_CONVERSATION_DEPTH = 10;
 export async function getConversationDepth(
   parentId: string
 ): Promise<number> {
-  const supabase = await createClient();
   let depth = 0;
   let currentId: string | null = parentId;
 
   while (currentId && depth < MAX_CONVERSATION_DEPTH) {
-    const { data }: { data: { parent_generation_id: string | null } | null } =
-      await supabase
-        .from('generations')
-        .select('parent_generation_id')
-        .eq('id', currentId)
-        .single();
-
-    if (!data?.parent_generation_id) break;
-    currentId = data.parent_generation_id;
+    const parentGenId = await getParentGenerationId(currentId);
+    if (!parentGenId) break;
+    currentId = parentGenId;
     depth++;
   }
 
@@ -29,12 +25,7 @@ export async function getConversationDepth(
 export async function validateConversation(
   parentGenerationId: string
 ): Promise<void> {
-  const supabase = await createClient();
-  const { data: parentGen } = await supabase
-    .from('generations')
-    .select('id')
-    .eq('id', parentGenerationId)
-    .single();
+  const parentGen = await findGenerationById(parentGenerationId);
 
   if (!parentGen) {
     throw new NotFoundError('Parent generation not found');

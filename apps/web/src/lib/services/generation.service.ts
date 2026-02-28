@@ -1,4 +1,7 @@
-import { createClient } from '@/lib/supabase/server';
+import {
+  createGeneration,
+  updateGeneration,
+} from '@/lib/repositories/generation.repo';
 import { enrichPromptWithContext } from './context-enrichment';
 import { storeGenerationEmbedding } from './embeddings';
 import { runAllGates, type QualityReport } from '@/lib/quality/gates';
@@ -98,22 +101,15 @@ export interface GenerationRecordParams {
 export async function createGenerationRecord(
   params: GenerationRecordParams
 ): Promise<string | null> {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from('generations')
-    .insert({
-      user_id: params.userId,
-      prompt: params.prompt,
-      framework: params.framework,
-      status: 'processing',
-      ai_provider: params.provider,
-      model_used: params.model,
-      parent_generation_id: params.parentGenerationId || null,
-    })
-    .select('id')
-    .single();
-
-  return data?.id ?? null;
+  return createGeneration({
+    user_id: params.userId,
+    prompt: params.prompt,
+    framework: params.framework,
+    status: 'processing',
+    ai_provider: params.provider,
+    model_used: params.model,
+    parent_generation_id: params.parentGenerationId,
+  });
 }
 
 export async function completeGeneration(
@@ -122,27 +118,22 @@ export async function completeGeneration(
   provider: string,
   qualityScore: number
 ): Promise<void> {
-  const supabase = await createClient();
-  await supabase
-    .from('generations')
-    .update({
-      status: 'completed',
-      generated_code: code,
-      ai_provider: code ? provider : 'google',
-      quality_score: qualityScore,
-    })
-    .eq('id', generationId);
+  await updateGeneration(generationId, {
+    status: 'completed',
+    generated_code: code,
+    ai_provider: code ? provider : 'google',
+    quality_score: qualityScore,
+  });
 }
 
 export async function failGeneration(
   generationId: string,
   errorMessage: string
 ): Promise<void> {
-  const supabase = await createClient();
-  await supabase
-    .from('generations')
-    .update({ status: 'failed', error_message: errorMessage })
-    .eq('id', generationId);
+  await updateGeneration(generationId, {
+    status: 'failed',
+    error_message: errorMessage,
+  });
 }
 
 export function runQualityGates(code: string): QualityReport {
@@ -174,9 +165,9 @@ export function buildStreamPrompt(
 ): string {
   if (ctx) {
     return (
-      'Previous code:\n```\n' +
+      'Previous code:\n\`\`\`\n' +
       ctx.previousCode +
-      '\n```\n\nRefinement: ' +
+      '\n\`\`\`\n\nRefinement: ' +
       ctx.refinementPrompt
     );
   }
