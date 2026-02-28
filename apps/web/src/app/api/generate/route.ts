@@ -111,6 +111,7 @@ export async function POST(request: NextRequest) {
           });
 
           let fullCode = '';
+          let actualProvider = activeProvider;
           for await (const event of routeGeneration({
             mcpEnabled,
             prompt: streamPrompt,
@@ -128,6 +129,10 @@ export async function POST(request: NextRequest) {
             if (event.type === 'chunk' && event.content) {
               fullCode += event.content;
             }
+            if (event.type === 'fallback' && event.provider) {
+              actualProvider = event.provider;
+              fullCode = '';
+            }
             controller.enqueue(encoder.encode(createSseEvent(event)));
           }
 
@@ -143,7 +148,7 @@ export async function POST(request: NextRequest) {
           );
 
           if (generationId) {
-            await completeGeneration(generationId, fullCode, activeProvider, qualityReport.score);
+            await completeGeneration(generationId, fullCode, actualProvider, qualityReport.score);
             void postGenerationTasks(generationId, input.description, user.id, input.userApiKey);
           }
 
@@ -156,7 +161,7 @@ export async function POST(request: NextRequest) {
                 totalLength: fullCode.length,
                 qualityPassed: qualityReport.passed,
                 ragEnriched: contextAddition.length > 0,
-                provider: activeProvider,
+                provider: actualProvider,
                 parentGenerationId: input.parentGenerationId || null,
                 timestamp: Date.now(),
               })

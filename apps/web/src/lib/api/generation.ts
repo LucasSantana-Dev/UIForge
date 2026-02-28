@@ -32,10 +32,11 @@ export interface GenerationOptions {
 }
 
 export interface GenerationEvent {
-  type: 'start' | 'chunk' | 'complete' | 'error' | 'quality';
+  type: 'start' | 'chunk' | 'complete' | 'error' | 'quality' | 'fallback';
   content?: string;
   totalLength?: number;
   message?: string;
+  provider?: string;
   report?: {
     passed: boolean;
     results: Array<{

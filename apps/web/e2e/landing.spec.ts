@@ -36,7 +36,7 @@ test.describe('Landing Page', () => {
   });
 
   test('should render ecosystem section', async ({ page }) => {
-    await expect(page.getByText(/five repos/i)).toBeVisible();
+    await expect(page.getByText(/six repos/i)).toBeVisible();
     await expect(page.getByText(/siza-mcp/i).first()).toBeVisible();
     await expect(page.getByText(/mcp-gateway/i).first()).toBeVisible();
   });
