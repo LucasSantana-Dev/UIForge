@@ -257,7 +257,7 @@ export default function HomePage() {
             <a href="https://github.com/Forge-Space" target="_blank" rel="noopener noreferrer">
               GitHub
             </a>
-            <a href="https://siza.dev" target="_blank" rel="noopener noreferrer">
+            <a href="https://siza.forgespace.co" target="_blank" rel="noopener noreferrer">
               Platform
             </a>
             <Link href="/docs">Docs</Link>
