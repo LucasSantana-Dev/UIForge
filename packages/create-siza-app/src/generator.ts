@@ -27,8 +27,18 @@ const FRAMEWORK_DEV_DEPS: Record<Framework, Record<string, string>> = {
     vite: '^6.0.0',
     '@vitejs/plugin-react': '^4.0.0',
   },
-  vue: { typescript: '^5.7.0', vite: '^6.0.0', '@vitejs/plugin-vue': '^5.0.0' },
-  svelte: { typescript: '^5.7.0', vite: '^6.0.0', '@sveltejs/vite-plugin-svelte': '^4.0.0' },
+  vue: {
+    typescript: '^5.7.0',
+    vite: '^6.0.0',
+    '@vitejs/plugin-vue': '^5.0.0',
+    'vue-tsc': '^2.0.0',
+  },
+  svelte: {
+    typescript: '^5.7.0',
+    vite: '^6.0.0',
+    '@sveltejs/vite-plugin-svelte': '^4.0.0',
+    'svelte-check': '^4.0.0',
+  },
 };
 
 const UI_DEPS: Record<UILibrary, Record<string, string>> = {
@@ -44,7 +54,9 @@ const UI_DEPS: Record<UILibrary, Record<string, string>> = {
   none: {},
 };
 
-export async function generateProject(options: GeneratorOptions): Promise<void> {
+export async function generateProject(
+  options: GeneratorOptions
+): Promise<void> {
   const { name, framework, ui, template, mcp, targetDir } = options;
 
   await fs.ensureDir(targetDir);
@@ -54,7 +66,8 @@ export async function generateProject(options: GeneratorOptions): Promise<void> 
   await writePackageJson(targetDir, name, framework, ui);
   await writeTsConfig(targetDir, framework);
   await writeGitignore(targetDir);
-  await writeGlobalsCss(targetDir, ui);
+  await writeFrameworkConfig(targetDir, framework);
+  await writeGlobalsCss(targetDir, framework, ui);
   await writeEntryPage(targetDir, framework, template, name);
 
   if (mcp) {
@@ -70,12 +83,29 @@ async function writePackageJson(
   framework: Framework,
   ui: UILibrary
 ): Promise<void> {
-  const scripts: Record<string, string> = {
-    nextjs:
-      '{ "dev": "next dev", "build": "next build", "start": "next start", "lint": "next lint" }',
-    react: '{ "dev": "vite", "build": "vite build", "preview": "vite preview" }',
-    vue: '{ "dev": "vite", "build": "vite build", "preview": "vite preview" }',
-    svelte: '{ "dev": "vite dev", "build": "vite build", "preview": "vite preview" }',
+  const scripts: Record<Framework, Record<string, string>> = {
+    nextjs: {
+      dev: 'next dev',
+      build: 'next build',
+      start: 'next start',
+      lint: 'next lint',
+    },
+    react: {
+      dev: 'vite',
+      build: 'tsc -b && vite build',
+      preview: 'vite preview',
+    },
+    vue: {
+      dev: 'vite',
+      build: 'vue-tsc -b && vite build',
+      preview: 'vite preview',
+    },
+    svelte: {
+      dev: 'vite dev',
+      build: 'vite build',
+      preview: 'vite preview',
+      check: 'svelte-check --tsconfig ./tsconfig.json',
+    },
   };
 
   const pkg = {
@@ -83,7 +113,7 @@ async function writePackageJson(
     version: '0.1.0',
     private: true,
     type: 'module',
-    scripts: JSON.parse(scripts[framework]),
+    scripts: scripts[framework],
     dependencies: { ...FRAMEWORK_DEPS[framework], ...UI_DEPS[ui] },
     devDependencies: FRAMEWORK_DEV_DEPS[framework],
   };
@@ -91,12 +121,15 @@ async function writePackageJson(
   await fs.writeJson(path.join(dir, 'package.json'), pkg, { spaces: 2 });
 }
 
-async function writeTsConfig(dir: string, framework: Framework): Promise<void> {
-  const base = {
+async function writeTsConfig(
+  dir: string,
+  framework: Framework
+): Promise<void> {
+  const base: Record<string, unknown> = {
     compilerOptions: {
       target: 'ES2022',
       module: framework === 'nextjs' ? 'ESNext' : 'ES2022',
-      moduleResolution: framework === 'nextjs' ? 'bundler' : 'bundler',
+      moduleResolution: 'bundler',
       strict: true,
       esModuleInterop: true,
       skipLibCheck: true,
@@ -107,8 +140,9 @@ async function writeTsConfig(dir: string, framework: Framework): Promise<void> {
     exclude: ['node_modules'],
   };
 
-  if (!base.compilerOptions.jsx) {
-    delete base.compilerOptions.jsx;
+  const opts = base.compilerOptions as Record<string, unknown>;
+  if (!opts.jsx) {
+    delete opts.jsx;
   }
 
   await fs.writeJson(path.join(dir, 'tsconfig.json'), base, { spaces: 2 });
@@ -126,7 +160,150 @@ dist/
   await fs.writeFile(path.join(dir, '.gitignore'), content);
 }
 
-async function writeGlobalsCss(dir: string, ui: UILibrary): Promise<void> {
+async function writeFrameworkConfig(
+  dir: string,
+  framework: Framework
+): Promise<void> {
+  if (framework === 'nextjs') {
+    const config = `import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {};
+
+export default nextConfig;
+`;
+    await fs.writeFile(path.join(dir, 'next.config.ts'), config);
+  } else if (framework === 'react') {
+    const config = `import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: { '@': '/src' },
+  },
+});
+`;
+    await fs.writeFile(path.join(dir, 'vite.config.ts'), config);
+    await writeIndexHtml(dir);
+    await writeReactEntry(dir);
+  } else if (framework === 'vue') {
+    const config = `import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+
+export default defineConfig({
+  plugins: [vue()],
+  resolve: {
+    alias: { '@': '/src' },
+  },
+});
+`;
+    await fs.writeFile(path.join(dir, 'vite.config.ts'), config);
+    await writeIndexHtml(dir);
+    await writeVueEntry(dir);
+  } else if (framework === 'svelte') {
+    const svelteConfig = `import adapter from '@sveltejs/adapter-auto';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+  preprocess: vitePreprocess(),
+  kit: {
+    adapter: adapter(),
+    alias: { '@': './src' },
+  },
+};
+
+export default config;
+`;
+    await fs.writeFile(path.join(dir, 'svelte.config.js'), svelteConfig);
+
+    const viteConfig = `import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+  plugins: [sveltekit()],
+});
+`;
+    await fs.writeFile(path.join(dir, 'vite.config.ts'), viteConfig);
+    await writeSvelteApp(dir);
+  }
+}
+
+async function writeIndexHtml(dir: string): Promise<void> {
+  const html = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>App</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+`;
+  await fs.writeFile(path.join(dir, 'index.html'), html);
+}
+
+async function writeReactEntry(dir: string): Promise<void> {
+  const main = `import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App.tsx';
+import './globals.css';
+
+createRoot(document.getElementById('app')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>
+);
+`;
+  await fs.writeFile(path.join(dir, 'src', 'main.tsx'), main);
+}
+
+async function writeVueEntry(dir: string): Promise<void> {
+  const main = `import { createApp } from 'vue';
+import App from './App.vue';
+import './globals.css';
+
+createApp(App).mount('#app');
+`;
+  await fs.writeFile(path.join(dir, 'src', 'main.ts'), main);
+}
+
+async function writeSvelteApp(dir: string): Promise<void> {
+  const appHtml = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-prerender="true">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>
+`;
+  await fs.writeFile(path.join(dir, 'src', 'app.html'), appHtml);
+
+  await fs.ensureDir(path.join(dir, 'src', 'routes'));
+  const layout = `<script>
+  import '../globals.css';
+</script>
+
+<slot />
+`;
+  await fs.writeFile(
+    path.join(dir, 'src', 'routes', '+layout.svelte'),
+    layout
+  );
+}
+
+async function writeGlobalsCss(
+  dir: string,
+  framework: Framework,
+  ui: UILibrary
+): Promise<void> {
   if (ui === 'none') return;
 
   const content =
@@ -162,8 +339,13 @@ body {
   font-family: system-ui, sans-serif;
 }
 `;
-  await fs.ensureDir(path.join(dir, 'src'));
-  await fs.writeFile(path.join(dir, 'src', 'globals.css'), content);
+
+  const cssDir =
+    framework === 'nextjs'
+      ? path.join(dir, 'src', 'app')
+      : path.join(dir, 'src');
+  await fs.ensureDir(cssDir);
+  await fs.writeFile(path.join(cssDir, 'globals.css'), content);
 }
 
 async function writeEntryPage(
@@ -273,13 +455,11 @@ async function writeEntryPage(
     </div>`,
   };
 
-  const jsx = templates[template].replace(/\{name\}/g, name);
+  const jsx = templates[template].replace(/{name}/g, name);
 
   if (framework === 'nextjs') {
     await fs.ensureDir(path.join(dir, 'src', 'app'));
-    const page = `import './globals.css';
-
-export default function Home() {
+    const page = `export default function Home() {
   const name = '${name}';
   return (
     ${jsx}
@@ -296,7 +476,11 @@ export const metadata: Metadata = {
   description: 'Built with Siza',
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className="dark">
       <body>{children}</body>
@@ -307,34 +491,29 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     await fs.writeFile(path.join(dir, 'src', 'app', 'layout.tsx'), layout);
   } else if (framework === 'vue') {
     await fs.ensureDir(path.join(dir, 'src'));
+    const vueJsx = convertToVueTemplate(jsx);
     const app = `<template>
-  <div>
-    ${jsx.replace(/className=/g, 'class=').replace(/\{name\}/g, '{{ name }}')}
-  </div>
+  ${vueJsx}
 </template>
 
 <script setup lang="ts">
 const name = '${name}';
 </script>
-
-<style>
-@import './globals.css';
-</style>
 `;
     await fs.writeFile(path.join(dir, 'src', 'App.vue'), app);
   } else if (framework === 'svelte') {
     await fs.ensureDir(path.join(dir, 'src', 'routes'));
+    const svelteJsx = convertToSvelteTemplate(jsx);
     const page = `<script lang="ts">
   const name = '${name}';
 </script>
 
-${jsx.replace(/className=/g, 'class=')}
-
-<style>
-  @import '../globals.css';
-</style>
+${svelteJsx}
 `;
-    await fs.writeFile(path.join(dir, 'src', 'routes', '+page.svelte'), page);
+    await fs.writeFile(
+      path.join(dir, 'src', 'routes', '+page.svelte'),
+      page
+    );
   } else {
     await fs.ensureDir(path.join(dir, 'src'));
     const app = `import './globals.css';
@@ -348,6 +527,23 @@ export default function App() {
 `;
     await fs.writeFile(path.join(dir, 'src', 'App.tsx'), app);
   }
+}
+
+function convertToVueTemplate(jsx: string): string {
+  return jsx
+    .replace(/className=/g, 'class=')
+    .replace(/\{name\}/g, '{{ name }}')
+    .replace(/\{(\[[\s\S]*?\.map[\s\S]*?\))\}/g, '<!-- TODO: v-for loop -->');
+}
+
+function convertToSvelteTemplate(jsx: string): string {
+  let result = jsx.replace(/className=/g, 'class=');
+  result = result.replace(/\{name\}/g, '{name}');
+  result = result.replace(
+    /\{(\[[\s\S]*?)\.map\(\s*(\w+)\s*=>\s*\(([\s\S]*?)\)\s*\)\}/g,
+    '{#each $1 as $2}\n$3\n{/each}'
+  );
+  return result;
 }
 
 async function writeMcpConfig(dir: string): Promise<void> {
@@ -370,7 +566,12 @@ async function writeReadme(
   ui: UILibrary,
   template: Template
 ): Promise<void> {
-  const frameworkName = { nextjs: 'Next.js', react: 'React', vue: 'Vue', svelte: 'SvelteKit' };
+  const frameworkName = {
+    nextjs: 'Next.js',
+    react: 'React',
+    vue: 'Vue',
+    svelte: 'SvelteKit',
+  };
   const content = `# ${name}
 
 Created with [create-siza-app](https://github.com/Forge-Space/siza).
