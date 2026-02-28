@@ -169,7 +169,7 @@ describe('getComponentCode', () => {
 describe('storeComponentCode', () => {
   it('uploads code and returns storage path', async () => {
     mockGenPath.mockReturnValueOnce('projects/p1/components/c1/code.tsx');
-    mockUpload.mockResolvedValueOnce(undefined);
+    mockUpload.mockResolvedValueOnce({ path: 'projects/p1/components/c1/code.tsx' });
     const path = await storeComponentCode(
       'p1',
       'c1',
@@ -186,7 +186,7 @@ describe('storeComponentCode', () => {
   });
 
   it('uses existing path when provided', async () => {
-    mockUpload.mockResolvedValueOnce(undefined);
+    mockUpload.mockResolvedValueOnce({ path: 'projects/p1/components/c1/code.tsx' });
     const path = await storeComponentCode(
       'p1',
       'c1',
