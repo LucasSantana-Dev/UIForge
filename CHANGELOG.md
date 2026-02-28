@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-02-28
+
+### Added
+- **Brand identity import**: Import brand assets (colors, fonts, spacing) from branding-mcp into theme system
+  - `parseBrandIdentity()` converts brand JSON to SizaTheme format
+  - `importBrand()` action on theme store for one-click brand application
+  - BrandMeta type with semantic colors, neutrals, heading/body fonts
+  - Typography, spacing, and border-radius auto-mapping from brand tokens
+  - 10 unit tests covering parsing, edge cases, and theme creation
+- **Project creation form**: Wire up form submission with dashboard redirect after creation
+
+### Fixed
+- **15 CodeQL security alerts**: Replace `Math.random()` with `crypto.randomUUID()`, entity-encode HTML, fix regex patterns, add `rel="noopener noreferrer"`
+- **Dashboard redirect**: Proper navigation to new project after creation
+
+### Security
+- Replace `Math.random()` ID generation with `crypto.randomUUID()` across 8 files
+- Entity encoding for user-provided HTML content in sanitize and wireframe services
+- Fix ReDoS-prone regex pattern in quality gates
+- Sanitize inline event handlers in LivePreview component
+
 ## [0.15.0] - 2026-02-28
 
 ### Added
