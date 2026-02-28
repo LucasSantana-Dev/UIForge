@@ -41,7 +41,7 @@ describe('Feature Flags', () => {
   });
 
   describe('FEATURE_FLAGS array', () => {
-    it('should have all 19 flag entries', () => {
+    it('should have all 23 flag entries', () => {
       expect(FEATURE_FLAGS).toHaveLength(23);
     });
 

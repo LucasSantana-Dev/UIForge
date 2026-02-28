@@ -153,6 +153,18 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     description: 'Framework-aware code snippets in the Monaco editor',
     category: 'generation',
   },
+  {
+    name: 'ENABLE_CONVERSATION_MODE',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_CONVERSATION_MODE,
+    description: 'Enable multi-turn conversation mode for AI generation',
+    category: 'generation',
+  },
+  {
+    name: 'ENABLE_DESIGN_ANALYSIS',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_DESIGN_ANALYSIS,
+    description: 'Enable image-based design analysis for code generation',
+    category: 'generation',
+  },
 ];
 
 export function getFeatureFlag(name: FeatureFlagName): boolean {
