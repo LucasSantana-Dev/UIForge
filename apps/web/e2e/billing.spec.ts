@@ -213,7 +213,7 @@ test.describe('Billing Page for Subscribed User', () => {
     await seedUsageTracking(testUser.id, 42, 500);
 
     await authenticatedPage.goto('/billing');
-    await authenticatedPage.waitForLoadState('networkidle');
+    await authenticatedPage.waitForLoadState('domcontentloaded');
 
     await expect(authenticatedPage.getByText(/pro/i).first()).toBeVisible();
 
