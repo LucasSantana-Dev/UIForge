@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.18.0] - 2026-03-01
+
+### Security
+- **Encryption hardening**: Explicit AES key/IV derivation with PBKDF2 hashing, replacing implicit key handling
+- **CodeQL fixes**: Logger sanitization, quality gates regex, sanitize library improvements, theme store safety
+
+### Fixed
+- **Docs site**: Navigation links, CSS overhaul (globals.css), installation/quality-gates/templates content updates
+- **Docs deployment**: Updated wrangler.jsonc configuration
+- **E2E tests**: Billing page strict mode selectors, about page content
+- **Prettier**: Normalize create-siza-app package.json formatting
+
 ## [0.17.0] - 2026-03-01
 
 ### Added
