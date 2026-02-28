@@ -13,7 +13,7 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)](CONTRIBUTING.md)
 [![Discussions](https://img.shields.io/github/discussions/Forge-Space/siza)](https://github.com/Forge-Space/siza/discussions)
 
-**Live**: [siza-web.uiforge.workers.dev](https://siza-web.uiforge.workers.dev)\
+**Live**: [siza.dev](https://siza.dev)\
 **Dev**: [siza-web-dev.uiforge.workers.dev](https://siza-web-dev.uiforge.workers.dev)
 
 ## Why Siza
