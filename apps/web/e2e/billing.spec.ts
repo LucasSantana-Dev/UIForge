@@ -74,7 +74,7 @@ test.describe('Billing Page (authenticated)', () => {
   test('should show usage charts', async ({ authenticatedPage }) => {
     await authenticatedPage.goto('/billing');
 
-    await expect(authenticatedPage.getByText('AI Generations')).toBeVisible();
+    await expect(authenticatedPage.getByText('AI Generations', { exact: true })).toBeVisible();
     await expect(authenticatedPage.getByText('Projects')).toBeVisible();
   });
 
@@ -213,11 +213,11 @@ test.describe('Billing Page for Subscribed User', () => {
     await seedUsageTracking(testUser.id, 42, 500);
 
     await authenticatedPage.goto('/billing');
-    await authenticatedPage.waitForLoadState('networkidle');
+    await authenticatedPage.waitForLoadState('domcontentloaded');
 
     await expect(authenticatedPage.getByText(/pro/i).first()).toBeVisible();
 
-    await expect(authenticatedPage.getByText('AI Generations')).toBeVisible();
+    await expect(authenticatedPage.getByText('AI Generations', { exact: true })).toBeVisible();
 
     const manageButton = authenticatedPage.getByRole('button', {
       name: /manage/i,
