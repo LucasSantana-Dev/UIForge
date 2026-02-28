@@ -11,24 +11,35 @@ interface LogContext {
   [key: string]: unknown;
 }
 
+function sanitizeLogMessage(msg: string): string {
+  let result = '';
+  for (let i = 0; i < msg.length; i++) {
+    const code = msg.charCodeAt(i);
+    if (code === 10 || code === 13) result += ' ';
+    else if (code >= 0x20 && code !== 0x7f) result += msg[i];
+  }
+  return result;
+}
+
 class Logger {
   private isDevelopment = env.NODE_ENV === 'development';
 
   private formatMessage(level: LogLevel, message: string, context?: LogContext): string {
+    const sanitized = sanitizeLogMessage(message);
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
 
     if (this.isDevelopment) {
       return context
-        ? `${prefix} ${message} ${JSON.stringify(context, null, 2)}`
-        : `${prefix} ${message}`;
+        ? `${prefix} ${sanitized} ${JSON.stringify(context, null, 2)}`
+        : `${prefix} ${sanitized}`;
     }
 
     // Production: JSON format for log aggregation
     return JSON.stringify({
       timestamp,
       level,
-      message,
+      message: sanitized,
       ...context,
     });
   }
