@@ -2,15 +2,7 @@
 
 import { useState } from 'react';
 import { useGenerations, useDeleteGeneration } from '@/hooks/use-generations';
-import {
-  ClockIcon,
-  CodeIcon,
-  CopyIcon,
-  CheckIcon,
-  TrashIcon,
-  GitBranchIcon,
-  InboxIcon,
-} from 'lucide-react';
+import { CodeIcon, CopyIcon, CheckIcon, TrashIcon, GitBranchIcon, InboxIcon } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
@@ -45,19 +37,11 @@ export default function GenerationHistory({
   };
 
   if (isLoading) {
-    return (
-      <div className="p-6 text-center text-sm text-text-secondary">
-        Loading history...
-      </div>
-    );
+    return <div className="p-6 text-center text-sm text-text-secondary">Loading history...</div>;
   }
 
   if (error) {
-    return (
-      <div className="p-6 text-center text-sm text-red-500">
-        Failed to load history
-      </div>
-    );
+    return <div className="p-6 text-center text-sm text-red-500">Failed to load history</div>;
   }
 
   if (!generations || generations.length === 0) {
@@ -65,9 +49,7 @@ export default function GenerationHistory({
       <div className="p-6 text-center space-y-2">
         <InboxIcon className="h-8 w-8 mx-auto text-text-muted" />
         <p className="text-sm text-text-secondary">No generations yet</p>
-        <p className="text-xs text-text-muted">
-          Create your first component!
-        </p>
+        <p className="text-xs text-text-muted">Create your first component!</p>
       </div>
     );
   }
@@ -75,10 +57,7 @@ export default function GenerationHistory({
   return (
     <div className="divide-y divide-surface-3">
       {generations.map((gen) => (
-        <div
-          key={gen.id}
-          className="p-3 hover:bg-surface-0 transition-colors"
-        >
+        <div key={gen.id} className="p-3 hover:bg-surface-0 transition-colors">
           <div className="flex items-start justify-between gap-2 mb-1">
             <span className="text-sm font-medium text-text-primary truncate">
               {gen.component_name}
@@ -123,9 +102,7 @@ export default function GenerationHistory({
                 size="sm"
                 className="h-7 w-7 p-0"
                 title="Load code"
-                onClick={() =>
-                  onSelectGeneration?.(gen.generated_code, gen.id)
-                }
+                onClick={() => onSelectGeneration?.(gen.generated_code, gen.id)}
               >
                 <CodeIcon className="h-3.5 w-3.5" />
               </Button>
@@ -134,9 +111,7 @@ export default function GenerationHistory({
                 size="sm"
                 className="h-7 w-7 p-0"
                 title="Fork as new conversation"
-                onClick={() =>
-                  onForkGeneration?.(gen.generated_code, gen.prompt)
-                }
+                onClick={() => onForkGeneration?.(gen.generated_code, gen.prompt)}
               >
                 <GitBranchIcon className="h-3.5 w-3.5" />
               </Button>
