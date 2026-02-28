@@ -7,10 +7,7 @@
     "create-siza-app": "./dist/index.js"
   },
   "main": "./dist/index.js",
-  "files": [
-    "dist",
-    "templates"
-  ],
+  "files": ["dist", "templates"],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -18,16 +15,7 @@
     "type-check": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [
-    "siza",
-    "create-app",
-    "scaffold",
-    "ai",
-    "ui",
-    "mcp",
-    "react",
-    "nextjs"
-  ],
+  "keywords": ["siza", "create-app", "scaffold", "ai", "ui", "mcp", "react", "nextjs"],
   "license": "MIT",
   "repository": {
     "type": "git",
