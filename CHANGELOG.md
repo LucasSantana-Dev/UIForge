@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.12.1] - 2026-02-28
+
+### Fixed
+- Force dark theme on docs site landing page (removes light mode flash)
+- Add navigation links to docs landing page (Getting Started, API Reference, GitHub)
+
 ## [0.12.0] - 2026-02-28
 
 ### Added
