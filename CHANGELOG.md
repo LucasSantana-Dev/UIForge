@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [desktop-v0.2.0] - 2026-02-27
+
+### Added
+- **Ollama Local Generation**: Generate UI components using local LLM models via Ollama
+  - `OllamaClient` HTTP client with connection check and chat API support
+  - System prompts tuned for React, Vue, Angular, Svelte, HTML component generation
+  - Generate page dual-source toggle: MCP Registry (cloud/offline) vs Ollama (local LLM)
+  - Model selector dropdown showing installed Ollama models with sizes
+  - Generation timing badge showing latency
+  - Automatic code fence stripping from LLM output
+  - Graceful fallback when Ollama not running
+- **Tests**: 12 new unit tests for Ollama client and prompt builder (22 total)
+
 ## [0.11.0] - 2026-02-27
 
 ### Added
