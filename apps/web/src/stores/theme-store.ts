@@ -83,7 +83,7 @@ export function parseBrandIdentity(
     else if (spacingUnit >= 12) spacing = 'spacious';
 
     const radiusMd = data.borders?.radii?.md ?? 8;
-    let borderRadius: SizaTheme['borderRadius'] = 'medium';
+    let borderRadius: SizaTheme['borderRadius'];
     if (radiusMd === 0) borderRadius = 'none';
     else if (radiusMd <= 4) borderRadius = 'small';
     else if (radiusMd <= 8) borderRadius = 'medium';

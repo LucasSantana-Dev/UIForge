@@ -1,28 +1,50 @@
-const SCRIPT_RE = /<script\b[^>]*>[\s\S]*?<\/script>/gi;
-const EVENT_HANDLER_RE = /\bon\w+=\s*["'][^"']*["']/gi;
-const HTML_TAG_RE = /<[^>]*>/g;
+function stripScriptContent(input: string): string {
+  let result = '';
+  let i = 0;
+  const lower = input.toLowerCase();
+  while (i < input.length) {
+    if (
+      input[i] === '<' &&
+      lower.slice(i, i + 7) === '<script' &&
+      (i + 7 >= input.length || /[\s>]/.test(input[i + 7]))
+    ) {
+      const closeIdx = lower.indexOf('</script>', i);
+      if (closeIdx !== -1) {
+        i = closeIdx + 9;
+        continue;
+      }
+      break;
+    }
+    result += input[i];
+    i++;
+  }
+  return result;
+}
+
+function stripEventHandlers(input: string): string {
+  return input.replace(/\bon\w+=\s*["'][^"']*["']/gi, '');
+}
+
+function stripAllTags(input: string): string {
+  let result = '';
+  let inTag = false;
+  for (let i = 0; i < input.length; i++) {
+    if (input[i] === '<') inTag = true;
+    else if (input[i] === '>') inTag = false;
+    else if (!inTag) result += input[i];
+  }
+  return result;
+}
 
 export function sanitizeText(input: string): string {
-  let result = input;
-  for (let i = 0; i < 10; i++) {
-    const next = result
-      .replace(SCRIPT_RE, '')
-      .replace(EVENT_HANDLER_RE, '')
-      .replace(HTML_TAG_RE, '');
-    if (next === result) break;
-    result = next;
-  }
-  return result.trim();
+  const noScripts = stripScriptContent(input);
+  const noHandlers = stripEventHandlers(noScripts);
+  return stripAllTags(noHandlers).trim();
 }
 
 export function sanitizeHtml(input: string): string {
-  let result = input;
-  for (let i = 0; i < 10; i++) {
-    const next = result.replace(SCRIPT_RE, '').replace(EVENT_HANDLER_RE, '');
-    if (next === result) break;
-    result = next;
-  }
-  return result.trim();
+  const noScripts = stripScriptContent(input);
+  return stripEventHandlers(noScripts).trim();
 }
 
 export function escapeForAttribute(input: string): string {
