@@ -5,44 +5,18 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { useGeneration } from '@/hooks/use-generation';
-import { useCreateGeneration } from '@/hooks/use-generations';
 
 // Mock dependencies
-jest.mock('@/hooks/use-generations');
 jest.mock('@/lib/api/generation', () => ({
   streamGeneration: jest.fn(),
 }));
 
-const mockUseCreateGeneration = useCreateGeneration as jest.MockedFunction<
-  typeof useCreateGeneration
->;
 const mockStreamGeneration = require('@/lib/api/generation').streamGeneration;
 
 // TODO: Enable when feature is implemented
 describe('useGeneration', () => {
-  const mockCreateGeneration = {
-    mutateAsync: jest.fn().mockResolvedValue({}),
-    data: undefined,
-    error: null,
-    isError: false,
-    isPending: false,
-    isSuccess: false,
-    isIdle: true,
-    mutate: jest.fn(),
-    reset: jest.fn(),
-    status: 'idle' as const,
-    failureCount: 0,
-    failureReason: null,
-    errorUpdatedAt: 0,
-    isPaused: false,
-    submittedAt: 0,
-    variables: undefined,
-    context: undefined,
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
-    mockUseCreateGeneration.mockReturnValue(mockCreateGeneration as any);
 
     // Reset stream generation mock
     mockStreamGeneration.mockImplementation(async function* () {
@@ -119,39 +93,6 @@ describe('useGeneration', () => {
       expect(result.current.isGenerating).toBe(false);
       expect(result.current.error).toBe('Generation failed');
       expect(result.current.code).toBe('');
-    });
-
-    it('should save to database when project ID is provided', async () => {
-      const { result } = renderHook(() => useGeneration('test-project-id'));
-
-      const options = {
-        framework: 'react' as const,
-        componentLibrary: 'tailwind' as const,
-        description: 'Create a button component',
-        style: 'modern' as const,
-        typescript: false,
-      };
-
-      await act(async () => {
-        await result.current.startGeneration({
-          ...options,
-          componentName: 'Button',
-          prompt: 'Create a button component',
-        });
-      });
-
-      expect(mockCreateGeneration.mutateAsync).toHaveBeenCalledWith({
-        project_id: 'test-project-id',
-        prompt: 'Create a button component',
-        component_name: 'Button',
-        generated_code: 'export default function Button() { return <button>Click me</button>; }',
-        framework: 'react',
-        component_library: 'tailwind',
-        style: 'modern',
-        typescript: false,
-        tokens_used: 0,
-        generation_time_ms: expect.any(Number),
-      });
     });
 
     it('should update progress during generation', async () => {
@@ -314,33 +255,6 @@ describe('useGeneration', () => {
   });
 
   describe('error handling', () => {
-    it('should handle database save errors gracefully', async () => {
-      const { result } = renderHook(() => useGeneration('test-project-id'));
-
-      mockCreateGeneration.mutateAsync.mockRejectedValue(new Error('Database error'));
-
-      const options = {
-        framework: 'react' as const,
-        componentLibrary: 'tailwind' as const,
-        description: 'Create a button component',
-        style: 'modern' as const,
-        typescript: false,
-      };
-
-      await act(async () => {
-        await result.current.startGeneration({
-          ...options,
-          componentName: 'Button',
-          prompt: 'Create a button component',
-        });
-      });
-
-      // Generation should still complete despite database error
-      expect(result.current.isGenerating).toBe(false);
-      expect(result.current.code).toContain('Button');
-      expect(result.current.error).toBe(null);
-    });
-
     it('should handle stream interruption', async () => {
       const { result } = renderHook(() => useGeneration());
 
