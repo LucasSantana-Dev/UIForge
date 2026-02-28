@@ -15,7 +15,7 @@ import {
   isApiKeyExpired,
 } from '@/lib/encryption';
 import { AIProvider } from '@/lib/encryption';
-import { TEST_CONFIG } from '../../../test-config';
+import { TEST_CONFIG } from '../test-config';
 
 // Mock crypto-js for testing with improved key validation
 jest.mock('crypto-js', () => {

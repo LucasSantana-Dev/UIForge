@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
-import { TEST_CONFIG } from '../../../../../test-config';
+import { TEST_CONFIG } from '../test-config';
 import crypto from 'crypto';
 
 // Explicitly type the TEST_CONFIG to help TypeScript
