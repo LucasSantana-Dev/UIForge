@@ -4,6 +4,7 @@ import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { UnauthorizedError } from '@/lib/api/errors';
+import { captureServerError } from '@/lib/sentry/server';
 
 interface Suggestion {
   text: string;
@@ -113,7 +114,7 @@ export async function GET(request: NextRequest) {
     if (error instanceof UnauthorizedError) {
       return errorResponse(error.message, 401);
     }
-    console.error('GET /api/suggestions error:', error);
+    captureServerError(error, { route: '/api/suggestions' });
     return errorResponse('Internal server error', 500);
   }
 }

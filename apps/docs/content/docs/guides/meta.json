@@ -1,10 +1,12 @@
 {
   "title": "Guides",
   "pages": [
-    "mcp-integration",
     "first-component",
-    "github-export",
     "components",
+    "templates",
+    "mcp-integration",
+    "quality-gates",
+    "github-export",
     "desktop-app",
     "troubleshooting"
   ]

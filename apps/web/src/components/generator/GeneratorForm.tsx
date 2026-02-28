@@ -1,31 +1,22 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import {
-  SparklesIcon,
-  WandIcon,
-  KeyIcon,
-  ImageIcon,
-  XIcon,
-  ChevronDownIcon,
-  CpuIcon,
-} from 'lucide-react';
+import { SparklesIcon, WandIcon } from 'lucide-react';
 import { useGeneration } from '@/hooks/use-generation';
-import { useApiKeyForProvider, useHasApiKey, useAIKeyStore } from '@/stores/ai-keys';
+import { useApiKeyForProvider, useAIKeyStore } from '@/stores/ai-keys';
 import { decryptApiKey, type AIProvider } from '@/lib/encryption';
 import { PROVIDER_MODELS } from '@/lib/services/generation';
 import { isFeatureEnabled } from '@/lib/features/flags';
 import GenerationProgress from './GenerationProgress';
 import { DesignContext, DESIGN_DEFAULTS, type DesignContextValues } from './DesignContext';
 import { PromptAutocomplete } from './PromptAutocomplete';
-import { UpgradePrompt } from '@/components/billing/UpgradePrompt';
 import { useSubscription } from '@/hooks/use-subscription';
-
-const ACCEPTED_TYPES = ['image/png', 'image/jpeg', 'image/webp'] as const;
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+import { ImageUpload, type ImageState } from './ImageUpload';
+import { ProviderSelector } from './ProviderSelector';
+import { QuotaGuard } from './QuotaGuard';
 
 const generatorSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters').max(1000),
@@ -37,13 +28,6 @@ const generatorSchema = z.object({
 
 type GeneratorFormData = z.infer<typeof generatorSchema>;
 
-interface ImageState {
-  base64: string;
-  mimeType: 'image/png' | 'image/jpeg' | 'image/webp';
-  name: string;
-  previewUrl: string;
-}
-
 interface GeneratorFormProps {
   projectId: string;
   framework: string;
@@ -51,24 +35,6 @@ interface GeneratorFormProps {
   onGenerating: () => void;
   isGenerating: boolean;
   initialDescription?: string;
-}
-
-const PROVIDER_LABELS: Record<AIProvider, string> = {
-  google: 'Google Gemini',
-  openai: 'OpenAI',
-  anthropic: 'Anthropic',
-};
-
-function fileToBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve(result.split(',')[1]);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
 }
 
 export default function GeneratorForm({
@@ -90,18 +56,12 @@ export default function GeneratorForm({
   const multiLlmEnabled = isFeatureEnabled('ENABLE_MULTI_LLM');
   const [selectedProvider, setSelectedProvider] = useState<AIProvider>('google');
   const [selectedModel, setSelectedModel] = useState('gemini-2.0-flash');
-
   const providerKey = useApiKeyForProvider(selectedProvider);
-  const hasProviderKey = useHasApiKey(selectedProvider);
-
-  const models = useMemo(() => PROVIDER_MODELS[selectedProvider] || [], [selectedProvider]);
 
   const handleProviderChange = (provider: AIProvider) => {
     setSelectedProvider(provider);
     const firstModel = PROVIDER_MODELS[provider]?.[0];
-    if (firstModel) {
-      setSelectedModel(firstModel.id);
-    }
+    if (firstModel) setSelectedModel(firstModel.id);
   };
 
   const [currentSettings, setCurrentSettings] = useState({
@@ -115,10 +75,6 @@ export default function GeneratorForm({
   const [designContext, setDesignContext] = useState<DesignContextValues>(DESIGN_DEFAULTS);
   const [promptValue, setPromptValue] = useState(initialDescription || '');
   const [image, setImage] = useState<ImageState | null>(null);
-  const [imageError, setImageError] = useState<string | null>(null);
-  const [showImageUpload, setShowImageUpload] = useState(false);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -137,65 +93,14 @@ export default function GeneratorForm({
   });
 
   useEffect(() => {
-    if (initialDescription) {
-      setValue('prompt', initialDescription);
-    }
+    if (initialDescription) setValue('prompt', initialDescription);
   }, [initialDescription, setValue]);
 
-  const processFile = useCallback(async (file: File) => {
-    setImageError(null);
-
-    if (!ACCEPTED_TYPES.includes(file.type as any)) {
-      setImageError('Only PNG, JPEG, and WebP images are supported.');
-      return;
-    }
-    if (file.size > MAX_FILE_SIZE) {
-      setImageError('Image must be under 5MB.');
-      return;
-    }
-
-    try {
-      const base64 = await fileToBase64(file);
-      setImage({
-        base64,
-        mimeType: file.type as ImageState['mimeType'],
-        name: file.name,
-        previewUrl: URL.createObjectURL(file),
-      });
-    } catch {
-      setImageError('Failed to process image.');
-    }
-  }, []);
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      setIsDragOver(false);
-      const file = e.dataTransfer.files[0];
-      if (file) processFile(file);
-    },
-    [processFile, setIsDragOver]
-  );
-
-  const handleFileInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (file) processFile(file);
-    },
-    [processFile]
-  );
-
-  const removeImage = useCallback(() => {
-    if (image?.previewUrl) URL.revokeObjectURL(image.previewUrl);
-    setImage(null);
-    setImageError(null);
-    if (fileInputRef.current) fileInputRef.current.value = '';
-  }, [image]);
+  const needsApiKey = selectedProvider !== 'google' && !providerKey;
 
   const onSubmit = async (data: GeneratorFormData) => {
     try {
       onGenerating();
-
       setCurrentSettings({
         componentName: data.componentName,
         componentLibrary: data.componentLibrary || 'none',
@@ -218,10 +123,7 @@ export default function GeneratorForm({
         prompt: data.prompt,
         provider: selectedProvider,
         model: selectedModel,
-        ...(image && {
-          imageBase64: image.base64,
-          imageMimeType: image.mimeType,
-        }),
+        ...(image && { imageBase64: image.base64, imageMimeType: image.mimeType }),
         ...(apiKey && { userApiKey: apiKey }),
         ...(designContextEnabled && {
           colorMode: designContext.colorMode,
@@ -234,8 +136,8 @@ export default function GeneratorForm({
           typography: designContext.typography,
         }),
       });
-    } catch (err) {
-      console.error('Generation failed:', err);
+    } catch {
+      // Generation errors are handled by useGeneration hook
     }
   };
 
@@ -256,99 +158,22 @@ export default function GeneratorForm({
   ]);
 
   useEffect(() => {
-    if (generation.isGenerating && !isGenerating) {
-      onGenerating();
-    }
+    if (generation.isGenerating && !isGenerating) onGenerating();
   }, [generation.isGenerating, isGenerating, onGenerating]);
-
-  const needsApiKey = selectedProvider !== 'google' && !hasProviderKey;
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex-1 overflow-y-auto p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {generation.error &&
-            (generation.error.toLowerCase().includes('quota') ||
-            generation.error.toLowerCase().includes('limit reached') ? (
-              <UpgradePrompt resource="Generation" />
-            ) : (
-              <div className="rounded-md border border-red-800 bg-red-900/20 px-4 py-3 text-sm text-red-400">
-                {generation.error}
-              </div>
-            ))}
+          <QuotaGuard error={generation.error} usage={usage} isQuotaExceeded={isQuotaExceeded} />
 
-          {isQuotaExceeded && !generation.error && <UpgradePrompt resource="Generation" />}
-
-          {multiLlmEnabled && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 text-sm font-medium text-text-primary">
-                <CpuIcon className="h-4 w-4" />
-                AI Provider
-              </div>
-              <div className="grid grid-cols-3 gap-2">
-                {(Object.keys(PROVIDER_LABELS) as AIProvider[]).map((p) => (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => handleProviderChange(p)}
-                    className={`px-3 py-2 text-sm rounded-md border transition-colors ${
-                      selectedProvider === p
-                        ? 'border-brand bg-brand/10 text-brand-light'
-                        : 'border-surface-3 text-text-secondary hover:border-surface-3 hover:text-text-primary'
-                    }`}
-                  >
-                    {PROVIDER_LABELS[p]}
-                  </button>
-                ))}
-              </div>
-              <select
-                value={selectedModel}
-                onChange={(e) => setSelectedModel(e.target.value)}
-                className="w-full px-3 py-2 border border-surface-3 rounded-md text-sm focus:ring-brand focus:border-brand"
-              >
-                {models.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          <div className="flex items-center gap-2 text-xs px-3 py-2 rounded-md border">
-            <KeyIcon className="h-3.5 w-3.5" />
-            {hasProviderKey ? (
-              <span className="text-green-700">
-                Using your {PROVIDER_LABELS[selectedProvider]} API key
-              </span>
-            ) : selectedProvider === 'google' ? (
-              <span className="text-amber-700">
-                Using server API key &mdash;{' '}
-                <a href="/ai-keys" className="underline">
-                  add your own
-                </a>
-              </span>
-            ) : (
-              <span className="text-red-700">
-                API key required &mdash;{' '}
-                <a href="/ai-keys" className="underline">
-                  add your {PROVIDER_LABELS[selectedProvider]} key
-                </a>
-              </span>
-            )}
-          </div>
-
-          {usage && usage.generations_limit !== -1 && (
-            <div className="flex items-center justify-between text-xs px-3 py-2 rounded-md border border-surface-3">
-              <span className="text-text-secondary">
-                {usage.generations_count} / {usage.generations_limit} generations this month
-              </span>
-              {usage.generations_count >= usage.generations_limit * 0.8 &&
-                usage.generations_count < usage.generations_limit && (
-                  <span className="text-yellow-400 font-medium">Nearing limit</span>
-                )}
-            </div>
-          )}
+          <ProviderSelector
+            selectedProvider={selectedProvider}
+            selectedModel={selectedModel}
+            onProviderChange={handleProviderChange}
+            onModelChange={setSelectedModel}
+            multiLlmEnabled={multiLlmEnabled}
+          />
 
           <div>
             <label
@@ -408,74 +233,7 @@ export default function GeneratorForm({
             )}
           </div>
 
-          <div>
-            <button
-              type="button"
-              onClick={() => setShowImageUpload(!showImageUpload)}
-              className="flex items-center gap-2 text-sm text-text-secondary hover:text-text-primary"
-            >
-              <ImageIcon className="h-4 w-4" />
-              <span>Reference Image</span>
-              <ChevronDownIcon
-                className={`h-4 w-4 transition-transform ${showImageUpload ? 'rotate-180' : ''}`}
-              />
-              {image && <span className="text-xs text-green-600 font-medium ml-1">attached</span>}
-            </button>
-
-            {showImageUpload && (
-              <div className="mt-3">
-                {image ? (
-                  <div className="relative rounded-lg border border-surface-3 overflow-hidden">
-                    <img
-                      src={image.previewUrl}
-                      alt="Reference"
-                      className="w-full max-h-48 object-contain bg-surface-0"
-                    />
-                    <div className="flex items-center justify-between px-3 py-2 bg-surface-0 border-t border-surface-3">
-                      <span className="text-xs text-text-secondary truncate">{image.name}</span>
-                      <button
-                        type="button"
-                        onClick={removeImage}
-                        className="text-text-muted hover:text-red-500"
-                      >
-                        <XIcon className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsDragOver(true);
-                    }}
-                    onDragLeave={() => setIsDragOver(false)}
-                    onDrop={handleDrop}
-                    onClick={() => fileInputRef.current?.click()}
-                    className={`flex flex-col items-center justify-center gap-2 p-6 rounded-lg border-2 border-dashed cursor-pointer transition-colors w-full ${
-                      isDragOver
-                        ? 'border-blue-400 bg-brand/10'
-                        : 'border-surface-3 hover:border-surface-3'
-                    }`}
-                  >
-                    <ImageIcon className="h-8 w-8 text-text-muted" />
-                    <p className="text-sm text-text-secondary">
-                      Drop a screenshot here, or <span className="text-brand">browse</span>
-                    </p>
-                    <p className="text-xs text-text-muted">PNG, JPEG, or WebP up to 5MB</p>
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/png,image/jpeg,image/webp"
-                      onChange={handleFileInput}
-                      className="hidden"
-                    />
-                  </button>
-                )}
-                {imageError && <p className="mt-2 text-sm text-red-600">{imageError}</p>}
-              </div>
-            )}
-          </div>
+          <ImageUpload image={image} onImageChange={setImage} />
 
           {designContextEnabled && (
             <DesignContext
@@ -505,7 +263,6 @@ export default function GeneratorForm({
                 <option value="none">None</option>
               </select>
             </div>
-
             <div>
               <label htmlFor="style" className="block text-sm font-medium text-text-primary mb-2">
                 Design Style
@@ -520,7 +277,6 @@ export default function GeneratorForm({
                 <option value="colorful">Colorful</option>
               </select>
             </div>
-
             <label className="flex items-center">
               <input
                 {...register('typescript')}

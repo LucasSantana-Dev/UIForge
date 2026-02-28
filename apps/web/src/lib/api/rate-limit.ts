@@ -1,6 +1,30 @@
 import { getSession } from './auth';
 import { RateLimitError } from './errors';
 
+export interface RouteLimitConfig {
+  limit: number;
+  window: number;
+}
+
+const ROUTE_LIMITS: Record<string, RouteLimitConfig> = {
+  '/api/generate': { limit: 15, window: 60000 },
+  '/api/generate/validate': { limit: 30, window: 60000 },
+  '/api/generate/format': { limit: 30, window: 60000 },
+  '/api/components': { limit: 60, window: 60000 },
+  '/api/projects': { limit: 60, window: 60000 },
+  '/api/templates': { limit: 60, window: 60000 },
+  '/api/generations': { limit: 60, window: 60000 },
+  '/api/auth': { limit: 10, window: 60000 },
+  '/api/wireframe': { limit: 10, window: 60000 },
+};
+
+export function getRouteLimit(pathname: string): RouteLimitConfig {
+  for (const [route, config] of Object.entries(ROUTE_LIMITS)) {
+    if (pathname.startsWith(route)) return config;
+  }
+  return { limit: 100, window: 60000 };
+}
+
 interface RateLimitInfo {
   count: number;
   resetAt: number;

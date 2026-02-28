@@ -2,7 +2,7 @@ name: Deploy Docs to Cloudflare Workers
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'feat/*']
     paths:
       - 'apps/docs/**'
   workflow_dispatch:
@@ -12,10 +12,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  deploy-production:
     runs-on: ubuntu-latest
-    name: Deploy
-    if: ${{ vars.CLOUDFLARE_DEPLOY_ENABLED == 'true' }}
+    name: Deploy Production
+    if: ${{ github.ref == 'refs/heads/main' && vars.CLOUDFLARE_DEPLOY_ENABLED == 'true' }}
     permissions:
       contents: read
       deployments: write
@@ -41,3 +41,33 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: apps/docs
           command: deploy --keep-vars
+
+  deploy-dev:
+    runs-on: ubuntu-latest
+    name: Deploy Dev
+    if: ${{ startsWith(github.ref, 'refs/heads/feat/') && vars.CLOUDFLARE_DEPLOY_ENABLED == 'true' }}
+    permissions:
+      contents: read
+      deployments: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - run: npm ci --legacy-peer-deps
+
+      - name: Build with OpenNext
+        working-directory: apps/docs
+        run: npx opennextjs-cloudflare build
+
+      - name: Deploy to Cloudflare Workers (dev)
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/docs
+          command: deploy --env dev --keep-vars

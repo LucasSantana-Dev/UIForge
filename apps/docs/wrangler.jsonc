@@ -6,6 +6,17 @@
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS",
+    "binding": "ASSETS"
   },
+  "env": {
+    "dev": {
+      "name": "siza-docs-dev",
+      "routes": [
+        {
+          "pattern": "dev-docs.forgespace.co",
+          "custom_domain": true
+        }
+      ]
+    }
+  }
 }

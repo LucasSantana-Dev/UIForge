@@ -416,14 +416,6 @@ describe('DELETE /api/components/[id]', () => {
       error: null,
     });
 
-    const mockProjectChain: any = {};
-    mockProjectChain.select = jest.fn(() => mockProjectChain);
-    mockProjectChain.eq = jest.fn(() => mockProjectChain);
-    mockProjectChain.single = jest.fn().mockResolvedValue({
-      data: { id: mockComponent.project_id },
-      error: null,
-    });
-
     const mockDeleteChain: any = {};
     mockDeleteChain.delete = jest.fn(() => mockDeleteChain);
     mockDeleteChain.eq = jest.fn().mockResolvedValue({ error: null });
@@ -432,7 +424,6 @@ describe('DELETE /api/components/[id]', () => {
       from: jest.fn((_table: string) => {
         fromCallCount++;
         if (fromCallCount === 1) return mockComponentChain;
-        if (fromCallCount === 2) return mockProjectChain;
         return mockDeleteChain;
       }),
     } as any);
@@ -509,14 +500,6 @@ describe('DELETE /api/components/[id]', () => {
       error: null,
     });
 
-    const mockProjectChain: any = {};
-    mockProjectChain.select = jest.fn(() => mockProjectChain);
-    mockProjectChain.eq = jest.fn(() => mockProjectChain);
-    mockProjectChain.single = jest.fn().mockResolvedValue({
-      data: { id: mockComponent.project_id },
-      error: null,
-    });
-
     const mockDeleteChain: any = {};
     mockDeleteChain.delete = jest.fn(() => mockDeleteChain);
     mockDeleteChain.eq = jest.fn().mockResolvedValue({ error: null });
@@ -525,7 +508,6 @@ describe('DELETE /api/components/[id]', () => {
       from: jest.fn((_table: string) => {
         fromCallCount++;
         if (fromCallCount === 1) return mockComponentChain;
-        if (fromCallCount === 2) return mockProjectChain;
         return mockDeleteChain;
       }),
     } as any);

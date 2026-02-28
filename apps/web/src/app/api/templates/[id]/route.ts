@@ -4,6 +4,7 @@ import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, errorResponse, noContentResponse } from '@/lib/api/response';
 import { UnauthorizedError, ForbiddenError } from '@/lib/api/errors';
+import { captureServerError } from '@/lib/sentry/server';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
     setRateLimitHeaders(response, { allowed, remaining, resetAt }, 120);
     return response;
   } catch (error) {
-    console.error('GET /api/templates/[id] error:', error);
+    captureServerError(error, { route: '/api/templates/[id]' });
     return errorResponse('Internal server error', 500);
   }
 }
@@ -69,7 +70,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     const { error: deleteError } = await supabase.from('templates').delete().eq('id', id);
 
     if (deleteError) {
-      console.error('Failed to delete template:', deleteError);
+      captureServerError(deleteError, { route: '/api/templates/[id]' });
       return errorResponse('Failed to delete template', 500);
     }
 
@@ -78,7 +79,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     if (error instanceof UnauthorizedError || error instanceof ForbiddenError) {
       return errorResponse(error.message, error.statusCode);
     }
-    console.error('DELETE /api/templates/[id] error:', error);
+    captureServerError(error, { route: '/api/templates/[id]' });
     return errorResponse('Internal server error', 500);
   }
 }

@@ -1,0 +1,97 @@
+---
+title: Templates
+description: Use Siza's template library to scaffold complete pages and applications.
+---
+
+## Overview
+
+Templates are pre-built page layouts that combine multiple components into a cohesive design. Unlike individual components, templates provide full page structures with routing, data flow, and responsive behavior.
+
+## Available Templates
+
+### Landing Page
+
+A marketing landing page with hero, features, pricing, and CTA sections.
+
+```json
+{
+  "tool": "generate_page_template",
+  "input": {
+    "template_type": "landing",
+    "industry": "saas",
+    "framework": "react-tailwind"
+  }
+}
+```
+
+### Dashboard
+
+An admin dashboard with sidebar navigation, stat cards, charts, and data tables.
+
+```json
+{
+  "tool": "generate_page_template",
+  "input": {
+    "template_type": "dashboard",
+    "industry": "analytics",
+    "framework": "react-tailwind"
+  }
+}
+```
+
+### E-commerce
+
+Product listing, detail pages, cart, and checkout flow.
+
+```json
+{
+  "tool": "generate_page_template",
+  "input": {
+    "template_type": "ecommerce",
+    "industry": "retail",
+    "framework": "react-tailwind"
+  }
+}
+```
+
+### Authentication
+
+Sign in, sign up, forgot password, and verification pages.
+
+```json
+{
+  "tool": "generate_page_template",
+  "input": {
+    "template_type": "auth",
+    "framework": "react-tailwind"
+  }
+}
+```
+
+## Customization
+
+Templates accept the same mood, visual style, and industry parameters as components:
+
+| Parameter | Description | Examples |
+|-----------|-------------|----------|
+| `mood` | Visual tone | `professional`, `playful`, `minimal` |
+| `visual_style` | Design system | `glassmorphism`, `neobrutalism`, `flat` |
+| `industry` | Domain context | `saas`, `ecommerce`, `healthcare` |
+| `framework` | Output format | `react-tailwind`, `vue-css`, `svelte` |
+
+## Full Application Scaffolding
+
+For complete multi-page applications, use the `scaffold_full_application` tool:
+
+```json
+{
+  "tool": "scaffold_full_application",
+  "input": {
+    "app_type": "saas",
+    "features": ["auth", "dashboard", "billing", "settings"],
+    "framework": "react-tailwind"
+  }
+}
+```
+
+This generates a full project structure with routing, layouts, and connected components.

@@ -5,6 +5,7 @@ import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, createdResponse, errorResponse } from '@/lib/api/response';
 import { UnauthorizedError, ValidationError } from '@/lib/api/errors';
 import { templateQuerySchema, createTemplateSchema } from '@/lib/api/validation/templates';
+import { captureServerError } from '@/lib/sentry/server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
     const { data: templates, error: dbError } = await query;
 
     if (dbError) {
-      console.error('Failed to fetch templates:', dbError);
+      captureServerError(dbError, { route: '/api/templates' });
       return errorResponse('Failed to fetch templates', 500);
     }
 
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
     if (error instanceof ValidationError) {
       return errorResponse(error.message, error.statusCode);
     }
-    console.error('GET /api/templates error:', error);
+    captureServerError(error, { route: '/api/templates' });
     return errorResponse('Internal server error', 500);
   }
 }
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (dbError) {
-      console.error('Failed to create template:', dbError);
+      captureServerError(dbError, { route: '/api/templates' });
       return errorResponse('Failed to create template', 500);
     }
 
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof UnauthorizedError || error instanceof ValidationError) {
       return errorResponse(error.message, error.statusCode);
     }
-    console.error('POST /api/templates error:', error);
+    captureServerError(error, { route: '/api/templates' });
     return errorResponse('Internal server error', 500);
   }
 }
