@@ -15,7 +15,7 @@
   },
   "routes": [
     {
-      "pattern": "siza.dev/*",
+      "pattern": "siza.forgespace.co/*",
       "custom_domain": true,
     },
   ],

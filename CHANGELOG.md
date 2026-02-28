@@ -15,6 +15,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Usage limits: generation quota checks with feature flag gating (6 tests)
 - Expanded `collectCoverageFrom` to include quality, usage, email, and auth modules
 
+### Changed
+
+- **Domain migration**: All URLs migrated to `forgespace.co` subdomains
+  - Production: `siza.forgespace.co`
+  - Documentation: `docs.forgespace.co`
+  - Dev environment: `dev.forgespace.co`
+  - API: `api.forgespace.co`
+  - Email: `noreply@forgespace.co`
+
 ## [0.13.0] - 2026-02-28
 
 ### Changed
