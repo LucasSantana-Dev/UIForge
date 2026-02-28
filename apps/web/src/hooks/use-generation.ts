@@ -94,6 +94,9 @@ export function useGeneration(projectId?: string) {
               }));
               break;
 
+            case 'fallback':
+              break;
+
             case 'complete':
               setState((prev) => ({ ...prev, code, progress: 100, isGenerating: false }));
 

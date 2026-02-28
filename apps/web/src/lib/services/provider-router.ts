@@ -80,7 +80,23 @@ async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<Genera
   }
 }
 
+const QUOTA_ERROR_PATTERNS = [
+  'quota',
+  '429',
+  'rate limit',
+  'resource_exhausted',
+  'too many requests',
+];
+
+function isQuotaError(message?: string): boolean {
+  if (!message) return false;
+  const lower = message.toLowerCase();
+  return QUOTA_ERROR_PATTERNS.some((p) => lower.includes(p));
+}
+
 async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
+  let quotaError: GenerationEvent | null = null;
+
   for await (const event of generateWithProvider({
     provider: opts.provider as AIProvider,
     model: opts.model,
@@ -90,6 +106,45 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
     style: opts.style,
     typescript: opts.typescript,
     apiKey: opts.userApiKey,
+    contextAddition: opts.contextAddition,
+    imageBase64: opts.imageBase64,
+    imageMimeType: opts.imageMimeType,
+  })) {
+    if (event.type === 'complete') break;
+    if (event.type === 'error' && isQuotaError(event.message)) {
+      quotaError = event;
+      break;
+    }
+    yield event;
+  }
+
+  if (!quotaError) return;
+
+  if (opts.provider === 'anthropic' || !process.env.ANTHROPIC_API_KEY) {
+    yield quotaError;
+    return;
+  }
+
+  captureServerError(new Error(quotaError.message), {
+    route: '/api/generate',
+    extra: { fallback: `${opts.provider}-to-anthropic` },
+  });
+
+  yield {
+    type: 'fallback',
+    provider: 'anthropic',
+    message: `${opts.provider} quota exceeded, falling back to Anthropic`,
+    timestamp: Date.now(),
+  };
+
+  for await (const event of generateWithProvider({
+    provider: 'anthropic',
+    model: 'claude-sonnet-4-20250514',
+    prompt: opts.prompt,
+    framework: opts.framework,
+    componentLibrary: opts.componentLibrary,
+    style: opts.style,
+    typescript: opts.typescript,
     contextAddition: opts.contextAddition,
     imageBase64: opts.imageBase64,
     imageMimeType: opts.imageMimeType,
