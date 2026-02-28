@@ -77,6 +77,25 @@ Quick guide to set up Siza with Supabase Cloud instead of local development.
    - ✅ project-files
    - ✅ user-uploads
 
+### 2.6 Configure Custom SMTP (Production)
+
+Configure Resend as the SMTP provider so auth emails (verification, password reset) come from `noreply@forgespace.co`:
+
+1. Go to **Authentication → SMTP Settings** in the Supabase Dashboard
+2. Enable **Custom SMTP** and configure:
+   - **Sender email**: `noreply@forgespace.co`
+   - **Sender name**: `Siza`
+   - **Host**: `smtp.resend.com`
+   - **Port**: `587`
+   - **Username**: `resend`
+   - **Password**: Your Resend API key (`re_xxxxx`)
+3. Go to **Authentication → Email Templates** and update all 4 templates
+   - Branded HTML templates are in `docs/email-templates/`
+4. Go to **Authentication → Rate Limits** and set email rate to 30/hour
+5. Save all changes
+
+**Prerequisites**: forgespace.co domain must be verified in Resend with DKIM/SPF/MX records configured in Cloudflare DNS.
+
 ## Step 3: Get API Credentials (1 minute)
 
 ### 3.1 Navigate to API Settings
