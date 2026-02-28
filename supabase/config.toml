@@ -63,9 +63,9 @@ enable_confirmations = true
 # Production SMTP via Resend (configure in Supabase Dashboard):
 # Host: smtp.resend.com, Port: 587, User: resend, Pass: RESEND_API_KEY
 # Local dev uses Inbucket (port 54324) by default
-# [auth.email.smtp]
+[auth.email.smtp]
 # host = "smtp.resend.com"
-# port = 587
+port = 587
 # user = "resend"
 # pass = "env(RESEND_API_KEY)"
 # sender_name = "Siza"
@@ -83,5 +83,5 @@ secret = "env(GITHUB_CLIENT_SECRET)"
 redirect_uri = "http://localhost:54321/auth/v1/callback"
 
 # [edge_functions]
-# enabled = false
+enabled = true
 # Enable when needed for backend logic (commented out for CLI compatibility)
