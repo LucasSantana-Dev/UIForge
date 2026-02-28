@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+
+## [0.14.0] - 2026-02-28
+
 ### Added
 - **@siza/ui component extraction**: Pure UI versions of QualityPanel, GenerationProgress, and NavigationSidebar for cross-platform reuse
   - `NavigationSidebar` with headless `renderLink` pattern for platform-agnostic routing
@@ -17,6 +20,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Responsive generator layout**: Mobile-first `flex-col lg:flex-row` with Code/Preview tab switcher on small screens
 - **Focus-visible styles**: Global focus ring using brand color for keyboard navigation
 - **ARIA attributes**: `aria-describedby`, `aria-invalid`, `role="alert"` on generator form fields and errors
+- **Quality Gates**: Enable quality scoring for generated components with inline score display
+  - 5 gates: security (XSS/injection), lint, type-check, accessibility, responsive
+  - Weighted scoring (0-100%) shown inline on QualityBadge
+  - Expandable QualityPanel with per-gate pass/fail details
+  - Quality check step in generation progress indicator
+  - 34 unit tests covering all gate functions
+- **Generator UX Polish**: Loading skeletons, responsive layout, focus-visible states, aria attributes
+- **Test coverage boost**: 63 new unit tests across 4 new test suites
+  - Template validation, auth emails, usage limits
 
 ### Changed
 - **Docs landing page**: Animations (hero glow, fade-up, shimmer, pulse-ring), glassmorphism cards, gradient text, staggered entrance, `prefers-reduced-motion` support
@@ -34,27 +46,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Mobile nav**: Consistent left-border active indicator matching desktop sidebar
 - **Desktop generate page**: Branded header with gradient and SparklesIcon
 
-## [0.14.0] - 2026-02-28
-
-### Added
-- **Quality Gates**: Enable quality scoring for generated components with inline score display
-  - 5 gates: security (XSS/injection), lint, type-check, accessibility, responsive
-  - Weighted scoring (0-100%) shown inline on QualityBadge
-  - Expandable QualityPanel with per-gate pass/fail details
-  - Quality check step in generation progress indicator
-  - 34 unit tests covering all gate functions
-- **Generator UX Polish**: Loading skeletons, responsive layout, focus-visible states, aria attributes
-- **Test coverage boost**: 63 new unit tests across 4 new test suites
-  - Template validation, auth emails, usage limits
-
-### Changed
-
 - **Domain migration**: All URLs migrated to `forgespace.co` subdomains
   - Production: `siza.forgespace.co`
   - Documentation: `docs.forgespace.co`
   - Dev environment: `dev.forgespace.co`
   - API: `api.forgespace.co`
   - Email: `noreply@forgespace.co`
+
 
 ## [0.13.0] - 2026-02-28
 
