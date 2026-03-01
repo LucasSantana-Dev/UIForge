@@ -6,7 +6,26 @@ import { useRealtimeProjects } from '@/hooks/use-realtime-projects';
 import ProjectGrid from './ProjectGrid';
 import ProjectFilters from './ProjectFilters';
 import EmptyState from '@/components/ui/EmptyState';
+import { Skeleton } from '@siza/ui';
 import { FolderIcon } from 'lucide-react';
+
+function ProjectCardSkeleton() {
+  return (
+    <div className="bg-surface-1 rounded-xl border border-surface-3 overflow-hidden">
+      <Skeleton className="aspect-video w-full rounded-none" />
+      <div className="p-4 space-y-3">
+        <Skeleton className="h-5 w-3/4" />
+        <Skeleton className="h-4 w-full" />
+        <div className="flex items-center justify-between pt-2">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-3 w-24" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export { ProjectCardSkeleton };
 
 export default function ProjectList() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -18,8 +37,8 @@ export default function ProjectList() {
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="h-64 bg-muted animate-pulse rounded-lg" />
+        {Array.from({ length: 6 }).map((_, i) => (
+          <ProjectCardSkeleton key={i} />
         ))}
       </div>
     );
