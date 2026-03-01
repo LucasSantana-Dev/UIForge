@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.27.0] - 2026-03-01
+
+### Added
+- **Loading skeletons**: Structured loading states for projects, generate, and settings pages with Skeleton component in @siza/ui (#279)
+
+### Fixed
+- **Error messages**: Actionable, user-friendly error messages across generation API — covers providers, MCP gateway, validation, and streaming errors (#278)
+
+### Testing
+- **Billing component tests**: 38 tests across PricingCard, SubscriptionStatus, UsageChart, and UpgradePrompt (#280)
+
 ## [0.26.0] - 2026-03-01
 
 ### Added
