@@ -7,12 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.20.0] - 2026-03-01
+
 ### Added
 - **Docs typography**: Outfit font for headings, gradient h1, bordered h2, accent-bar h3
 - **Docs code blocks**: Enhanced code blocks with language label, copy-to-clipboard button, glassmorphism header
 - **Docs callout component**: Callout with info/warning/tip/danger variants for MDX content
 - **Docs content polish**: Styled blockquotes, lists, links (underline-on-hover), horizontal rules, images
 - **Docs sidebar/nav**: Gradient active indicator, scroll-spy dot, nav gradient line, custom scrollbar
+
+### Fixed
+- **Feature flag defaults**: Align `.env.example` with code defaults — enable quality gates, multi-LLM, conversation mode, and design analysis for new installs
 
 ## [0.19.0] - 2026-03-01
 
