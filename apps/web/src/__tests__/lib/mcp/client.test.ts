@@ -107,9 +107,7 @@ describe('callTool', () => {
       ok: true,
       json: () => Promise.resolve({ jsonrpc: '2.0', id: 1 }),
     });
-    await expect(callTool('empty', {})).rejects.toThrow(
-      'MCP gateway returned an empty result'
-    );
+    await expect(callTool('empty', {})).rejects.toThrow('MCP gateway returned an empty result');
   });
 
   it('throws on HTTP error', async () => {
