@@ -15,9 +15,7 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsBody>
         <h1>{page.data.title}</h1>
-        {page.data.description && (
-          <p className="fd-description">{page.data.description}</p>
-        )}
+        {page.data.description && <p className="fd-description">{page.data.description}</p>}
         <Mdx components={defaultMdxComponents} />
       </DocsBody>
     </DocsPage>
