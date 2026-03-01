@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.24.0] - 2026-03-01
+
+### Added
+- **Siza AI smart routing**: Automatically selects optimal AI model based on prompt complexity (Claude for complex, Gemini Flash for simple/vision/free-tier)
+- **BYOK provider grid**: Collapsible grid for users who want to use their own API keys with OpenAI, Anthropic, or Google
+- **Brand-guide integration**: Siza sub-brand fonts (Plus Jakarta Sans, DM Sans, IBM Plex Mono), semantic colors, 40+ hardcoded hex replaced with Tailwind tokens
+- **Forge Space built-in theme**: Full theme with brandMeta (fonts, semantic colors, neutrals)
+- **8 new E2E test files**: Comprehensive coverage for onboarding, auth, dashboard, templates, history, generation, error states, responsive design
+- **Database migration**: routed_provider and routing_reason columns for routing metadata
+
+### Changed
+- **Default provider**: Changed from google to siza for intelligent routing
+
+### Fixed
+- **CodeRabbit review items**: Siza provider validation and accessibility improvements
+
 ## [0.23.1] - 2026-03-01
 
 ### Fixed
