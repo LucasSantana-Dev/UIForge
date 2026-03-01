@@ -24,6 +24,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_CODE_INTELLISENSE: true,
   ENABLE_CONVERSATION_MODE: true,
   ENABLE_DESIGN_ANALYSIS: true,
+  ENABLE_SIZA_AI: true,
   ENABLE_ONBOARDING: false,
 };
 
@@ -162,8 +163,8 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
   },
   {
     name: 'ENABLE_SIZA_AI',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_SIZA_AI,
     description: 'Enable Siza AI as default smart routing provider',
-    defaultValue: true,
     category: 'generation',
   },
   {
