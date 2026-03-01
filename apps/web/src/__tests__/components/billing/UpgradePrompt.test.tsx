@@ -2,11 +2,15 @@ import { render, screen } from '@testing-library/react';
 import { UpgradePrompt } from '@/components/billing/UpgradePrompt';
 
 jest.mock('next/link', () => {
-  return ({ children, href, ...props }: { children: React.ReactNode; href: string }) => (
-    <a href={href} {...props}>
-      {children}
-    </a>
-  );
+  function MockLink({ children, href, ...props }: { children: React.ReactNode; href: string }) {
+    return (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    );
+  }
+  MockLink.displayName = 'MockLink';
+  return MockLink;
 });
 
 describe('UpgradePrompt', () => {
