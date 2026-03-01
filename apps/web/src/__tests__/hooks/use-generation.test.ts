@@ -7,6 +7,10 @@ import { renderHook, act } from '@testing-library/react';
 import { useGeneration } from '@/hooks/use-generation';
 
 // Mock dependencies
+jest.mock('@tanstack/react-query', () => ({
+  useQueryClient: () => ({ invalidateQueries: jest.fn() }),
+}));
+
 jest.mock('@/lib/api/generation', () => ({
   streamGeneration: jest.fn(),
 }));

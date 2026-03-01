@@ -145,7 +145,7 @@ export function useGeneration(projectId?: string) {
         return null;
       }
     },
-    []
+    [projectId, queryClient]
   );
 
   const stopGeneration = useCallback(() => {
