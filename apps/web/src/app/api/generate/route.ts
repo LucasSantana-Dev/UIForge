@@ -113,6 +113,8 @@ export async function POST(request: NextRequest) {
 
           let fullCode = '';
           let actualProvider = activeProvider;
+          let routedProvider: string | undefined;
+          let routingReason: string | undefined;
           for await (const event of routeGeneration({
             mcpEnabled,
             prompt: streamPrompt,
@@ -134,6 +136,10 @@ export async function POST(request: NextRequest) {
               actualProvider = event.provider;
               fullCode = '';
             }
+            if ((event as unknown as { type: string }).type === 'routing' && event.provider) {
+              routedProvider = event.provider;
+              routingReason = (event as unknown as { message: string }).message;
+            }
             controller.enqueue(encoder.encode(createSseEvent(event)));
           }
 
@@ -149,7 +155,14 @@ export async function POST(request: NextRequest) {
           );
 
           if (generationId) {
-            await completeGeneration(generationId, fullCode, actualProvider, qualityReport.score);
+            await completeGeneration(
+              generationId,
+              fullCode,
+              actualProvider,
+              qualityReport.score,
+              routedProvider,
+              routingReason
+            );
             void postGenerationTasks(generationId, input.description, user.id, input.userApiKey);
           }
 

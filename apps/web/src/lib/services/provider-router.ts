@@ -1,4 +1,5 @@
 import type { AIProvider } from '@/lib/encryption';
+import { routeSizaGeneration } from './siza-router';
 import type { GenerationEvent } from './gemini';
 import { generateComponentStream } from './gemini';
 import { generateWithProvider } from './generation';
@@ -26,9 +27,32 @@ export async function* routeGeneration(
 ): AsyncGenerator<GenerationEvent> {
   if (opts.mcpEnabled) {
     yield* routeViaMcp(opts);
+  } else if (opts.provider === 'siza') {
+    yield* routeViaSizaAI(opts);
   } else {
     yield* routeViaProvider(opts);
   }
+}
+
+async function* routeViaSizaAI(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
+  const routing = routeSizaGeneration({
+    prompt: opts.prompt,
+    hasImage: !!opts.imageBase64,
+    isFreeTier: !opts.userApiKey,
+  });
+
+  yield {
+    type: 'routing' as GenerationEvent['type'],
+    provider: routing.provider,
+    message: 'Routing via ' + routing.provider + ' (' + routing.reason + ')',
+    timestamp: Date.now(),
+  };
+
+  yield* routeViaProvider({
+    ...opts,
+    provider: routing.provider,
+    model: routing.model,
+  });
 }
 
 async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {

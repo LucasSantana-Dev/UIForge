@@ -113,14 +113,19 @@ export async function completeGeneration(
   generationId: string,
   code: string,
   provider: string,
-  qualityScore: number
+  qualityScore: number,
+  routedProvider?: string,
+  routingReason?: string
 ): Promise<void> {
-  await updateGeneration(generationId, {
+  const record: Record<string, unknown> = {
     status: 'completed',
     generated_code: code,
     ai_provider: code ? provider : 'google',
     quality_score: qualityScore,
-  });
+  };
+  if (routedProvider) record.routed_provider = routedProvider;
+  if (routingReason) record.routing_reason = routingReason;
+  await updateGeneration(generationId, record);
 }
 
 export async function failGeneration(generationId: string, errorMessage: string): Promise<void> {

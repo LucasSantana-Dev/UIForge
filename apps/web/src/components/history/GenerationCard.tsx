@@ -13,6 +13,7 @@ interface GenerationCardProps {
     component_library?: string;
     style?: string;
     ai_provider?: string;
+    routed_provider?: string;
     model_used?: string;
     generation_time_ms?: number;
     quality_score?: number;
@@ -31,6 +32,7 @@ const FRAMEWORK_COLORS: Record<string, string> = {
 };
 
 const PROVIDER_LABELS: Record<string, string> = {
+  siza: 'Siza AI',
   google: 'Gemini',
   openai: 'OpenAI',
   anthropic: 'Claude',
@@ -81,7 +83,12 @@ export function GenerationCard({ generation, onReusePrompt, onCopyCode }: Genera
         {generation.ai_provider && (
           <>
             <span className="text-surface-3">|</span>
-            <span>{PROVIDER_LABELS[generation.ai_provider] || generation.ai_provider}</span>
+            <span>
+              {PROVIDER_LABELS[generation.ai_provider] || generation.ai_provider}
+              {generation.ai_provider === 'siza' && generation.routed_provider && (
+                <> &rarr; {PROVIDER_LABELS[generation.routed_provider]}</>
+              )}
+            </span>
           </>
         )}
         {generation.component_library && (

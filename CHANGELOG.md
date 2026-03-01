@@ -7,19 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-03-01
+
+### Added
+- **Siza AI smart routing**: Automatically selects optimal AI model based on prompt complexity (Anthropic Claude for complex, Gemini Flash for simple/vision/free-tier)
+- **Routing visualization**: Generation history shows routing path ("Siza AI → Gemini Flash") with provider labels
+- **Tab-based generation form**: Restructured UI with Prompt / Options / Design tabs for cleaner generation workflow
+- **Database migration**: `routed_provider` and `routing_reason` columns for routing metadata persistence
+- **8 new E2E test files**: Comprehensive coverage for onboarding, auth, dashboard, templates, history, generation, error states, and responsive design
+- **E2E mock API helper**: Route interception utilities for flaky-free E2E tests
+
 ### Changed
-- **Landing page repositioning**: Reframe from UI generation to full-stack project generation platform
-- **Hero**: "Generate production UI with AI" → "Vibe code the right way" with full-stack subheading
-- **Stats bar**: Ecosystem-wide metrics (1,500+ tests, 502 snippets, 5 quality gates, 7 repos)
-- **Capabilities**: Reframe 6 cards as architecture, security, quality, scaffolds, context-awareness, multi-provider
-- **Code showcase**: Gateway config → full-stack scaffold tree with architecture layers
-- **CTA**: "Start building with precision" → "Start building the right way"
-- **Metadata**: Title, description, OG tags, keywords updated for full-stack positioning
-- **Ecosystem section**: Add missing brand-guide repo card (7 of 7), update siza-mcp description
+- **Generation form layout**: Split into tabs for cleaner UX with sheet-based history sidebar
+- **Default provider**: Changed from `google` to `siza` for intelligent routing as default
+- **History sidebar**: Moved to Sheet component for better space usage
 
 ### Fixed
-- **Ecosystem section**: brand-guide (7th repo) was missing from the repo cards
-
+- **Dark theme form inputs**: Native select, input, and textarea elements now use dark theme styles
+- **useCallback deps**: Fixed missing `projectId` and `queryClient` dependencies in `use-generation.ts`
+- **E2E template literal escaping**: Fixed mock-api.ts using array.join pattern
 
 ## [0.21.0] - 2026-03-01
 

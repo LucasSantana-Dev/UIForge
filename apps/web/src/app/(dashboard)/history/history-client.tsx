@@ -24,6 +24,7 @@ interface HistoryGeneration {
   typescript: boolean;
   status: string;
   ai_provider?: string;
+  routed_provider?: string;
   model_used?: string;
   tokens_used?: number;
   generation_time_ms?: number;
