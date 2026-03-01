@@ -24,10 +24,10 @@
     --text-brand: #a78bfa;
 
     /* ── Semantic colors ── */
-    --success: #10b981;
-    --warning: #f59e0b;
-    --error: #ef4444;
-    --info: #3b82f6;
+    --success: #22c35d;
+    --warning: #f59f0a;
+    --error: #ef4343;
+    --info: #368fe7;
 
     /* ── Design tokens ── */
     --transition-fast: 150ms ease;
@@ -67,12 +67,14 @@
     --chart-5: 340 75% 55%;
 
     /* ── Font families ── */
-    --font-sans: var(--font-inter);
-    --font-display: var(--font-outfit);
-    --font-mono: var(--font-jetbrains-mono);
+    --font-sans: var(--font-dm-sans);
+    --font-display: var(--font-plus-jakarta);
+    --font-mono: var(--font-ibm-plex-mono);
 
     /* ── Easing ── */
     --ease-siza: cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-spring: cubic-bezier(0.2, 1.6, 0.4, 1);
+    --ease-bounce: cubic-bezier(0.2, 1.4, 0.4, 1);
   }
 }
 
