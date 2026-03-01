@@ -3,14 +3,6 @@ import { DocsBody, DocsPage } from 'fumadocs-ui/layouts/docs/page';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import Callout from '@/components/mdx/Callout';
-import CodeBlock from '@/components/mdx/CodeBlock';
-
-const mdxComponents = {
-  ...defaultMdxComponents,
-  Callout,
-  pre: CodeBlock,
-};
 
 export default async function Page(props: { params: Promise<{ slug?: string[] }> }) {
   const params = await props.params;
@@ -22,22 +14,11 @@ export default async function Page(props: { params: Promise<{ slug?: string[] }>
   return (
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsBody>
-        <div className="prose-docs" style={{ maxWidth: '65ch' }}>
-          <h1>{page.data.title}</h1>
-          {page.data.description && (
-            <p
-              style={{
-                color: 'rgb(var(--color-fd-muted-foreground))',
-                fontSize: '1.125rem',
-                lineHeight: 1.7,
-                marginBottom: '2rem',
-              }}
-            >
-              {page.data.description}
-            </p>
-          )}
-          <Mdx components={mdxComponents} />
-        </div>
+        <h1>{page.data.title}</h1>
+        {page.data.description && (
+          <p className="fd-description">{page.data.description}</p>
+        )}
+        <Mdx components={defaultMdxComponents} />
       </DocsBody>
     </DocsPage>
   );
