@@ -29,7 +29,8 @@ export function CTASection({ user }: CTASectionProps) {
             </h2>
 
             <p className="text-lg text-[#A1A1AA] text-center max-w-xl mx-auto mb-10">
-              Full-stack generation with architecture, security, and quality built in. Open source, MIT licensed.
+              Full-stack generation with architecture, security, and quality built in. Open source,
+              MIT licensed.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

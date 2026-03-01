@@ -36,7 +36,8 @@ const capabilities = [
   {
     icon: Brain,
     title: 'Context-Aware Generation',
-    description: 'MCP-native tools that understand your codebase, brand identity, and design system. No generic output.',
+    description:
+      'MCP-native tools that understand your codebase, brand identity, and design system. No generic output.',
     accent: 'from-indigo-500/20 to-indigo-600/5',
   },
   {

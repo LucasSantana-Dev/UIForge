@@ -27,7 +27,7 @@ test.describe('Landing Page', () => {
   test('should render capabilities section', async ({ page }) => {
     await expect(page.getByText(/what makes it different/i)).toBeVisible();
     await expect(page.getByText(/architecture-first/i)).toBeVisible();
-    await expect(page.getByText(/security by default/i)).toBeVisible();
+    await expect(page.getByText(/security by default/i).first()).toBeVisible();
   });
 
   test('should render code showcase section', async ({ page }) => {

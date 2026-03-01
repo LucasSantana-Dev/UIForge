@@ -169,11 +169,15 @@ export function HeroSection({ user }: HeroSectionProps) {
             </div>
             <div>
               <span className="text-[#22C55E]">&#10003;</span>{' '}
-              <span className="text-[#A1A1AA]">Architecture scaffolded (service layers, middleware)</span>
+              <span className="text-[#A1A1AA]">
+                Architecture scaffolded (service layers, middleware)
+              </span>
             </div>
             <div>
               <span className="text-[#22C55E]">&#10003;</span>{' '}
-              <span className="text-[#A1A1AA]">Security configured (BYOK, RLS, input validation)</span>
+              <span className="text-[#A1A1AA]">
+                Security configured (BYOK, RLS, input validation)
+              </span>
             </div>
             <div>
               <span className="text-[#22C55E]">&#10003;</span>{' '}
@@ -181,7 +185,9 @@ export function HeroSection({ user }: HeroSectionProps) {
             </div>
             <div>
               <span className="text-[#22C55E]">&#10003;</span>{' '}
-              <span className="text-[#A1A1AA]">CI/CD pipeline ready (lint, test, security scan)</span>
+              <span className="text-[#A1A1AA]">
+                CI/CD pipeline ready (lint, test, security scan)
+              </span>
             </div>
             <div>
               <span

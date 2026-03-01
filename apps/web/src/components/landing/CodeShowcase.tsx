@@ -70,9 +70,7 @@ export function CodeShowcase() {
       <div className={`${CONTAINER} grid grid-cols-1 lg:grid-cols-2 gap-12 items-center`}>
         <FadeIn delay={0}>
           <div>
-            <div className="text-sm font-mono text-[#7C3AED] mb-4">
-              {'// npx create-siza-app'}
-            </div>
+            <div className="text-sm font-mono text-[#7C3AED] mb-4">{'// npx create-siza-app'}</div>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-6">
               Your next project.
               <br />

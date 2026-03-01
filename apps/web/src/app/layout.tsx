@@ -28,7 +28,17 @@ export const metadata: Metadata = {
   title: 'Siza — Vibe Code the Right Way',
   description:
     'AI-powered full-stack generation with real architecture, security by default, and quality gates. Open source, MIT licensed.',
-  keywords: ['full-stack generation', 'AI code generation', 'vibe coding', 'architecture', 'security', 'code quality', 'React', 'Next.js', 'MCP'],
+  keywords: [
+    'full-stack generation',
+    'AI code generation',
+    'vibe coding',
+    'architecture',
+    'security',
+    'code quality',
+    'React',
+    'Next.js',
+    'MCP',
+  ],
   authors: [{ name: 'Siza Team' }],
   icons: {
     icon: '/favicon.ico',
