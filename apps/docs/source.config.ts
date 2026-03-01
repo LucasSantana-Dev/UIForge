@@ -8,8 +8,8 @@ export default defineConfig({
   mdxOptions: {
     rehypeCodeOptions: {
       themes: {
-        light: 'github-dark',
-        dark: 'github-dark',
+        light: 'rose-pine-moon',
+        dark: 'rose-pine-moon',
       },
     },
   },

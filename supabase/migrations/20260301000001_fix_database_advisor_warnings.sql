@@ -102,10 +102,22 @@ ALTER FUNCTION public.get_user_project_count(uuid) SET search_path = public;
 ALTER FUNCTION public.get_user_component_count(uuid) SET search_path = public;
 ALTER FUNCTION public.get_user_generation_count(uuid) SET search_path = public;
 ALTER FUNCTION public.get_user_storage_usage(uuid) SET search_path = public;
-ALTER FUNCTION public.match_patterns(vector, double precision, integer)
-  SET search_path = public, extensions;
-ALTER FUNCTION public.match_generations(vector, double precision, integer, double precision)
-  SET search_path = public, extensions;
+DO $$
+BEGIN
+  ALTER FUNCTION public.match_patterns(extensions.vector, double precision, integer)
+    SET search_path = public, extensions;
+EXCEPTION WHEN undefined_function OR undefined_object THEN
+  RAISE NOTICE 'match_patterns not found, skipping';
+END;
+$$;
+DO $$
+BEGIN
+  ALTER FUNCTION public.match_generations(extensions.vector, double precision, integer, double precision)
+    SET search_path = public, extensions;
+EXCEPTION WHEN undefined_function OR undefined_object THEN
+  RAISE NOTICE 'match_generations not found, skipping';
+END;
+$$;
 
 -- ============================================================
 -- 4. FIX rls_policy_always_true (WARN): Tighten overly
