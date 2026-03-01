@@ -1,17 +1,87 @@
 ---
 title: Contributing
 description: How to contribute to Siza
+icon: Heart
 ---
 
-Siza is open-source. Contributions welcome across all five repositories.
+<ContribHero />
+
+## Ways to Contribute
+
+<ContribTypes>
+  <ContribType
+    icon={<IconCode />}
+    name="Features"
+    desc="Build new generators, tools, or UI components across any repository."
+    tag="feat/*"
+    accent="#f59e0b"
+  />
+  <ContribType
+    icon={<IconBug />}
+    name="Bug Fixes"
+    desc="Squash bugs, fix edge cases, and improve error handling."
+    tag="fix/*"
+    accent="#f87171"
+  />
+  <ContribType
+    icon={<IconBook />}
+    name="Documentation"
+    desc="Write guides, improve API docs, or add code examples."
+    tag="docs/*"
+    accent="#60a5fa"
+  />
+  <ContribType
+    icon={<IconLightbulb />}
+    name="Ideas"
+    desc="Propose features, discuss architecture, or share feedback."
+    tag="discussion"
+    accent="#a78bfa"
+  />
+  <ContribType
+    icon={<IconTestTube />}
+    name="Testing"
+    desc="Add unit tests, integration tests, or improve coverage."
+    tag="test/*"
+    accent="#34d399"
+  />
+  <ContribType
+    icon={<IconGitPR />}
+    name="Reviews"
+    desc="Review pull requests, suggest improvements, share expertise."
+    tag="review"
+    accent="#fb923c"
+  />
+</ContribTypes>
 
 ## Getting Started
 
-1. Fork the repository you want to contribute to
-2. Clone your fork
-3. Create a feature branch from `main`
-4. Make your changes
-5. Open a PR against `main`
+<ContribSteps>
+  <ContribStep
+    number={1}
+    title="Fork the repository"
+    desc="Pick any repository from the ecosystem and fork it to your GitHub account."
+  />
+  <ContribStep
+    number={2}
+    title="Clone and install"
+    desc="Clone your fork locally and run npm install to set up dependencies."
+  />
+  <ContribStep
+    number={3}
+    title="Create a feature branch"
+    desc="Branch from main using the convention: feat/*, fix/*, docs/*, or chore/*."
+  />
+  <ContribStep
+    number={4}
+    title="Make your changes"
+    desc="Write code, add tests, run lint and type-check. Each repo has a CLAUDE.md with specific setup instructions."
+  />
+  <ContribStep
+    number={5}
+    title="Open a pull request"
+    desc="Push your branch and open a PR against main. We use squash merge with conventional commits."
+  />
+</ContribSteps>
 
 ## Development Setup
 
@@ -22,22 +92,9 @@ npm install
 npm run dev
 ```
 
-Each repository has its own `CLAUDE.md` with specific setup instructions and conventions.
-
-## Branching Strategy
-
-We use trunk-based development:
-
-- **main** — production branch, always deployable
-- **feat/\*** — feature branches
-- **fix/\*** — bug fix branches
-- **chore/\*** — maintenance branches
-
-PRs merge to `main` via squash merge.
-
 ## Commit Conventions
 
-[Conventional Commits](https://www.conventionalcommits.org/) required:
+[Conventional Commits](https://www.conventionalcommits.org/) required. Sentence-case subjects:
 
 ```
 feat: Add template pack generation tool
@@ -52,15 +109,14 @@ docs: Add MCP integration guide
 - TypeScript strict mode
 - Functions under 50 lines, cyclomatic complexity under 10
 - Line width under 100 characters
-- No comments unless necessary — code should be self-documenting
-- Security-first: validate inputs, sanitize outputs, never expose credentials
+- Self-documenting code — no comments unless necessary
+- Security-first: validate inputs, sanitize outputs
 
 ## Testing
 
-- Coverage target: 80%+
+- Coverage target: **80%+**
 - Test business logic, not trivial getters/setters
 - Edge cases and error conditions
-- Use realistic test data
 
 ```bash
 npm run test        # Unit tests
@@ -69,38 +125,59 @@ npm run lint        # Linting
 npm run type-check  # TypeScript checking
 ```
 
-## Repository-Specific Notes
+## Repositories
 
-### siza (Web App)
-
-- Next.js App Router + Turborepo
-- shadcn/ui component pattern
-- Supabase SSR auth
-- Cloudflare Workers deployment
-
-### siza-mcp (MCP Server)
-
-- Jest ESM mode (`NODE_OPTIONS=--experimental-vm-modules`)
-- SQLite for RAG storage (`.uiforge/rag.sqlite`)
-- Delete the SQLite DB when changing snippet files
-
-### mcp-gateway
-
-- Python + FastAPI
-- `ruff check` AND `ruff format` required
-- Redis for caching (optional for development)
-
-### forge-patterns
-
-- Shared TypeScript library
-- Changes here affect all downstream repos
-- Run tests in consuming repos before merging
+<ContribRepos>
+  <ContribRepo
+    name="siza"
+    desc="The main platform — Next.js web app, Electron desktop, docs, shared UI."
+    lang="TypeScript"
+    langColor="#3178c6"
+    tags={["Next.js", "Turborepo", "Supabase", "shadcn/ui"]}
+    url="https://github.com/Forge-Space/siza"
+  />
+  <ContribRepo
+    name="siza-gen"
+    desc="AI generation core — ML composition, quality scoring, 500+ snippet registry."
+    lang="TypeScript"
+    langColor="#f59e0b"
+    tags={["AI", "ML", "npm", "FastAPI"]}
+    url="https://github.com/Forge-Space/siza-gen"
+  />
+  <ContribRepo
+    name="siza-mcp"
+    desc="MCP protocol adapter — 17 tools for any IDE, RAG-based design matching."
+    lang="TypeScript"
+    langColor="#34d399"
+    tags={["MCP", "SQLite", "Jest ESM"]}
+    url="https://github.com/Forge-Space/ui-mcp"
+  />
+  <ContribRepo
+    name="mcp-gateway"
+    desc="AI routing gateway — multi-provider scoring, caching, rate limiting."
+    lang="Python"
+    langColor="#a78bfa"
+    tags={["FastAPI", "Redis", "Docker"]}
+    url="https://github.com/Forge-Space/mcp-gateway"
+  />
+  <ContribRepo
+    name="forge-patterns"
+    desc="Shared configs, TypeScript types, security framework, ecosystem standards."
+    lang="TypeScript"
+    langColor="#60a5fa"
+    tags={["ESLint", "Security", "Core"]}
+    url="https://github.com/Forge-Space/core"
+  />
+  <ContribRepo
+    name="branding-mcp"
+    desc="Brand identity generation — logos, color palettes, design tokens, typography."
+    lang="TypeScript"
+    langColor="#fb923c"
+    tags={["MCP", "Design", "Brand"]}
+    url="https://github.com/Forge-Space/branding-mcp"
+  />
+</ContribRepos>
 
 ## Reporting Issues
 
-Open issues on the relevant repository:
-
-- [siza issues](https://github.com/Forge-Space/siza/issues)
-- [siza-mcp issues](https://github.com/Forge-Space/ui-mcp/issues)
-- [mcp-gateway issues](https://github.com/Forge-Space/mcp-gateway/issues)
-- [forge-patterns issues](https://github.com/Forge-Space/core/issues)
+Found a bug or have a feature request? Open an issue on the relevant repository above.

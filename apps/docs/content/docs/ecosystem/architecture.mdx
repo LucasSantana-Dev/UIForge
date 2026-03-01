@@ -1,124 +1,74 @@
 ---
 title: Architecture
 description: The 7-repository Forge Space ecosystem
+icon: Network
 ---
 
 Siza is built as a distributed ecosystem of seven repositories, each with a clear responsibility.
 
 ## Repository Map
 
-```mermaid
-graph TB
-    FP[forge-patterns<br/>Shared configs & types] --> MG[mcp-gateway<br/>AI routing & scoring]
-    FP --> SG[siza-gen<br/>AI generation core]
-    FP --> SM[siza-mcp<br/>MCP protocol adapter]
-    FP --> SZ[siza<br/>Web app & API]
-    FP --> BM[branding-mcp<br/>Brand generation]
-    BM --> BG[brand-guide<br/>Brand documentation site]
-    SG --> SM
-    MG --> SZ
-    SM --> SZ
-```
-
-## Repositories
-
-### siza (Web App + Desktop)
-
-**GitHub:** [Forge-Space/siza](https://github.com/Forge-Space/siza)
-
-The main application. A Turborepo monorepo with web, desktop, docs, and shared UI.
-
-| App            | Purpose                                                 |
-| -------------- | ------------------------------------------------------- |
-| `apps/web`     | Next.js frontend (dashboard, editor, preview, billing)  |
-| `apps/desktop` | Electron desktop app with local MCP + Ollama            |
-| `apps/docs`    | Fumadocs documentation site                             |
-| `apps/api`     | Cloudflare Workers API with AI provider integrations    |
-| `packages/ui`  | Shared `@siza/ui` component library (shadcn/ui + Radix) |
-
-**Stack:** Next.js 16, React 19, Electron, Supabase, Stripe, Tailwind CSS, shadcn/ui, Monaco Editor
-
-### siza-gen (AI Generation Core)
-
-**GitHub:** [Forge-Space/siza-gen](https://github.com/Forge-Space/siza-gen)
-
-The extracted AI brain — contains all generation logic, ML composition, quality scoring, and the 500+ snippet registry. Published as `@forgespace/siza-gen` on npm.
-
-**Key modules:**
-
-- AI layer — prompt engineering, multi-provider routing, quality scoring
-- Generators — component, page, application, prototype generators
-- Registry — 500+ curated UI snippets (components, animations, backend patterns)
-
-### siza-mcp (MCP Server)
-
-**GitHub:** [Forge-Space/ui-mcp](https://github.com/Forge-Space/ui-mcp)
-
-Thin MCP protocol adapter that exposes 21 tools to any MCP-compatible IDE. Delegates all generation logic to `@forgespace/siza-gen`.
-
-**Key features:**
-
-- Multi-framework code generation (React, Vue, Svelte, Angular, HTML)
-- ML composition pipeline with quality scoring
-- RAG-based design reference matching
-- Template packs for full-app scaffolding
-- Feedback loop for continuous improvement
-
-### mcp-gateway (AI Gateway)
-
-**GitHub:** [Forge-Space/mcp-gateway](https://github.com/Forge-Space/mcp-gateway)
-
-Python service that routes AI requests across multiple providers (Gemini, Claude, GPT) with intelligent selection, scoring, and caching.
-
-### forge-patterns (Core Library)
-
-**GitHub:** [Forge-Space/core](https://github.com/Forge-Space/core)
-
-Shared configurations, TypeScript types, security framework, and ecosystem standards. Every other repository depends on this.
-
-### branding-mcp (Brand Generation)
-
-**GitHub:** [Forge-Space/branding-mcp](https://github.com/Forge-Space/branding-mcp)
-
-MCP server specialized in brand identity generation — logos, color palettes, typography, brand guidelines, and AI-powered brand interpretation.
-
-### brand-guide (Brand Documentation)
-
-**GitHub:** [Forge-Space/brand-guide](https://github.com/Forge-Space/brand-guide)
-
-Astro-based static site documenting the Siza brand identity. Exports design tokens in CSS, W3C JSON, Tailwind, Sass, and React formats. Generated from `branding-mcp`.
+<ArchitectureDiagram />
 
 ## Data Flow
 
-### Component Generation (Web App)
+<DataFlow label="Web App Generation">
+  <FlowStep type="start">User prompt</FlowStep>
+  <FlowArrow />
+  <FlowStep>Web App</FlowStep>
+  <FlowArrow />
+  <FlowStep>AI Provider</FlowStep>
+  <FlowArrow />
+  <FlowStep>Generated code</FlowStep>
+  <FlowArrow />
+  <FlowStep>Preview</FlowStep>
+  <FlowArrow />
+  <FlowStep type="end">Export</FlowStep>
+</DataFlow>
 
-```
-User prompt -> Web App -> AI Provider (Gemini/Claude/OpenAI) -> Generated code -> Preview -> Export
-```
+<DataFlow label="MCP Generation">
+  <FlowStep type="start">IDE prompt</FlowStep>
+  <FlowArrow />
+  <FlowStep>siza-mcp</FlowStep>
+  <FlowArrow />
+  <FlowStep>siza-gen</FlowStep>
+  <FlowArrow />
+  <FlowStep>RAG lookup</FlowStep>
+  <FlowArrow />
+  <FlowStep>ML composition</FlowStep>
+  <FlowArrow />
+  <FlowStep type="end">Generated code</FlowStep>
+</DataFlow>
 
-### Component Generation (MCP)
+<DataFlow label="Desktop Generation">
+  <FlowStep type="start">Desktop app</FlowStep>
+  <FlowArrow />
+  <FlowStep>Ollama / Cloud</FlowStep>
+  <FlowArrow />
+  <FlowStep>siza-mcp</FlowStep>
+  <FlowArrow />
+  <FlowStep>siza-gen</FlowStep>
+  <FlowArrow />
+  <FlowStep type="end">Local filesystem</FlowStep>
+</DataFlow>
 
-```
-IDE prompt -> siza-mcp -> siza-gen -> RAG lookup -> ML composition -> Quality scoring -> Generated code
-```
-
-### Component Generation (Desktop)
-
-```
-Desktop app -> Local Ollama / Cloud API -> siza-mcp -> siza-gen -> Generated code -> Local filesystem
-```
-
-### Subscription Flow
-
-```
-User -> Stripe Checkout -> Webhook -> Supabase sync -> Plan limits enforced
-```
+<DataFlow label="Subscription Flow">
+  <FlowStep type="start">User</FlowStep>
+  <FlowArrow />
+  <FlowStep>Stripe Checkout</FlowStep>
+  <FlowArrow />
+  <FlowStep>Webhook</FlowStep>
+  <FlowArrow />
+  <FlowStep>Supabase sync</FlowStep>
+  <FlowArrow />
+  <FlowStep type="end">Plan limits</FlowStep>
+</DataFlow>
 
 ## Technology Stack
 
 | Layer    | Technology                                               |
 | -------- | -------------------------------------------------------- |
-| Frontend | Next.js 16, React 19, Electron, Tailwind CSS, shadcn/ui  |
+| Frontend | Next.js 16, React 19, Electron, Tailwind CSS, shadcn/ui |
 | Backend  | Cloudflare Workers, Supabase (Postgres + Auth + Storage) |
 | AI       | Google Gemini, Anthropic Claude, OpenAI GPT, Ollama      |
 | MCP      | TypeScript MCP server, SQLite (RAG), vector search       |
