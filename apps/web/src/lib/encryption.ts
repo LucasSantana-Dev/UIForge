@@ -9,7 +9,7 @@ export interface EncryptedApiKey {
   isDefault?: boolean;
 }
 
-export type AIProvider = 'openai' | 'anthropic' | 'google';
+export type AIProvider = 'openai' | 'anthropic' | 'google' | 'siza';
 
 export interface AIProviderConfig {
   name: string;
@@ -43,6 +43,13 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
     baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
     models: ['gemini-1.5-pro-latest', 'gemini-1.5-flash-latest'],
     maxTokens: 2097152,
+    rateLimitPerMinute: 60,
+  },
+  siza: {
+    name: 'Siza AI',
+    baseUrl: '',
+    models: [],
+    maxTokens: 0,
     rateLimitPerMinute: 60,
   },
 };

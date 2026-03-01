@@ -30,7 +30,7 @@ describe('AI Keys Store', () => {
     mockAIKeyManager.setDefaultApiKey.mockResolvedValue(undefined);
     mockAIKeyManager.getUsageStats.mockResolvedValue({
       totalKeys: 0,
-      keysByProvider: { openai: 0, anthropic: 0, google: 0 },
+      keysByProvider: { openai: 0, anthropic: 0, google: 0, siza: 0 },
       lastUsedTimes: {},
       expiredKeys: [],
     });
