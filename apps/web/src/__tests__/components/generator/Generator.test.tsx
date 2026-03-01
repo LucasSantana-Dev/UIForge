@@ -113,7 +113,7 @@ describe('ComponentGenerator Component', () => {
     expect(screen.getByTestId('generator-form')).toBeInTheDocument();
     expect(screen.getByTestId('code-editor')).toBeInTheDocument();
     expect(screen.getByTestId('live-preview')).toBeInTheDocument();
-    expect(screen.getByTestId('generation-history')).toBeInTheDocument();
+    expect(screen.getByText('History')).toBeInTheDocument();
   });
 
   it('should pass projectId to GeneratorForm', () => {
