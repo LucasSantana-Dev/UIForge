@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **ESLint config cleanup**: Removed 3 legacy .eslintrc.json files and unused packages/eslint-config/ package; all linting now uses flat configs exclusively
+- **ESLint plugins**: Added explicit root devDeps for eslint-plugin-react, eslint-plugin-react-hooks, eslint-plugin-jsx-a11y, @eslint/js
+- **Lint scripts**: Removed deprecated --ext flag from web and API lint commands
+- **API dep cleanup**: Removed stale eslint-config-next and eslint-config-prettier from API runtime dependencies
+- **@supabase/ssr**: Upgraded from 0.5.2 to 0.8.0 (no breaking API changes)
+- **@anthropic-ai/sdk**: Upgraded from 0.33.0 to 0.78.0 (memory leak fixes, latest model support)
+- **Claude model IDs**: Updated from Claude 3.x to Claude 4.5/4.6 family (claude-sonnet-4-6, claude-opus-4-6, claude-haiku-4-5)
+- **API key validation**: Relaxed Anthropic key regex to support variable-length key formats
+- **@typescript-eslint/***: Bumped to ^8.56.0 across all workspaces
+- **eslint-config-prettier**: Bumped to ^10.1.0 in web app
+
+### Fixed
+- **Missing dependencies**: Added cmdk and @radix-ui/react-tooltip (used by CommandPalette and tooltip components)
+- **Lint error**: Suppressed jsx-a11y/no-autofocus on CommandPalette (intentional UX pattern)
 - **Dependencies**: Updated 15 packages within semver range — Next.js 16.1.6, Stripe 20.4.0, wrangler 4.69.0, @supabase/supabase-js 2.98.0, @modelcontextprotocol/sdk 1.27.1, autoprefixer 10.4.27, and more
 - **Stripe API version**: Updated from 2026-01-28.clover to 2026-02-25.clover (matches SDK 20.4.0)
 
