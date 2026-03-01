@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.0] - 2026-03-01
+
+### Added
+- **Tab-based generation form**: Split crowded left panel into 3 progressive-disclosure tabs (Prompt, Options, Design)
+- **Sheet-based generation history**: Moved GenerationHistory into slide-over Sheet triggered from header
+
+### Fixed
+- **Generation history loading**: Records now include `project_id`, fixing "Failed to load history" when GenerationHistory queries by project
+- **Usage counter refresh**: React Query cache invalidation on SSE complete event — usage counter updates immediately after generation
+- **Dark theme form inputs**: Added `bg-surface-1 text-text-primary` to all native `<select>`, `<input>`, and `<textarea>` elements across 8 components
+
+## [0.22.0] - 2026-03-01
+
 ### Changed
 - **Landing page repositioning**: Reframe from UI generation to full-stack project generation platform
 - **Hero**: "Generate production UI with AI" → "Vibe code the right way" with full-stack subheading
@@ -19,7 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Ecosystem section**: brand-guide (7th repo) was missing from the repo cards
-
 
 ## [0.21.0] - 2026-03-01
 
