@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Collapsible sidebar**: Desktop sidebar toggles between 256px full mode and 64px icon-only mode with smooth transitions and Radix Tooltip hints
+- **Command palette**: Fuzzy search command palette (⌘K) with Quick Actions and Page navigation groups, powered by cmdk
+- **Global keyboard shortcuts**: ⌘K (palette), ⌘B (sidebar), ⌘1-4 (nav pages), ⌘N (generate), ⌘, (settings) — skips inputs and Monaco
+- **Dynamic TopBar**: Page title and icon derived from pathname, breadcrumb navigation, ⌘K search trigger button
+- **Tooltip primitive**: New Radix Tooltip component in @siza/ui with brand styling and animations
+- **DashboardShell**: Client wrapper for mounting hooks in async server layout
+- **25 new tests**: ui-store (6), keyboard shortcuts (9), page meta (8), command palette (2)
+
+### Fixed
+- **MobileNav parity**: Added missing History, AI Keys, and Billing items; removed GitHub link; matched Sidebar order
+
+
 ### Changed
 - **Dependencies**: Updated 15 packages within semver range — Next.js 16.1.6, Stripe 20.4.0, wrangler 4.69.0, @supabase/supabase-js 2.98.0, @modelcontextprotocol/sdk 1.27.1, autoprefixer 10.4.27, and more
 - **Stripe API version**: Updated from 2026-01-28.clover to 2026-02-25.clover (matches SDK 20.4.0)
