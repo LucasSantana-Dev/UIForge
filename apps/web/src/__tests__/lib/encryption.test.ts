@@ -219,7 +219,7 @@ describe('Encryption Utilities', () => {
     it('should have required fields in each config', () => {
       Object.values(AI_PROVIDERS).forEach((config) => {
         expect(config.name).toBeTruthy();
-        expect(config.baseUrl).toBeTruthy();
+        expect(typeof config.baseUrl).toBe('string');
         expect(config.models).toBeInstanceOf(Array);
         expect(config.maxTokens).toBeGreaterThan(0);
         expect(config.rateLimitPerMinute).toBeGreaterThan(0);

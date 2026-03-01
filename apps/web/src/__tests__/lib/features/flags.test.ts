@@ -19,8 +19,8 @@ describe('Feature Flags', () => {
   });
 
   describe('DEFAULT_FEATURE_FLAGS', () => {
-    it('should have all 23 flags defined', () => {
-      expect(Object.keys(DEFAULT_FEATURE_FLAGS)).toHaveLength(24);
+    it('should have all flag entries defined', () => {
+      expect(Object.keys(DEFAULT_FEATURE_FLAGS)).toHaveLength(25);
     });
 
     it('should have auth flags enabled by default', () => {
@@ -41,8 +41,8 @@ describe('Feature Flags', () => {
   });
 
   describe('FEATURE_FLAGS array', () => {
-    it('should have all 23 flag entries', () => {
-      expect(FEATURE_FLAGS).toHaveLength(24);
+    it('should have all flag entries in array', () => {
+      expect(FEATURE_FLAGS).toHaveLength(25);
     });
 
     it('should have required fields on each entry', () => {
@@ -93,7 +93,7 @@ describe('Feature Flags', () => {
       delete process.env.NEXT_PUBLIC_ENABLE_STRIPE_BILLING;
       delete process.env.NEXT_PUBLIC_ENABLE_USAGE_LIMITS;
       const flags = getAllFeatureFlags();
-      expect(Object.keys(flags)).toHaveLength(24);
+      expect(Object.keys(flags)).toHaveLength(25);
       expect(flags.ENABLE_GOOGLE_SSO).toBe(true);
       expect(flags.ENABLE_STRIPE_BILLING).toBe(false);
     });
