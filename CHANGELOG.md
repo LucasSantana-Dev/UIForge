@@ -7,25 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Dependencies**: Updated 15 packages within semver range — Next.js 16.1.6, Stripe 20.4.0, wrangler 4.69.0, @supabase/supabase-js 2.98.0, @modelcontextprotocol/sdk 1.27.1, autoprefixer 10.4.27, and more
+- **Stripe API version**: Updated from 2026-01-28.clover to 2026-02-25.clover (matches SDK 20.4.0)
+
 ## [0.25.0] - 2026-03-01
 
 ### Added
-- **Skills system**: Prompt enrichment skills (component-gen, form-builder, dashboard, d2c, a11y) with SkillSelector, SkillCard, SkillParameterForm UI and full DB/API pipeline (#256, #257)
-- **Platform metrics API**: BUILD/SHIP/VALIDATE tracking endpoint for growth analytics (#262)
-- **GitHub PR tracking**: Project versioning via GitHub pull request integration (#258)
-- **Security policy**: SECURITY.md with vulnerability disclosure process (#259)
-- **Tooltip component**: New @siza/ui tooltip with @radix-ui/react-tooltip (#262)
-- **Sentry error tracking**: Activated client-side error reporting (#264)
+- **Skills system**: Prompt enrichment skills with parameter support, up to 3 per generation (#256, #257)
+- **Platform metrics API**: BUILD/SHIP/VALIDATE tracking endpoint for platform analytics (#262)
+- **GitHub PR tracking**: Automatic project version tracking via GitHub integration (#258)
+- **Sentry error tracking**: Production error monitoring via Envelope API (#264)
 
 ### Changed
-- **GeneratorForm layout**: Replaced 3-tab progressive disclosure with flat scrollable form featuring SizaAICard and BYOKProviderGrid inline (#262)
-- **Dependencies**: Updated 15 packages within semver range — Next.js 16.1.6, Stripe 20.4.0, wrangler 4.69.0, @supabase/supabase-js 2.98.0, @modelcontextprotocol/sdk 1.27.1, autoprefixer 10.4.27, and more (#255)
-- **Stripe API version**: Updated from 2026-01-28.clover to 2026-02-25.clover (matches SDK 20.4.0)
+- **Generator form refactor**: Replaced tab layout with SizaAI card + BYOK provider grid for cleaner UX (#261)
 
 ### Fixed
-- **E2E test infrastructure**: Migrated all spec files to fixtures pattern with Supabase admin API auth (#260)
-- **Missing @radix-ui/react-tooltip**: Added to @siza/ui dependencies (#262)
-- **Template preview and quick-create**: Fixed template usage flow (#262)
+- **E2E test reliability**: Migrated specs to fixtures pattern with Supabase admin API for deterministic tests (#260)
+
+### Security
+- **Vulnerability disclosure policy**: Added SECURITY.md with responsible disclosure process (#259)
 
 ## [0.24.0] - 2026-03-01
 
