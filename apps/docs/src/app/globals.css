@@ -562,6 +562,99 @@
   line-height: 1.6;
 }
 
+[data-docs-body] {
+  max-width: 65ch;
+}
+
+.docs-codeblock {
+  position: relative;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+  margin: 1.5rem 0;
+}
+
+.docs-codeblock-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(var(--color-fd-secondary), 0.3);
+  font-size: 0.75rem;
+}
+
+.docs-codeblock-lang {
+  color: rgb(var(--color-fd-muted-foreground));
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.docs-codeblock-copy {
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.6875rem;
+  color: rgb(var(--color-fd-muted-foreground));
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.docs-codeblock-copy:hover {
+  color: rgb(var(--color-fd-foreground));
+  border-color: var(--border-hover);
+}
+
+.docs-codeblock pre {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
+.docs-callout {
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-subtle);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.docs-callout--info {
+  border-left: 3px solid rgb(var(--color-fd-accent));
+  background: rgba(139, 92, 246, 0.04);
+}
+
+.docs-callout--tip {
+  border-left: 3px solid #4ade80;
+  background: rgba(74, 222, 128, 0.04);
+}
+
+.docs-callout--warning {
+  border-left: 3px solid #facc15;
+  background: rgba(250, 204, 21, 0.04);
+}
+
+.docs-callout--error {
+  border-left: 3px solid #f87171;
+  background: rgba(248, 113, 113, 0.04);
+}
+
+.docs-callout-title {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.375rem;
+  color: rgb(var(--color-fd-foreground));
+}
+
+.docs-callout-body {
+  color: rgb(var(--color-fd-muted-foreground));
+}
+
 .prose-docs h1 {
   font-size: 2.25rem;
   font-weight: 700;
