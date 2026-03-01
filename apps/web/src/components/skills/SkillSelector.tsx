@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { WandSparklesIcon, SearchIcon } from 'lucide-react';
-import { listSkills } from '@/lib/services/skill.service';
-import type { SkillRow, SkillCategory } from '@/lib/repositories/skill.repo';
+import type { SkillRow, SkillCategory } from '@/lib/repositories/skill.types';
 import { SkillCard } from './SkillCard';
 import { SkillParameterForm } from './SkillParameterForm';
 
@@ -39,13 +38,20 @@ export function SkillSelector({
   const loading = loadedKey !== filterKey;
   const fetchIdRef = useRef(0);
 
+  const fetchSkills = useCallback(async (cat: SkillCategory | 'all', q: string) => {
+    const params = new URLSearchParams();
+    if (cat !== 'all') params.set('category', cat);
+    if (q) params.set('search', q);
+    const res = await fetch(`/api/skills?${params}`);
+    if (!res.ok) return [];
+    const json = await res.json();
+    return (json.data ?? []) as SkillRow[];
+  }, []);
+
   useEffect(() => {
     const id = ++fetchIdRef.current;
     const key = JSON.stringify({ category, search });
-    listSkills({
-      ...(category !== 'all' && { category }),
-      ...(search && { search }),
-    })
+    fetchSkills(category, search)
       .then((data) => {
         if (id === fetchIdRef.current) {
           setSkills(data);
@@ -58,7 +64,7 @@ export function SkillSelector({
           setLoadedKey(key);
         }
       });
-  }, [category, search]);
+  }, [category, search, fetchSkills]);
 
   const handleToggle = (skillId: string) => {
     if (selectedSkillIds.includes(skillId)) {
