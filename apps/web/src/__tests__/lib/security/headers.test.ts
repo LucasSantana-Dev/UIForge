@@ -27,14 +27,29 @@ describe('securityHeaders', () => {
     expect(headers['Content-Security-Policy']).toContain('https://js.stripe.com');
   });
 
-  it('CSP allows Supabase connections', () => {
+  it('CSP allows Monaco Editor CDN', () => {
     const headers = securityHeaders();
-    expect(headers['Content-Security-Policy']).toContain('https://*.supabase.co');
+    const csp = headers['Content-Security-Policy'];
+    expect(csp).toContain('https://cdn.jsdelivr.net');
+    expect(csp).toMatch(/script-src[^;]*https:\/\/cdn\.jsdelivr\.net/);
+    expect(csp).toMatch(/style-src[^;]*https:\/\/cdn\.jsdelivr\.net/);
+  });
+
+  it('CSP allows Supabase connections including WebSocket', () => {
+    const headers = securityHeaders();
+    const csp = headers['Content-Security-Policy'];
+    expect(csp).toContain('https://*.supabase.co');
+    expect(csp).toContain('wss://*.supabase.co');
   });
 
   it('CSP allows Sentry connections', () => {
     const headers = securityHeaders();
     expect(headers['Content-Security-Policy']).toContain('https://*.sentry.io');
+  });
+
+  it('CSP allows blob: workers for Monaco', () => {
+    const headers = securityHeaders();
+    expect(headers['Content-Security-Policy']).toContain("worker-src 'self' blob:");
   });
 
   it('CSP denies frame-ancestors', () => {
