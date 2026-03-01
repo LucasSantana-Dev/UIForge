@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.21.0] - 2026-03-01
+
 ### Added
 - **Onboarding wizard**: 4-step post-signup wizard (Welcome → Create Project → Generate Component → Done) guiding new users through first project creation and AI generation
 - **`ENABLE_ONBOARDING` feature flag**: Gated behind flag (default `false`), enable with `NEXT_PUBLIC_ENABLE_ONBOARDING=true`
