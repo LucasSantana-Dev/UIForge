@@ -36,7 +36,7 @@ export interface GenerationOptions {
 }
 
 export interface GenerationEvent {
-  type: 'start' | 'chunk' | 'complete' | 'error' | 'quality' | 'fallback';
+  type: 'start' | 'chunk' | 'complete' | 'error' | 'quality' | 'fallback' | 'routing';
   content?: string;
   totalLength?: number;
   message?: string;

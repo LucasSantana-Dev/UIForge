@@ -22,7 +22,8 @@ export type FeatureFlagName =
   | 'ENABLE_CODE_INTELLISENSE'
   | 'ENABLE_CONVERSATION_MODE'
   | 'ENABLE_DESIGN_ANALYSIS'
-  | 'ENABLE_ONBOARDING';
+  | 'ENABLE_ONBOARDING'
+  | 'ENABLE_SIZA_AI';
 
 export type FeatureFlagCategory =
   | 'auth'
