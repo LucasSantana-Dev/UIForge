@@ -23,6 +23,7 @@ export function SizaAICard({
     <button
       type="button"
       onClick={onSelect}
+      aria-pressed={selected}
       className={cn(
         'w-full rounded-lg border p-4 text-left transition-all',
         selected
