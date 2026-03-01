@@ -43,8 +43,8 @@ export async function createPRFromGeneration(params: CreatePRFromGenerationParam
     installation_id: installation.installation_id,
     pr_number: pr.number,
     pr_url: pr.url,
-    pr_html_url: pr.html_url,
-    branch_name: pr.head?.ref || '',
+    pr_html_url: pr.htmlUrl,
+    branch_name: 'siza/generate-' + params.componentName.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     file_paths: params.files.map((f) => f.path),
     component_name: params.componentName,
   });
