@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
+import { updatePRState } from '@/lib/repositories/github.repo';
 import { NextResponse, type NextRequest } from 'next/server';
 import crypto from 'crypto';
 
@@ -75,14 +76,38 @@ export async function POST(request: NextRequest) {
           github_repo_id: r.id,
           full_name: r.full_name,
         }));
-        await supabase.from('github_repos').upsert(repos, {
-          onConflict: 'github_repo_id',
-        });
+        await supabase.from('github_repos').upsert(repos, { onConflict: 'github_repo_id' });
       }
 
       if (payload.repositories_removed?.length) {
         const ids = payload.repositories_removed.map((r: { id: number }) => r.id);
         await supabase.from('github_repos').delete().in('github_repo_id', ids);
+      }
+    }
+  }
+
+  if (event === 'pull_request') {
+    const action = payload.action;
+    const prNumber = payload.pull_request?.number;
+    const repoId = payload.repository?.id;
+
+    if (prNumber && repoId) {
+      const { data: repo } = await supabase
+        .from('github_repos')
+        .select('id')
+        .eq('github_repo_id', repoId)
+        .single();
+
+      if (repo) {
+        if (action === 'opened' || action === 'reopened') {
+          await updatePRState(repo.id, prNumber, 'open');
+        } else if (action === 'closed') {
+          const merged = payload.pull_request?.merged === true;
+          await updatePRState(repo.id, prNumber, merged ? 'merged' : 'closed', {
+            merged_at: merged ? payload.pull_request.merged_at : undefined,
+            closed_at: payload.pull_request.closed_at,
+          });
+        }
       }
     }
   }

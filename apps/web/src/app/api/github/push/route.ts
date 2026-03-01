@@ -1,5 +1,5 @@
 import { verifySession } from '@/lib/api/auth';
-import { generateAndCreatePR } from '@/lib/github/pipeline';
+import { createPRFromGeneration } from '@/lib/services/github.service';
 import { runAllGates } from '@/lib/quality/gates';
 import { NextResponse, type NextRequest } from 'next/server';
 
@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const { user } = await verifySession();
     const body = await request.json();
 
-    const { projectId, componentName, code, prompt, model } = body;
+    const { projectId, generationId, componentName, code, prompt, model } = body;
 
     if (!projectId || !componentName || !code) {
       return NextResponse.json(
@@ -20,10 +20,7 @@ export async function POST(request: NextRequest) {
     const qualityReport = runAllGates(code);
     if (!qualityReport.passed) {
       return NextResponse.json(
-        {
-          error: 'Quality gates failed',
-          report: qualityReport,
-        },
+        { error: 'Quality gates failed', report: qualityReport },
         { status: 422 }
       );
     }
@@ -36,9 +33,10 @@ export async function POST(request: NextRequest) {
     const ext = code.includes('tsx') || code.includes('React') ? 'tsx' : 'ts';
     const filePath = `src/components/${slug}.${ext}`;
 
-    const pr = await generateAndCreatePR({
+    const pr = await createPRFromGeneration({
       userId: user.id,
       projectId,
+      generationId,
       componentName,
       files: [{ path: filePath, content: code }],
       prompt: prompt || componentName,

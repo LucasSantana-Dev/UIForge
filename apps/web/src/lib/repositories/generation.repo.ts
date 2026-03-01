@@ -17,6 +17,7 @@ export interface GenerationUpdate {
   ai_provider?: string;
   quality_score?: number;
   error_message?: string;
+  github_pr_id?: string;
 }
 
 export async function createGeneration(data: GenerationInsert): Promise<string | null> {
@@ -40,9 +41,10 @@ export async function updateGeneration(id: string, data: GenerationUpdate): Prom
     .eq('id', id);
 }
 
-export async function findGenerationById(
-  id: string
-): Promise<{ id: string; parent_generation_id: string | null } | null> {
+export async function findGenerationById(id: string): Promise<{
+  id: string;
+  parent_generation_id: string | null;
+} | null> {
   const supabase = await getClient();
   const { data } = await supabase
     .from('generations')
@@ -54,7 +56,11 @@ export async function findGenerationById(
 
 export async function getParentGenerationId(id: string): Promise<string | null> {
   const supabase = await getClient();
-  const { data }: { data: { parent_generation_id: string | null } | null } = await supabase
+  const {
+    data,
+  }: {
+    data: { parent_generation_id: string | null } | null;
+  } = await supabase
     .from('generations')
     .select('parent_generation_id' as any)
     .eq('id', id)
