@@ -409,9 +409,12 @@ function GeneratePageClient() {
 function GenerateLoadingSkeleton() {
   return (
     <div className="h-full flex flex-col">
-      <div className="mb-6">
-        <Skeleton className="h-9 w-64 mb-2" />
-        <Skeleton className="h-4 w-96" />
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <Skeleton className="h-9 w-64 mb-2" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <Skeleton className="h-9 w-24" />
       </div>
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
         <Card className="h-full p-4 space-y-4">
