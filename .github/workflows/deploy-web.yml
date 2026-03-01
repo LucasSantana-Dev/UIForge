@@ -39,6 +39,7 @@ jobs:
           NEXT_PUBLIC_ENABLE_STRIPE_BILLING: ${{ vars.NEXT_PUBLIC_ENABLE_STRIPE_BILLING }}
           NEXT_PUBLIC_ENABLE_USAGE_LIMITS: ${{ vars.NEXT_PUBLIC_ENABLE_USAGE_LIMITS }}
           NEXT_PUBLIC_ENABLE_ONBOARDING: ${{ vars.NEXT_PUBLIC_ENABLE_ONBOARDING }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
 
       - name: Stub unused @vercel/og WASM to fit Workers free tier
         run: |

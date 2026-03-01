@@ -79,6 +79,7 @@ jobs:
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_ENABLE_STRIPE_BILLING: ${{ vars.NEXT_PUBLIC_ENABLE_STRIPE_BILLING }}
           NEXT_PUBLIC_ENABLE_USAGE_LIMITS: ${{ vars.NEXT_PUBLIC_ENABLE_USAGE_LIMITS }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
 
       - name: Stub unused WASM and remove _redirects
         run: |
