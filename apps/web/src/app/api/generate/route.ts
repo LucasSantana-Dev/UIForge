@@ -235,8 +235,7 @@ export async function POST(request: NextRequest) {
       });
     }
     captureServerError(error, { route: '/api/generate' });
-    const isAuthError =
-      error instanceof Error && error.message === 'Authentication required';
+    const isAuthError = error instanceof Error && error.message === 'Authentication required';
     const message = isAuthError
       ? 'Authentication required. Please sign in to generate components.'
       : error instanceof Error

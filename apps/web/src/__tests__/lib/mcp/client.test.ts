@@ -60,12 +60,12 @@ describe('listTools', () => {
 
   it('throws on non-ok response', async () => {
     global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500 });
-    await expect(listTools()).rejects.toThrow('Failed to list tools: 500');
+    await expect(listTools()).rejects.toThrow('MCP gateway is unavailable (HTTP 500)');
   });
 
   it('throws when not configured', async () => {
     delete process.env.MCP_GATEWAY_URL;
-    await expect(listTools()).rejects.toThrow('MCP gateway not configured');
+    await expect(listTools()).rejects.toThrow('MCP gateway is not configured');
   });
 });
 
@@ -107,7 +107,9 @@ describe('callTool', () => {
       ok: true,
       json: () => Promise.resolve({ jsonrpc: '2.0', id: 1 }),
     });
-    await expect(callTool('empty', {})).rejects.toThrow('MCP gateway returned empty result');
+    await expect(callTool('empty', {})).rejects.toThrow(
+      'MCP gateway returned an empty result'
+    );
   });
 
   it('throws on HTTP error', async () => {
@@ -194,7 +196,7 @@ describe('generateComponent', () => {
         }),
     });
     await expect(generateComponent({ prompt: 't', framework: 'react' })).rejects.toThrow(
-      'MCP gateway returned no text content'
+      'The AI model did not produce any code'
     );
   });
 

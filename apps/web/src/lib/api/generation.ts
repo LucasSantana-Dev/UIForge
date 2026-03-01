@@ -219,9 +219,7 @@ export async function formatCode(
   });
 
   if (!response.ok) {
-    throw new Error(
-      'Code formatting failed. You can still use the unformatted code above.'
-    );
+    throw new Error('Code formatting failed. You can still use the unformatted code above.');
   }
 
   return response.json();
@@ -283,9 +281,7 @@ export async function* streamWireframe(options: WireframeOptions): AsyncGenerato
   }
 
   if (!response.body) {
-    throw new Error(
-      'Wireframe server returned an empty response. Please try again.'
-    );
+    throw new Error('Wireframe server returned an empty response. Please try again.');
   }
 
   const reader = response.body.getReader();
@@ -333,16 +329,13 @@ export async function generateWireframe(options: WireframeOptions): Promise<Wire
         break;
       case 'error':
         throw new Error(
-          event.message ||
-            'Wireframe generation failed unexpectedly. Please try again.'
+          event.message || 'Wireframe generation failed unexpectedly. Please try again.'
         );
     }
   }
 
   if (!finalEvent) {
-    throw new Error(
-      'Wireframe generation ended without producing output. Please try again.'
-    );
+    throw new Error('Wireframe generation ended without producing output. Please try again.');
   }
 
   // Fetch the final result
@@ -355,9 +348,7 @@ export async function generateWireframe(options: WireframeOptions): Promise<Wire
   });
 
   if (!response.ok) {
-    throw new Error(
-      'Failed to fetch wireframe result. Please refresh the page and try again.'
-    );
+    throw new Error('Failed to fetch wireframe result. Please refresh the page and try again.');
   }
 
   return response.json();
@@ -378,9 +369,7 @@ export async function getWireframeTemplates(): Promise<{
   const response = await fetch('/api/wireframe/templates');
 
   if (!response.ok) {
-    throw new Error(
-      'Failed to load wireframe templates. Please refresh the page and try again.'
-    );
+    throw new Error('Failed to load wireframe templates. Please refresh the page and try again.');
   }
 
   return response.json();
@@ -416,9 +405,7 @@ export async function exportToFigma(
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(
-      errorData.error || 'Failed to export wireframe to Figma. Please try again.'
-    );
+    throw new Error(errorData.error || 'Failed to export wireframe to Figma. Please try again.');
   }
 
   return response.json();

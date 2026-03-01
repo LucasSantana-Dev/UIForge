@@ -38,7 +38,10 @@ export const generateSchema = z.object({
       info: z.string().regex(hexColorRegex, 'Must be a hex color (e.g. #7c3aed)'),
     })
     .optional(),
-  skillIds: z.array(z.string().uuid('Invalid skill ID')).max(3, 'You can select up to 3 skills').optional(),
+  skillIds: z
+    .array(z.string().uuid('Invalid skill ID'))
+    .max(3, 'You can select up to 3 skills')
+    .optional(),
   skillParams: z.record(z.string(), z.any()).optional(),
   parentGenerationId: z.string().uuid('Invalid generation ID').optional(),
   previousCode: z.string().max(50000, 'Previous code is too large (max 50KB)').optional(),

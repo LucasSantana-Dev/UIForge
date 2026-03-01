@@ -184,8 +184,7 @@ async function* generateWithOpenAI(options: MultiProviderOptions): AsyncGenerato
 
     yield { type: 'complete', timestamp: Date.now() };
   } catch (error) {
-    const detail =
-      error instanceof Error ? error.message : 'Check your API key and try again.';
+    const detail = error instanceof Error ? error.message : 'Check your API key and try again.';
     yield {
       type: 'error',
       message: `OpenAI generation failed: ${detail}`,
@@ -278,8 +277,7 @@ async function* generateWithAnthropic(
 
     yield { type: 'complete', timestamp: Date.now() };
   } catch (error) {
-    const detail =
-      error instanceof Error ? error.message : 'Check your API key and try again.';
+    const detail = error instanceof Error ? error.message : 'Check your API key and try again.';
     yield {
       type: 'error',
       message: `Anthropic generation failed: ${detail}`,
