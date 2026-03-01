@@ -97,7 +97,7 @@ export async function* generateWithProvider(
     default:
       yield {
         type: 'error',
-        message: `Unsupported provider: ${provider}`,
+        message: `Unsupported provider "${provider}". Supported providers: Google, OpenAI, Anthropic.`,
         timestamp: Date.now(),
       };
   }
@@ -148,7 +148,11 @@ async function* generateWithOpenAI(options: MultiProviderOptions): AsyncGenerato
     }
 
     if (!response.body) {
-      yield { type: 'error', message: 'No response stream', timestamp: Date.now() };
+      yield {
+        type: 'error',
+        message: 'OpenAI returned an empty response. Please try again.',
+        timestamp: Date.now(),
+      };
       return;
     }
 
@@ -180,9 +184,10 @@ async function* generateWithOpenAI(options: MultiProviderOptions): AsyncGenerato
 
     yield { type: 'complete', timestamp: Date.now() };
   } catch (error) {
+    const detail = error instanceof Error ? error.message : 'Check your API key and try again.';
     yield {
       type: 'error',
-      message: error instanceof Error ? error.message : 'OpenAI generation failed',
+      message: `OpenAI generation failed: ${detail}`,
       timestamp: Date.now(),
     };
   }
@@ -234,7 +239,11 @@ async function* generateWithAnthropic(
     }
 
     if (!response.body) {
-      yield { type: 'error', message: 'No response stream', timestamp: Date.now() };
+      yield {
+        type: 'error',
+        message: 'Anthropic returned an empty response. Please try again.',
+        timestamp: Date.now(),
+      };
       return;
     }
 
@@ -268,9 +277,10 @@ async function* generateWithAnthropic(
 
     yield { type: 'complete', timestamp: Date.now() };
   } catch (error) {
+    const detail = error instanceof Error ? error.message : 'Check your API key and try again.';
     yield {
       type: 'error',
-      message: error instanceof Error ? error.message : 'Anthropic generation failed',
+      message: `Anthropic generation failed: ${detail}`,
       timestamp: Date.now(),
     };
   }

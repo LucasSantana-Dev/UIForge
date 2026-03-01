@@ -88,14 +88,17 @@ export async function* streamGeneration(
     const message =
       typeof errorData.error === 'string'
         ? errorData.error
-        : errorData.error?.message || 'Generation failed';
+        : errorData.error?.message ||
+          'Generation failed. Please try again or use a different provider.';
     const err = new Error(message);
     if (errorData.quota) (err as any).quota = errorData.quota;
     throw err;
   }
 
   if (!response.body) {
-    throw new Error('No response body');
+    throw new Error(
+      'Server returned an empty response. This may be a temporary issue — please try again.'
+    );
   }
 
   const reader = response.body.getReader();
@@ -147,12 +150,17 @@ export async function generateComponent(options: GenerationOptions): Promise<Gen
         finalEvent = event;
         break;
       case 'error':
-        throw new Error(event.message || 'Generation failed');
+        throw new Error(
+          event.message ||
+            'Generation failed unexpectedly. Please try again or use a different provider.'
+        );
     }
   }
 
   if (!finalEvent) {
-    throw new Error('Generation incomplete');
+    throw new Error(
+      'Generation ended without producing output. The AI provider may be experiencing issues — please try again.'
+    );
   }
 
   return {
@@ -183,7 +191,9 @@ export async function validateCode(
   });
 
   if (!response.ok) {
-    throw new Error('Validation failed');
+    throw new Error(
+      'Code validation failed. The generated code may have syntax issues — try regenerating.'
+    );
   }
 
   return response.json();
@@ -209,7 +219,7 @@ export async function formatCode(
   });
 
   if (!response.ok) {
-    throw new Error('Formatting failed');
+    throw new Error('Code formatting failed. You can still use the unformatted code above.');
   }
 
   return response.json();
@@ -264,11 +274,14 @@ export async function* streamWireframe(options: WireframeOptions): AsyncGenerato
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error?.message || 'Wireframe generation failed');
+    throw new Error(
+      errorData.error?.message ||
+        'Wireframe generation failed. Please try again with different parameters.'
+    );
   }
 
   if (!response.body) {
-    throw new Error('No response body');
+    throw new Error('Wireframe server returned an empty response. Please try again.');
   }
 
   const reader = response.body.getReader();
@@ -315,12 +328,14 @@ export async function generateWireframe(options: WireframeOptions): Promise<Wire
         finalEvent = event;
         break;
       case 'error':
-        throw new Error(event.message || 'Wireframe generation failed');
+        throw new Error(
+          event.message || 'Wireframe generation failed unexpectedly. Please try again.'
+        );
     }
   }
 
   if (!finalEvent) {
-    throw new Error('Wireframe generation incomplete');
+    throw new Error('Wireframe generation ended without producing output. Please try again.');
   }
 
   // Fetch the final result
@@ -333,7 +348,7 @@ export async function generateWireframe(options: WireframeOptions): Promise<Wire
   });
 
   if (!response.ok) {
-    throw new Error('Failed to fetch wireframe result');
+    throw new Error('Failed to fetch wireframe result. Please refresh the page and try again.');
   }
 
   return response.json();
@@ -354,7 +369,7 @@ export async function getWireframeTemplates(): Promise<{
   const response = await fetch('/api/wireframe/templates');
 
   if (!response.ok) {
-    throw new Error('Failed to fetch wireframe templates');
+    throw new Error('Failed to load wireframe templates. Please refresh the page and try again.');
   }
 
   return response.json();
@@ -390,7 +405,7 @@ export async function exportToFigma(
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error || 'Failed to export to Figma');
+    throw new Error(errorData.error || 'Failed to export wireframe to Figma. Please try again.');
   }
 
   return response.json();

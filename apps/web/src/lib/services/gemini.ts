@@ -105,7 +105,12 @@ export async function* generateComponentStream(
 
     yield { type: 'complete', timestamp: Date.now() };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Generation failed';
-    yield { type: 'error', message, timestamp: Date.now() };
+    const detail =
+      error instanceof Error ? error.message : 'Please try again or use a different provider.';
+    yield {
+      type: 'error',
+      message: `Gemini generation failed: ${detail}`,
+      timestamp: Date.now(),
+    };
   }
 }

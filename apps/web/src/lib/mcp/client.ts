@@ -12,7 +12,9 @@ function getConfig(): McpGatewayConfig {
   const jwt = process.env.MCP_GATEWAY_JWT;
 
   if (!baseUrl || !jwt) {
-    throw new Error('MCP gateway not configured');
+    throw new Error(
+      'MCP gateway is not configured. Set MCP_GATEWAY_URL and MCP_GATEWAY_JWT environment variables.'
+    );
   }
 
   return {
@@ -69,7 +71,9 @@ export async function listTools(): Promise<McpToolDefinition[]> {
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to list tools: ${response.status}`);
+    throw new Error(
+      `MCP gateway is unavailable (HTTP ${response.status}). Generation will use direct provider instead.`
+    );
   }
 
   const data = await response.json();
@@ -88,7 +92,9 @@ export async function callTool(
   }
 
   if (!result.result) {
-    throw new Error('MCP gateway returned empty result');
+    throw new Error(
+      'MCP gateway returned an empty result. The AI model may have failed to generate output — please try again.'
+    );
   }
 
   return result.result;
@@ -130,7 +136,9 @@ export async function generateComponent(options: McpGenerateOptions): Promise<st
 
   const textContent = result.content.find((c) => c.type === 'text');
   if (!textContent?.text) {
-    throw new Error('MCP gateway returned no text content');
+    throw new Error(
+      'The AI model did not produce any code. Try rephrasing your prompt or using a different provider.'
+    );
   }
 
   return textContent.text;

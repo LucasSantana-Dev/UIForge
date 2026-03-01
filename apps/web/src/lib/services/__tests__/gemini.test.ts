@@ -79,7 +79,7 @@ describe('generateComponentStream', () => {
     expect(events[0].type).toBe('start');
     expect(events[1]).toMatchObject({
       type: 'error',
-      message: 'quota exceeded',
+      message: 'Gemini generation failed: quota exceeded',
     });
   });
 
