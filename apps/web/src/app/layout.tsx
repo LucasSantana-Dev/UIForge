@@ -1,25 +1,26 @@
 import type { Metadata } from 'next';
-import { Inter, Outfit, JetBrains_Mono } from 'next/font/google';
+import { DM_Sans, Plus_Jakarta_Sans, IBM_Plex_Mono } from 'next/font/google';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { FeatureFlagProvider } from '@/lib/features/provider';
 import './globals.css';
 
-const inter = Inter({
+const dmSans = DM_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-dm-sans',
   preload: false,
 });
 
-const outfit = Outfit({
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  weight: '700',
-  variable: '--font-outfit',
+  weight: ['600', '700', '800'],
+  variable: '--font-plus-jakarta',
   preload: false,
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
-  variable: '--font-jetbrains-mono',
+  weight: '400',
+  variable: '--font-ibm-plex-mono',
   preload: false,
 });
 
@@ -71,7 +72,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${inter.variable} ${outfit.variable} ${jetbrainsMono.variable}`}>
+    <html
+      lang="en"
+      className={`${dmSans.variable} ${plusJakarta.variable} ${ibmPlexMono.variable}`}
+    >
       <body className="font-sans">
         <a
           href="#main-content"

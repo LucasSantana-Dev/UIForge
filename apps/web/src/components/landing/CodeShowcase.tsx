@@ -21,7 +21,7 @@ const CODE_TEXT = `my-saas/
 const dir = 'color:#60A5FA';
 const comment = 'color:#71717A';
 const tree = 'color:#A1A1AA';
-const root = 'color:#8B5CF6';
+const root = 'color:var(--brand-light)';
 
 const CODE_HTML = [
   `<span style="${root}">my-saas/</span>`,
@@ -70,7 +70,7 @@ export function CodeShowcase() {
       <div className={`${CONTAINER} grid grid-cols-1 lg:grid-cols-2 gap-12 items-center`}>
         <FadeIn delay={0}>
           <div>
-            <div className="text-sm font-mono text-[#7C3AED] mb-4">{'// npx create-siza-app'}</div>
+            <div className="text-sm font-mono text-brand mb-4">{'// npx create-siza-app'}</div>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-6">
               Your next project.
               <br />

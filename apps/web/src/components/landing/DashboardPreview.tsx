@@ -9,9 +9,7 @@ export function DashboardPreview() {
     <section className={`${SECTION_PADDING} border-t border-[#27272A]`}>
       <div className={CONTAINER}>
         <div className="text-center">
-          <div className="text-sm font-mono text-[#7C3AED] tracking-wider uppercase mb-4">
-            Preview
-          </div>
+          <div className="text-sm font-mono text-brand tracking-wider uppercase mb-4">Preview</div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-4">
             Your AI workspace
           </h2>
@@ -44,7 +42,7 @@ export function DashboardPreview() {
                   <Sparkles className="w-4 h-4" />
                   <span>Generate</span>
                 </div>
-                <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-[rgba(124,58,237,0.1)] text-[#8B5CF6] border-l-2 border-[#7C3AED]">
+                <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-brand/10 text-brand-light border-l-2 border-brand">
                   <Layers className="w-4 h-4" />
                   <span>Components</span>
                 </div>
@@ -69,7 +67,7 @@ export function DashboardPreview() {
               <div className="flex-1 p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-[#FAFAFA]">Components</h3>
-                  <span className="text-xs bg-[rgba(124,58,237,0.1)] text-[#8B5CF6] rounded-md px-2 py-0.5">
+                  <span className="text-xs bg-brand/10 text-brand-light rounded-md px-2 py-0.5">
                     24 items
                   </span>
                 </div>
@@ -78,7 +76,7 @@ export function DashboardPreview() {
                   <div className="rounded-lg border border-[#27272A] bg-[#18181B] p-4">
                     <div className="text-sm font-medium text-[#FAFAFA] mb-3">Button</div>
                     <div className="flex gap-2">
-                      <div className="h-7 w-16 rounded bg-[#7C3AED]" />
+                      <div className="h-7 w-16 rounded bg-brand" />
                       <div className="h-7 w-16 rounded border border-[#27272A]" />
                     </div>
                   </div>

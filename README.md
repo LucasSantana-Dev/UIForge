@@ -1,6 +1,10 @@
-# Siza
-
-> **The open full-stack AI workspace — generate, integrate, ship.**
+<div align="center">
+  <a href="https://forgespace.co">
+    <img src="https://brand.forgespace.co/logos/wordmark.svg" alt="Forge Space" height="48">
+  </a>
+  <h1>Siza</h1>
+  <p>The open full-stack AI workspace — generate, integrate, ship.</p>
+</div>
 
 Every AI code tool generates beautiful frontends. Then you spend days wiring auth, database, APIs, and deployment. Siza owns the full-stack integration layer — from idea to production, zero lock-in.
 

@@ -73,7 +73,7 @@ export function CapabilitiesSection() {
       <div className={CONTAINER}>
         <FadeIn>
           <div className="text-center">
-            <p className="text-sm font-mono text-[#7C3AED] tracking-wider uppercase mb-4">
+            <p className="text-sm font-mono text-brand tracking-wider uppercase mb-4">
               Capabilities
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-4">
@@ -92,9 +92,9 @@ export function CapabilitiesSection() {
               <FadeIn key={cap.title} delay={i * 0.06}>
                 <div className="group bg-[#18181B] border border-[#27272A] rounded-xl p-6 transition-all duration-200 ease-siza hover:border-[var(--border-hover)] hover:shadow-card-hover hover:-translate-y-0.5">
                   <div
-                    className={`w-10 h-10 flex items-center justify-center rounded-lg ${iconBgs[cap.title] || 'bg-[rgba(124,58,237,0.1)]'} mb-4 transition-transform duration-200 group-hover:scale-110`}
+                    className={`w-10 h-10 flex items-center justify-center rounded-lg ${iconBgs[cap.title] || 'bg-brand/10'} mb-4 transition-transform duration-200 group-hover:scale-110`}
                   >
-                    <Icon className={`w-5 h-5 ${iconColors[cap.title] || 'text-[#8B5CF6]'}`} />
+                    <Icon className={`w-5 h-5 ${iconColors[cap.title] || 'text-brand-light'}`} />
                   </div>
                   <h3 className="text-base font-semibold text-[#FAFAFA] mb-2">{cap.title}</h3>
                   <p className="text-sm text-[#A1A1AA] leading-relaxed">{cap.description}</p>

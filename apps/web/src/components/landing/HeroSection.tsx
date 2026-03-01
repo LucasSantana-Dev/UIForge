@@ -51,7 +51,7 @@ export function HeroSection({ user }: HeroSectionProps) {
       {particles.map((p) => (
         <div
           key={p.id}
-          className="absolute rounded-full bg-[#7C3AED]"
+          className="absolute rounded-full bg-brand"
           style={
             {
               width: `${p.size}px`,
@@ -99,7 +99,7 @@ export function HeroSection({ user }: HeroSectionProps) {
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mt-6"
         >
           Vibe code{' '}
-          <span className="bg-gradient-to-r from-[#7C3AED] via-[#8B5CF6] to-[#6366F1] bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-brand via-brand-light to-info bg-clip-text text-transparent">
             the right way
           </span>
         </motion.h1>
@@ -130,7 +130,7 @@ export function HeroSection({ user }: HeroSectionProps) {
         >
           <Link
             href={user ? '/generate' : '/signin'}
-            className="group relative inline-flex items-center gap-2 bg-[#7C3AED] text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-[#8B5CF6] hover:shadow-[0_8px_24px_rgba(124,58,237,0.4)] hover:-translate-y-0.5 overflow-hidden"
+            className="group relative inline-flex items-center gap-2 bg-brand text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-brand-light hover:shadow-card-hover hover:-translate-y-0.5 overflow-hidden"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
             <span className="relative">{user ? 'Go to Dashboard' : 'Get Started Free'}</span>
@@ -191,7 +191,7 @@ export function HeroSection({ user }: HeroSectionProps) {
             </div>
             <div>
               <span
-                className="inline-block w-2 h-4 bg-[#7C3AED]"
+                className="inline-block w-2 h-4 bg-brand"
                 style={{
                   animation: 'cursor-blink 1s step-end infinite',
                 }}

@@ -104,7 +104,8 @@ function ScoreGauge({ score }: { score: number }) {
   const circumference = 2 * Math.PI * 20;
   const offset = circumference - (percent / 100) * circumference;
   const color = percent >= 80 ? 'text-success' : percent >= 50 ? 'text-warning' : 'text-error';
-  const strokeColor = percent >= 80 ? '#10b981' : percent >= 50 ? '#f59e0b' : '#ef4444';
+  const strokeColor =
+    percent >= 80 ? 'var(--success)' : percent >= 50 ? 'var(--warning)' : 'var(--error)';
 
   return (
     <div className="relative w-14 h-14">
