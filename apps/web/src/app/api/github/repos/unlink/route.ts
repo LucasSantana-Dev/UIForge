@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { user } = await verifySession();
+    await verifySession();
     const { projectId } = await request.json();
 
     if (!projectId) {

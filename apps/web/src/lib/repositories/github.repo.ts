@@ -31,7 +31,7 @@ export async function insertPR(data: GitHubPRInsert): Promise<string | null> {
     .insert(data as any)
     .select('id')
     .single();
-  if (error) handleRepoError(error);
+  if (error) handleRepoError(error, 'github.repo.insertPR');
   return pr?.id ?? null;
 }
 
@@ -53,7 +53,7 @@ export async function updatePRState(
     .update(update)
     .eq('repo_id', repoId)
     .eq('pr_number', prNumber);
-  if (error) handleRepoError(error);
+  if (error) handleRepoError(error, 'github.repo.updatePRState');
 }
 
 export async function findPRsByProject(
@@ -67,7 +67,7 @@ export async function findPRsByProject(
     .eq('user_id', userId)
     .eq('project_id', projectId)
     .order('created_at', { ascending: false });
-  if (error) handleRepoError(error);
+  if (error) handleRepoError(error, 'github.repo.findPRsByProject');
   return (data as any as GitHubPRRecord[]) ?? [];
 }
 
