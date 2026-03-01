@@ -26,6 +26,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_DESIGN_ANALYSIS: true,
   ENABLE_ONBOARDING: false,
   ENABLE_SIZA_AI: true,
+  ENABLE_SKILLS: false,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -177,6 +178,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     name: 'ENABLE_SIZA_AI',
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_SIZA_AI,
     description: 'Enable Siza AI as default smart routing provider',
+    category: 'generation',
+  },
+  {
+    name: 'ENABLE_SKILLS',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_SKILLS,
+    description: 'Enable skills system for prompt enrichment during generation',
     category: 'generation',
   },
 ];
