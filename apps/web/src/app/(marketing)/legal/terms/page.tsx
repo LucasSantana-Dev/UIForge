@@ -104,7 +104,7 @@ export default function TermsPage() {
           <h2 className="text-lg font-semibold text-[#FAFAFA] mb-3">10. Contact</h2>
           <p>
             Questions? Email{' '}
-            <a href="mailto:support@forgespace.co" className="text-[#8B5CF6] hover:underline">
+            <a href="mailto:support@forgespace.co" className="text-brand-light hover:underline">
               support@forgespace.co
             </a>
             .

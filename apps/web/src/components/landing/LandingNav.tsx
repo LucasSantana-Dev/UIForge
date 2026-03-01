@@ -72,7 +72,7 @@ export function LandingNav({ user }: LandingNavProps) {
           {user ? (
             <Link
               href="/generate"
-              className="bg-[#7C3AED] hover:bg-[#8B5CF6] text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+              className="bg-brand hover:bg-brand-light text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
             >
               Dashboard
             </Link>
@@ -86,7 +86,7 @@ export function LandingNav({ user }: LandingNavProps) {
               </Link>
               <Link
                 href="/signup"
-                className="bg-[#7C3AED] hover:bg-[#8B5CF6] text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
+                className="bg-brand hover:bg-brand-light text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors"
               >
                 Get Started
               </Link>
