@@ -63,9 +63,9 @@ export const PROVIDER_MODELS: Record<AIProvider, { id: string; name: string }[]>
     { id: 'gpt-4-turbo', name: 'GPT-4 Turbo' },
   ],
   anthropic: [
-    { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4' },
+    { id: 'claude-sonnet-4-6', name: 'Claude Sonnet 4.6' },
     { id: 'claude-haiku-4-5-20251001', name: 'Claude Haiku 4.5' },
-    { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet' },
+    { id: 'claude-opus-4-6', name: 'Claude Opus 4.6' },
   ],
 };
 
@@ -215,7 +215,7 @@ async function* generateWithAnthropic(
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: options.model || 'claude-sonnet-4-20250514',
+        model: options.model || 'claude-sonnet-4-6',
         max_tokens: 4000,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }],

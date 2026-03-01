@@ -56,7 +56,7 @@ export function routeSizaGeneration(params: {
   if (complexity >= 0.6) {
     return {
       provider: 'anthropic',
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       reason: 'quality',
     };
   }

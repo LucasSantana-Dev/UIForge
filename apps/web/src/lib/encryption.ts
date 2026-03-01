@@ -41,7 +41,7 @@ export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
   anthropic: {
     name: 'Anthropic',
     baseUrl: 'https://api.anthropic.com/v1',
-    models: ['claude-3-5-sonnet-20241022', 'claude-3-haiku-20240307', 'claude-3-opus-20240229'],
+    models: ['claude-sonnet-4-6', 'claude-haiku-4-5-20251001', 'claude-opus-4-6'],
     maxTokens: 200000,
     rateLimitPerMinute: 1000,
   },

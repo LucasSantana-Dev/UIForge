@@ -8,8 +8,8 @@ import { logger } from '../utils/logger';
 import type { GenerateComponentOptions, ComponentGenerationResult } from '../types/ai';
 
 // Model configuration
-const DEFAULT_MODEL = 'claude-3-5-sonnet-20241022';
-const FALLBACK_MODEL = 'claude-3-haiku-20240307';
+const DEFAULT_MODEL = 'claude-sonnet-4-6';
+const FALLBACK_MODEL = 'claude-haiku-4-5-20251001';
 
 /**
  * Get Anthropic client instance
@@ -242,8 +242,7 @@ export async function* streamComponentGeneration(
  * Validate Anthropic API key format
  */
 export function validateApiKey(apiKey: string): boolean {
-  // Anthropic API keys start with 'sk-ant-' and are 95 characters long
-  return /^sk-ant-[A-Za-z0-9_-]{95}$/.test(apiKey);
+  return /^sk-ant-[A-Za-z0-9_-]{20,}$/.test(apiKey);
 }
 
 /**
@@ -252,27 +251,27 @@ export function validateApiKey(apiKey: string): boolean {
 export function getAvailableModels() {
   return [
     {
-      id: 'claude-3-5-sonnet-20241022',
-      name: 'Claude 3.5 Sonnet',
-      maxTokens: 200000,
+      id: 'claude-sonnet-4-6',
+      name: 'Claude Sonnet 4.6',
+      maxTokens: 16384,
       contextWindow: 200000,
       costPer1kTokens: 0.015,
       features: ['function-calling', 'vision', 'long-context'],
     },
     {
-      id: 'claude-3-opus-20240229',
-      name: 'Claude 3 Opus',
-      maxTokens: 4096,
+      id: 'claude-opus-4-6',
+      name: 'Claude Opus 4.6',
+      maxTokens: 16384,
       contextWindow: 200000,
       costPer1kTokens: 0.075,
-      features: ['vision', 'long-context'],
+      features: ['function-calling', 'vision', 'long-context'],
     },
     {
-      id: 'claude-3-haiku-20240307',
-      name: 'Claude 3 Haiku',
-      maxTokens: 4096,
+      id: 'claude-haiku-4-5-20251001',
+      name: 'Claude Haiku 4.5',
+      maxTokens: 8192,
       contextWindow: 200000,
-      costPer1kTokens: 0.0025,
+      costPer1kTokens: 0.004,
       features: ['vision'],
     },
   ];

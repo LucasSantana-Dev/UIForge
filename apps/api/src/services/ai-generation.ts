@@ -247,7 +247,7 @@ export function getProviderInfo(provider: 'openai' | 'anthropic' | 'google') {
     case 'anthropic':
       return {
         name: 'Anthropic',
-        models: ['claude-3.5-sonnet', 'claude-3-haiku', 'claude-3-opus'],
+        models: ['claude-sonnet-4-6', 'claude-haiku-4-5', 'claude-opus-4-6'],
         maxTokens: 200000,
         rateLimitPerMinute: 1000,
         features: ['function-calling', 'vision', 'long-context'],
@@ -281,7 +281,7 @@ export function validateApiKey(
       return /^sk-[A-Za-z0-9]{48}$|^sk-proj-[A-Za-z0-9_-]{48}$/.test(apiKey);
 
     case 'anthropic':
-      return /^sk-ant-[A-Za-z0-9_-]{95}$/.test(apiKey);
+      return /^sk-ant-[A-Za-z0-9_-]{20,}$/.test(apiKey);
 
     case 'google':
       return /^AIza[A-Za-z0-9_-]{35}$/.test(apiKey);

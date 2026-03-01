@@ -148,7 +148,7 @@ describe('AI Generation Service Integration', () => {
         language: 'typescript',
         framework: 'react',
         provider: 'anthropic',
-        model: 'claude-3-5-sonnet',
+        model: 'claude-sonnet-4-6',
       };
 
       expect(result.code).toContain('export default function Button');
