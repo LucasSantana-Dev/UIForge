@@ -134,7 +134,7 @@ describe('POST /api/generate', () => {
         framework: 'react',
         componentLibrary: 'tailwind',
         typescript: true,
-        provider: 'google',
+        provider: 'siza',
       })
     );
   });
