@@ -16,10 +16,12 @@ const customJestConfig = {
     '<rootDir>/e2e/',
     '<rootDir>/src/__tests__/integration/',
     '<rootDir>/src/__tests__/__fixtures__/',
+    '<rootDir>/src/__tests__/__mocks__/',
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@shared/(.*)$': '<rootDir>/../../packages/shared/src/$1',
+    '^@forgespace/brand-guide$': '<rootDir>/src/__tests__/__mocks__/brand-guide.js',
   },
   collectCoverageFrom: [
     'src/lib/api/*.{ts,tsx}',

@@ -11,5 +11,6 @@
         "@typescript-eslint/no-explicit-any": "off"
       }
     }
-  ]
+  ],
+  "ignorePatterns": ["src/__tests__/__mocks__/*.js"]
 }

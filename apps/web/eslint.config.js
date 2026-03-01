@@ -7,9 +7,7 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
 import prettier from 'eslint-config-prettier';
 
 export default [
-  js.configs.recommended,
   {
-    files: ['**/*.{ts,tsx,js,jsx}'],
     ignores: [
       '.next/**',
       'node_modules/**',
@@ -18,7 +16,12 @@ export default [
       'coverage/**',
       '*.config.js',
       'test-config.ts',
+      '**/__mocks__/**',
     ],
+  },
+  js.configs.recommended,
+  {
+    files: ['**/*.{ts,tsx,js,jsx}'],
     languageOptions: {
       parser: typescriptParser,
       parserOptions: {
