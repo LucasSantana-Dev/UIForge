@@ -37,7 +37,6 @@ const FRAMEWORK_DEV_DEPS: Record<Framework, Record<string, string>> = {
     typescript: '^5.7.0',
     vite: '^6.0.0',
     '@sveltejs/vite-plugin-svelte': '^4.0.0',
-    'svelte-check': '^4.0.0',
   },
 };
 
@@ -66,7 +65,7 @@ export async function generateProject(options: GeneratorOptions): Promise<void> 
   await writeGitignore(targetDir);
   await writeFrameworkConfig(targetDir, framework);
   await writeGlobalsCss(targetDir, framework, ui);
-  await writeEntryPage(targetDir, framework, template, name);
+  await writeEntryFiles(targetDir, framework, template, name);
 
   if (mcp) {
     await writeMcpConfig(targetDir);
@@ -88,22 +87,13 @@ async function writePackageJson(
       start: 'next start',
       lint: 'next lint',
     },
-    react: {
-      dev: 'vite',
-      build: 'tsc -b && vite build',
-      preview: 'vite preview',
-    },
+    react: { dev: 'vite', build: 'vite build', preview: 'vite preview' },
     vue: {
       dev: 'vite',
       build: 'vue-tsc -b && vite build',
       preview: 'vite preview',
     },
-    svelte: {
-      dev: 'vite dev',
-      build: 'vite build',
-      preview: 'vite preview',
-      check: 'svelte-check --tsconfig ./tsconfig.json',
-    },
+    svelte: { dev: 'vite dev', build: 'vite build', preview: 'vite preview' },
   };
 
   const pkg = {
@@ -128,7 +118,7 @@ async function writeTsConfig(dir: string, framework: Framework): Promise<void> {
       strict: true,
       esModuleInterop: true,
       skipLibCheck: true,
-      jsx: framework === 'svelte' ? undefined : 'react-jsx',
+      jsx: framework === 'svelte' ? undefined : framework === 'vue' ? 'preserve' : 'react-jsx',
       paths: { '@/*': ['./src/*'] },
     },
     include: ['src'],
@@ -157,204 +147,101 @@ dist/
 
 async function writeFrameworkConfig(dir: string, framework: Framework): Promise<void> {
   if (framework === 'nextjs') {
-    const config = `import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {};
-
-export default nextConfig;
-`;
-    await fs.writeFile(path.join(dir, 'next.config.ts'), config);
-  } else if (framework === 'react') {
-    const config = `import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: { "@": "/src" },
-  },
-});
-`;
-    await fs.writeFile(path.join(dir, 'vite.config.ts'), config);
-    await writeIndexHtml(dir, 'react');
-    await writeReactEntry(dir);
-  } else if (framework === 'vue') {
-    const config = `import { defineConfig } from "vite";
-import vue from "@vitejs/plugin-vue";
-
-export default defineConfig({
-  plugins: [vue()],
-  resolve: {
-    alias: { "@": "/src" },
-  },
-});
-`;
-    await fs.writeFile(path.join(dir, 'vite.config.ts'), config);
-    await writeIndexHtml(dir, 'vue');
-    await writeVueEntry(dir);
-  } else if (framework === 'svelte') {
-    const svelteConfig = `import adapter from "@sveltejs/adapter-auto";
-import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
-
-/** @type {import('@sveltejs/kit').Config} */
-const config = {
-  preprocess: vitePreprocess(),
-  kit: {
-    adapter: adapter(),
-    alias: { "@": "./src" },
-  },
-};
-
-export default config;
-`;
-    await fs.writeFile(path.join(dir, 'svelte.config.js'), svelteConfig);
-
-    const viteConfig = `import { sveltekit } from "@sveltejs/kit/vite";
-import { defineConfig } from "vite";
-
-export default defineConfig({
-  plugins: [sveltekit()],
-});
-`;
-    await fs.writeFile(path.join(dir, 'vite.config.ts'), viteConfig);
-    await writeSvelteApp(dir);
+    await fs.writeFile(
+      path.join(dir, 'next.config.ts'),
+      "import type { NextConfig } from 'next';\n\nconst nextConfig: NextConfig = {};\n\nexport default nextConfig;\n"
+    );
+    return;
   }
-}
 
-async function writeIndexHtml(dir: string, framework: 'react' | 'vue'): Promise<void> {
-  const src = framework === 'react' ? '/src/main.tsx' : '/src/main.ts';
-  const html = `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="${src}"></script>
-  </body>
-</html>
-`;
-  await fs.writeFile(path.join(dir, 'index.html'), html);
-}
+  if (framework === 'react') {
+    await fs.writeFile(
+      path.join(dir, 'vite.config.ts'),
+      "import { defineConfig } from 'vite';\nimport react from '@vitejs/plugin-react';\n\nexport default defineConfig({\n  plugins: [react()],\n  resolve: { alias: { '@': '/src' } },\n});\n"
+    );
+    return;
+  }
 
-async function writeReactEntry(dir: string): Promise<void> {
-  const main = `import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
-import "./globals.css";
+  if (framework === 'vue') {
+    await fs.writeFile(
+      path.join(dir, 'vite.config.ts'),
+      "import { defineConfig } from 'vite';\nimport vue from '@vitejs/plugin-vue';\n\nexport default defineConfig({\n  plugins: [vue()],\n  resolve: { alias: { '@': '/src' } },\n});\n"
+    );
+    return;
+  }
 
-createRoot(document.getElementById("app")!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
-`;
-  await fs.writeFile(path.join(dir, 'src', 'main.tsx'), main);
-}
-
-async function writeVueEntry(dir: string): Promise<void> {
-  const main = `import { createApp } from "vue";
-import App from "./App.vue";
-import "./globals.css";
-
-createApp(App).mount("#app");
-`;
-  await fs.writeFile(path.join(dir, 'src', 'main.ts'), main);
-}
-
-async function writeSvelteApp(dir: string): Promise<void> {
-  const appHtml = `<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    %sveltekit.head%
-  </head>
-  <body data-sveltekit-prerender="true">
-    <div style="display: contents">%sveltekit.body%</div>
-  </body>
-</html>
-`;
-  await fs.writeFile(path.join(dir, 'src', 'app.html'), appHtml);
-
-  await fs.ensureDir(path.join(dir, 'src', 'routes'));
-  const layout = `<script>
-  import "../globals.css";
-</script>
-
-<slot />
-`;
-  await fs.writeFile(path.join(dir, 'src', 'routes', '+layout.svelte'), layout);
+  if (framework === 'svelte') {
+    await fs.writeFile(
+      path.join(dir, 'vite.config.ts'),
+      "import { defineConfig } from 'vite';\nimport { sveltekit } from '@sveltejs/kit/vite';\n\nexport default defineConfig({\n  plugins: [sveltekit()],\n});\n"
+    );
+    await fs.writeFile(
+      path.join(dir, 'svelte.config.js'),
+      "import adapter from '@sveltejs/adapter-auto';\nimport { vitePreprocess } from '@sveltejs/vite-plugin-svelte';\n\nconst config = {\n  preprocess: vitePreprocess(),\n  kit: { adapter: adapter() },\n};\n\nexport default config;\n"
+    );
+  }
 }
 
 async function writeGlobalsCss(dir: string, framework: Framework, ui: UILibrary): Promise<void> {
   if (ui === 'none') return;
 
-  const content =
-    ui === 'shadcn'
-      ? `@import "tailwindcss";
+  const shadcnCss = [
+    "@import 'tailwindcss';",
+    '',
+    ':root {',
+    '  --background: 0 0% 7%;',
+    '  --foreground: 0 0% 95%;',
+    '  --primary: 262 83% 58%;',
+    '  --primary-foreground: 0 0% 100%;',
+    '  --muted: 0 0% 15%;',
+    '  --muted-foreground: 0 0% 64%;',
+    '  --border: 0 0% 15%;',
+    '  --card: 0 0% 9%;',
+    '  --card-foreground: 0 0% 95%;',
+    '  --accent: 262 83% 58%;',
+    '  --accent-foreground: 0 0% 100%;',
+    '  --radius: 0.5rem;',
+    '}',
+    '',
+    'body {',
+    '  background: hsl(var(--background));',
+    '  color: hsl(var(--foreground));',
+    '  font-family: system-ui, sans-serif;',
+    '}',
+    '',
+  ].join('\n');
 
-:root {
-  --background: 0 0% 7%;
-  --foreground: 0 0% 95%;
-  --primary: 262 83% 58%;
-  --primary-foreground: 0 0% 100%;
-  --muted: 0 0% 15%;
-  --muted-foreground: 0 0% 64%;
-  --border: 0 0% 15%;
-  --card: 0 0% 9%;
-  --card-foreground: 0 0% 95%;
-  --accent: 262 83% 58%;
-  --accent-foreground: 0 0% 100%;
-  --radius: 0.5rem;
-}
+  const tailwindCss = [
+    "@import 'tailwindcss';",
+    '',
+    'body {',
+    '  background: #111;',
+    '  color: #f5f5f5;',
+    '  font-family: system-ui, sans-serif;',
+    '}',
+    '',
+  ].join('\n');
 
-body {
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-family: system-ui, sans-serif;
-}
-`
-      : `@import "tailwindcss";
-
-body {
-  background: #111;
-  color: #f5f5f5;
-  font-family: system-ui, sans-serif;
-}
-`;
+  const content = ui === 'shadcn' ? shadcnCss : tailwindCss;
 
   const cssDir = framework === 'nextjs' ? path.join(dir, 'src', 'app') : path.join(dir, 'src');
   await fs.ensureDir(cssDir);
   await fs.writeFile(path.join(cssDir, 'globals.css'), content);
 }
 
-async function writeEntryPage(
-  dir: string,
-  framework: Framework,
-  template: Template,
-  name: string
-): Promise<void> {
+function getTemplateJsx(template: Template, name: string): string {
   const templates: Record<Template, string> = {
     blank: `<main className="flex min-h-screen flex-col items-center justify-center p-8">
-      <h1 className="text-4xl font-bold">{name}</h1>
+      <h1 className="text-4xl font-bold">${name}</h1>
       <p className="mt-4 text-lg text-gray-400">Built with Siza</p>
     </main>`,
     dashboard: `<div className="flex min-h-screen">
       <aside className="w-64 border-r border-gray-800 p-4">
-        <h2 className="text-xl font-bold mb-4">{name}</h2>
+        <h2 className="text-xl font-bold mb-4">${name}</h2>
         <nav className="space-y-2">
-          <a href="#" className="block px-3 py-2 rounded hover:bg-gray-800">
-            Overview
-          </a>
-          <a href="#" className="block px-3 py-2 rounded hover:bg-gray-800">
-            Analytics
-          </a>
-          <a href="#" className="block px-3 py-2 rounded hover:bg-gray-800">
-            Settings
-          </a>
+          <a href="#" className="block px-3 py-2 rounded hover:bg-gray-800">Overview</a>
+          <a href="#" className="block px-3 py-2 rounded hover:bg-gray-800">Analytics</a>
+          <a href="#" className="block px-3 py-2 rounded hover:bg-gray-800">Settings</a>
         </nav>
       </aside>
       <main className="flex-1 p-8">
@@ -377,63 +264,40 @@ async function writeEntryPage(
     </div>`,
     landing: `<div className="min-h-screen">
       <header className="flex items-center justify-between p-6">
-        <span className="text-xl font-bold">{name}</span>
+        <span className="text-xl font-bold">${name}</span>
         <nav className="space-x-4">
-          <a href="#features" className="text-gray-400 hover:text-white">
-            Features
-          </a>
-          <a href="#pricing" className="text-gray-400 hover:text-white">
-            Pricing
-          </a>
-          <button className="rounded-lg bg-purple-600 px-4 py-2 text-white hover:bg-purple-700">
-            Get Started
-          </button>
+          <a href="#features" className="text-gray-400 hover:text-white">Features</a>
+          <a href="#pricing" className="text-gray-400 hover:text-white">Pricing</a>
+          <button className="rounded-lg bg-purple-600 px-4 py-2 text-white hover:bg-purple-700">Get Started</button>
         </nav>
       </header>
       <main className="flex flex-col items-center justify-center py-32 text-center">
         <h1 className="text-6xl font-bold">Build faster with AI</h1>
-        <p className="mt-6 max-w-xl text-xl text-gray-400">
-          {name} helps you ship beautiful interfaces in minutes, not hours.
-        </p>
+        <p className="mt-6 max-w-xl text-xl text-gray-400">${name} helps you ship beautiful interfaces in minutes, not hours.</p>
         <div className="mt-8 flex gap-4">
-          <button className="rounded-lg bg-purple-600 px-6 py-3 text-lg text-white hover:bg-purple-700">
-            Start Free
-          </button>
-          <button className="rounded-lg border border-gray-600 px-6 py-3 text-lg hover:bg-gray-800">
-            View Demo
-          </button>
+          <button className="rounded-lg bg-purple-600 px-6 py-3 text-lg text-white hover:bg-purple-700">Start Free</button>
+          <button className="rounded-lg border border-gray-600 px-6 py-3 text-lg hover:bg-gray-800">View Demo</button>
         </div>
       </main>
     </div>`,
     ecommerce: `<div className="min-h-screen">
       <header className="flex items-center justify-between border-b border-gray-800 p-6">
-        <span className="text-xl font-bold">{name}</span>
+        <span className="text-xl font-bold">${name}</span>
         <div className="flex items-center gap-4">
-          <input
-            type="search"
-            placeholder="Search products..."
-            className="rounded-lg border border-gray-700 bg-transparent px-4 py-2"
-          />
-          <button className="rounded-lg bg-purple-600 px-4 py-2 text-white">
-            Cart (0)
-          </button>
+          <input type="search" placeholder="Search products..." className="rounded-lg border border-gray-700 bg-transparent px-4 py-2" />
+          <button className="rounded-lg bg-purple-600 px-4 py-2 text-white">Cart (0)</button>
         </div>
       </header>
       <main className="p-8">
         <h1 className="text-2xl font-bold mb-6">Featured Products</h1>
         <div className="grid grid-cols-4 gap-6">
           {[1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              className="rounded-lg border border-gray-800 overflow-hidden"
-            >
+            <div key={i} className="rounded-lg border border-gray-800 overflow-hidden">
               <div className="aspect-square bg-gray-800" />
               <div className="p-4">
                 <h3 className="font-medium">Product {i}</h3>
                 <p className="text-purple-400 font-bold mt-1">$99.00</p>
-                <button className="mt-3 w-full rounded bg-purple-600 py-2 text-sm text-white hover:bg-purple-700">
-                  Add to Cart
-                </button>
+                <button className="mt-3 w-full rounded bg-purple-600 py-2 text-sm text-white hover:bg-purple-700">Add to Cart</button>
               </div>
             </div>
           ))}
@@ -442,66 +306,86 @@ async function writeEntryPage(
     </div>`,
     auth: `<div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md rounded-xl border border-gray-800 p-8">
-        <h1 className="text-2xl font-bold text-center mb-6">
-          Sign in to {name}
-        </h1>
+        <h1 className="text-2xl font-bold text-center mb-6">Sign in to ${name}</h1>
         <form className="space-y-4">
           <div>
             <label className="block text-sm text-gray-400 mb-1">Email</label>
-            <input
-              type="email"
-              className="w-full rounded-lg border border-gray-700 bg-transparent px-4 py-2"
-              placeholder="you@example.com"
-            />
+            <input type="email" className="w-full rounded-lg border border-gray-700 bg-transparent px-4 py-2" placeholder="you@example.com" />
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">
-              Password
-            </label>
-            <input
-              type="password"
-              className="w-full rounded-lg border border-gray-700 bg-transparent px-4 py-2"
-            />
+            <label className="block text-sm text-gray-400 mb-1">Password</label>
+            <input type="password" className="w-full rounded-lg border border-gray-700 bg-transparent px-4 py-2" />
           </div>
-          <button
-            type="submit"
-            className="w-full rounded-lg bg-purple-600 py-2 text-white hover:bg-purple-700"
-          >
-            Sign In
-          </button>
+          <button type="submit" className="w-full rounded-lg bg-purple-600 py-2 text-white hover:bg-purple-700">Sign In</button>
         </form>
         <div className="mt-6 text-center text-sm text-gray-400">
           <p>Or continue with</p>
           <div className="mt-3 flex gap-3 justify-center">
-            <button className="rounded-lg border border-gray-700 px-4 py-2 hover:bg-gray-800">
-              GitHub
-            </button>
-            <button className="rounded-lg border border-gray-700 px-4 py-2 hover:bg-gray-800">
-              Google
-            </button>
+            <button className="rounded-lg border border-gray-700 px-4 py-2 hover:bg-gray-800">GitHub</button>
+            <button className="rounded-lg border border-gray-700 px-4 py-2 hover:bg-gray-800">Google</button>
           </div>
         </div>
       </div>
     </div>`,
   };
+  return templates[template];
+}
 
-  const jsx = templates[template].replace(/{name}/g, name);
+function jsxToVueTemplate(jsx: string): string {
+  let result = jsx.replace(/className=/g, 'class=');
+  const mapRegex = /\{(\[[\s\S]*?\])\.map\(\((\w+)\)\s*=>\s*\(([\s\S]*?)\)\)\}/g;
+  result = result.replace(
+    mapRegex,
+    (_match: string, array: string, item: string, inner: string) =>
+      `<template v-for="${item} in ${array}" :key="${item}">${inner}</template>`
+  );
+  result = result.replace(/\{(\w+)\}/g, (_match: string, n: string) => `{{ ${n} }}`);
+  return result;
+}
 
-  if (framework === 'nextjs') {
-    await fs.ensureDir(path.join(dir, 'src', 'app'));
-    const page = `export default function Home() {
-  const name = "${name}";
-  return (${jsx});
+function jsxToSvelteTemplate(jsx: string): string {
+  let result = jsx.replace(/className=/g, 'class=');
+  const mapRegex = /\{(\[[\s\S]*?\])\.map\(\((\w+)\)\s*=>\s*\(([\s\S]*?)\)\)\}/g;
+  result = result.replace(
+    mapRegex,
+    (_match: string, array: string, item: string, inner: string) => {
+      const cleanInner = inner.replace(/\s*key=\{[^}]*\}/g, '');
+      return `{#each ${array} as ${item}}${cleanInner}{/each}`;
+    }
+  );
+  return result;
+}
+
+async function writeEntryFiles(
+  dir: string,
+  framework: Framework,
+  template: Template,
+  name: string
+): Promise<void> {
+  const jsx = getTemplateJsx(template, name);
+  if (framework === 'nextjs') await writeNextjsEntry(dir, name, jsx);
+  else if (framework === 'react') await writeReactEntry(dir, jsx);
+  else if (framework === 'vue') await writeVueEntry(dir, name, jsx);
+  else await writeSvelteEntry(dir, name, jsx);
+}
+
+async function writeNextjsEntry(dir: string, name: string, jsx: string): Promise<void> {
+  await fs.ensureDir(path.join(dir, 'src', 'app'));
+
+  const page = `export default function Home() {
+  return (
+    ${jsx}
+  );
 }
 `;
-    await fs.writeFile(path.join(dir, 'src', 'app', 'page.tsx'), page);
+  await fs.writeFile(path.join(dir, 'src', 'app', 'page.tsx'), page);
 
-    const layout = `import type { Metadata } from "next";
-import "./globals.css";
+  const layout = `import type { Metadata } from 'next';
+import './globals.css';
 
 export const metadata: Metadata = {
-  title: "${name}",
-  description: "Built with Siza",
+  title: '${name}',
+  description: 'Built with Siza',
 };
 
 export default function RootLayout({
@@ -516,57 +400,132 @@ export default function RootLayout({
   );
 }
 `;
-    await fs.writeFile(path.join(dir, 'src', 'app', 'layout.tsx'), layout);
-  } else if (framework === 'vue') {
-    await fs.ensureDir(path.join(dir, 'src'));
-    const vueJsx = convertToVueTemplate(jsx);
-    const app = `<template>
-  ${vueJsx}
+  await fs.writeFile(path.join(dir, 'src', 'app', 'layout.tsx'), layout);
+}
+
+async function writeReactEntry(dir: string, jsx: string): Promise<void> {
+  await fs.ensureDir(path.join(dir, 'src'));
+
+  await fs.writeFile(
+    path.join(dir, 'index.html'),
+    `<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Siza App</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+`
+  );
+
+  await fs.writeFile(
+    path.join(dir, 'src', 'main.tsx'),
+    `import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+import './globals.css';
+
+createRoot(document.getElementById('root')!).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
+`
+  );
+
+  await fs.writeFile(
+    path.join(dir, 'src', 'App.tsx'),
+    `export default function App() {
+  return (
+    ${jsx}
+  );
+}
+`
+  );
+}
+
+async function writeVueEntry(dir: string, name: string, jsx: string): Promise<void> {
+  await fs.ensureDir(path.join(dir, 'src'));
+
+  await fs.writeFile(
+    path.join(dir, 'index.html'),
+    `<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${name}</title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
+`
+  );
+
+  await fs.writeFile(
+    path.join(dir, 'src', 'main.ts'),
+    `import { createApp } from 'vue';
+import App from './App.vue';
+import './globals.css';
+
+createApp(App).mount('#app');
+`
+  );
+
+  const vueTemplate = jsxToVueTemplate(jsx);
+  await fs.writeFile(
+    path.join(dir, 'src', 'App.vue'),
+    `<template>
+  ${vueTemplate}
 </template>
 
 <script setup lang="ts">
-const name = "${name}";
+const name = '${name}';
 </script>
-`;
-    await fs.writeFile(path.join(dir, 'src', 'App.vue'), app);
-  } else if (framework === 'svelte') {
-    await fs.ensureDir(path.join(dir, 'src', 'routes'));
-    const svelteJsx = convertToSvelteTemplate(jsx);
-    const page = `<script lang="ts">
-  const name = "${name}";
-</script>
-
-${svelteJsx}
-`;
-    await fs.writeFile(path.join(dir, 'src', 'routes', '+page.svelte'), page);
-  } else {
-    await fs.ensureDir(path.join(dir, 'src'));
-    const app = `import "./globals.css";
-
-export default function App() {
-  const name = "${name}";
-  return (${jsx});
-}
-`;
-    await fs.writeFile(path.join(dir, 'src', 'App.tsx'), app);
-  }
-}
-
-function convertToVueTemplate(jsx: string): string {
-  return jsx
-    .replace(/className=/g, 'class=')
-    .replace(/{name}/g, '{{ name }}')
-    .replace(/{\[[\s\S]*?\.map[\s\S]*?\)}/g, '<!-- TODO: v-for loop -->');
-}
-
-function convertToSvelteTemplate(jsx: string): string {
-  let result = jsx.replace(/className=/g, 'class=');
-  result = result.replace(/{name}/g, '{name}');
-  result = result.replace(
-    /{(\[[\s\S]*?)\.map\(\s*(\w+)\s*=>\s*\(([\s\S]*?)\)\s*\)}/g,
-    '{#each $1 as $2}\n$3\n{/each}'
+`
   );
-  return result;
+}
+
+async function writeSvelteEntry(dir: string, name: string, jsx: string): Promise<void> {
+  await fs.ensureDir(path.join(dir, 'src', 'routes'));
+
+  await fs.writeFile(
+    path.join(dir, 'src', 'app.html'),
+    `<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    %sveltekit.head%
+  </head>
+  <body>
+    <div>%sveltekit.body%</div>
+  </body>
+</html>
+`
+  );
+
+  const svelteTemplate = jsxToSvelteTemplate(jsx);
+  await fs.writeFile(
+    path.join(dir, 'src', 'routes', '+page.svelte'),
+    `<script lang="ts">
+  const name = '${name}';
+</script>
+
+${svelteTemplate}
+
+<style>
+  @import '../globals.css';
+</style>
+`
+  );
 }
 
 async function writeMcpConfig(dir: string): Promise<void> {
@@ -595,6 +554,8 @@ async function writeReadme(
     vue: 'Vue',
     svelte: 'SvelteKit',
   };
+  const uiName =
+    ui === 'shadcn' ? 'shadcn/ui + Tailwind CSS' : ui === 'tailwind' ? 'Tailwind CSS' : 'Custom';
   const content = `# ${name}
 
 Created with [create-siza-app](https://github.com/Forge-Space/siza).
@@ -602,7 +563,7 @@ Created with [create-siza-app](https://github.com/Forge-Space/siza).
 ## Stack
 
 - **Framework**: ${frameworkName[framework]}
-- **UI**: ${ui === 'shadcn' ? 'shadcn/ui + Tailwind CSS' : ui === 'tailwind' ? 'Tailwind CSS' : 'Custom'}
+- **UI**: ${uiName}
 - **Template**: ${template}
 
 ## Getting Started
@@ -617,16 +578,12 @@ npm run dev
 This project is configured for AI-assisted development with Siza.
 
 \`\`\`bash
-# Generate a component
 npx siza generate "A responsive pricing card with three tiers"
-
-# Start the AI workspace
-npx siza workspace
 \`\`\`
 
 ## Learn More
 
-- [Siza Documentation](https://docs.siza.dev)
+- [Siza Documentation](https://docs.forgespace.co)
 - [Siza GitHub](https://github.com/Forge-Space/siza)
 `;
   await fs.writeFile(path.join(dir, 'README.md'), content);
