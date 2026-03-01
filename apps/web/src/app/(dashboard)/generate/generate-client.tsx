@@ -29,8 +29,6 @@ import { isFeatureEnabled } from '@/lib/features/flags';
 import { useGeneration } from '@/hooks/use-generation';
 import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog';
 import { FolderPlus } from 'lucide-react';
-import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog';
-import { FolderPlus } from 'lucide-react';
 
 function GeneratePageClient() {
   const searchParams = useSearchParams();
