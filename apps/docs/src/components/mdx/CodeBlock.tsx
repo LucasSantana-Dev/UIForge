@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, type ReactNode } from 'react';
+import { useState, useRef, useEffect, type ReactNode } from 'react';
 import { Copy, Check } from 'lucide-react';
 
 const LANG_MAP: Record<string, string> = {
@@ -29,7 +29,14 @@ interface ChildProps {
 }
 
 function isElementWithProps(node: ReactNode): node is React.ReactElement<ChildProps> {
-  return node !== null && node !== undefined && typeof node === 'object' && 'props' in node;
+  return (
+    node !== null &&
+    node !== undefined &&
+    typeof node === 'object' &&
+    'props' in node &&
+    node.props !== undefined &&
+    typeof node.props === 'object'
+  );
 }
 
 function extractLanguage(children: ReactNode): string | undefined {
@@ -58,6 +65,12 @@ export default function CodeBlock({ children, ...props }: { children: ReactNode 
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
   const lang = extractLanguage(children);
   const label = lang ? (LANG_MAP[lang] ?? lang) : undefined;
 
@@ -79,6 +92,7 @@ export default function CodeBlock({ children, ...props }: { children: ReactNode 
             className="docs-codeblock-copy"
             onClick={handleCopy}
             aria-label={copied ? 'Copied' : 'Copy code'}
+            aria-live="polite"
           >
             {copied ? <Check size={14} /> : <Copy size={14} />}
             <span>{copied ? 'Copied' : 'Copy'}</span>
