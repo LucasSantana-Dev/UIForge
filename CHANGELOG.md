@@ -13,6 +13,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Docs architecture**: Add brand-guide to mermaid diagram and repo sections, fix Node.js version requirement
 - **Docs index**: Add brand-guide to ecosystem table
 
+### Added
+- **Interactive architecture diagram**: Tiered repo map with hover-to-highlight dependency visualization
+- **Interactive contributing guide**: Hero stats, contribution type cards, numbered steps, and repo cards
+- **Data flow diagrams**: Visual flows for Web, MCP, Desktop generation, and Subscription paths
+- **Sidebar icons**: All 18 docs pages now display Lucide icons in the sidebar
+
+### Changed
+- **Code theme**: Restore `github-dark` syntax highlighting (was `rose-pine-moon`)
+- **Architecture page**: Update ecosystem count from 6 to 7 repositories (brand-guide)
+- **Contributing page**: Full rewrite with interactive React components
+
 ## [0.21.0] - 2026-03-01
 
 ### Added
