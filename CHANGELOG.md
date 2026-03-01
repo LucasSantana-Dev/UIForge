@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Dependencies**: Updated 15 packages within semver range — Next.js 16.1.6, Stripe 20.4.0, wrangler 4.69.0, @supabase/supabase-js 2.98.0, @modelcontextprotocol/sdk 1.27.1, autoprefixer 10.4.27, and more
+- **Stripe API version**: Updated from 2026-01-28.clover to 2026-02-25.clover (matches SDK 20.4.0)
+
 ## [0.24.0] - 2026-03-01
 
 ### Added
