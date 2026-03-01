@@ -33,7 +33,7 @@ export function ContribHero() {
           <span className="contrib-stat-label">Tests passing</span>
         </div>
         <div className="contrib-stat">
-          <span className="contrib-stat-value">22</span>
+          <span className="contrib-stat-value">21</span>
           <span className="contrib-stat-label">MCP Tools</span>
         </div>
         <div className="contrib-stat">
