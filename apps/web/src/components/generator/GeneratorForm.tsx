@@ -5,9 +5,8 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SparklesIcon, WandIcon } from 'lucide-react';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@siza/ui';
 import { useGeneration } from '@/hooks/use-generation';
-import { useApiKeyForProvider, useAIKeyStore } from '@/stores/ai-keys';
+import { useApiKeyForProvider, useAIKeyStore, useAIKeys } from '@/stores/ai-keys';
 import { decryptApiKey, type AIProvider } from '@/lib/encryption';
 import { PROVIDER_MODELS } from '@/lib/services/generation';
 import { isFeatureEnabled } from '@/lib/features/flags';
@@ -19,10 +18,13 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { ImageUpload, type ImageState } from './ImageUpload';
 import DesignAnalysisPanel from './DesignAnalysisPanel';
 import type { DesignAnalysis } from '@/lib/services/image-analysis';
-import { ProviderSelector } from './ProviderSelector';
 import { QuotaGuard } from './QuotaGuard';
+import { SizaAICard } from './SizaAICard';
+import { BYOKProviderGrid } from './BYOKProviderGrid';
 import { SkillSelector } from '../skills/SkillSelector';
 import { SkillBadge } from '../skills/SkillBadge';
+
+type ProviderOption = AIProvider | 'siza';
 
 const generatorSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters').max(1000),
@@ -53,26 +55,36 @@ export default function GeneratorForm({
 }: GeneratorFormProps) {
   const generation = useGeneration(projectId);
   const encryptionKey = useAIKeyStore((s) => s.encryptionKey);
+  const apiKeys = useAIKeys();
   const { usage } = useSubscription();
   const isQuotaExceeded =
     usage != null &&
     usage.generations_limit !== -1 &&
     usage.generations_count >= usage.generations_limit;
 
-  const multiLlmEnabled = isFeatureEnabled('ENABLE_MULTI_LLM');
   const sizaAiEnabled = isFeatureEnabled('ENABLE_SIZA_AI');
-  const [selectedProvider, setSelectedProvider] = useState<AIProvider>(
+  const skillsEnabled = isFeatureEnabled('ENABLE_SKILLS');
+  const [selectedProvider, setSelectedProvider] = useState<ProviderOption>(
     sizaAiEnabled ? 'siza' : 'google'
   );
   const [selectedModel, setSelectedModel] = useState(
     sizaAiEnabled ? 'siza-auto' : 'gemini-2.0-flash'
   );
-  const providerKey = useApiKeyForProvider(selectedProvider);
+  const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
+  const [skillParams, setSkillParams] = useState<Record<string, Record<string, unknown>>>({});
 
-  const handleProviderChange = (provider: AIProvider) => {
+  const realProvider: AIProvider = selectedProvider === 'siza' ? 'google' : selectedProvider;
+  const providerKey = useApiKeyForProvider(realProvider);
+
+  const handleBYOKProviderChange = (provider: AIProvider) => {
     setSelectedProvider(provider);
     const firstModel = PROVIDER_MODELS[provider]?.[0];
     if (firstModel) setSelectedModel(firstModel.id);
+  };
+
+  const handleSelectSiza = () => {
+    setSelectedProvider('siza');
+    setSelectedModel('siza-auto');
   };
 
   const [currentSettings, setCurrentSettings] = useState({
@@ -81,9 +93,6 @@ export default function GeneratorForm({
     style: '',
     typescript: false,
   });
-  const skillsEnabled = isFeatureEnabled('ENABLE_SKILLS');
-  const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
-  const [skillParams, setSkillParams] = useState<Record<string, Record<string, unknown>>>({});
   const designContextEnabled = isFeatureEnabled('ENABLE_DESIGN_CONTEXT');
   const autocompleteEnabled = isFeatureEnabled('ENABLE_PROMPT_AUTOCOMPLETE');
   const [designContext, setDesignContext] = useState<DesignContextValues>(DESIGN_DEFAULTS);
@@ -153,7 +162,7 @@ export default function GeneratorForm({
         componentName: data.componentName,
         prompt: data.prompt,
         projectId,
-        provider: selectedProvider,
+        provider: selectedProvider as AIProvider,
         model: selectedModel,
         ...(image && { imageBase64: image.base64, imageMimeType: image.mimeType }),
         ...(apiKey && { userApiKey: apiKey }),
@@ -222,197 +231,181 @@ export default function GeneratorForm({
 
   return (
     <div className="flex flex-col h-full">
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
-        <Tabs defaultValue="prompt" className="flex flex-col flex-1 overflow-hidden">
-          <TabsList className="mx-4 mt-4 grid w-auto grid-cols-3">
-            <TabsTrigger value="prompt">Prompt</TabsTrigger>
-            <TabsTrigger value="options">Options</TabsTrigger>
-            <TabsTrigger value="design">Design</TabsTrigger>
-          </TabsList>
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex flex-col flex-1 overflow-y-auto p-6 space-y-4"
+      >
+        <QuotaGuard error={generation.error} usage={usage} isQuotaExceeded={isQuotaExceeded} />
 
-          <TabsContent value="prompt" className="flex-1 overflow-y-auto p-6 space-y-4 mt-0">
-            <QuotaGuard error={generation.error} usage={usage} isQuotaExceeded={isQuotaExceeded} />
+        <div>
+          <label
+            htmlFor="componentName"
+            className="block text-sm font-medium text-text-primary mb-2"
+          >
+            Component Name *
+          </label>
+          <input
+            {...register('componentName')}
+            type="text"
+            id="componentName"
+            aria-describedby={errors.componentName ? 'componentName-error' : undefined}
+            aria-invalid={!!errors.componentName}
+            className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+            placeholder="MyButton"
+          />
+          {errors.componentName && (
+            <p id="componentName-error" role="alert" className="mt-1 text-sm text-error">
+              {errors.componentName.message}
+            </p>
+          )}
+        </div>
 
-            <div>
-              <label
-                htmlFor="componentName"
-                className="block text-sm font-medium text-text-primary mb-2"
-              >
-                Component Name *
-              </label>
-              <input
-                {...register('componentName')}
-                type="text"
-                id="componentName"
-                aria-describedby={errors.componentName ? 'componentName-error' : undefined}
-                aria-invalid={!!errors.componentName}
-                className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-                placeholder="MyButton"
-              />
-              {errors.componentName && (
-                <p id="componentName-error" role="alert" className="mt-1 text-sm text-error">
-                  {errors.componentName.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="prompt" className="block text-sm font-medium text-text-primary mb-2">
-                Describe Your Component *
-              </label>
-              {autocompleteEnabled ? (
-                <PromptAutocomplete
-                  id="prompt"
-                  value={promptValue}
-                  onChange={(val) => {
-                    setPromptValue(val);
-                    setValue('prompt', val, { shouldValidate: true });
-                  }}
-                  framework={framework}
-                  rows={8}
-                  className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-                  placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
-                />
-              ) : (
-                <textarea
-                  {...register('prompt')}
-                  id="prompt"
-                  rows={8}
-                  aria-describedby={errors.prompt ? 'prompt-error' : undefined}
-                  aria-invalid={!!errors.prompt}
-                  className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-                  placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
-                />
-              )}
-              {errors.prompt && (
-                <p id="prompt-error" role="alert" className="mt-1 text-sm text-error">
-                  {errors.prompt.message}
-                </p>
-              )}
-            </div>
-
-            <button
-              type="submit"
-              disabled={generation.isGenerating || isQuotaExceeded || needsApiKey}
-              className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {generation.isGenerating ? (
-                <>
-                  <WandIcon className="animate-spin h-5 w-5 mr-2" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <SparklesIcon className="h-5 w-5 mr-2" />
-                  Generate Component
-                  {selectedSkillIds.length > 0 && <SkillBadge count={selectedSkillIds.length} />}
-                </>
-              )}
-            </button>
-
-            {(generation.isGenerating || generation.progress > 0 || generation.error) && (
-              <GenerationProgress
-                isGenerating={generation.isGenerating}
-                progress={generation.progress}
-                events={generation.events}
-                error={generation.error}
-              />
-            )}
-          </TabsContent>
-
-          <TabsContent value="options" className="flex-1 overflow-y-auto p-6 space-y-4 mt-0">
-            {skillsEnabled && (
-              <SkillSelector
-                selectedSkillIds={selectedSkillIds}
-                onSelectedChange={setSelectedSkillIds}
-                skillParams={skillParams}
-                onParamsChange={setSkillParams}
-              />
-            )}
-
-            <ProviderSelector
-              selectedProvider={selectedProvider}
-              selectedModel={selectedModel}
-              onProviderChange={handleProviderChange}
-              onModelChange={setSelectedModel}
-              multiLlmEnabled={multiLlmEnabled}
+        <div>
+          <label htmlFor="prompt" className="block text-sm font-medium text-text-primary mb-2">
+            Describe Your Component *
+          </label>
+          {autocompleteEnabled ? (
+            <PromptAutocomplete
+              id="prompt"
+              value={promptValue}
+              onChange={(val) => {
+                setPromptValue(val);
+                setValue('prompt', val, { shouldValidate: true });
+              }}
+              framework={framework}
+              rows={8}
+              className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+              placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
             />
+          ) : (
+            <textarea
+              {...register('prompt')}
+              id="prompt"
+              rows={8}
+              aria-describedby={errors.prompt ? 'prompt-error' : undefined}
+              aria-invalid={!!errors.prompt}
+              className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+              placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
+            />
+          )}
+          {errors.prompt && (
+            <p id="prompt-error" role="alert" className="mt-1 text-sm text-error">
+              {errors.prompt.message}
+            </p>
+          )}
+        </div>
 
-            <div>
-              <label
-                htmlFor="componentLibrary"
-                className="block text-sm font-medium text-text-primary mb-2"
-              >
-                Component Library
-              </label>
-              <select
-                {...register('componentLibrary')}
-                id="componentLibrary"
-                className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-              >
-                <option value="tailwind">Tailwind CSS</option>
-                <option value="shadcn">shadcn/ui</option>
-                <option value="mui">Material-UI</option>
-                <option value="chakra">Chakra UI</option>
-                <option value="none">None</option>
-              </select>
-            </div>
+        <ImageUpload image={image} onImageChange={setImage} />
 
-            <div>
-              <label htmlFor="style" className="block text-sm font-medium text-text-primary mb-2">
-                Design Style
-              </label>
-              <select
-                {...register('style')}
-                id="style"
-                className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-              >
-                <option value="modern">Modern</option>
-                <option value="minimal">Minimal</option>
-                <option value="colorful">Colorful</option>
-              </select>
-            </div>
+        {designAnalysisEnabled && image && (
+          <DesignAnalysisPanel
+            imageBase64={image.base64}
+            imageMimeType={image.mimeType}
+            onApply={handleApplyAnalysis}
+          />
+        )}
 
-            <label className="flex items-center">
-              <input
-                {...register('typescript')}
-                type="checkbox"
-                className="rounded border-surface-3 text-brand focus:ring-brand"
-              />
-              <span className="ml-2 text-sm text-text-primary">Use TypeScript</span>
-            </label>
+        {designContextEnabled && (
+          <DesignContext projectId={projectId} values={designContext} onChange={setDesignContext} />
+        )}
 
-            <div className="text-xs text-text-secondary mt-6">
-              <p className="font-medium mb-1">Tips:</p>
-              <ul className="list-disc list-inside space-y-1">
-                <li>Be specific about styling and behavior</li>
-                <li>Mention any props or state needed</li>
-                <li>Describe responsive behavior if needed</li>
-                <li>Upload a screenshot to match an existing design</li>
-              </ul>
-            </div>
-          </TabsContent>
+        {sizaAiEnabled && (
+          <SizaAICard
+            selected={selectedProvider === 'siza'}
+            onSelect={handleSelectSiza}
+            generationsUsed={usage?.generations_count ?? 0}
+            generationsLimit={usage?.generations_limit ?? 50}
+          />
+        )}
 
-          <TabsContent value="design" className="flex-1 overflow-y-auto p-6 space-y-4 mt-0">
-            <ImageUpload image={image} onImageChange={setImage} />
+        <BYOKProviderGrid
+          selectedProvider={selectedProvider !== 'siza' ? selectedProvider : null}
+          selectedModel={selectedModel}
+          onProviderChange={handleBYOKProviderChange}
+          onModelChange={setSelectedModel}
+          hasKey={(p) => apiKeys.some((k) => k.provider === p)}
+        />
 
-            {designAnalysisEnabled && image && (
-              <DesignAnalysisPanel
-                imageBase64={image.base64}
-                imageMimeType={image.mimeType}
-                onApply={handleApplyAnalysis}
-              />
-            )}
+        {skillsEnabled && (
+          <SkillSelector
+            selectedSkillIds={selectedSkillIds}
+            onSelectedChange={setSelectedSkillIds}
+            skillParams={skillParams}
+            onParamsChange={setSkillParams}
+          />
+        )}
 
-            {designContextEnabled && (
-              <DesignContext
-                projectId={projectId}
-                values={designContext}
-                onChange={setDesignContext}
-              />
-            )}
-          </TabsContent>
-        </Tabs>
+        <div>
+          <label
+            htmlFor="componentLibrary"
+            className="block text-sm font-medium text-text-primary mb-2"
+          >
+            Component Library
+          </label>
+          <select
+            {...register('componentLibrary')}
+            id="componentLibrary"
+            className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+          >
+            <option value="tailwind">Tailwind CSS</option>
+            <option value="shadcn">shadcn/ui</option>
+            <option value="mui">Material-UI</option>
+            <option value="chakra">Chakra UI</option>
+            <option value="none">None</option>
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="style" className="block text-sm font-medium text-text-primary mb-2">
+            Design Style
+          </label>
+          <select
+            {...register('style')}
+            id="style"
+            className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+          >
+            <option value="modern">Modern</option>
+            <option value="minimal">Minimal</option>
+            <option value="colorful">Colorful</option>
+          </select>
+        </div>
+
+        <label className="flex items-center">
+          <input
+            {...register('typescript')}
+            type="checkbox"
+            className="rounded border-surface-3 text-brand focus:ring-brand"
+          />
+          <span className="ml-2 text-sm text-text-primary">Use TypeScript</span>
+        </label>
+
+        <button
+          type="submit"
+          disabled={generation.isGenerating || isQuotaExceeded || needsApiKey}
+          className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {generation.isGenerating ? (
+            <>
+              <WandIcon className="animate-spin h-5 w-5 mr-2" />
+              Generating...
+            </>
+          ) : (
+            <>
+              <SparklesIcon className="h-5 w-5 mr-2" />
+              Generate Component
+              {selectedSkillIds.length > 0 && <SkillBadge count={selectedSkillIds.length} />}
+            </>
+          )}
+        </button>
+
+        {(generation.isGenerating || generation.progress > 0 || generation.error) && (
+          <GenerationProgress
+            isGenerating={generation.isGenerating}
+            progress={generation.progress}
+            events={generation.events}
+            error={generation.error}
+          />
+        )}
       </form>
     </div>
   );
