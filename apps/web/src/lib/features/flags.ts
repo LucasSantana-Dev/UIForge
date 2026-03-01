@@ -24,6 +24,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_CODE_INTELLISENSE: true,
   ENABLE_CONVERSATION_MODE: true,
   ENABLE_DESIGN_ANALYSIS: true,
+  ENABLE_ONBOARDING: false,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -164,6 +165,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_DESIGN_ANALYSIS,
     description: 'Enable image-based design analysis for code generation',
     category: 'generation',
+  },
+  {
+    name: 'ENABLE_ONBOARDING',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_ONBOARDING,
+    description: 'Show onboarding wizard for new users after signup',
+    category: 'ui',
   },
 ];
 
