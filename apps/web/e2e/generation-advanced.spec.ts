@@ -4,7 +4,8 @@ import { mockGenerateAPI } from './helpers/mock-api';
 test.describe('Advanced Generation Features', () => {
   test('should show tab-based generation form', async ({ authenticatedPage: page }) => {
     await page.goto('/generate');
-    const promptTab = page.getByRole('tab', { name: /prompt/i })
+    const promptTab = page
+      .getByRole('tab', { name: /prompt/i })
       .or(page.getByText(/prompt/i).first());
     const hasTabUI = await promptTab.isVisible().catch(() => false);
     if (!hasTabUI) {
@@ -30,8 +31,7 @@ test.describe('Advanced Generation Features', () => {
 
   test('should show Siza AI provider option', async ({ authenticatedPage: page }) => {
     await page.goto('/generate');
-    const sizaOption = page.getByText(/siza ai/i)
-      .or(page.locator('[data-value="siza"]'));
+    const sizaOption = page.getByText(/siza ai/i).or(page.locator('[data-value="siza"]'));
     const hasSiza = await sizaOption.isVisible().catch(() => false);
     if (hasSiza) {
       await expect(sizaOption).toBeVisible();

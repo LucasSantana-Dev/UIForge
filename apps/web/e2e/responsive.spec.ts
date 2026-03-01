@@ -14,11 +14,15 @@ test.describe('Responsive Design', () => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
 
-    const hamburger = page.getByRole('button', { name: /menu|navigation/i })
+    const hamburger = page
+      .getByRole('button', { name: /menu|navigation/i })
       .or(page.locator('[class*="hamburger"]'))
       .or(page.locator('button svg[class*="menu"]'));
 
-    const hasHamburger = await hamburger.first().isVisible().catch(() => false);
+    const hasHamburger = await hamburger
+      .first()
+      .isVisible()
+      .catch(() => false);
     // Either hamburger or responsive nav should exist
     expect(typeof hasHamburger).toBe('boolean');
   });

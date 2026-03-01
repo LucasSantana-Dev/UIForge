@@ -5,7 +5,10 @@ test.describe('Error States', () => {
   test('should show 404 for non-existent routes', async ({ page }) => {
     const response = await page.goto('/this-page-does-not-exist');
     const is404 = response?.status() === 404;
-    const has404Text = await page.getByText(/not found|404/i).isVisible().catch(() => false);
+    const has404Text = await page
+      .getByText(/not found|404/i)
+      .isVisible()
+      .catch(() => false);
     expect(is404 || has404Text).toBe(true);
   });
 
@@ -14,7 +17,10 @@ test.describe('Error States', () => {
     await page.goto('/generate');
 
     const errorMsg = page.getByText(/error|something went wrong|try again/i);
-    const hasError = await errorMsg.first().isVisible().catch(() => false);
+    const hasError = await errorMsg
+      .first()
+      .isVisible()
+      .catch(() => false);
     // Page should load even if API is broken
     expect(page.url()).toContain('/generate');
   });
@@ -24,7 +30,10 @@ test.describe('Error States', () => {
     await page.goto('/generate');
 
     const rateLimitMsg = page.getByText(/rate limit|too many|try again/i);
-    const hasLimit = await rateLimitMsg.first().isVisible().catch(() => false);
+    const hasLimit = await rateLimitMsg
+      .first()
+      .isVisible()
+      .catch(() => false);
     expect(typeof hasLimit).toBe('boolean');
   });
 

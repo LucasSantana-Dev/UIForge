@@ -10,6 +10,7 @@ const PROVIDER_LABELS: Record<AIProvider, string> = {
   google: 'Google Gemini',
   openai: 'OpenAI',
   anthropic: 'Anthropic',
+  siza: 'Siza AI',
 };
 
 interface ProviderSelectorProps {

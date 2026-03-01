@@ -11,13 +11,14 @@ test.describe('Authentication Flows', () => {
   test('should validate email format on signup', async ({ page }) => {
     await page.goto('/signup');
     await page.getByLabel(/email/i).fill('invalid-email');
-    await page.getByLabel(/password/i).first().fill('ValidPass123!');
+    await page
+      .getByLabel(/password/i)
+      .first()
+      .fill('ValidPass123!');
     await page.getByRole('button', { name: /sign up|create account/i }).click();
 
     const emailInput = page.getByLabel(/email/i);
-    const isInvalid = await emailInput.evaluate(
-      (el: HTMLInputElement) => !el.validity.valid
-    );
+    const isInvalid = await emailInput.evaluate((el: HTMLInputElement) => !el.validity.valid);
     expect(isInvalid).toBe(true);
   });
 
@@ -34,9 +35,7 @@ test.describe('Authentication Flows', () => {
     await page.getByLabel(/password/i).fill('WrongPassword123!');
     await page.getByRole('button', { name: /sign in/i }).click();
 
-    await expect(
-      page.getByText(/invalid|error|incorrect|failed/i)
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText(/invalid|error|incorrect|failed/i)).toBeVisible({ timeout: 10000 });
   });
 
   test('should navigate to forgot password', async ({ page }) => {
