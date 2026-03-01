@@ -27,6 +27,8 @@ import type { QualityReport } from '@/lib/quality/gates';
 import { SaveTemplateDialog } from '@/components/generator/SaveTemplateDialog';
 import { isFeatureEnabled } from '@/lib/features/flags';
 import { useGeneration } from '@/hooks/use-generation';
+import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog';
+import { FolderPlus } from 'lucide-react';
 
 function GeneratePageClient() {
   const searchParams = useSearchParams();
@@ -203,14 +205,35 @@ function GeneratePageClient() {
     setIsTemplateMode(false);
   };
 
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+
+  const handleProjectCreated = (newProjectId: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('projectId', newProjectId);
+    router.push('/generate?' + params.toString());
+  };
+
   if (!projectId) {
     return (
       <div className="flex items-center justify-center h-full">
-        <Card className="p-6 max-w-md">
+        <Card className="p-6 max-w-md text-center">
+          <FolderPlus className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
           <h2 className="text-lg font-semibold mb-2">No Project Selected</h2>
-          <p className="text-sm text-muted-foreground">
-            Please select a project from the projects page to generate components.
+          <p className="text-sm text-muted-foreground mb-4">
+            Create a project to start generating components.
           </p>
+          <div className="flex gap-2 justify-center">
+            <Button onClick={() => setCreateDialogOpen(true)}>Create Project</Button>
+            <Button variant="outline" onClick={() => router.push('/projects')}>
+              Browse Projects
+            </Button>
+          </div>
+          <CreateProjectDialog
+            open={createDialogOpen}
+            onOpenChange={setCreateDialogOpen}
+            onSuccess={handleProjectCreated}
+            defaultFramework={framework}
+          />
         </Card>
       </div>
     );

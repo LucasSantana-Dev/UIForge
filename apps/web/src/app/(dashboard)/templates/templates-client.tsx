@@ -12,7 +12,9 @@ import {
 } from 'lucide-react';
 import { TemplateCard } from '@/components/templates/TemplateCard';
 import { TemplatePreview } from '@/components/templates/TemplatePreview';
+import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog';
 import { useRouter } from 'next/navigation';
+import { useProjects } from '@/hooks/use-projects';
 
 interface DBTemplate {
   id: string;
@@ -112,6 +114,7 @@ function useDebounce(value: string, delay: number): string {
 
 export function TemplatesClient() {
   const router = useRouter();
+  const { data: projects } = useProjects();
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -123,6 +126,8 @@ export function TemplatesClient() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedTemplate, setSelectedTemplate] = useState<Template | null>(null);
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [pendingTemplate, setPendingTemplate] = useState<Template | null>(null);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
@@ -177,14 +182,34 @@ export function TemplatesClient() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  const handleUseTemplate = (template: Template) => {
+  const navigateToGenerate = (template: Template, projectId: string) => {
     const params = new URLSearchParams({
+      projectId,
       template: template.id,
       framework: template.framework,
       componentLibrary: template.componentLibrary,
       description: template.description,
     });
     router.push('/generate?' + params.toString());
+  };
+
+  const handleUseTemplate = (template: Template) => {
+    const firstProject = projects?.[0];
+    if (firstProject) {
+      navigateToGenerate(template, firstProject.id);
+    } else {
+      setPendingTemplate(template);
+      setCreateDialogOpen(true);
+    }
+  };
+
+  const handleProjectCreated = (projectId: string) => {
+    if (pendingTemplate) {
+      navigateToGenerate(pendingTemplate, projectId);
+      setPendingTemplate(null);
+    } else {
+      router.push('/generate?projectId=' + projectId);
+    }
   };
 
   const handlePreview = (template: Template) => {
@@ -391,6 +416,13 @@ export function TemplatesClient() {
         open={previewOpen}
         onOpenChange={setPreviewOpen}
         onUseTemplate={handleUseTemplate}
+      />
+
+      <CreateProjectDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={handleProjectCreated}
+        defaultFramework={pendingTemplate?.framework}
       />
     </div>
   );
