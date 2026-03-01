@@ -81,6 +81,8 @@ export { SizaBackground } from './components/ui/siza-background';
 export { Toaster as SonnerToaster } from './components/ui/sonner';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/ui/tabs';
 export { Textarea } from './components/ui/textarea';
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/ui/tooltip';
+
 export {
   type ToastProps,
   type ToastActionElement,

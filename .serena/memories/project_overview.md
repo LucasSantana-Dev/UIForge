@@ -27,7 +27,7 @@ Three offset rectangles — base (widest), face (wide), horn (narrow, right-shif
 - MCP server integration for AI routing
 
 ## Tech Stack
-- **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS 4
+- **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS 3
 - **Backend**: Cloudflare Workers, Hono framework
 - **Database**: Supabase (auth + PostgreSQL + storage)
 - **AI**: Gemini 2.0 Flash (primary), BYOK for OpenAI/Anthropic
@@ -43,19 +43,24 @@ Three offset rectangles — base (widest), face (wide), horn (narrow, right-shif
 Precise, confident, technical, dry, architectural. Write for engineers. No emoji in product copy. No marketing speak.
 
 ## Current State (2026-03-01)
-- **Version**: v0.20.0 (released 2026-03-01)
+- **Version**: v0.25.0 (released 2026-03-01)
 - **Domain**: `siza.forgespace.co` (Cloudflare Workers)
 - **Dev**: `dev.forgespace.co`
-- **Branch**: `feat/landing-page-polish` — PR #228 open
-- **Tags**: v0.2.1 → ... → v0.19.0 → v0.20.0
-- **Recent merges**: #227 (v0.20.0 release), #226 (docs UI polish), #224 (v0.19.0), #222 (cost controls + refinement)
-- **PR #228**: Landing page polish — OG image, metadata, stats bar fix, hero copy, footer links
+- **Branch**: main — 0 open PRs, all CI green
+- **Tags**: v0.2.1 → ... → v0.24.0 → v0.25.0
+- **v0.25.0 includes**: Skills system (#256, #257), platform metrics API (#262), GitHub PR tracking (#258), GeneratorForm refactor (#261), Sentry tracking (#264), E2E fixture fix (#260), dep upgrades (#271)
+- **Dep upgrades (PR #271)**: @supabase/ssr ^0.8.0 (getAll/setAll cookie API), @anthropic-ai/sdk ^0.78.0, cmdk ^1.1.1
 - **Desktop**: v0.2.0 released (Electron + Ollama local generation)
-- **Tests**: 608+ webapp + 22 desktop passing
+- **Tests**: 618 webapp + 54 API passing (49+ suites), 8 E2E spec files
+- **Supabase prod** (`nfwmwdzbnvsyziyeubqb`): Skills + GitHub PR tracking migrations applied
 
-## Landing Page (apps/web)
+## Supabase SSR Cookie API (v0.8.0)
+- Old: `get(name)`, `set(name, value, options)`, `remove(name, options)` + `CookieOptions` import
+- New: `getAll()`, `setAll(cookiesToSet)` — bulk operations, no CookieOptions needed
+- Files: `apps/web/src/lib/supabase/server.ts`, `apps/web/src/middleware.ts`
+
+## Landing Page
 - **OG image**: `apps/web/public/og-image.png` — branded 1200x630, 102 KB static PNG
-- **Metadata**: Complete OpenGraph + Twitter card in `layout.tsx` with `metadataBase`, `siteName`, `canonical`
-- **Stats bar**: 7 repos, 4 frameworks, 5 quality gates, 608+ tests
+- **Metadata**: Complete OpenGraph + Twitter card in `layout.tsx`
+- **Stats bar**: 8 repos, 4 frameworks, 5 quality gates, 618+ tests
 - **Hero**: "Generate production UI with AI"
-- **Footer**: "Community" (GitHub Discussions), "Changelog" → GitHub Releases

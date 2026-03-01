@@ -32,6 +32,13 @@ npm run test      # Jest unit tests
 - CI checks must pass
 - No direct pushes to `main` (except docs)
 
+## Multi-Session Isolation (Critical)
+When multiple Claude sessions share the repo, branches switch between tool calls. Reliable approaches:
+1. **Git worktree** at `/tmp/siza-<task>` for full isolation (clean up after)
+2. **Atomic python3 scripts** that write files + `git add` + `git commit` in a single Bash call
+3. Always verify branch with `git worktree list` (shows actual state, not just `git branch`)
+4. python3 file writes bypass PostToolUse Prettier hooks — run `npx prettier --write` manually before committing
+
 ## Local Development
 - Start dev server: `npm run dev`
 - Runs on http://localhost:3000
