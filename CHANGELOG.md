@@ -14,7 +14,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Docs content polish**: Styled blockquotes, lists, links (underline-on-hover), horizontal rules, images
 - **Docs sidebar/nav**: Gradient active indicator, scroll-spy dot, nav gradient line, custom scrollbar
 
-
 ## [0.19.0] - 2026-03-01
 
 ### Added
