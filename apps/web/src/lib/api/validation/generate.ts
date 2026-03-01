@@ -35,6 +35,8 @@ export const generateSchema = z.object({
       info: z.string().regex(hexColorRegex),
     })
     .optional(),
+  skillIds: z.array(z.string().uuid()).max(3).optional(),
+  skillParams: z.record(z.string(), z.any()).optional(),
   parentGenerationId: z.string().uuid().optional(),
   previousCode: z.string().max(50000).optional(),
   refinementPrompt: z.string().min(3).max(1000).optional(),

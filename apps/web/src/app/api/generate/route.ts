@@ -21,6 +21,7 @@ import {
   type ConversationContext,
 } from '@/lib/services/generation.service';
 import { routeGeneration } from '@/lib/services/provider-router';
+import { buildSkillContext, trackSkillUsage } from '@/lib/services/skill.service';
 
 export const dynamic = 'force-dynamic';
 
@@ -74,7 +75,10 @@ export async function POST(request: NextRequest) {
     }
 
     const designContext = buildDesignContext(input);
-    const enrichedDescription = input.description + designContext;
+    const skillsEnabled = getFeatureFlag('ENABLE_SKILLS');
+    const skillContext =
+      skillsEnabled && input.skillIds?.length ? await buildSkillContext(input.skillIds) : '';
+    const enrichedDescription = input.description + designContext + skillContext;
     const contextAddition =
       input.useRag !== false
         ? await enrichWithRag(enrichedDescription, {
@@ -166,6 +170,9 @@ export async function POST(request: NextRequest) {
               routingReason
             );
             void postGenerationTasks(generationId, input.description, user.id, input.userApiKey);
+            if (skillsEnabled && input.skillIds?.length) {
+              trackSkillUsage(generationId, input.skillIds, input.skillParams).catch(() => {});
+            }
           }
 
           controller.enqueue(
@@ -250,6 +257,7 @@ export async function GET() {
         'image-input',
         ...(mcpEnabled ? ['mcp-gateway'] : []),
         ...(conversationEnabled ? ['conversation-mode'] : []),
+        ...(getFeatureFlag('ENABLE_SKILLS') ? ['skills'] : []),
       ],
     }),
     {

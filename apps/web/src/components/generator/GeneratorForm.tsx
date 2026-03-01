@@ -21,6 +21,8 @@ import DesignAnalysisPanel from './DesignAnalysisPanel';
 import type { DesignAnalysis } from '@/lib/services/image-analysis';
 import { ProviderSelector } from './ProviderSelector';
 import { QuotaGuard } from './QuotaGuard';
+import { SkillSelector } from '../skills/SkillSelector';
+import { SkillBadge } from '../skills/SkillBadge';
 
 const generatorSchema = z.object({
   prompt: z.string().min(10, 'Prompt must be at least 10 characters').max(1000),
@@ -79,6 +81,9 @@ export default function GeneratorForm({
     style: '',
     typescript: false,
   });
+  const skillsEnabled = isFeatureEnabled('ENABLE_SKILLS');
+  const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
+  const [skillParams, setSkillParams] = useState<Record<string, Record<string, unknown>>>({});
   const designContextEnabled = isFeatureEnabled('ENABLE_DESIGN_CONTEXT');
   const autocompleteEnabled = isFeatureEnabled('ENABLE_PROMPT_AUTOCOMPLETE');
   const [designContext, setDesignContext] = useState<DesignContextValues>(DESIGN_DEFAULTS);
@@ -152,6 +157,11 @@ export default function GeneratorForm({
         model: selectedModel,
         ...(image && { imageBase64: image.base64, imageMimeType: image.mimeType }),
         ...(apiKey && { userApiKey: apiKey }),
+        ...(skillsEnabled &&
+          selectedSkillIds.length > 0 && {
+            skillIds: selectedSkillIds,
+            skillParams,
+          }),
         ...(designContextEnabled && {
           colorMode: designContext.colorMode,
           primaryColor: designContext.primaryColor,
@@ -295,6 +305,7 @@ export default function GeneratorForm({
                 <>
                   <SparklesIcon className="h-5 w-5 mr-2" />
                   Generate Component
+                  {selectedSkillIds.length > 0 && <SkillBadge count={selectedSkillIds.length} />}
                 </>
               )}
             </button>
@@ -310,6 +321,15 @@ export default function GeneratorForm({
           </TabsContent>
 
           <TabsContent value="options" className="flex-1 overflow-y-auto p-6 space-y-4 mt-0">
+            {skillsEnabled && (
+              <SkillSelector
+                selectedSkillIds={selectedSkillIds}
+                onSelectedChange={setSelectedSkillIds}
+                skillParams={skillParams}
+                onParamsChange={setSkillParams}
+              />
+            )}
+
             <ProviderSelector
               selectedProvider={selectedProvider}
               selectedModel={selectedModel}

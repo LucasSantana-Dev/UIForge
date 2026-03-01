@@ -30,6 +30,8 @@ export interface GenerationOptions {
     error: string;
     info: string;
   };
+  skillIds?: string[];
+  skillParams?: Record<string, Record<string, unknown>>;
   parentGenerationId?: string;
   previousCode?: string;
   refinementPrompt?: string;
