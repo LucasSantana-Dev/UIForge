@@ -1,5 +1,5 @@
 import './globals.css';
-import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono, Outfit } from 'next/font/google';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { RootProvider } from 'fumadocs-ui/provider/next';
@@ -11,6 +11,11 @@ const inter = Inter({
 
 const jetbrainsMono = JetBrains_Mono({
   variable: '--font-jetbrains-mono',
+  subsets: ['latin'],
+});
+
+const outfit = Outfit({
+  variable: '--font-outfit',
   subsets: ['latin'],
 });
 
@@ -29,7 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} dark`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${outfit.variable} dark`}
       style={{
         colorScheme: 'dark',
         fontFamily: 'var(--font-inter), system-ui, sans-serif',
@@ -44,7 +49,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
         <style
           dangerouslySetInnerHTML={{
-            __html: ':root{--font-sans:var(--font-inter);--font-mono:var(--font-jetbrains-mono)}',
+            __html:
+              ':root{--font-sans:var(--font-inter);--font-mono:var(--font-jetbrains-mono);--font-heading:var(--font-outfit)}',
           }}
         />
       </head>
