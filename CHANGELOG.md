@@ -7,9 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.26.0] - 2026-03-01
+
+### Added
+- **Navigation shell overhaul**: Collapsible sidebar, command palette (Cmd+K), keyboard shortcuts, and tooltip navigation (#263)
+- **Brand-guide theme wiring**: Forge Space theme dynamically sourced from @forgespace/brand-guide identity data (#269)
+- **Tooltip component**: New @siza/ui Tooltip component built on Radix UI (#263)
+- **DashboardShell**: New layout wrapper managing sidebar, topbar, and mobile navigation (#263)
+- **Keyboard shortcuts hook**: `useKeyboardShortcuts` for global hotkey management (#263)
+- **Page metadata hook**: `usePageMeta` for dynamic page titles and breadcrumbs (#263)
+
 ### Changed
-- **Dependencies**: Updated 15 packages within semver range — Next.js 16.1.6, Stripe 20.4.0, wrangler 4.69.0, @supabase/supabase-js 2.98.0, @modelcontextprotocol/sdk 1.27.1, autoprefixer 10.4.27, and more
-- **Stripe API version**: Updated from 2026-01-28.clover to 2026-02-25.clover (matches SDK 20.4.0)
+- **Dependencies**: Upgraded Supabase SSR + Anthropic SDK to latest versions (#271)
+
+### Fixed
+- **ESLint flat config**: Added __mocks__ directory to ignores for Jest mock files (#269)
+- **JSX autoFocus lint**: Fixed eslint-disable pattern for Turbopack-compatible JSX comments (#263)
 
 ## [0.25.0] - 2026-03-01
 
