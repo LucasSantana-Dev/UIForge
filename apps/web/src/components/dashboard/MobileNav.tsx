@@ -2,7 +2,16 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { XIcon, FolderIcon, FileTextIcon, SettingsIcon, PlusIcon, Github } from 'lucide-react';
+import {
+  XIcon,
+  FolderIcon,
+  FileTextIcon,
+  SettingsIcon,
+  PlusIcon,
+  ClockIcon,
+  KeyIcon,
+  CreditCardIcon,
+} from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 interface MobileNavProps {
@@ -11,26 +20,12 @@ interface MobileNavProps {
 }
 
 const navigation = [
-  {
-    name: 'Projects',
-    href: '/projects',
-    icon: FolderIcon,
-  },
-  {
-    name: 'Templates',
-    href: '/templates',
-    icon: FileTextIcon,
-  },
-  {
-    name: 'GitHub',
-    href: '/settings?tab=github',
-    icon: Github,
-  },
-  {
-    name: 'Settings',
-    href: '/settings',
-    icon: SettingsIcon,
-  },
+  { name: 'Projects', href: '/projects', icon: FolderIcon },
+  { name: 'Templates', href: '/templates', icon: FileTextIcon },
+  { name: 'History', href: '/history', icon: ClockIcon },
+  { name: 'AI Keys', href: '/ai-keys', icon: KeyIcon },
+  { name: 'Billing', href: '/billing', icon: CreditCardIcon },
+  { name: 'Settings', href: '/settings', icon: SettingsIcon },
 ];
 
 export default function MobileNav({ open, onClose }: MobileNavProps) {
@@ -51,7 +46,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
       if (e.key !== 'Tab' || !panelRef.current) return;
 
       const focusableElements = panelRef.current.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       );
       const firstElement = focusableElements[0];
       const lastElement = focusableElements[focusableElements.length - 1];
