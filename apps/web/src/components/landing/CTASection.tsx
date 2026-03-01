@@ -22,14 +22,14 @@ export function CTASection({ user }: CTASectionProps) {
         <FadeIn>
           <div className="relative z-10">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-center mb-6">
-              Start building with{' '}
+              Start building{' '}
               <span className="bg-gradient-to-r from-[#7C3AED] via-[#8B5CF6] to-[#6366F1] bg-clip-text text-transparent">
-                precision
+                the right way
               </span>
             </h2>
 
             <p className="text-lg text-[#A1A1AA] text-center max-w-xl mx-auto mb-10">
-              Join thousands of developers shipping faster with AI-powered generation.
+              Full-stack generation with architecture, security, and quality built in. Open source, MIT licensed.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

@@ -4,10 +4,10 @@ import { useCountUp } from '@/hooks/use-count-up';
 import { FadeIn } from './FadeIn';
 
 const stats = [
+  { end: 1500, suffix: '+', label: 'Tests Across Ecosystem' },
+  { end: 502, suffix: '', label: 'Component & Backend Snippets' },
+  { end: 5, suffix: '', label: 'Quality Validation Gates' },
   { end: 7, suffix: '', label: 'Open Source Repos' },
-  { end: 4, suffix: '', label: 'Frameworks Supported' },
-  { end: 5, suffix: '', label: 'Quality Gates' },
-  { end: 608, suffix: '+', label: 'Tests Passing' },
 ];
 
 function StatItem({ end, suffix, label }: { end: number; suffix: string; label: string }) {

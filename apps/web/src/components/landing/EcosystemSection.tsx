@@ -19,7 +19,7 @@ const repos = [
   {
     name: 'siza-mcp',
     badge: 'MCP Server',
-    desc: '21 AI-powered tools for UI generation via Model Context Protocol',
+    desc: '21 AI-powered tools for full-stack generation via Model Context Protocol',
     href: 'https://github.com/Forge-Space/ui-mcp',
   },
   {
@@ -39,6 +39,12 @@ const repos = [
     badge: 'Library',
     desc: 'Shared configurations, standards, and MCP context server',
     href: 'https://github.com/Forge-Space/core',
+  },
+  {
+    name: 'brand-guide',
+    badge: 'Brand',
+    desc: 'Design tokens, typography, color system, and brand identity site',
+    href: 'https://github.com/Forge-Space/brand-guide',
   },
 ];
 

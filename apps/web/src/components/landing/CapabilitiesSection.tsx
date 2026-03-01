@@ -1,68 +1,69 @@
 'use client';
 
-import { Layers, GitFork, Network, Shield, Zap, Terminal } from 'lucide-react';
+import { Layers, GitFork, ShieldCheck, CheckSquare, Boxes, Brain } from 'lucide-react';
 import { FadeIn } from './FadeIn';
 import { CONTAINER, SECTION_PADDING } from './constants';
 
 const capabilities = [
   {
     icon: Layers,
-    title: 'Component Architecture',
+    title: 'Architecture-First',
     description:
-      'Atomic design system with 200+ composable primitives. From atoms to full page templates.',
+      'Service layers, middleware, proper separation of concerns. Every scaffold follows patterns that scale.',
     accent: 'from-purple-500/20 to-purple-600/5',
   },
   {
-    icon: GitFork,
-    title: 'AI Provider Gateway',
+    icon: ShieldCheck,
+    title: 'Security by Default',
     description:
-      'Route to 12+ AI providers through a single API. Automatic failover and load balancing.',
-    accent: 'from-blue-500/20 to-blue-600/5',
-  },
-  {
-    icon: Network,
-    title: 'Repository Ecosystem',
-    description: 'Six interconnected open-source repositories. Use one or all \u2014 zero lock-in.',
-    accent: 'from-indigo-500/20 to-indigo-600/5',
-  },
-  {
-    icon: Shield,
-    title: 'Enterprise Security',
-    description:
-      'AES-256 BYOK encryption, RLS policies, and SOC 2-ready architecture out of the box.',
+      'BYOK encryption, RLS policies, input validation, and SOC 2-ready patterns baked into every project.',
     accent: 'from-emerald-500/20 to-emerald-600/5',
   },
   {
-    icon: Zap,
-    title: 'Edge-First Performance',
-    description: 'Deploy to Cloudflare Workers for sub-50ms response times at the edge, globally.',
+    icon: CheckSquare,
+    title: 'Quality Gates',
+    description:
+      'Anti-generic detection, accessibility audit, diversity tracking. Five validation layers before code ships.',
+    accent: 'from-blue-500/20 to-blue-600/5',
+  },
+  {
+    icon: Boxes,
+    title: 'Full-Stack Scaffolds',
+    description:
+      'SaaS, API, monorepo templates with auth, billing, database, and tests included. Not just components.',
     accent: 'from-amber-500/20 to-amber-600/5',
   },
   {
-    icon: Terminal,
-    title: 'Developer Experience',
+    icon: Brain,
+    title: 'Context-Aware Generation',
+    description: 'MCP-native tools that understand your codebase, brand identity, and design system. No generic output.',
+    accent: 'from-indigo-500/20 to-indigo-600/5',
+  },
+  {
+    icon: GitFork,
+    title: 'Multi-Provider AI',
     description:
-      'TypeScript-first SDK, MCP integration, and CLI tools. Built by developers, for developers.',
+      '12+ AI providers, single API. Swap models without changing code. Automatic failover built in.',
     accent: 'from-rose-500/20 to-rose-600/5',
   },
 ];
 
 const iconColors: Record<string, string> = {
-  'Component Architecture': 'text-purple-400',
-  'AI Provider Gateway': 'text-blue-400',
-  'Repository Ecosystem': 'text-indigo-400',
-  'Enterprise Security': 'text-emerald-400',
-  'Edge-First Performance': 'text-amber-400',
-  'Developer Experience': 'text-rose-400',
+  'Architecture-First': 'text-purple-400',
+  'Security by Default': 'text-emerald-400',
+  'Quality Gates': 'text-blue-400',
+  'Full-Stack Scaffolds': 'text-amber-400',
+  'Context-Aware Generation': 'text-indigo-400',
+  'Multi-Provider AI': 'text-rose-400',
 };
 
 const iconBgs: Record<string, string> = {
-  'Component Architecture': 'bg-purple-500/10',
-  'AI Provider Gateway': 'bg-blue-500/10',
-  'Repository Ecosystem': 'bg-indigo-500/10',
-  'Enterprise Security': 'bg-emerald-500/10',
-  'Edge-First Performance': 'bg-amber-500/10',
-  'Developer Experience': 'bg-rose-500/10',
+  'Architecture-First': 'bg-purple-500/10',
+  'Security by Default': 'bg-emerald-500/10',
+  'Quality Gates': 'bg-blue-500/10',
+  'Full-Stack Scaffolds': 'bg-amber-500/10',
+  'Context-Aware Generation': 'bg-indigo-500/10',
+  'Multi-Provider AI': 'bg-rose-500/10',
 };
 
 export function CapabilitiesSection() {
@@ -75,10 +76,10 @@ export function CapabilitiesSection() {
               Capabilities
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-4">
-              Everything you need to ship
+              What makes it different
             </h2>
             <p className="text-lg text-[#A1A1AA] max-w-2xl mx-auto">
-              A complete toolkit for modern UI development, from generation to deployment.
+              AI generators produce code fast. We produce code that lasts.
             </p>
           </div>
         </FadeIn>

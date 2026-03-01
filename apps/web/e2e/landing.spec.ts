@@ -14,31 +14,32 @@ test.describe('Landing Page', () => {
 
   test('should render hero section with headline and CTAs', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect(page.getByText(/generate production ui/i)).toBeVisible();
+    await expect(page.getByText(/vibe code/i)).toBeVisible();
     await expect(page.getByRole('link', { name: /get started free/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /view on github/i }).first()).toBeVisible();
   });
 
   test('should render stats bar with counters', async ({ page }) => {
-    await expect(page.getByText(/open source repos/i).first()).toBeVisible();
-    await expect(page.getByText(/frameworks supported/i).first()).toBeVisible();
+    await expect(page.getByText(/tests across ecosystem/i).first()).toBeVisible();
+    await expect(page.getByText(/quality validation gates/i).first()).toBeVisible();
   });
 
   test('should render capabilities section', async ({ page }) => {
-    await expect(page.getByText(/everything you need to ship/i)).toBeVisible();
-    await expect(page.getByText(/component architecture/i)).toBeVisible();
-    await expect(page.getByText(/ai provider gateway/i)).toBeVisible();
+    await expect(page.getByText(/what makes it different/i)).toBeVisible();
+    await expect(page.getByText(/architecture-first/i)).toBeVisible();
+    await expect(page.getByText(/security by default/i)).toBeVisible();
   });
 
   test('should render code showcase section', async ({ page }) => {
-    await expect(page.getByText(/one gateway/i)).toBeVisible();
-    await expect(page.getByText(/gateway\.config\.ts/i)).toBeVisible();
+    await expect(page.getByText(/your next project/i)).toBeVisible();
+    await expect(page.getByText(/project structure/i)).toBeVisible();
   });
 
   test('should render ecosystem section', async ({ page }) => {
     await expect(page.getByText(/seven repos/i)).toBeVisible();
     await expect(page.getByText(/siza-mcp/i).first()).toBeVisible();
     await expect(page.getByText(/mcp-gateway/i).first()).toBeVisible();
+    await expect(page.getByText(/brand-guide/i).first()).toBeVisible();
   });
 
   test('should render footer with links', async ({ page }) => {
