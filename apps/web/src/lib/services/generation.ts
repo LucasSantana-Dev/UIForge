@@ -1,7 +1,7 @@
 import { AIProvider } from '@/lib/encryption';
 import { GenerationEvent, generateComponentStream } from './gemini';
 
-const SYSTEM_PROMPT = `You are a UI component generator. Generate a single, self-contained React component.
+const FALLBACK_SYSTEM_PROMPT = `You are a UI component generator. Generate a single, self-contained React component.
 
 Rules:
 - Export the component as the default export
@@ -23,6 +23,9 @@ export interface MultiProviderOptions {
   contextAddition?: string;
   imageBase64?: string;
   imageMimeType?: string;
+  componentType?: string;
+  mood?: string;
+  industry?: string;
   conversationContext?: {
     previousCode: string;
     refinementPrompt: string;
@@ -46,8 +49,33 @@ function buildPrompt(options: MultiProviderOptions): string {
   return parts.join('\n');
 }
 
-function getSystemPrompt(contextAddition?: string): string {
-  return contextAddition ? `${SYSTEM_PROMPT}\n\n${contextAddition}` : SYSTEM_PROMPT;
+function getEnrichedSystemPrompt(options: {
+  framework: string;
+  componentLibrary?: string;
+  componentType?: string;
+  mood?: string;
+  industry?: string;
+  contextAddition?: string;
+}): string {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const siza = require('@forgespace/siza-gen');
+    const assembled = siza.assembleContext({
+      framework: options.framework,
+      componentLibrary: options.componentLibrary,
+      componentType: options.componentType,
+      mood: options.mood,
+      industry: options.industry,
+      tokenBudget: 4000,
+      maxExamples: 3,
+    });
+    const base = assembled.systemPrompt;
+    return options.contextAddition ? `${base}\n\n${options.contextAddition}` : base;
+  } catch {
+    return options.contextAddition
+      ? `${FALLBACK_SYSTEM_PROMPT}\n\n${options.contextAddition}`
+      : FALLBACK_SYSTEM_PROMPT;
+  }
 }
 
 export const PROVIDER_MODELS: Record<AIProvider, { id: string; name: string }[]> = {
@@ -116,7 +144,14 @@ async function* generateWithOpenAI(options: MultiProviderOptions): AsyncGenerato
   yield { type: 'start', timestamp: Date.now() };
 
   try {
-    const systemPrompt = getSystemPrompt(options.contextAddition);
+    const systemPrompt = getEnrichedSystemPrompt({
+      framework: options.framework,
+      componentLibrary: options.componentLibrary,
+      componentType: options.componentType,
+      mood: options.mood,
+      industry: options.industry,
+      contextAddition: options.contextAddition,
+    });
     const userPrompt = buildPrompt(options);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -204,7 +239,14 @@ async function* generateWithAnthropic(
   yield { type: 'start', timestamp: Date.now() };
 
   try {
-    const systemPrompt = getSystemPrompt(options.contextAddition);
+    const systemPrompt = getEnrichedSystemPrompt({
+      framework: options.framework,
+      componentLibrary: options.componentLibrary,
+      componentType: options.componentType,
+      mood: options.mood,
+      industry: options.industry,
+      contextAddition: options.contextAddition,
+    });
     const userPrompt = buildPrompt(options);
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {

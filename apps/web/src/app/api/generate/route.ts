@@ -14,7 +14,7 @@ import {
   createGenerationRecord,
   completeGeneration,
   failGeneration,
-  runQualityGates,
+  runEnhancedGates,
   postGenerationTasks,
   createSseEvent,
   buildStreamPrompt,
@@ -128,6 +128,9 @@ export async function POST(request: NextRequest) {
             imageMimeType: input.imageMimeType,
             provider: input.provider,
             model: input.model || 'gemini-2.0-flash',
+            componentType: input.componentType,
+            mood: input.mood,
+            industry: input.industry,
           })) {
             if (event.type === 'chunk' && event.content) {
               fullCode += event.content;
@@ -145,7 +148,11 @@ export async function POST(request: NextRequest) {
             controller.enqueue(encoder.encode(createSseEvent(event)));
           }
 
-          const qualityReport = runQualityGates(fullCode);
+          const qualityReport = await runEnhancedGates(
+            fullCode,
+            input.description,
+            input.framework
+          );
           controller.enqueue(
             encoder.encode(
               createSseEvent({

@@ -20,6 +20,9 @@ export interface RouteGenerationOptions {
   imageMimeType?: string;
   provider: string;
   model: string;
+  componentType?: string;
+  mood?: string;
+  industry?: string;
 }
 
 export async function* routeGeneration(

@@ -35,6 +35,37 @@ export const generateSchema = z.object({
       info: z.string().regex(hexColorRegex),
     })
     .optional(),
+  componentType: z.string().max(50).optional(),
+  mood: z
+    .enum([
+      'professional',
+      'playful',
+      'elegant',
+      'bold',
+      'minimal',
+      'warm',
+      'cool',
+      'futuristic',
+      'organic',
+      'corporate',
+      'creative',
+      'technical',
+    ])
+    .optional(),
+  industry: z
+    .enum([
+      'saas',
+      'ecommerce',
+      'fintech',
+      'healthcare',
+      'education',
+      'media',
+      'social',
+      'enterprise',
+      'startup',
+      'agency',
+    ])
+    .optional(),
   parentGenerationId: z.string().uuid().optional(),
   previousCode: z.string().max(50000).optional(),
   refinementPrompt: z.string().min(3).max(1000).optional(),

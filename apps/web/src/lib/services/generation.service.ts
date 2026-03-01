@@ -1,7 +1,12 @@
 import { createGeneration, updateGeneration } from '@/lib/repositories/generation.repo';
 import { enrichPromptWithContext } from './context-enrichment';
 import { storeGenerationEmbedding } from './embeddings';
-import { runAllGates, type QualityReport } from '@/lib/quality/gates';
+import {
+  runAllGates,
+  runEnhancedGates,
+  type QualityReport,
+  type EnhancedQualityReport,
+} from '@/lib/quality/gates';
 import { incrementGenerationCount } from '@/lib/usage/tracker';
 
 const BORDER_RADIUS_MAP: Record<string, string> = {
@@ -138,6 +143,8 @@ export async function failGeneration(generationId: string, errorMessage: string)
 export function runQualityGates(code: string): QualityReport {
   return runAllGates(code);
 }
+
+export { runEnhancedGates, type EnhancedQualityReport };
 
 export async function postGenerationTasks(
   generationId: string,

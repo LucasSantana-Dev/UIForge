@@ -178,3 +178,32 @@ export function runAllGates(code: string): QualityReport {
     timestamp: new Date().toISOString(),
   };
 }
+
+export interface EnhancedQualityReport extends QualityReport {
+  heuristicFactors?: Record<string, number>;
+}
+
+export async function runEnhancedGates(
+  code: string,
+  prompt: string,
+  framework: string
+): Promise<EnhancedQualityReport> {
+  const gateReport = runAllGates(code);
+
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const siza = require('@forgespace/siza-gen');
+    const heuristicScore = await siza.scoreQuality(prompt, code, {
+      framework,
+    });
+    const blendedScore = gateReport.score * 0.7 + (heuristicScore.score / 10) * 0.3;
+
+    return {
+      ...gateReport,
+      score: Math.round(blendedScore * 100) / 100,
+      heuristicFactors: heuristicScore.factors,
+    };
+  } catch {
+    return gateReport;
+  }
+}
