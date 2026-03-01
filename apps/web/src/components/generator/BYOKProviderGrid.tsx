@@ -30,6 +30,7 @@ export function BYOKProviderGrid({
       <button
         type="button"
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
         className="w-full flex items-center justify-between p-3 text-sm text-text-secondary hover:text-text-primary"
       >
         <span>Advanced: Use Your Own Key</span>

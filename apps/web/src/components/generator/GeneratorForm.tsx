@@ -122,7 +122,7 @@ export default function GeneratorForm({
     if (initialDescription) setValue('prompt', initialDescription);
   }, [initialDescription, setValue]);
 
-  const needsApiKey = selectedProvider !== 'google' && !providerKey;
+  const needsApiKey = selectedProvider !== 'google' && selectedProvider !== 'siza' && !providerKey;
 
   const onSubmit = async (data: GeneratorFormData) => {
     try {
