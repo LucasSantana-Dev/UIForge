@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.23.1] - 2026-03-01
+
+### Fixed
+- **Siza AI generate button blocked**: Excluded `siza` provider from BYOK key requirement — generate button was disabled for all users without a stored key
+- **Accessibility**: Added `aria-pressed` to SizaAICard, `aria-expanded` to BYOKProviderGrid disclosure
+
 ## [0.23.0] - 2026-03-01
 
 ### Added
