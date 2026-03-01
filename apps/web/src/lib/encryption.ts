@@ -25,7 +25,7 @@ const KDF_ITERATIONS = 600000;
 export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
   siza: {
     name: 'Siza AI',
-    baseUrl: '',
+    baseUrl: 'internal://siza-routing',
     models: ['siza-auto'],
     maxTokens: 2097152,
     rateLimitPerMinute: 60,
