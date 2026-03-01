@@ -57,7 +57,7 @@ export function ProviderSelector({
           <select
             value={selectedModel}
             onChange={(e) => onModelChange(e.target.value)}
-            className="w-full px-3 py-2 border border-surface-3 rounded-md text-sm focus:ring-brand focus:border-brand"
+            className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md text-sm focus:ring-brand focus:border-brand"
           >
             {models.map((m) => (
               <option key={m.id} value={m.id}>

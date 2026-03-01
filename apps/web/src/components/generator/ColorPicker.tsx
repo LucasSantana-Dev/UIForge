@@ -44,7 +44,7 @@ export function ColorPicker({ label, value, onChange }: ColorPickerProps) {
           value={value}
           onChange={handleHexChange}
           maxLength={7}
-          className="w-24 px-2 py-1.5 text-sm border border-surface-3 rounded-md font-mono focus:ring-brand focus:border-brand"
+          className="w-24 px-2 py-1.5 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md font-mono focus:ring-brand focus:border-brand"
           placeholder="#7C3AED"
         />
       </div>

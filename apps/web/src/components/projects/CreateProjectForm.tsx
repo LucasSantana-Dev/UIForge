@@ -90,7 +90,7 @@ export default function CreateProjectForm() {
           {...register('name')}
           type="text"
           id="name"
-          className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+          className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
           placeholder="My Awesome Project"
         />
         {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
@@ -104,7 +104,7 @@ export default function CreateProjectForm() {
           {...register('description')}
           id="description"
           rows={3}
-          className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+          className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
           placeholder="A brief description of your project..."
         />
         {errors.description && (
@@ -119,7 +119,7 @@ export default function CreateProjectForm() {
         <select
           {...register('framework')}
           id="framework"
-          className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+          className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
         >
           <option value="react">React</option>
           <option value="vue">Vue</option>

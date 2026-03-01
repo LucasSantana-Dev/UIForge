@@ -283,7 +283,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
                     onKeyDown={handleSaveKeyDown}
                     placeholder="Theme name..."
                     maxLength={50}
-                    className="flex-1 px-2.5 py-1.5 text-sm border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                    className="flex-1 px-2.5 py-1.5 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
                   />
                   <button
                     type="button"
@@ -335,7 +335,7 @@ export function ThemeSelector({ projectId, currentValues, onSelectTheme }: Theme
                   onChange={(e) => setImportJson(e.target.value)}
                   placeholder="Paste theme JSON or brand identity JSON..."
                   rows={4}
-                  className="w-full px-2 py-1.5 text-xs font-mono border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                  className="w-full px-2 py-1.5 text-xs font-mono bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
                 />
                 {importError && <p className="text-xs text-red-500">{importError}</p>}
                 <div className="flex gap-2">

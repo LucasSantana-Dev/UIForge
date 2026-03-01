@@ -7,6 +7,7 @@ const hexColorRegex = /^#[0-9A-Fa-f]{6}$/;
 export const generateSchema = z.object({
   description: z.string().min(10).max(2000),
   framework: z.enum(['react', 'vue', 'angular', 'svelte']).default('react'),
+  projectId: z.string().uuid().optional(),
   componentLibrary: z.enum(['tailwind', 'mui', 'chakra', 'shadcn', 'none']).optional(),
   style: z.enum(['modern', 'minimal', 'colorful']).optional(),
   typescript: z.boolean().optional(),

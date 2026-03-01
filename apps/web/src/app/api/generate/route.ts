@@ -107,6 +107,7 @@ export async function POST(request: NextRequest) {
             framework: input.framework,
             provider: activeProvider,
             model: activeModel,
+            projectId: input.projectId,
             parentGenerationId: input.parentGenerationId,
           });
 

@@ -24,13 +24,13 @@ export default function ProjectFilters({
           placeholder="Search projects..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+          className="w-full pl-10 pr-4 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
         />
       </div>
       <select
         value={sortBy}
         onChange={(e) => onSortChange(e.target.value as 'updated' | 'created' | 'name')}
-        className="px-4 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+        className="px-4 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
       >
         <option value="updated">Last Updated</option>
         <option value="created">Date Created</option>
