@@ -50,7 +50,7 @@ export function usePageMeta(): PageMetaResult {
 
   const breadcrumbs: Breadcrumb[] = [{ label: 'Home', href: '/dashboard' }];
 
-  if (meta && matchedKey !== '/dashboard') {
+  if (meta && matchedKey && matchedKey !== '/dashboard') {
     breadcrumbs.push({ label: meta.title, href: matchedKey });
   }
 
