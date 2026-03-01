@@ -10,6 +10,7 @@ import GenerationHistory from '@/components/generator/GenerationHistory';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@siza/ui';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
   ArrowLeft,
@@ -405,17 +406,43 @@ function GeneratePageClient() {
   );
 }
 
+function GenerateLoadingSkeleton() {
+  return (
+    <div className="h-full flex flex-col">
+      <div className="mb-6 flex items-center justify-between">
+        <div>
+          <Skeleton className="h-9 w-64 mb-2" />
+          <Skeleton className="h-4 w-96" />
+        </div>
+        <Skeleton className="h-9 w-24" />
+      </div>
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
+        <Card className="h-full p-4 space-y-4">
+          <Skeleton className="h-5 w-32" />
+          <Skeleton className="h-24 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full" />
+        </Card>
+        <Card className="h-full p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-8 w-20" />
+          </div>
+          <Skeleton className="h-full min-h-[200px] w-full" />
+        </Card>
+        <Card className="h-full p-4 space-y-3">
+          <Skeleton className="h-5 w-28" />
+          <Skeleton className="h-full min-h-[200px] w-full" />
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 export function GenerateClient() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center h-full">
-          <Card className="p-6 max-w-md">
-            <p className="text-sm text-muted-foreground">Loading...</p>
-          </Card>
-        </div>
-      }
-    >
+    <Suspense fallback={<GenerateLoadingSkeleton />}>
       <GeneratePageClient />
     </Suspense>
   );

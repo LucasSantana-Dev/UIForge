@@ -1,9 +1,19 @@
 export const dynamic = 'force-dynamic';
 
 import { Suspense } from 'react';
-import ProjectList from '@/components/projects/ProjectList';
+import ProjectList, { ProjectCardSkeleton } from '@/components/projects/ProjectList';
 import { PlusIcon } from 'lucide-react';
 import Link from 'next/link';
+
+function ProjectsLoadingSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <ProjectCardSkeleton key={i} />
+      ))}
+    </div>
+  );
+}
 
 export default function ProjectsPage() {
   return (
@@ -22,7 +32,7 @@ export default function ProjectsPage() {
         </Link>
       </div>
 
-      <Suspense fallback={<div>Loading projects...</div>}>
+      <Suspense fallback={<ProjectsLoadingSkeleton />}>
         <ProjectList />
       </Suspense>
     </div>

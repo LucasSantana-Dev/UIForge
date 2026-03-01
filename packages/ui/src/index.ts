@@ -65,6 +65,7 @@ export {
   SelectScrollDownButton,
 } from './components/ui/select';
 export { Separator } from './components/ui/separator';
+export { Skeleton } from './components/ui/skeleton';
 export {
   Sheet,
   SheetPortal,
