@@ -19,7 +19,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Stats bar**: Replace misleading repo counts (4 Core + 6 Open) with accurate stats (7 repos, 4 frameworks, 5 quality gates, 608+ tests)
 - **Hero copy**: Sharpen headline from abstract "enables building" to concrete "Generate production UI with AI"
+- **Ecosystem section**: "Six repos" → "Seven repos" (brand-guide added)
 - **Footer links**: Rename "Blog" to "Community" (honest label for GitHub Discussions), point "Changelog" to GitHub Releases
+- **Docs CSS**: Modernize CSS variables from rgb() triplets to hex values with color-mix() for transparency
+- **Docs MDX**: Replace custom CodeBlock/Callout components with Fumadocs defaults, switch code theme to github-dark
+
+### Fixed
+- **E2E tests**: Update landing page tests to match new stats labels, hero text, and ecosystem count
 
 ## [0.20.0] - 2026-03-01
 
