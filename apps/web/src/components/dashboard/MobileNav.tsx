@@ -46,7 +46,7 @@ export default function MobileNav({ open, onClose }: MobileNavProps) {
       if (e.key !== 'Tab' || !panelRef.current) return;
 
       const focusableElements = panelRef.current.querySelectorAll<HTMLElement>(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
       );
       const firstElement = focusableElements[0];
       const lastElement = focusableElements[focusableElements.length - 1];

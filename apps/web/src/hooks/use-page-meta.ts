@@ -43,9 +43,7 @@ interface PageMetaResult {
 export function usePageMeta(): PageMetaResult {
   const pathname = usePathname();
 
-  const matchedKey = Object.keys(PAGE_META).find((key) =>
-    pathname.startsWith(key),
-  );
+  const matchedKey = Object.keys(PAGE_META).find((key) => pathname.startsWith(key));
   const meta = matchedKey ? PAGE_META[matchedKey] : null;
 
   const breadcrumbs: Breadcrumb[] = [{ label: 'Home', href: '/dashboard' }];
@@ -60,9 +58,7 @@ export function usePageMeta(): PageMetaResult {
     for (let i = 0; i < remaining.length; i++) {
       const seg = remaining[i];
       const href = '/' + segments.slice(0, i + 2).join('/');
-      const label = seg
-        .replace(/[-_]/g, ' ')
-        .replace(/\b\w/g, (c) => c.toUpperCase());
+      const label = seg.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
       breadcrumbs.push({ label, href });
     }
   }

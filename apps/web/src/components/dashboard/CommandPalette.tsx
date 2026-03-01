@@ -48,7 +48,7 @@ export function CommandPalette() {
       setOpen(false);
       router.push(href);
     },
-    [router, setOpen],
+    [router, setOpen]
   );
 
   useEffect(() => {
@@ -78,10 +78,10 @@ export function CommandPalette() {
         >
           <div className="flex items-center border-b border-surface-3 px-3">
             <SearchIcon className="mr-2 h-4 w-4 shrink-0 text-text-muted" />
+            {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
             <Command.Input
               placeholder="Type a command or search..."
               className="flex h-12 w-full bg-transparent py-3 text-sm text-text-primary outline-none placeholder:text-text-muted"
-              {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
               autoFocus
             />
           </div>
