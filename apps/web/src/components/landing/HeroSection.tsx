@@ -98,9 +98,9 @@ export function HeroSection({ user }: HeroSectionProps) {
           }}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mt-6"
         >
-          Generate production UI{' '}
+          Vibe code{' '}
           <span className="bg-gradient-to-r from-[#7C3AED] via-[#8B5CF6] to-[#6366F1] bg-clip-text text-transparent">
-            with AI
+            the right way
           </span>
         </motion.h1>
 
@@ -114,8 +114,8 @@ export function HeroSection({ user }: HeroSectionProps) {
           }}
           className="text-lg text-[#A1A1AA] max-w-xl mx-auto mt-6"
         >
-          Open-source workspace for AI-powered UI generation. Go from prompt to production-ready
-          components in seconds.
+          AI-powered full-stack generation with real architecture, security by default, and quality
+          gates that catch what linters miss.
         </motion.p>
 
         <motion.div
@@ -165,15 +165,29 @@ export function HeroSection({ user }: HeroSectionProps) {
           <div className="p-5 font-mono text-[13px] leading-relaxed">
             <div>
               <span className="text-[#71717A]">$</span>{' '}
-              <span className="text-[#FAFAFA]">npx siza generate</span>
+              <span className="text-[#FAFAFA]">npx create-siza-app my-saas</span>
             </div>
             <div>
               <span className="text-[#22C55E]">&#10003;</span>{' '}
-              <span className="text-[#A1A1AA]">Dashboard layout generated (2.3s)</span>
+              <span className="text-[#A1A1AA]">
+                Architecture scaffolded (service layers, middleware)
+              </span>
             </div>
             <div>
               <span className="text-[#22C55E]">&#10003;</span>{' '}
-              <span className="text-[#A1A1AA]">12 components scaffolded</span>
+              <span className="text-[#A1A1AA]">
+                Security configured (BYOK, RLS, input validation)
+              </span>
+            </div>
+            <div>
+              <span className="text-[#22C55E]">&#10003;</span>{' '}
+              <span className="text-[#A1A1AA]">Quality gates enabled (5 validation layers)</span>
+            </div>
+            <div>
+              <span className="text-[#22C55E]">&#10003;</span>{' '}
+              <span className="text-[#A1A1AA]">
+                CI/CD pipeline ready (lint, test, security scan)
+              </span>
             </div>
             <div>
               <span

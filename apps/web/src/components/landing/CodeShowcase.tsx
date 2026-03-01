@@ -5,92 +5,55 @@ import { Check, Copy } from 'lucide-react';
 import { FadeIn } from './FadeIn';
 import { CONTAINER, SECTION_PADDING } from './constants';
 
-const CODE_TEXT = `import { Gateway } from '@siza/gateway'
+const CODE_TEXT = `my-saas/
+├── src/
+│   ├── app/             # Next.js App Router
+│   ├── services/        # Business logic layer
+│   ├── repositories/    # Data access layer
+│   ├── middleware/       # Auth, rate-limit, logging
+│   └── lib/
+│       ├── security/    # BYOK, input validation
+│       └── quality/     # Anti-generic, a11y
+├── tests/               # 80%+ coverage target
+├── supabase/            # Migrations, RLS policies
+└── .github/             # CI/CD, security scan`;
 
-export const gateway = new Gateway({
-  providers: {
-    anthropic: { model: 'claude-sonnet-4-20250514' },
-    openai: { model: 'gpt-4o' },
-    google: { model: 'gemini-2.0-flash' },
-  },
-  routing: {
-    strategy: 'cost-optimized',
-    fallback: true,
-  },
-})`;
-
-const kw = 'color:#8B5CF6';
-const str = 'color:#22C55E';
-const prop = 'color:#60A5FA';
-const def = 'color:#FAFAFA';
+const dir = 'color:#60A5FA';
+const comment = 'color:#71717A';
+const tree = 'color:#A1A1AA';
+const root = 'color:#8B5CF6';
 
 const CODE_HTML = [
-  `<span style="${kw}">import</span>`,
-  `<span style="${def}"> { Gateway } </span>`,
-  `<span style="${kw}">from</span>`,
-  `<span style="${str}"> '@siza/gateway'</span>`,
-  '\n\n',
-  `<span style="${kw}">export const</span>`,
-  `<span style="${def}"> gateway = </span>`,
-  `<span style="${kw}">new</span>`,
-  `<span style="${def}"> Gateway({</span>`,
+  `<span style="${root}">my-saas/</span>`,
   '\n',
-  `<span style="${def}">  </span>`,
-  `<span style="${prop}">providers</span>`,
-  `<span style="${def}">: {</span>`,
+  `<span style="${tree}">├── </span><span style="${dir}">src/</span>`,
   '\n',
-  `<span style="${def}">    </span>`,
-  `<span style="${prop}">anthropic</span>`,
-  `<span style="${def}">: { </span>`,
-  `<span style="${prop}">model</span>`,
-  `<span style="${def}">: </span>`,
-  `<span style="${str}">'claude-sonnet-4-20250514'</span>`,
-  `<span style="${def}"> },</span>`,
+  `<span style="${tree}">│   ├── </span><span style="${dir}">app/</span><span style="${comment}">             # Next.js App Router</span>`,
   '\n',
-  `<span style="${def}">    </span>`,
-  `<span style="${prop}">openai</span>`,
-  `<span style="${def}">: { </span>`,
-  `<span style="${prop}">model</span>`,
-  `<span style="${def}">: </span>`,
-  `<span style="${str}">'gpt-4o'</span>`,
-  `<span style="${def}"> },</span>`,
+  `<span style="${tree}">│   ├── </span><span style="${dir}">services/</span><span style="${comment}">        # Business logic layer</span>`,
   '\n',
-  `<span style="${def}">    </span>`,
-  `<span style="${prop}">google</span>`,
-  `<span style="${def}">: { </span>`,
-  `<span style="${prop}">model</span>`,
-  `<span style="${def}">: </span>`,
-  `<span style="${str}">'gemini-2.0-flash'</span>`,
-  `<span style="${def}"> },</span>`,
+  `<span style="${tree}">│   ├── </span><span style="${dir}">repositories/</span><span style="${comment}">    # Data access layer</span>`,
   '\n',
-  `<span style="${def}">  },</span>`,
+  `<span style="${tree}">│   ├── </span><span style="${dir}">middleware/</span><span style="${comment}">       # Auth, rate-limit, logging</span>`,
   '\n',
-  `<span style="${def}">  </span>`,
-  `<span style="${prop}">routing</span>`,
-  `<span style="${def}">: {</span>`,
+  `<span style="${tree}">│   └── </span><span style="${dir}">lib/</span>`,
   '\n',
-  `<span style="${def}">    </span>`,
-  `<span style="${prop}">strategy</span>`,
-  `<span style="${def}">: </span>`,
-  `<span style="${str}">'cost-optimized'</span>`,
-  `<span style="${def}">,</span>`,
+  `<span style="${tree}">│       ├── </span><span style="${dir}">security/</span><span style="${comment}">    # BYOK, input validation</span>`,
   '\n',
-  `<span style="${def}">    </span>`,
-  `<span style="${prop}">fallback</span>`,
-  `<span style="${def}">: </span>`,
-  `<span style="${kw}">true</span>`,
-  `<span style="${def}">,</span>`,
+  `<span style="${tree}">│       └── </span><span style="${dir}">quality/</span><span style="${comment}">     # Anti-generic, a11y</span>`,
   '\n',
-  `<span style="${def}">  },</span>`,
+  `<span style="${tree}">├── </span><span style="${dir}">tests/</span><span style="${comment}">               # 80%+ coverage target</span>`,
   '\n',
-  `<span style="${def}">})</span>`,
+  `<span style="${tree}">├── </span><span style="${dir}">supabase/</span><span style="${comment}">            # Migrations, RLS policies</span>`,
+  '\n',
+  `<span style="${tree}">└── </span><span style="${dir}">.github/</span><span style="${comment}">             # CI/CD, security scan</span>`,
 ].join('');
 
 const FEATURES = [
-  'Unified API across OpenAI, Anthropic, Google, and 9 more',
-  'Automatic failover with intelligent load balancing',
-  'Built-in rate limiting and usage tracking',
-  'Type-safe TypeScript SDK with full IntelliSense',
+  'Architecture patterns baked in — service layers, repositories, middleware',
+  'Security from line one — BYOK encryption, RLS policies, input validation',
+  'Quality gates included — anti-generic detection, accessibility audit',
+  'Full CI/CD pipeline — lint, build, test, security scan, deploy',
 ];
 
 export function CodeShowcase() {
@@ -107,11 +70,11 @@ export function CodeShowcase() {
       <div className={`${CONTAINER} grid grid-cols-1 lg:grid-cols-2 gap-12 items-center`}>
         <FadeIn delay={0}>
           <div>
-            <div className="text-sm font-mono text-[#7C3AED] mb-4">{'// TypeScript SDK'}</div>
+            <div className="text-sm font-mono text-[#7C3AED] mb-4">{'// npx create-siza-app'}</div>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-6">
-              One gateway.
+              Your next project.
               <br />
-              Every AI provider.
+              Properly structured.
             </h2>
             <div>
               {FEATURES.map((feature) => (
@@ -127,7 +90,7 @@ export function CodeShowcase() {
         <FadeIn delay={0.15}>
           <div className="rounded-xl border border-[#27272A] bg-[#18181B] overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300">
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#27272A]">
-              <span className="text-[13px] font-mono text-[#71717A]">gateway.config.ts</span>
+              <span className="text-[13px] font-mono text-[#71717A]">project structure</span>
               <button
                 onClick={handleCopy}
                 className="text-[#71717A] hover:text-[#FAFAFA] transition-colors p-1 rounded hover:bg-[#27272A]"

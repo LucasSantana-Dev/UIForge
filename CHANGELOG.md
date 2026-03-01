@@ -7,22 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
-- **Docs accuracy**: Update repo count 6→7, tool count 17→21, flag count 17→24 across all docs pages
-- **Docs feature flags**: Add 7 missing flags (conversation mode, design analysis/context, autocomplete, IntelliSense, MCP gateway, onboarding), fix `ENABLE_MULTI_LLM` default from `false` to `true`
-- **Docs architecture**: Add brand-guide to mermaid diagram and repo sections, fix Node.js version requirement
-- **Docs index**: Add brand-guide to ecosystem table
-
-### Added
-- **Interactive architecture diagram**: Tiered repo map with hover-to-highlight dependency visualization
-- **Interactive contributing guide**: Hero stats, contribution type cards, numbered steps, and repo cards
-- **Data flow diagrams**: Visual flows for Web, MCP, Desktop generation, and Subscription paths
-- **Sidebar icons**: All 18 docs pages now display Lucide icons in the sidebar
-
 ### Changed
-- **Code theme**: Restore `github-dark` syntax highlighting (was `rose-pine-moon`)
-- **Architecture page**: Update ecosystem count from 6 to 7 repositories (brand-guide)
-- **Contributing page**: Full rewrite with interactive React components
+- **Landing page repositioning**: Reframe from UI generation to full-stack project generation platform
+- **Hero**: "Generate production UI with AI" → "Vibe code the right way" with full-stack subheading
+- **Stats bar**: Ecosystem-wide metrics (1,500+ tests, 502 snippets, 5 quality gates, 7 repos)
+- **Capabilities**: Reframe 6 cards as architecture, security, quality, scaffolds, context-awareness, multi-provider
+- **Code showcase**: Gateway config → full-stack scaffold tree with architecture layers
+- **CTA**: "Start building with precision" → "Start building the right way"
+- **Metadata**: Title, description, OG tags, keywords updated for full-stack positioning
+- **Ecosystem section**: Add missing brand-guide repo card (7 of 7), update siza-mcp description
+
+### Fixed
+- **Ecosystem section**: brand-guide (7th repo) was missing from the repo cards
+
 
 ## [0.21.0] - 2026-03-01
 

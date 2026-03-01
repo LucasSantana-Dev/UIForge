@@ -25,17 +25,27 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://siza.forgespace.co'),
-  title: 'Siza — AI-Powered UI Generation',
+  title: 'Siza — Vibe Code the Right Way',
   description:
-    'The open full-stack AI workspace. Generate, integrate, and ship production-ready UI.',
-  keywords: ['UI generation', 'AI', 'React', 'Next.js', 'Vue', 'Components'],
+    'AI-powered full-stack generation with real architecture, security by default, and quality gates. Open source, MIT licensed.',
+  keywords: [
+    'full-stack generation',
+    'AI code generation',
+    'vibe coding',
+    'architecture',
+    'security',
+    'code quality',
+    'React',
+    'Next.js',
+    'MCP',
+  ],
   authors: [{ name: 'Siza Team' }],
   icons: {
     icon: '/favicon.ico',
   },
   openGraph: {
-    title: 'Siza — AI-Powered UI Generation',
-    description: 'The open full-stack AI workspace — generate, integrate, ship.',
+    title: 'Siza — Vibe Code the Right Way',
+    description: 'Full-stack AI generation with architecture, security, and quality built in.',
     url: 'https://siza.forgespace.co',
     siteName: 'Siza',
     images: [
@@ -43,15 +53,15 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Siza — AI-Powered UI Generation',
+        alt: 'Siza — Vibe Code the Right Way',
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Siza — AI-Powered UI Generation',
-    description: 'The open full-stack AI workspace — generate, integrate, ship.',
+    title: 'Siza — Vibe Code the Right Way',
+    description: 'Full-stack AI generation with architecture, security, and quality built in.',
     images: ['/og-image.png'],
   },
   alternates: {
