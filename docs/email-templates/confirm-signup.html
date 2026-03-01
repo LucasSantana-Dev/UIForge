@@ -1,37 +1,97 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Confirm your email - Siza</title>
     <style>
-      body { margin: 0; padding: 0; background-color: #09090b; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-      .container { max-width: 480px; margin: 0 auto; padding: 40px 24px; }
-      .card { background-color: #18181b; border: 1px solid #27272a; border-radius: 12px; padding: 32px; }
-      .logo { font-size: 24px; font-weight: 700; color: #fafafa; margin-bottom: 24px; }
-      .logo span { color: #7c3aed; }
-      h1 { color: #fafafa; font-size: 20px; font-weight: 600; margin: 0 0 12px 0; }
-      p { color: #a1a1aa; font-size: 14px; line-height: 1.6; margin: 0 0 16px 0; }
-      .btn { display: inline-block; background-color: #7c3aed; color: #ffffff; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 500; margin: 8px 0 24px 0; }
-      .btn:hover { background-color: #6d28d9; }
-      .footer { color: #52525b; font-size: 12px; text-align: center; margin-top: 24px; }
-      .footer a { color: #7c3aed; text-decoration: none; }
-      .divider { border: none; border-top: 1px solid #27272a; margin: 24px 0; }
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: #09090b;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      }
+      .container {
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 40px 24px;
+      }
+      .card {
+        background-color: #18181b;
+        border: 1px solid #27272a;
+        border-radius: 12px;
+        padding: 32px;
+      }
+      .logo {
+        font-size: 24px;
+        font-weight: 700;
+        color: #fafafa;
+        margin-bottom: 24px;
+      }
+      .logo span {
+        color: #7c3aed;
+      }
+      h1 {
+        color: #fafafa;
+        font-size: 20px;
+        font-weight: 600;
+        margin: 0 0 12px 0;
+      }
+      p {
+        color: #a1a1aa;
+        font-size: 14px;
+        line-height: 1.6;
+        margin: 0 0 16px 0;
+      }
+      .btn {
+        display: inline-block;
+        background-color: #7c3aed;
+        color: #ffffff;
+        text-decoration: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        margin: 8px 0 24px 0;
+      }
+      .btn:hover {
+        background-color: #6d28d9;
+      }
+      .footer {
+        color: #52525b;
+        font-size: 12px;
+        text-align: center;
+        margin-top: 24px;
+      }
+      .footer a {
+        color: #7c3aed;
+        text-decoration: none;
+      }
+      .divider {
+        border: none;
+        border-top: 1px solid #27272a;
+        margin: 24px 0;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
       <div class="card">
         <div class="logo"><span>S</span>iza</div>
         <h1>Confirm your email</h1>
-        <p>Thanks for signing up! Click the button below to verify your email address and get started.</p>
+        <p>
+          Thanks for signing up! Click the button below to verify your email address and get
+          started.
+        </p>
         <a href="{{ .ConfirmationURL }}" class="btn">Confirm Email</a>
-        <hr class="divider">
-        <p style="font-size: 12px; color: #52525b;">If you didn't request this, you can safely ignore this email.</p>
+        <hr class="divider" />
+        <p style="font-size: 12px; color: #52525b">
+          If you didn't request this, you can safely ignore this email.
+        </p>
       </div>
       <div class="footer">
         <p>&copy; 2026 Siza by <a href="https://forgespace.co">Forge Space</a></p>
       </div>
     </div>
-</body>
+  </body>
 </html>
