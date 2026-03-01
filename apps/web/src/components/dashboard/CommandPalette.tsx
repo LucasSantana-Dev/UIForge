@@ -81,6 +81,7 @@ export function CommandPalette() {
             <Command.Input
               placeholder="Type a command or search..."
               className="flex h-12 w-full bg-transparent py-3 text-sm text-text-primary outline-none placeholder:text-text-muted"
+              {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
               autoFocus
             />
           </div>
