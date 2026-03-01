@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 export interface GenerationEvent {
-  type: 'start' | 'chunk' | 'complete' | 'error' | 'fallback';
+  type: 'start' | 'chunk' | 'complete' | 'error' | 'fallback' | 'routing';
   content?: string;
   message?: string;
   provider?: string;

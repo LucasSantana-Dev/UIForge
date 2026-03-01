@@ -17,6 +17,9 @@ export interface GenerationUpdate {
   ai_provider?: string;
   quality_score?: number;
   error_message?: string;
+  routed_provider?: string;
+  routing_reason?: string;
+  github_pr_id?: string;
 }
 
 export async function createGeneration(data: GenerationInsert): Promise<string | null> {

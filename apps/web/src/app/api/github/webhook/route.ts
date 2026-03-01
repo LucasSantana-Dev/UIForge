@@ -87,5 +87,37 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  if (event === 'pull_request') {
+    const prData = payload.pull_request;
+    if (prData && payload.repository?.full_name) {
+      const { data: repo } = await supabase
+        .from('github_repos')
+        .select('id')
+        .eq('full_name', payload.repository.full_name)
+        .single();
+
+      if (repo) {
+        const stateMap: Record<string, string> = {
+          opened: 'open',
+          reopened: 'open',
+          closed: prData.merged ? 'merged' : 'closed',
+        };
+        const newState = stateMap[payload.action];
+        if (newState) {
+          await supabase
+            .from('github_prs')
+            .update({
+              state: newState,
+              ...(prData.merged_at && { merged_at: prData.merged_at }),
+              ...(prData.closed_at && { closed_at: prData.closed_at }),
+              updated_at: new Date().toISOString(),
+            } as any)
+            .eq('repo_id', repo.id)
+            .eq('pr_number', prData.number);
+        }
+      }
+    }
+  }
+
   return NextResponse.json({ ok: true });
 }

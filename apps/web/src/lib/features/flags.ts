@@ -161,6 +161,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     category: 'generation',
   },
   {
+    name: 'ENABLE_SIZA_AI',
+    description: 'Enable Siza AI as default smart routing provider',
+    defaultValue: true,
+    category: 'generation',
+  },
+  {
     name: 'ENABLE_DESIGN_ANALYSIS',
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_DESIGN_ANALYSIS,
     description: 'Enable image-based design analysis for code generation',
