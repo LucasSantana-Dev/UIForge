@@ -78,12 +78,13 @@ export function CommandPalette() {
         >
           <div className="flex items-center border-b border-surface-3 px-3">
             <SearchIcon className="mr-2 h-4 w-4 shrink-0 text-text-muted" />
-            {/* eslint-disable-next-line jsx-a11y/no-autofocus */}
+            {/* eslint-disable jsx-a11y/no-autofocus */}
             <Command.Input
               placeholder="Type a command or search..."
               className="flex h-12 w-full bg-transparent py-3 text-sm text-text-primary outline-none placeholder:text-text-muted"
               autoFocus
             />
+            {/* eslint-enable jsx-a11y/no-autofocus */}
           </div>
           <Command.List className="max-h-[300px] overflow-y-auto p-2">
             <Command.Empty className="py-6 text-center text-sm text-text-muted">
