@@ -73,7 +73,7 @@ export default function RefinementInput({
             onKeyDown={handleKeyDown}
             disabled={isGenerating}
             rows={1}
-            className="flex-1 px-3 py-2 text-sm border border-surface-3 rounded-md resize-none focus:ring-brand focus:border-brand disabled:opacity-50"
+            className="flex-1 px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md resize-none focus:ring-brand focus:border-brand disabled:opacity-50"
             placeholder="How would you like to refine this? (e.g., make it darker, add hover states)"
           />
           <Button

@@ -172,7 +172,7 @@ export function DesignContext({ projectId, values, onChange }: DesignContextProp
             id="design-animation"
             value={values.animation}
             onChange={(e) => update({ animation: e.target.value as AnimationLevel })}
-            className="w-full px-3 py-2 text-sm border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+            className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
           >
             {ANIMATION_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -193,7 +193,7 @@ export function DesignContext({ projectId, values, onChange }: DesignContextProp
             id="design-spacing"
             value={values.spacing}
             onChange={(e) => update({ spacing: e.target.value as SpacingLevel })}
-            className="w-full px-3 py-2 text-sm border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+            className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
           >
             {SPACING_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -218,7 +218,7 @@ export function DesignContext({ projectId, values, onChange }: DesignContextProp
                 borderRadius: e.target.value as BorderRadiusLevel,
               })
             }
-            className="w-full px-3 py-2 text-sm border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+            className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
           >
             {BORDER_RADIUS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -243,7 +243,7 @@ export function DesignContext({ projectId, values, onChange }: DesignContextProp
                 typography: e.target.value as TypographyStyle,
               })
             }
-            className="w-full px-3 py-2 text-sm border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+            className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
           >
             {TYPOGRAPHY_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>

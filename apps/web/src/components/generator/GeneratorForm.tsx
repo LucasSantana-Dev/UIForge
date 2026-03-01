@@ -231,7 +231,7 @@ export default function GeneratorForm({
                 id="componentName"
                 aria-describedby={errors.componentName ? 'componentName-error' : undefined}
                 aria-invalid={!!errors.componentName}
-                className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
                 placeholder="MyButton"
               />
               {errors.componentName && (
@@ -255,7 +255,7 @@ export default function GeneratorForm({
                   }}
                   framework={framework}
                   rows={8}
-                  className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                  className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
                   placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
                 />
               ) : (
@@ -265,7 +265,7 @@ export default function GeneratorForm({
                   rows={8}
                   aria-describedby={errors.prompt ? 'prompt-error' : undefined}
                   aria-invalid={!!errors.prompt}
-                  className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                  className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
                   placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
                 />
               )}
@@ -323,7 +323,7 @@ export default function GeneratorForm({
               <select
                 {...register('componentLibrary')}
                 id="componentLibrary"
-                className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
               >
                 <option value="tailwind">Tailwind CSS</option>
                 <option value="shadcn">shadcn/ui</option>
@@ -340,7 +340,7 @@ export default function GeneratorForm({
               <select
                 {...register('style')}
                 id="style"
-                className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                className="w-full px-3 py-2 bg-surface-1 text-text-primary border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
               >
                 <option value="modern">Modern</option>
                 <option value="minimal">Minimal</option>
