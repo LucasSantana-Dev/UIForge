@@ -11,6 +11,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dependencies**: Updated 15 packages within semver range — Next.js 16.1.6, Stripe 20.4.0, wrangler 4.69.0, @supabase/supabase-js 2.98.0, @modelcontextprotocol/sdk 1.27.1, autoprefixer 10.4.27, and more
 - **Stripe API version**: Updated from 2026-01-28.clover to 2026-02-25.clover (matches SDK 20.4.0)
 
+## [0.25.0] - 2026-03-01
+
+### Added
+- **Skills system**: Prompt enrichment skills with parameter support, up to 3 per generation (#256, #257)
+- **Platform metrics API**: BUILD/SHIP/VALIDATE tracking endpoint for platform analytics (#262)
+- **GitHub PR tracking**: Automatic project version tracking via GitHub integration (#258)
+- **Sentry error tracking**: Production error monitoring via Envelope API (#264)
+
+### Changed
+- **Generator form refactor**: Replaced tab layout with SizaAI card + BYOK provider grid for cleaner UX (#261)
+
+### Fixed
+- **E2E test reliability**: Migrated specs to fixtures pattern with Supabase admin API for deterministic tests (#260)
+
+### Security
+- **Vulnerability disclosure policy**: Added SECURITY.md with responsible disclosure process (#259)
+
 ## [0.24.0] - 2026-03-01
 
 ### Added
