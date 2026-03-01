@@ -23,7 +23,8 @@ test.describe('Dashboard Home', () => {
 
   test('should navigate to generate page', async ({ authenticatedPage: page }) => {
     await page.goto('/dashboard');
-    const generateLink = page.getByRole('link', { name: /generate/i })
+    const generateLink = page
+      .getByRole('link', { name: /generate/i })
       .or(page.getByText(/generate/i).first());
     if (await generateLink.isVisible().catch(() => false)) {
       await generateLink.click();
@@ -33,7 +34,8 @@ test.describe('Dashboard Home', () => {
 
   test('should navigate to projects page', async ({ authenticatedPage: page }) => {
     await page.goto('/dashboard');
-    const projectsLink = page.getByRole('link', { name: /projects/i })
+    const projectsLink = page
+      .getByRole('link', { name: /projects/i })
       .or(page.locator('a[href*="projects"]'));
     if (await projectsLink.isVisible().catch(() => false)) {
       await projectsLink.click();
@@ -43,7 +45,8 @@ test.describe('Dashboard Home', () => {
 
   test('should navigate to settings page', async ({ authenticatedPage: page }) => {
     await page.goto('/dashboard');
-    const settingsLink = page.getByRole('link', { name: /settings/i })
+    const settingsLink = page
+      .getByRole('link', { name: /settings/i })
       .or(page.locator('a[href*="settings"]'));
     if (await settingsLink.isVisible().catch(() => false)) {
       await settingsLink.click();

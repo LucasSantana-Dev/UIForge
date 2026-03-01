@@ -48,6 +48,8 @@ test.describe('Onboarding Wizard', () => {
 
     await page.reload();
     const wizard = page.getByTestId('onboarding-wizard');
-    await expect(wizard).not.toBeVisible({ timeout: 3000 }).catch(() => {});
+    await expect(wizard)
+      .not.toBeVisible({ timeout: 3000 })
+      .catch(() => {});
   });
 });
