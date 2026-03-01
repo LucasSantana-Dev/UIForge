@@ -14,14 +14,14 @@ test.describe('Landing Page', () => {
 
   test('should render hero section with headline and CTAs', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect(page.getByText(/an ecosystem that enables/i)).toBeVisible();
+    await expect(page.getByText(/generate production ui/i)).toBeVisible();
     await expect(page.getByRole('link', { name: /get started free/i }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: /view on github/i }).first()).toBeVisible();
   });
 
   test('should render stats bar with counters', async ({ page }) => {
-    await expect(page.getByText(/ai providers/i).first()).toBeVisible();
-    await expect(page.getByText(/ui components/i).first()).toBeVisible();
+    await expect(page.getByText(/open source repos/i).first()).toBeVisible();
+    await expect(page.getByText(/frameworks supported/i).first()).toBeVisible();
   });
 
   test('should render capabilities section', async ({ page }) => {
@@ -36,7 +36,7 @@ test.describe('Landing Page', () => {
   });
 
   test('should render ecosystem section', async ({ page }) => {
-    await expect(page.getByText(/six repos/i)).toBeVisible();
+    await expect(page.getByText(/seven repos/i)).toBeVisible();
     await expect(page.getByText(/siza-mcp/i).first()).toBeVisible();
     await expect(page.getByText(/mcp-gateway/i).first()).toBeVisible();
   });
