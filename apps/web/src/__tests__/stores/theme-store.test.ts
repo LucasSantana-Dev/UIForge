@@ -211,7 +211,9 @@ describe('Theme Store', () => {
       const copy = result.current.getThemes().find((t) => t.id === newId!);
       expect(copy!.name).toBe('My Copy');
       expect(copy!.builtIn).toBe(false);
-      expect(copy!.primaryColor).toBe(BUILT_IN_THEMES[0].primaryColor);
+      expect(copy!.primaryColor).toBe(
+        BUILT_IN_THEMES.find((t) => t.id === 'siza-default')!.primaryColor
+      );
     });
 
     it('returns null for nonexistent source', () => {
