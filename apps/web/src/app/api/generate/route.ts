@@ -205,7 +205,10 @@ export async function POST(request: NextRequest) {
             encoder.encode(
               createSseEvent({
                 type: 'error',
-                message: error instanceof Error ? error.message : 'Stream failed',
+                message:
+                  error instanceof Error
+                    ? error.message
+                    : 'Component generation failed unexpectedly. Please try again.',
                 timestamp: Date.now(),
               })
             )
@@ -232,8 +235,14 @@ export async function POST(request: NextRequest) {
       });
     }
     captureServerError(error, { route: '/api/generate' });
-    const message = error instanceof Error ? error.message : 'Internal server error';
-    const status = message === 'Authentication required' ? 401 : 500;
+    const isAuthError =
+      error instanceof Error && error.message === 'Authentication required';
+    const message = isAuthError
+      ? 'Authentication required. Please sign in to generate components.'
+      : error instanceof Error
+        ? error.message
+        : 'An unexpected error occurred. Please try again or contact support.';
+    const status = isAuthError ? 401 : 500;
     return new Response(JSON.stringify({ error: message }), {
       status,
       headers: { 'Content-Type': 'application/json' },

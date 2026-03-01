@@ -122,7 +122,9 @@ export function useGeneration(projectId?: string) {
             case 'error':
               setState((prev) => ({
                 ...prev,
-                error: event.message || 'Generation failed',
+                error:
+                  event.message ||
+                  'Generation failed unexpectedly. Please try again or use a different provider.',
                 isGenerating: false,
               }));
               break;
@@ -138,7 +140,10 @@ export function useGeneration(projectId?: string) {
       } catch (error) {
         setState((prev) => ({
           ...prev,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error:
+            error instanceof Error
+              ? error.message
+              : 'Something went wrong. Please check your connection and try again.',
           isGenerating: false,
         }));
 

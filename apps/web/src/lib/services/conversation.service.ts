@@ -21,7 +21,9 @@ export async function validateConversation(parentGenerationId: string): Promise<
   const parentGen = await findGenerationById(parentGenerationId);
 
   if (!parentGen) {
-    throw new NotFoundError('Parent generation not found');
+    throw new NotFoundError(
+      'The previous generation could not be found. It may have been deleted — please start a new generation.'
+    );
   }
 
   const depth = await getConversationDepth(parentGenerationId);
