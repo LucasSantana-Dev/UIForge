@@ -8,17 +8,13 @@ export async function POST(request: NextRequest) {
     const { repoId, projectId } = await request.json();
 
     if (!repoId || !projectId) {
-      return NextResponse.json(
-        { error: 'Missing repoId or projectId' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing repoId or projectId' }, { status: 400 });
     }
 
     await linkRepoToProject(repoId, projectId);
     return NextResponse.json({ linked: true });
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : 'Failed to link repo';
+    const message = err instanceof Error ? err.message : 'Failed to link repo';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

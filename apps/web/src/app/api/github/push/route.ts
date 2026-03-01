@@ -8,14 +8,12 @@ export async function POST(request: NextRequest) {
     const { user } = await verifySession();
     const body = await request.json();
 
-    const { projectId, generationId, componentName, code, prompt, model } =
-      body;
+    const { projectId, generationId, componentName, code, prompt, model } = body;
 
     if (!projectId || !componentName || !code) {
       return NextResponse.json(
         {
-          error:
-            'Missing required fields: projectId, componentName, code',
+          error: 'Missing required fields: projectId, componentName, code',
         },
         { status: 400 }
       );
@@ -41,8 +39,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ pr });
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : 'Failed to create PR';
+    const message = err instanceof Error ? err.message : 'Failed to create PR';
     const status = message.includes('No GitHub repo linked') ? 404 : 500;
     return NextResponse.json({ error: message }, { status });
   }

@@ -8,17 +8,13 @@ export async function POST(request: NextRequest) {
     const { projectId } = await request.json();
 
     if (!projectId) {
-      return NextResponse.json(
-        { error: 'Missing projectId' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing projectId' }, { status: 400 });
     }
 
     await unlinkRepo(projectId);
     return NextResponse.json({ unlinked: true });
   } catch (err) {
-    const message =
-      err instanceof Error ? err.message : 'Failed to unlink repo';
+    const message = err instanceof Error ? err.message : 'Failed to unlink repo';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

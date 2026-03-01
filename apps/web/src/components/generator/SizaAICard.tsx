@@ -17,10 +17,7 @@ export function SizaAICard({
   generationsLimit,
 }: SizaAICardProps) {
   const remaining = Math.max(0, generationsLimit - generationsUsed);
-  const pct =
-    generationsLimit > 0
-      ? (generationsUsed / generationsLimit) * 100
-      : 0;
+  const pct = generationsLimit > 0 ? (generationsUsed / generationsLimit) * 100 : 0;
 
   return (
     <button
@@ -44,15 +41,11 @@ export function SizaAICard({
         <div
           className={cn(
             'h-4 w-4 rounded-full border-2',
-            selected
-              ? 'border-violet-500 bg-violet-500'
-              : 'border-surface-4'
+            selected ? 'border-violet-500 bg-violet-500' : 'border-surface-4'
           )}
         />
       </div>
-      <p className="text-xs text-text-secondary mb-3">
-        Smart routing for best quality and speed
-      </p>
+      <p className="text-xs text-text-secondary mb-3">Smart routing for best quality and speed</p>
       {generationsLimit > 0 && (
         <div>
           <div className="flex justify-between text-[10px] text-text-muted mb-1">

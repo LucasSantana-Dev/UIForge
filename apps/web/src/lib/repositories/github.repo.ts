@@ -34,9 +34,7 @@ export interface GitHubPRRow {
   created_at: string;
 }
 
-export async function insertPR(
-  data: GitHubPRInsert
-): Promise<string | null> {
+export async function insertPR(data: GitHubPRInsert): Promise<string | null> {
   try {
     const supabase = await getClient();
     const { data: pr } = await supabase
@@ -72,10 +70,7 @@ export async function updatePRState(
   }
 }
 
-export async function findPRsByProject(
-  userId: string,
-  projectId: string
-): Promise<GitHubPRRow[]> {
+export async function findPRsByProject(userId: string, projectId: string): Promise<GitHubPRRow[]> {
   try {
     const supabase = await getClient();
     const { data } = await supabase
@@ -90,9 +85,7 @@ export async function findPRsByProject(
   }
 }
 
-export async function findPRByGeneration(
-  generationId: string
-): Promise<GitHubPRRow | null> {
+export async function findPRByGeneration(generationId: string): Promise<GitHubPRRow | null> {
   try {
     const supabase = await getClient();
     const { data } = await supabase
@@ -106,10 +99,7 @@ export async function findPRByGeneration(
   }
 }
 
-export async function linkPRToGeneration(
-  generationId: string,
-  prId: string
-): Promise<void> {
+export async function linkPRToGeneration(generationId: string, prId: string): Promise<void> {
   try {
     const supabase = await getClient();
     await supabase

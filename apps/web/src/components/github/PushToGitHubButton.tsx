@@ -1,11 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  GitPullRequestIcon,
-  CheckCircleIcon,
-  Loader2Icon,
-} from 'lucide-react';
+import { GitPullRequestIcon, CheckCircleIcon, Loader2Icon } from 'lucide-react';
 
 interface PushToGitHubButtonProps {
   projectId: string;
@@ -24,9 +20,7 @@ export function PushToGitHubButton({
   prompt,
   model,
 }: PushToGitHubButtonProps) {
-  const [state, setState] = useState<
-    'idle' | 'pushing' | 'success' | 'error'
-  >('idle');
+  const [state, setState] = useState<'idle' | 'pushing' | 'success' | 'error'>('idle');
   const [prUrl, setPrUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -53,9 +47,7 @@ export function PushToGitHubButton({
       setPrUrl(data.pr?.htmlUrl || null);
       setState('success');
     } catch (err) {
-      setErrorMsg(
-        err instanceof Error ? err.message : 'Push failed'
-      );
+      setErrorMsg(err instanceof Error ? err.message : 'Push failed');
       setState('error');
     }
   };
@@ -89,9 +81,7 @@ export function PushToGitHubButton({
         )}
         Push to GitHub
       </button>
-      {state === 'error' && errorMsg && (
-        <span className="text-xs text-red-400">{errorMsg}</span>
-      )}
+      {state === 'error' && errorMsg && <span className="text-xs text-red-400">{errorMsg}</span>}
     </div>
   );
 }

@@ -1,12 +1,5 @@
-import {
-  generateAndCreatePR,
-  getLinkedRepo,
-} from '@/lib/github/pipeline';
-import {
-  insertPR,
-  linkPRToGeneration,
-  findPRsByProject,
-} from '@/lib/repositories/github.repo';
+import { generateAndCreatePR, getLinkedRepo } from '@/lib/github/pipeline';
+import { insertPR, linkPRToGeneration, findPRsByProject } from '@/lib/repositories/github.repo';
 import type { GitHubPRRow } from '@/lib/repositories/github.repo';
 
 export interface CreatePRFromGenerationParams {
@@ -19,9 +12,7 @@ export interface CreatePRFromGenerationParams {
   model: string;
 }
 
-export async function createPRFromGeneration(
-  params: CreatePRFromGenerationParams
-) {
+export async function createPRFromGeneration(params: CreatePRFromGenerationParams) {
   const linked = await getLinkedRepo(params.userId, params.projectId);
   if (!linked) {
     throw new Error('No GitHub repo linked to this project');
@@ -36,10 +27,7 @@ export async function createPRFromGeneration(
     .replace(/([a-z])([A-Z])/g, '$1-$2')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-');
-  const ext =
-    params.code.includes('tsx') || params.code.includes('React')
-      ? 'tsx'
-      : 'ts';
+  const ext = params.code.includes('tsx') || params.code.includes('React') ? 'tsx' : 'ts';
   const filePath = 'src/components/' + slug + '.' + ext;
 
   const pr = await generateAndCreatePR({
@@ -72,9 +60,6 @@ export async function createPRFromGeneration(
   return { ...pr, prId };
 }
 
-export async function getProjectPRs(
-  userId: string,
-  projectId: string
-): Promise<GitHubPRRow[]> {
+export async function getProjectPRs(userId: string, projectId: string): Promise<GitHubPRRow[]> {
   return findPRsByProject(userId, projectId);
 }

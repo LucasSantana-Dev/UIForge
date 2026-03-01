@@ -122,7 +122,12 @@ class AIKeyManagerImpl implements AIKeyManager {
 
   async getUsageStats(): Promise<UsageStats> {
     const keys = await storage.getApiKeys();
-    const keysByProvider: Record<AIProvider, number> = { openai: 0, anthropic: 0, google: 0, siza: 0 };
+    const keysByProvider: Record<AIProvider, number> = {
+      openai: 0,
+      anthropic: 0,
+      google: 0,
+      siza: 0,
+    };
     const lastUsedTimes: Record<string, string> = {};
     const expiredKeys: string[] = [];
     for (const key of keys) {

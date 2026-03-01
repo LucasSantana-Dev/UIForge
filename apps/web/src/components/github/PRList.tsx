@@ -30,10 +30,7 @@ export function PRList({ projectId }: PRListProps) {
   useEffect(() => {
     const fetchPRs = async () => {
       try {
-        const res = await fetch(
-          '/api/github/prs?projectId=' +
-            encodeURIComponent(projectId)
-        );
+        const res = await fetch('/api/github/prs?projectId=' + encodeURIComponent(projectId));
         if (res.ok) {
           const data = await res.json();
           setPrs(data.prs || []);
@@ -46,19 +43,11 @@ export function PRList({ projectId }: PRListProps) {
   }, [projectId]);
 
   if (loading) {
-    return (
-      <div className="text-sm text-text-muted py-2">
-        Loading PRs...
-      </div>
-    );
+    return <div className="text-sm text-text-muted py-2">Loading PRs...</div>;
   }
 
   if (prs.length === 0) {
-    return (
-      <div className="text-sm text-text-muted py-2">
-        No pull requests yet
-      </div>
-    );
+    return <div className="text-sm text-text-muted py-2">No pull requests yet</div>;
   }
 
   return (
@@ -78,17 +67,13 @@ export function PRList({ projectId }: PRListProps) {
           >
             <div className="flex items-center gap-2">
               <span
-                className={
-                  'rounded-full px-2 py-0.5 text-xs ' +
-                  (STATE_STYLES[pr.state] || '')
-                }
+                className={'rounded-full px-2 py-0.5 text-xs ' + (STATE_STYLES[pr.state] || '')}
               >
                 {pr.state}
               </span>
               <span className="text-text-primary">
                 #{pr.pr_number}
-                {pr.component_name &&
-                  ' — ' + pr.component_name}
+                {pr.component_name && ' — ' + pr.component_name}
               </span>
             </div>
             <ExternalLinkIcon className="h-3.5 w-3.5 text-text-muted" />
