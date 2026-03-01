@@ -33,6 +33,13 @@ export async function GET(request: Request) {
         sendWelcomeEmail(session.user.email).catch(() => {});
       }
 
+      if (isNewUser) {
+        const onboardingEnabled = process.env.NEXT_PUBLIC_ENABLE_ONBOARDING === 'true';
+        if (onboardingEnabled) {
+          return NextResponse.redirect(`${origin}/onboarding`);
+        }
+      }
+
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
