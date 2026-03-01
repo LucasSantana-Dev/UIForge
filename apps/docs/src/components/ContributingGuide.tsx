@@ -6,15 +6,22 @@ export function ContribHero() {
   return (
     <div className="contrib-hero">
       <div className="contrib-hero-badge">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
         </svg>
         Open Source
       </div>
       <h1 className="contrib-hero-title">Build the future of AI&#8209;powered&nbsp;UI</h1>
       <p className="contrib-hero-desc">
-        Siza is open-source and community-driven. Whether you fix a typo or
-        architect a new generator, every contribution moves the ecosystem forward.
+        Siza is open-source and community-driven. Whether you fix a typo or architect a new
+        generator, every contribution moves the ecosystem forward.
       </p>
       <div className="contrib-stats">
         <div className="contrib-stat">
@@ -92,7 +99,14 @@ interface ContribRepoProps {
   url: string;
 }
 
-export function ContribRepo({ name, desc, lang, langColor = '#f59e0b', tags, url }: ContribRepoProps) {
+export function ContribRepo({
+  name,
+  desc,
+  lang,
+  langColor = '#f59e0b',
+  tags,
+  url,
+}: ContribRepoProps) {
   return (
     <a
       className="contrib-repo"
@@ -108,7 +122,9 @@ export function ContribRepo({ name, desc, lang, langColor = '#f59e0b', tags, url
       <div className="contrib-repo-desc">{desc}</div>
       <div className="contrib-repo-tags">
         {tags.map((t) => (
-          <span key={t} className="contrib-repo-tag">{t}</span>
+          <span key={t} className="contrib-repo-tag">
+            {t}
+          </span>
         ))}
       </div>
     </a>
@@ -121,7 +137,14 @@ export function ContribRepos({ children }: { children: ReactNode }) {
 
 export function IconCode() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <polyline points="16 18 22 12 16 6" />
       <polyline points="8 6 2 12 8 18" />
     </svg>
@@ -130,7 +153,14 @@ export function IconCode() {
 
 export function IconBug() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="m8 2 1.88 1.88" />
       <path d="M14.12 3.88 16 2" />
       <path d="M9 7.13v-1a3.003 3.003 0 1 1 6 0v1" />
@@ -148,7 +178,14 @@ export function IconBug() {
 
 export function IconBook() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
     </svg>
   );
@@ -156,7 +193,14 @@ export function IconBook() {
 
 export function IconLightbulb() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5" />
       <path d="M9 18h6" />
       <path d="M10 22h4" />
@@ -166,7 +210,14 @@ export function IconLightbulb() {
 
 export function IconTestTube() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M14.5 2v17.5c0 1.4-1.1 2.5-2.5 2.5s-2.5-1.1-2.5-2.5V2" />
       <path d="M8.5 2h7" />
       <path d="M14.5 16h-5" />
@@ -176,7 +227,14 @@ export function IconTestTube() {
 
 export function IconGitPR() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="18" cy="18" r="3" />
       <circle cx="6" cy="6" r="3" />
       <path d="M13 6h3a2 2 0 0 1 2 2v7" />

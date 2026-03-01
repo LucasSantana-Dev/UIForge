@@ -90,10 +90,7 @@ export function ArchitectureDiagram() {
   const isRelated = (id: string) => {
     if (!active) return false;
     const activeRepo = getRepo(active);
-    return (
-      activeRepo.deps.includes(id) ||
-      getRepo(id).deps.includes(active)
-    );
+    return activeRepo.deps.includes(id) || getRepo(id).deps.includes(active);
   };
 
   const isDimmed = (id: string) => {
@@ -106,19 +103,14 @@ export function ArchitectureDiagram() {
       {tiers.map((tier) => (
         <div key={tier.label} className="arch-tier">
           <div className="arch-tier-label">{tier.label}</div>
-          <div
-            className="arch-tier-row"
-            data-cols={tier.ids.length}
-          >
+          <div className="arch-tier-row" data-cols={tier.ids.length}>
             {tier.ids.map((id) => {
               const repo = getRepo(id);
               return (
                 <a
                   key={id}
                   className="arch-card"
-                  style={
-                    { '--card-accent': repo.accent } as React.CSSProperties
-                  }
+                  style={{ '--card-accent': repo.accent } as React.CSSProperties}
                   data-active={active === id}
                   data-dimmed={isDimmed(id)}
                   href={repo.github}
@@ -195,7 +187,14 @@ export function FlowArrow() {
 
 function IconCube() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
       <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
       <line x1="12" y1="22.08" x2="12" y2="12" />
@@ -205,7 +204,14 @@ function IconCube() {
 
 function IconRoute() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="6" cy="19" r="3" />
       <path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15" />
       <circle cx="18" cy="5" r="3" />
@@ -215,7 +221,14 @@ function IconRoute() {
 
 function IconBrain() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z" />
       <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z" />
     </svg>
@@ -224,7 +237,14 @@ function IconBrain() {
 
 function IconPalette() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
       <circle cx="17.5" cy="10.5" r=".5" fill="currentColor" />
       <circle cx="8.5" cy="7.5" r=".5" fill="currentColor" />
@@ -236,7 +256,14 @@ function IconPalette() {
 
 function IconPlug() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <path d="M12 22v-5" />
       <path d="M9 8V2" />
       <path d="M15 8V2" />
@@ -247,7 +274,14 @@ function IconPlug() {
 
 function IconApp() {
   return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
       <rect width="7" height="7" x="3" y="3" rx="1" />
       <rect width="7" height="7" x="14" y="3" rx="1" />
       <rect width="7" height="7" x="14" y="14" rx="1" />

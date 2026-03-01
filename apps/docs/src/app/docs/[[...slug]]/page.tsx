@@ -46,9 +46,7 @@ const mdxComponents = {
   IconGitPR,
 };
 
-export default async function Page(
-  props: { params: Promise<{ slug?: string[] }> },
-) {
+export default async function Page(props: { params: Promise<{ slug?: string[] }> }) {
   const params = await props.params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
@@ -59,9 +57,7 @@ export default async function Page(
     <DocsPage toc={page.data.toc} full={page.data.full}>
       <DocsBody>
         <h1>{page.data.title}</h1>
-        {page.data.description && (
-          <p className="fd-description">{page.data.description}</p>
-        )}
+        {page.data.description && <p className="fd-description">{page.data.description}</p>}
         <Mdx components={mdxComponents} />
       </DocsBody>
     </DocsPage>

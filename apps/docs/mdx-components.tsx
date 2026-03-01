@@ -22,9 +22,7 @@ import {
   IconGitPR,
 } from '@/components/ContributingGuide';
 
-export function useMDXComponents(
-  components: MDXComponents,
-): MDXComponents {
+export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
     ...defaultMdxComponents,
     ...components,
