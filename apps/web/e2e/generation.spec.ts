@@ -1,19 +1,16 @@
-import { test, expect } from '@playwright/test';
-import { setupAuthenticatedUser, cleanupTestData } from './helpers/auth';
+import { test, expect } from './fixtures';
 
 test.describe('Component Generation', () => {
+  test.skip(!process.env.SUPABASE_SERVICE_ROLE_KEY, 'Requires SUPABASE_SERVICE_ROLE_KEY');
+
   let projectId: string;
 
-  test.beforeEach(async ({ page }) => {
-    await setupAuthenticatedUser(page);
-
-    // Create a test project for generation
+  test.beforeEach(async ({ authenticatedPage: page }) => {
     await page.goto('/projects/new');
     await page.getByLabel('Project Name *').fill('Generation Test Project');
     await page.getByLabel('Framework *').selectOption('react');
     await page.getByRole('button', { name: 'Create Project' }).click();
 
-    // Extract project ID from URL
     const url = page.url();
     const match = url.match(/\/projects\/([a-f0-9-]+)/);
     if (match) {
@@ -21,11 +18,9 @@ test.describe('Component Generation', () => {
     }
   });
 
-  test.afterEach(async () => {
-    await cleanupTestData();
-  });
-
-  test('should display generation page with project context', async ({ page }) => {
+  test('should display generation page with project context', async ({
+    authenticatedPage: page,
+  }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
 
     // Check page title
@@ -38,7 +33,7 @@ test.describe('Component Generation', () => {
     await expect(page.getByText('Live Preview')).toBeVisible();
   });
 
-  test('should show error when no project is selected', async ({ page }) => {
+  test('should show error when no project is selected', async ({ authenticatedPage: page }) => {
     await page.goto('/generate');
 
     // Should show error message
@@ -46,7 +41,7 @@ test.describe('Component Generation', () => {
     await expect(page.getByText(/select a project/i)).toBeVisible();
   });
 
-  test('should generate a component', async ({ page }) => {
+  test('should generate a component', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
 
     // Fill out generation form
@@ -77,7 +72,7 @@ test.describe('Component Generation', () => {
     await expect(page.locator('text=/TestButton/')).toBeVisible();
   });
 
-  test('should validate component name format', async ({ page }) => {
+  test('should validate component name format', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
 
     // Try invalid component names
@@ -99,7 +94,7 @@ test.describe('Component Generation', () => {
     }
   });
 
-  test('should validate prompt length', async ({ page }) => {
+  test('should validate prompt length', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
 
     await page.getByLabel('Component Name *').fill('ValidName');
@@ -111,7 +106,7 @@ test.describe('Component Generation', () => {
     await expect(page.getByText(/at least.*characters/i)).toBeVisible();
   });
 
-  test('should copy generated code', async ({ page }) => {
+  test('should copy generated code', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
 
     // Generate a component first
@@ -130,7 +125,7 @@ test.describe('Component Generation', () => {
     await expect(page.getByText('Copied')).toBeVisible();
   });
 
-  test('should download generated code', async ({ page }) => {
+  test('should download generated code', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
 
     // Generate a component first
@@ -154,7 +149,7 @@ test.describe('Component Generation', () => {
     expect(download.suggestedFilename()).toMatch(/\.tsx?$/);
   });
 
-  test('should handle generation with tests option', async ({ page }) => {
+  test('should handle generation with tests option', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
 
     await page.getByLabel('Component Name *').fill('TestWithTests');
@@ -172,7 +167,7 @@ test.describe('Component Generation', () => {
     await expect(page.locator('text=/describe|it|test|expect/')).toBeVisible();
   });
 
-  test('should handle rate limiting', async ({ page }) => {
+  test('should handle rate limiting', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
 
     // Make multiple rapid requests
@@ -193,7 +188,7 @@ test.describe('Component Generation', () => {
     ).toBeVisible({ timeout: 10000 });
   });
 
-  test('should edit generated code in Monaco editor', async ({ page }) => {
+  test('should edit generated code in Monaco editor', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
 
     // Generate a component
@@ -215,7 +210,7 @@ test.describe('Component Generation', () => {
     }
   });
 
-  test('should refresh live preview', async ({ page }) => {
+  test('should refresh live preview', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
 
     // Generate a component
@@ -234,7 +229,7 @@ test.describe('Component Generation', () => {
     await expect(refreshButton).toBeEnabled({ timeout: 2000 });
   });
 
-  test('should show tips section', async ({ page }) => {
+  test('should show tips section', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
 
     // Check tips are visible
@@ -243,7 +238,7 @@ test.describe('Component Generation', () => {
     await expect(page.getByText(/mention any props/i)).toBeVisible();
   });
 
-  test('should handle generation errors gracefully', async ({ page }) => {
+  test('should handle generation errors gracefully', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=invalid-uuid&framework=react`);
 
     await page.getByLabel('Component Name *').fill('ErrorTest');

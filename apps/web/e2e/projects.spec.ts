@@ -1,16 +1,9 @@
-import { test, expect } from '@playwright/test';
-import { setupAuthenticatedUser, cleanupTestData } from './helpers/auth';
+import { test, expect } from './fixtures';
 
 test.describe('Project Management', () => {
-  test.beforeEach(async ({ page }) => {
-    await setupAuthenticatedUser(page);
-  });
+  test.skip(!process.env.SUPABASE_SERVICE_ROLE_KEY, 'Requires SUPABASE_SERVICE_ROLE_KEY');
 
-  test.afterEach(async () => {
-    await cleanupTestData();
-  });
-
-  test('should display projects page', async ({ page }) => {
+  test('should display projects page', async ({ authenticatedPage: page }) => {
     await page.goto('/projects');
 
     // Check page title and description
@@ -21,7 +14,7 @@ test.describe('Project Management', () => {
     await expect(page.getByRole('link', { name: 'New Project' })).toBeVisible();
   });
 
-  test('should create a new project', async ({ page }) => {
+  test('should create a new project', async ({ authenticatedPage: page }) => {
     await page.goto('/projects/new');
 
     // Fill out project form
@@ -40,7 +33,7 @@ test.describe('Project Management', () => {
     await expect(page.getByText('Test Project')).toBeVisible();
   });
 
-  test('should search for projects', async ({ page }) => {
+  test('should search for projects', async ({ authenticatedPage: page }) => {
     // Create test projects first
     await page.goto('/projects/new');
     await page.getByLabel('Project Name *').fill('Search Test Project');
@@ -64,7 +57,7 @@ test.describe('Project Management', () => {
     await expect(page.getByText(/no projects found/i)).toBeVisible();
   });
 
-  test('should filter projects by framework', async ({ page }) => {
+  test('should filter projects by framework', async ({ authenticatedPage: page }) => {
     await page.goto('/projects');
 
     // Check if filter dropdown exists
@@ -84,7 +77,7 @@ test.describe('Project Management', () => {
     }
   });
 
-  test('should edit a project', async ({ page }) => {
+  test('should edit a project', async ({ authenticatedPage: page }) => {
     // Create a project first
     await page.goto('/projects/new');
     await page.getByLabel('Project Name *').fill('Edit Test Project');
@@ -113,7 +106,7 @@ test.describe('Project Management', () => {
     await expect(page.getByText('Updated Project Name')).toBeVisible();
   });
 
-  test('should delete a project', async ({ page }) => {
+  test('should delete a project', async ({ authenticatedPage: page }) => {
     // Create a project first
     await page.goto('/projects/new');
     await page.getByLabel('Project Name *').fill('Delete Test Project');
@@ -141,7 +134,7 @@ test.describe('Project Management', () => {
     await expect(page.getByText('Delete Test Project')).not.toBeVisible();
   });
 
-  test('should upload project thumbnail', async ({ page }) => {
+  test('should upload project thumbnail', async ({ authenticatedPage: page }) => {
     await page.goto('/projects/new');
 
     await page.getByLabel('Project Name *').fill('Thumbnail Test Project');
@@ -172,7 +165,7 @@ test.describe('Project Management', () => {
     await expect(page).toHaveURL(/\/projects\/[a-f0-9-]+$/);
   });
 
-  test('should show empty state when no projects exist', async ({ page }) => {
+  test('should show empty state when no projects exist', async ({ authenticatedPage: page }) => {
     await page.goto('/projects');
 
     // If no projects, should show empty state
@@ -187,7 +180,7 @@ test.describe('Project Management', () => {
     }
   });
 
-  test('should handle project creation validation errors', async ({ page }) => {
+  test('should handle project creation validation errors', async ({ authenticatedPage: page }) => {
     await page.goto('/projects/new');
 
     // Try to submit without required fields
@@ -199,7 +192,7 @@ test.describe('Project Management', () => {
     ).toBeVisible();
   });
 
-  test('should navigate between grid and list views', async ({ page }) => {
+  test('should navigate between grid and list views', async ({ authenticatedPage: page }) => {
     await page.goto('/projects');
 
     // Look for view toggle buttons
