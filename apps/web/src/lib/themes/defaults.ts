@@ -1,18 +1,13 @@
 import type { SizaTheme } from '@/stores/theme-store';
 
 export const BUILT_IN_THEMES: SizaTheme[] = [
-      neutrals: ['#f2f2f3', '#e5e4e7', '#cbc9cf', '#98949e', '#65616b', '#323036', '#19181b'],
-    },
-    createdAt: '2026-01-01T00:00:00.000Z',
-    updatedAt: '2026-01-01T00:00:00.000Z',
-  },
   {
     id: 'siza-default',
     name: 'Siza Default',
     builtIn: true,
     colorMode: 'dark',
     primaryColor: '#7C3AED',
-    secondaryColor: '#3B82F6',
+    secondaryColor: '#6366F1',
     accentColor: '#22C55E',
     animation: 'subtle',
     spacing: 'default',
@@ -103,4 +98,9 @@ export const BUILT_IN_THEMES: SizaTheme[] = [
         error: '#ef4343',
         info: '#368fe7',
       },
+      neutrals: ['#f2f2f3', '#e5e4e7', '#cbc9cf', '#98949e', '#65616b', '#323036', '#19181b'],
+    },
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  },
 ];
