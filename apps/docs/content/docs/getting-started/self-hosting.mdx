@@ -7,7 +7,7 @@ Siza is fully self-hostable. Bring your own API keys (BYOK) and deploy to Cloudf
 
 ## Prerequisites
 
-- Node.js 22+
+- Node.js 20+
 - A [Supabase](https://supabase.com) project (free tier works)
 - A [Google AI Studio](https://aistudio.google.com/apikey) API key (Gemini, free tier available)
 
@@ -84,7 +84,7 @@ npx wrangler secret put GEMINI_API_KEY
 
 ## Feature flags
 
-17 feature flags control what's enabled. All default to sensible values. Override via environment variables:
+24 feature flags control what's enabled. All default to sensible values. Override via environment variables:
 
 ```bash
 NEXT_PUBLIC_ENABLE_STRIPE_BILLING=true
