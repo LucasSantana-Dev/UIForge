@@ -51,6 +51,7 @@ function getSystemPrompt(contextAddition?: string): string {
 }
 
 export const PROVIDER_MODELS: Record<AIProvider, { id: string; name: string }[]> = {
+  siza: [{ id: 'siza-auto', name: 'Siza AI (Auto)' }],
   google: [
     { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash' },
     { id: 'gemini-1.5-pro-latest', name: 'Gemini 1.5 Pro' },

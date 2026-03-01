@@ -25,6 +25,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_CONVERSATION_MODE: true,
   ENABLE_DESIGN_ANALYSIS: true,
   ENABLE_ONBOARDING: false,
+  ENABLE_SIZA_AI: true,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -171,6 +172,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_ONBOARDING,
     description: 'Show onboarding wizard for new users after signup',
     category: 'ui',
+  },
+  {
+    name: 'ENABLE_SIZA_AI',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_SIZA_AI,
+    description: 'Enable Siza AI as default smart routing provider',
+    category: 'generation',
   },
 ];
 

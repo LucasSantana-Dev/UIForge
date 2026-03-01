@@ -1,4 +1,5 @@
 import type { AIProvider } from '@/lib/encryption';
+import { routeSizaGeneration, getQuotaFallback } from './siza-router';
 import type { GenerationEvent } from './gemini';
 import { generateComponentStream } from './gemini';
 import { generateWithProvider } from './generation';
@@ -26,8 +27,68 @@ export async function* routeGeneration(
 ): AsyncGenerator<GenerationEvent> {
   if (opts.mcpEnabled) {
     yield* routeViaMcp(opts);
+  } else if (opts.provider === 'siza') {
+    yield* routeViaSizaAI(opts);
   } else {
     yield* routeViaProvider(opts);
+  }
+}
+
+async function* routeViaSizaAI(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
+  const routing = routeSizaGeneration({
+    prompt: opts.prompt,
+    hasImage: !!opts.imageBase64,
+    isFreeTier: !opts.userApiKey,
+  });
+
+  yield {
+    type: 'routing',
+    provider: routing.provider,
+    model: routing.model,
+    reason: routing.reason,
+    timestamp: Date.now(),
+  } as GenerationEvent;
+
+  const resolvedOpts = {
+    ...opts,
+    provider: routing.provider,
+    model: routing.model,
+  };
+
+  let quotaError: GenerationEvent | null = null;
+  for await (const event of routeViaProvider(resolvedOpts)) {
+    if (event.type === 'error' && isQuotaError(event.message)) {
+      quotaError = event;
+      break;
+    }
+    yield event;
+  }
+
+  if (!quotaError) return;
+
+  const fallback = getQuotaFallback(routing.provider);
+  if (!fallback || !canUseFallback()) {
+    yield quotaError;
+    return;
+  }
+
+  recordFallback();
+  yield {
+    type: 'fallback',
+    provider: fallback.provider,
+    message: 'Siza AI routing to alternate provider',
+    timestamp: Date.now(),
+  };
+
+  const fallbackOpts = {
+    ...opts,
+    provider: fallback.provider,
+    model: fallback.model,
+  };
+
+  for await (const event of routeViaProvider(fallbackOpts)) {
+    if (event.type === 'complete') break;
+    yield event;
   }
 }
 

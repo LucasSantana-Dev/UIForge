@@ -7,6 +7,7 @@ import { PROVIDER_MODELS } from '@/lib/services/generation';
 import type { AIProvider } from '@/lib/encryption';
 
 const PROVIDER_LABELS: Record<AIProvider, string> = {
+  siza: 'Siza AI',
   google: 'Google Gemini',
   openai: 'OpenAI',
   anthropic: 'Anthropic',
