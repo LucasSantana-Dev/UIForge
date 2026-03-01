@@ -23,6 +23,16 @@ const proPlan: PlanDefinition = {
   limits: { generationsPerMonth: 100, maxProjects: 10, maxComponentsPerProject: 100, seats: 1 },
 };
 
+const teamPlan: PlanDefinition = {
+  id: 'team',
+  name: 'Team',
+  description: 'For small teams',
+  priceMonthly: 49,
+  stripePriceId: 'price_team_123',
+  features: ['2,500 generations', 'Unlimited projects', '5 team seats'],
+  limits: { generationsPerMonth: 2500, maxProjects: -1, maxComponentsPerProject: -1, seats: 5 },
+};
+
 const enterprisePlan: PlanDefinition = {
   id: 'enterprise',
   name: 'Enterprise',
@@ -107,6 +117,27 @@ describe('PricingCard', () => {
     const onSelect = jest.fn();
     render(<PricingCard plan={enterprisePlan} onSelect={onSelect} />);
     await userEvent.click(screen.getByText('Contact sales'));
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it('shows price for team plan', () => {
+    render(<PricingCard plan={teamPlan} onSelect={jest.fn()} />);
+    expect(screen.getByText('$49')).toBeInTheDocument();
+    expect(screen.getByText('/month')).toBeInTheDocument();
+  });
+
+  it('shows "Redirecting..." after clicking upgrade', async () => {
+    const onSelect = jest.fn();
+    render(<PricingCard plan={proPlan} currentPlan="free" onSelect={onSelect} />);
+    await userEvent.click(screen.getByText('Upgrade to Pro'));
+    expect(screen.getByText('Redirecting...')).toBeInTheDocument();
+  });
+
+  it('does not call onSelect when stripePriceId is null', async () => {
+    const onSelect = jest.fn();
+    const planWithoutPrice = { ...proPlan, stripePriceId: null };
+    render(<PricingCard plan={planWithoutPrice} currentPlan="free" onSelect={onSelect} />);
+    await userEvent.click(screen.getByText('Upgrade to Pro'));
     expect(onSelect).not.toHaveBeenCalled();
   });
 });

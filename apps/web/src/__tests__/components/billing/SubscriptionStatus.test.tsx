@@ -46,4 +46,10 @@ describe('SubscriptionStatus', () => {
     expect(screen.getByText('active')).toBeInTheDocument();
     expect(screen.queryByText('Canceling')).not.toBeInTheDocument();
   });
+
+  it('uses red styling for unknown status values', () => {
+    render(<SubscriptionStatus plan="pro" status="incomplete_expired" />);
+    const badge = screen.getByText('incomplete_expired');
+    expect(badge.className).toContain('text-red-400');
+  });
 });
