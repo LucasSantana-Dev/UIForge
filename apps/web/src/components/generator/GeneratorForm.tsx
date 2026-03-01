@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SparklesIcon, WandIcon } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@siza/ui';
 import { useGeneration } from '@/hooks/use-generation';
 import { useApiKeyForProvider, useAIKeyStore } from '@/stores/ai-keys';
 import { decryptApiKey, type AIProvider } from '@/lib/encryption';
@@ -141,6 +142,7 @@ export default function GeneratorForm({
         typescript: data.typescript,
         componentName: data.componentName,
         prompt: data.prompt,
+        projectId,
         provider: selectedProvider,
         model: selectedModel,
         ...(image && { imageBase64: image.base64, imageMimeType: image.mimeType }),
@@ -205,95 +207,112 @@ export default function GeneratorForm({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-y-auto p-6">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <QuotaGuard error={generation.error} usage={usage} isQuotaExceeded={isQuotaExceeded} />
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
+        <Tabs defaultValue="prompt" className="flex flex-col flex-1 overflow-hidden">
+          <TabsList className="mx-4 mt-4 grid w-auto grid-cols-3">
+            <TabsTrigger value="prompt">Prompt</TabsTrigger>
+            <TabsTrigger value="options">Options</TabsTrigger>
+            <TabsTrigger value="design">Design</TabsTrigger>
+          </TabsList>
 
-          <ProviderSelector
-            selectedProvider={selectedProvider}
-            selectedModel={selectedModel}
-            onProviderChange={handleProviderChange}
-            onModelChange={setSelectedModel}
-            multiLlmEnabled={multiLlmEnabled}
-          />
+          <TabsContent value="prompt" className="flex-1 overflow-y-auto p-6 space-y-4 mt-0">
+            <QuotaGuard error={generation.error} usage={usage} isQuotaExceeded={isQuotaExceeded} />
 
-          <div>
-            <label
-              htmlFor="componentName"
-              className="block text-sm font-medium text-text-primary mb-2"
+            <div>
+              <label
+                htmlFor="componentName"
+                className="block text-sm font-medium text-text-primary mb-2"
+              >
+                Component Name *
+              </label>
+              <input
+                {...register('componentName')}
+                type="text"
+                id="componentName"
+                aria-describedby={errors.componentName ? 'componentName-error' : undefined}
+                aria-invalid={!!errors.componentName}
+                className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                placeholder="MyButton"
+              />
+              {errors.componentName && (
+                <p id="componentName-error" role="alert" className="mt-1 text-sm text-error">
+                  {errors.componentName.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="prompt" className="block text-sm font-medium text-text-primary mb-2">
+                Describe Your Component *
+              </label>
+              {autocompleteEnabled ? (
+                <PromptAutocomplete
+                  id="prompt"
+                  value={promptValue}
+                  onChange={(val) => {
+                    setPromptValue(val);
+                    setValue('prompt', val, { shouldValidate: true });
+                  }}
+                  framework={framework}
+                  rows={8}
+                  className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                  placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
+                />
+              ) : (
+                <textarea
+                  {...register('prompt')}
+                  id="prompt"
+                  rows={8}
+                  aria-describedby={errors.prompt ? 'prompt-error' : undefined}
+                  aria-invalid={!!errors.prompt}
+                  className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
+                  placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
+                />
+              )}
+              {errors.prompt && (
+                <p id="prompt-error" role="alert" className="mt-1 text-sm text-error">
+                  {errors.prompt.message}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={generation.isGenerating || isQuotaExceeded || needsApiKey}
+              className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Component Name *
-            </label>
-            <input
-              {...register('componentName')}
-              type="text"
-              id="componentName"
-              aria-describedby={errors.componentName ? 'componentName-error' : undefined}
-              aria-invalid={!!errors.componentName}
-              className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-              placeholder="MyButton"
-            />
-            {errors.componentName && (
-              <p id="componentName-error" role="alert" className="mt-1 text-sm text-error">
-                {errors.componentName.message}
-              </p>
-            )}
-          </div>
+              {generation.isGenerating ? (
+                <>
+                  <WandIcon className="animate-spin h-5 w-5 mr-2" />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <SparklesIcon className="h-5 w-5 mr-2" />
+                  Generate Component
+                </>
+              )}
+            </button>
 
-          <div>
-            <label htmlFor="prompt" className="block text-sm font-medium text-text-primary mb-2">
-              Describe Your Component *
-            </label>
-            {autocompleteEnabled ? (
-              <PromptAutocomplete
-                id="prompt"
-                value={promptValue}
-                onChange={(val) => {
-                  setPromptValue(val);
-                  setValue('prompt', val, { shouldValidate: true });
-                }}
-                framework={framework}
-                rows={6}
-                className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-                placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
-              />
-            ) : (
-              <textarea
-                {...register('prompt')}
-                id="prompt"
-                rows={6}
-                aria-describedby={errors.prompt ? 'prompt-error' : undefined}
-                aria-invalid={!!errors.prompt}
-                className="w-full px-3 py-2 border border-surface-3 rounded-md focus:ring-brand focus:border-brand"
-                placeholder="Create a modern button component with primary and secondary variants, hover effects, and loading state..."
+            {(generation.isGenerating || generation.progress > 0 || generation.error) && (
+              <GenerationProgress
+                isGenerating={generation.isGenerating}
+                progress={generation.progress}
+                events={generation.events}
+                error={generation.error}
               />
             )}
-            {errors.prompt && (
-              <p id="prompt-error" role="alert" className="mt-1 text-sm text-error">
-                {errors.prompt.message}
-              </p>
-            )}
-          </div>
+          </TabsContent>
 
-          <ImageUpload image={image} onImageChange={setImage} />
-
-          {designAnalysisEnabled && image && (
-            <DesignAnalysisPanel
-              imageBase64={image.base64}
-              imageMimeType={image.mimeType}
-              onApply={handleApplyAnalysis}
+          <TabsContent value="options" className="flex-1 overflow-y-auto p-6 space-y-4 mt-0">
+            <ProviderSelector
+              selectedProvider={selectedProvider}
+              selectedModel={selectedModel}
+              onProviderChange={handleProviderChange}
+              onModelChange={setSelectedModel}
+              multiLlmEnabled={multiLlmEnabled}
             />
-          )}
 
-          {designContextEnabled && (
-            <DesignContext
-              projectId={projectId}
-              values={designContext}
-              onChange={setDesignContext}
-            />
-          )}
-
-          <div className="space-y-4">
             <div>
               <label
                 htmlFor="componentLibrary"
@@ -313,6 +332,7 @@ export default function GeneratorForm({
                 <option value="none">None</option>
               </select>
             </div>
+
             <div>
               <label htmlFor="style" className="block text-sm font-medium text-text-primary mb-2">
                 Design Style
@@ -327,6 +347,7 @@ export default function GeneratorForm({
                 <option value="colorful">Colorful</option>
               </select>
             </div>
+
             <label className="flex items-center">
               <input
                 {...register('typescript')}
@@ -335,50 +356,39 @@ export default function GeneratorForm({
               />
               <span className="ml-2 text-sm text-text-primary">Use TypeScript</span>
             </label>
-          </div>
 
-          <button
-            type="submit"
-            disabled={generation.isGenerating || isQuotaExceeded || needsApiKey}
-            className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-brand hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {generation.isGenerating ? (
-              <>
-                <WandIcon className="animate-spin h-5 w-5 mr-2" />
-                Generating...
-              </>
-            ) : (
-              <>
-                <SparklesIcon className="h-5 w-5 mr-2" />
-                Generate Component
-              </>
+            <div className="text-xs text-text-secondary mt-6">
+              <p className="font-medium mb-1">Tips:</p>
+              <ul className="list-disc list-inside space-y-1">
+                <li>Be specific about styling and behavior</li>
+                <li>Mention any props or state needed</li>
+                <li>Describe responsive behavior if needed</li>
+                <li>Upload a screenshot to match an existing design</li>
+              </ul>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="design" className="flex-1 overflow-y-auto p-6 space-y-4 mt-0">
+            <ImageUpload image={image} onImageChange={setImage} />
+
+            {designAnalysisEnabled && image && (
+              <DesignAnalysisPanel
+                imageBase64={image.base64}
+                imageMimeType={image.mimeType}
+                onApply={handleApplyAnalysis}
+              />
             )}
-          </button>
-        </form>
-      </div>
 
-      {(generation.isGenerating || generation.progress > 0 || generation.error) && (
-        <div className="border-t border-surface-3">
-          <GenerationProgress
-            isGenerating={generation.isGenerating}
-            progress={generation.progress}
-            events={generation.events}
-            error={generation.error}
-          />
-        </div>
-      )}
-
-      <div className="border-t border-surface-3 p-4 bg-surface-0">
-        <div className="text-xs text-text-secondary">
-          <p className="font-medium mb-1">Tips:</p>
-          <ul className="list-disc list-inside space-y-1">
-            <li>Be specific about styling and behavior</li>
-            <li>Mention any props or state needed</li>
-            <li>Describe responsive behavior if needed</li>
-            <li>Upload a screenshot to match an existing design</li>
-          </ul>
-        </div>
-      </div>
+            {designContextEnabled && (
+              <DesignContext
+                projectId={projectId}
+                values={designContext}
+                onChange={setDesignContext}
+              />
+            )}
+          </TabsContent>
+        </Tabs>
+      </form>
     </div>
   );
 }

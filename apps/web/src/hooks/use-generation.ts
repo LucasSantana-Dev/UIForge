@@ -3,6 +3,7 @@
  */
 
 import { useState, useCallback, useRef } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { streamGeneration, GenerationOptions, GenerationEvent } from '@/lib/api/generation';
 import type { QualityReport } from '@/lib/quality/gates';
 
@@ -19,7 +20,8 @@ export interface UseGenerationState {
 
 const MAX_CONVERSATION_TURNS = 10;
 
-export function useGeneration(_projectId?: string) {
+export function useGeneration(projectId?: string) {
+  const queryClient = useQueryClient();
   const [state, setState] = useState<UseGenerationState>({
     isGenerating: false,
     progress: 0,
@@ -109,6 +111,12 @@ export function useGeneration(_projectId?: string) {
                 parentGenerationId: event.generationId ?? prev.parentGenerationId,
                 conversationTurn: isRefinement ? prev.conversationTurn + 1 : prev.conversationTurn,
               }));
+              queryClient.invalidateQueries({ queryKey: ['subscription-usage'] });
+              if (projectId) {
+                queryClient.invalidateQueries({
+                  queryKey: ['generations', 'list', projectId],
+                });
+              }
               break;
 
             case 'error':

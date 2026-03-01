@@ -90,6 +90,7 @@ export interface GenerationRecordParams {
   framework: string;
   provider: string;
   model: string;
+  projectId?: string;
   parentGenerationId?: string | null;
 }
 
@@ -103,6 +104,7 @@ export async function createGenerationRecord(
     status: 'processing',
     ai_provider: params.provider,
     model_used: params.model,
+    project_id: params.projectId,
     parent_generation_id: params.parentGenerationId,
   });
 }

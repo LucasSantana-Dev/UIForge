@@ -7,6 +7,7 @@ export interface GenerationInsert {
   status?: string;
   ai_provider?: string;
   model_used?: string;
+  project_id?: string;
   parent_generation_id?: string | null;
 }
 

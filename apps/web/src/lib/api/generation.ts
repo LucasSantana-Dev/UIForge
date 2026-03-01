@@ -6,6 +6,7 @@ export interface GenerationOptions {
   framework: 'react' | 'vue' | 'angular' | 'svelte';
   componentLibrary?: 'tailwind' | 'mui' | 'chakra' | 'shadcn' | 'none';
   description: string;
+  projectId?: string;
   style?: 'modern' | 'minimal' | 'colorful';
   typescript?: boolean;
   userApiKey?: string;

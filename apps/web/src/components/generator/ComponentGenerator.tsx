@@ -8,7 +8,16 @@ import CodeEditor from './CodeEditor';
 import LivePreview from './LivePreview';
 import GenerationHistory from './GenerationHistory';
 import SaveToProject from './SaveToProject';
-import { SparklesIcon, Code2, Eye } from 'lucide-react';
+import { SparklesIcon, Code2, Eye, HistoryIcon } from 'lucide-react';
+import {
+  Button,
+  Sheet,
+  SheetTrigger,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  ScrollArea,
+} from '@siza/ui';
 
 interface ComponentGeneratorProps {
   projectId: string;
@@ -27,7 +36,7 @@ function LoadingSkeleton() {
         </div>
       </div>
       <div className="flex-1 flex flex-col lg:flex-row">
-        <div className="lg:w-96 border-b lg:border-b-0 lg:border-r border-surface-3 p-6 space-y-4">
+        <div className="lg:w-[400px] border-b lg:border-b-0 lg:border-r border-surface-3 p-6 space-y-4">
           <div className="h-10 rounded bg-surface-2" />
           <div className="h-32 rounded bg-surface-2" />
           <div className="h-10 rounded bg-surface-2" />
@@ -73,7 +82,7 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
 
   return (
     <div className="flex-1 flex flex-col bg-surface-1 rounded-xl border border-surface-3 overflow-hidden shadow-card">
-      <div className="px-4 sm:px-6 py-4 border-b border-surface-3 bg-gradient-to-r from-brand/5 to-transparent">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-surface-3 bg-gradient-to-r from-brand/5 to-transparent">
         <div className="flex items-center space-x-3">
           <div className="w-9 h-9 rounded-lg bg-brand/10 flex items-center justify-center flex-shrink-0">
             <SparklesIcon className="h-5 w-5 text-brand" />
@@ -87,10 +96,32 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
             </p>
           </div>
         </div>
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <HistoryIcon className="h-4 w-4" />
+              History
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="right" className="w-[400px] p-0">
+            <SheetHeader className="px-6 py-4 border-b border-surface-3">
+              <SheetTitle>Generation History</SheetTitle>
+            </SheetHeader>
+            <ScrollArea className="h-[calc(100%-60px)]">
+              <GenerationHistory
+                projectId={projectId}
+                onSelectGeneration={(code) => {
+                  setEditedCode(code);
+                  setIsEdited(true);
+                }}
+              />
+            </ScrollArea>
+          </SheetContent>
+        </Sheet>
       </div>
 
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        <div className="lg:w-96 border-b lg:border-b-0 lg:border-r border-surface-3 flex flex-col max-h-[50vh] lg:max-h-none">
+        <div className="lg:w-[400px] border-b lg:border-b-0 lg:border-r border-surface-3 flex flex-col max-h-[50vh] lg:max-h-none">
           <GeneratorForm
             projectId={projectId}
             framework={project.framework}
@@ -138,7 +169,7 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
           </div>
 
           <div
-            className={`flex-1 border-b border-surface-3 ${activeTab !== 'code' ? 'hidden lg:block' : ''}`}
+            className={`flex-[3] border-b border-surface-3 ${activeTab !== 'code' ? 'hidden lg:block' : ''}`}
           >
             <CodeEditor
               code={displayCode}
@@ -151,19 +182,9 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
           </div>
 
           <div
-            className={`flex-1 border-b border-surface-3 ${activeTab !== 'preview' ? 'hidden lg:block' : ''}`}
+            className={`flex-[2] border-b border-surface-3 ${activeTab !== 'preview' ? 'hidden lg:block' : ''}`}
           >
             <LivePreview code={displayCode} framework={project.framework} />
-          </div>
-
-          <div className="h-48">
-            <GenerationHistory
-              projectId={projectId}
-              onSelectGeneration={(code) => {
-                setEditedCode(code);
-                setIsEdited(true);
-              }}
-            />
           </div>
 
           {generation.code && (
