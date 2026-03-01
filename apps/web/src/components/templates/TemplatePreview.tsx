@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Copy, Download, Eye, EyeOff } from 'lucide-react';
+import LivePreview from '@/components/generator/LivePreview';
 import { Template } from './TemplateCard';
 
 interface TemplatePreviewProps {
@@ -22,6 +23,23 @@ export function TemplatePreview({
 }: TemplatePreviewProps) {
   const [showCode, setShowCode] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [highlightedHtml, setHighlightedHtml] = useState('');
+
+  useEffect(() => {
+    if (!template?.code) return;
+    let cancelled = false;
+    import('shiki').then(({ codeToHtml }) => {
+      codeToHtml(template.code!, {
+        lang: 'tsx',
+        theme: 'rose-pine-moon',
+      }).then((html) => {
+        if (!cancelled) setHighlightedHtml(html);
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [template?.code]);
 
   if (!template) return null;
 
@@ -78,12 +96,8 @@ export function TemplatePreview({
               <div className="flex items-center gap-2">
                 <span className="font-medium">Difficulty:</span>
                 <Badge className={getDifficultyColor(template.difficulty)}>
-                  {template.difficulty}
+                  {template.difficulty.charAt(0).toUpperCase() + template.difficulty.slice(1)}
                 </Badge>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Usage:</span>
-                <span className="text-muted-foreground">{template.usage} times</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-medium">Rating:</span>
@@ -115,14 +129,20 @@ export function TemplatePreview({
 
             <div className="border rounded-lg overflow-hidden">
               {!showCode ? (
-                <div className="aspect-video bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-muted-foreground font-medium">Component Preview</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {template.framework} • {template.componentLibrary}
+                template.code ? (
+                  <div className="aspect-video">
+                    <LivePreview code={template.code} framework={template.framework} />
+                  </div>
+                ) : (
+                  <div className="aspect-video bg-surface-1 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-muted-foreground font-medium">No preview available</div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {template.framework} • {template.componentLibrary}
+                      </div>
                     </div>
                   </div>
-                </div>
+                )
               ) : (
                 <div className="relative">
                   <div className="absolute top-2 right-2 z-10 flex gap-2">
@@ -145,12 +165,19 @@ export function TemplatePreview({
                       Download
                     </Button>
                   </div>
-                  <div className="bg-muted p-4">
-                    <pre className="text-xs overflow-x-auto whitespace-pre-wrap">
-                      <code>
-                        {template.code || '// Code will be available when template is used'}
-                      </code>
-                    </pre>
+                  <div className="bg-[#232136] p-4 rounded-b-lg">
+                    {highlightedHtml ? (
+                      <div
+                        className="text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0"
+                        dangerouslySetInnerHTML={{ __html: highlightedHtml }}
+                      />
+                    ) : (
+                      <pre className="text-xs overflow-x-auto whitespace-pre-wrap text-gray-300">
+                        <code>
+                          {template.code || '// Code will be available when template is used'}
+                        </code>
+                      </pre>
+                    )}
                   </div>
                 </div>
               )}
