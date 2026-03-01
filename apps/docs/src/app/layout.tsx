@@ -35,11 +35,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html
       lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} ${outfit.variable} dark`}
-      style={{
-        colorScheme: 'dark',
-        fontFamily: 'var(--font-inter), system-ui, sans-serif',
-        '--font-heading': 'var(--font-outfit)',
-      } as React.CSSProperties}
+      style={
+        {
+          colorScheme: 'dark',
+          fontFamily: 'var(--font-inter), system-ui, sans-serif',
+          '--font-heading': 'var(--font-outfit)',
+        } as React.CSSProperties
+      }
       suppressHydrationWarning
     >
       <head>
