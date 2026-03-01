@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.19.0] - 2026-03-01
+
+### Added
+- **Cost controls**: Daily fallback limiter (50 requests/day) + downgrade to Haiku model for Anthropic fallback
+- **create-siza-app templates**: Complete framework config generation for React, Vue, Svelte, Next.js
+- **Design analysis panel**: Wire design analysis panel to generator form
+- **Conversation refinement**: Wire refinement data flow to return generation results with IDs
+
+### Changed
+- Anthropic fallback model changed from claude-sonnet-4 to claude-haiku-4.5 for cost efficiency
+
 ## [0.18.0] - 2026-03-01
 
 ### Added
