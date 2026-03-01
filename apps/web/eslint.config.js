@@ -18,6 +18,7 @@ export default [
       'coverage/**',
       '*.config.js',
       'test-config.ts',
+      '**/__mocks__/**',
     ],
     languageOptions: {
       parser: typescriptParser,
