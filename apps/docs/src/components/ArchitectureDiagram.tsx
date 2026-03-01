@@ -55,9 +55,19 @@ const repos: RepoNode[] = [
     deps: ['forge-patterns'],
   },
   {
+    id: 'brand-guide',
+    name: 'brand-guide',
+    desc: 'Brand identity documentation site',
+    icon: <IconBook />,
+    badges: ['Astro', 'Tailwind', 'Design Tokens'],
+    accent: '#e879f9',
+    github: 'https://github.com/Forge-Space/brand-guide',
+    deps: ['branding-mcp'],
+  },
+  {
     id: 'siza-mcp',
     name: 'siza-mcp',
-    desc: 'MCP protocol adapter — 17 tools for IDEs',
+    desc: 'MCP protocol adapter — 21 tools for IDEs',
     icon: <IconPlug />,
     badges: ['TypeScript', 'MCP', 'SQLite'],
     accent: '#34d399',
@@ -79,7 +89,7 @@ const repos: RepoNode[] = [
 const tiers = [
   { label: 'Foundation', ids: ['forge-patterns'] },
   { label: 'Services', ids: ['mcp-gateway', 'siza-gen', 'branding-mcp'] },
-  { label: 'Integration', ids: ['siza-mcp', 'siza'] },
+  { label: 'Integration', ids: ['siza-mcp', 'brand-guide', 'siza'] },
 ];
 
 export function ArchitectureDiagram() {
@@ -268,6 +278,21 @@ function IconPlug() {
       <path d="M9 8V2" />
       <path d="M15 8V2" />
       <path d="M18 8v5a6 6 0 0 1-6 6v0a6 6 0 0 1-6-6V8Z" />
+    </svg>
+  );
+}
+
+function IconBook() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
     </svg>
   );
 }
