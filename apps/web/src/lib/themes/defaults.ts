@@ -1,4 +1,8 @@
 import type { SizaTheme } from '@/stores/theme-store';
+import { identity } from '@forgespace/brand-guide';
+
+const sizaFonts = (identity as Record<string, any>).subBrands?.siza;
+const neutralHexes = identity.colors.neutral.map((n) => n.hex);
 
 export const BUILT_IN_THEMES: SizaTheme[] = [
   {
@@ -78,27 +82,27 @@ export const BUILT_IN_THEMES: SizaTheme[] = [
   },
   {
     id: 'forge-space',
-    name: 'Forge Space',
+    name: identity.name || 'Forge Space',
     builtIn: true,
     colorMode: 'dark',
-    primaryColor: '#7c3aed',
-    secondaryColor: '#3B82F6',
-    accentColor: '#F59E0B',
+    primaryColor: identity.colors.primary.hex,
+    secondaryColor: identity.colors.secondary.hex,
+    accentColor: identity.colors.accent.hex,
     animation: 'standard',
     spacing: 'default',
     borderRadius: 'medium',
     typography: 'sans',
     brandMeta: {
-      brandName: 'Forge Space',
-      headingFont: 'Plus Jakarta Sans',
-      bodyFont: 'DM Sans',
+      brandName: identity.name || 'Forge Space',
+      headingFont: sizaFonts?.headingFont || 'Plus Jakarta Sans',
+      bodyFont: sizaFonts?.bodyFont || 'DM Sans',
       semanticColors: {
-        success: '#22c35d',
-        warning: '#f59f0a',
-        error: '#ef4343',
-        info: '#368fe7',
+        success: identity.colors.semantic.success.hex,
+        warning: identity.colors.semantic.warning.hex,
+        error: identity.colors.semantic.error.hex,
+        info: identity.colors.semantic.info.hex,
       },
-      neutrals: ['#f2f2f3', '#e5e4e7', '#cbc9cf', '#98949e', '#65616b', '#323036', '#19181b'],
+      neutrals: neutralHexes.slice(0, 10),
     },
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
