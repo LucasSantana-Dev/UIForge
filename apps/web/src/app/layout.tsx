@@ -72,7 +72,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${plusJakarta.variable} ${ibmPlexMono.variable}`}>
+    <html
+      lang="en"
+      className={`${dmSans.variable} ${plusJakarta.variable} ${ibmPlexMono.variable}`}
+    >
       <body className="font-sans">
         <a
           href="#main-content"

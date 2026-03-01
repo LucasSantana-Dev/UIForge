@@ -54,9 +54,7 @@ export function EcosystemSection() {
       <div className={CONTAINER}>
         <div className="text-center">
           <FadeIn>
-            <p className="text-sm font-mono text-brand tracking-wider uppercase mb-4">
-              Ecosystem
-            </p>
+            <p className="text-sm font-mono text-brand tracking-wider uppercase mb-4">Ecosystem</p>
           </FadeIn>
           <FadeIn delay={0.08}>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-4">
