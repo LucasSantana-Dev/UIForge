@@ -111,10 +111,12 @@ export function LandingFooter() {
               rel="noopener noreferrer"
               className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
             >
-              Blog
+              Community
             </Link>
             <Link
-              href="/docs"
+              href="https://github.com/Forge-Space/siza/releases"
+              target="_blank"
+              rel="noopener noreferrer"
               className="block text-sm text-[#71717A] hover:text-[#A1A1AA] transition-colors py-1"
             >
               Changelog

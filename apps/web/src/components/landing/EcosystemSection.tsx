@@ -54,7 +54,7 @@ export function EcosystemSection() {
           </FadeIn>
           <FadeIn delay={0.08}>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-4">
-              Six repos. One vision.
+              Seven repos. One vision.
             </h2>
           </FadeIn>
           <FadeIn delay={0.16}>

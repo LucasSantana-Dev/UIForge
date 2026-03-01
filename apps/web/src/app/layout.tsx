@@ -24,7 +24,8 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Siza - AI-Driven UI Generation',
+  metadataBase: new URL('https://siza.forgespace.co'),
+  title: 'Siza — AI-Powered UI Generation',
   description:
     'The open full-stack AI workspace. Generate, integrate, and ship production-ready UI.',
   keywords: ['UI generation', 'AI', 'React', 'Next.js', 'Vue', 'Components'],
@@ -33,9 +34,28 @@ export const metadata: Metadata = {
     icon: '/favicon.ico',
   },
   openGraph: {
-    title: 'Siza - AI-Driven UI Generation',
-    description: 'The open full-stack AI workspace — generate, integrate, ship',
+    title: 'Siza — AI-Powered UI Generation',
+    description: 'The open full-stack AI workspace — generate, integrate, ship.',
+    url: 'https://siza.forgespace.co',
+    siteName: 'Siza',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'Siza — AI-Powered UI Generation',
+      },
+    ],
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Siza — AI-Powered UI Generation',
+    description: 'The open full-stack AI workspace — generate, integrate, ship.',
+    images: ['/og-image.png'],
+  },
+  alternates: {
+    canonical: 'https://siza.forgespace.co',
   },
 };
 

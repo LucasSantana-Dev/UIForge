@@ -42,12 +42,20 @@ Three offset rectangles — base (widest), face (wide), horn (narrow, right-shif
 ## Brand Voice
 Precise, confident, technical, dry, architectural. Write for engineers. No emoji in product copy. No marketing speak.
 
-## Domain
-- **Live**: `siza-web.uiforge.workers.dev` (v0.8.0, deployed 2026-02-25)
-- **Dev**: `siza-web-dev.uiforge.workers.dev`
-- Production: siza.dev (planned custom domain, Issue #64)
-- Health: `GET /api/health → { status, timestamp, version }`
-- **Tags**: v0.2.1, v0.3.0, v0.4.0, v0.5.0, v0.6.0, v0.7.0, v0.7.1, v0.8.0, v0.8.1
-- **Open PRs**: #108 (docs redesign + landing cleanup), #94 (desktop app), #87 (docs overhaul)
-- **Recent Merges**: #105 (create-siza-app CLI), #106 (desktop publish fix)
-- **Open Issues**: #61 (Stripe E2E), #64 (custom domain)
+## Current State (2026-03-01)
+- **Version**: v0.20.0 (released 2026-03-01)
+- **Domain**: `siza.forgespace.co` (Cloudflare Workers)
+- **Dev**: `dev.forgespace.co`
+- **Branch**: `feat/landing-page-polish` — PR #228 open
+- **Tags**: v0.2.1 → ... → v0.19.0 → v0.20.0
+- **Recent merges**: #227 (v0.20.0 release), #226 (docs UI polish), #224 (v0.19.0), #222 (cost controls + refinement)
+- **PR #228**: Landing page polish — OG image, metadata, stats bar fix, hero copy, footer links
+- **Desktop**: v0.2.0 released (Electron + Ollama local generation)
+- **Tests**: 608+ webapp + 22 desktop passing
+
+## Landing Page (apps/web)
+- **OG image**: `apps/web/public/og-image.png` — branded 1200x630, 102 KB static PNG
+- **Metadata**: Complete OpenGraph + Twitter card in `layout.tsx` with `metadataBase`, `siteName`, `canonical`
+- **Stats bar**: 7 repos, 4 frameworks, 5 quality gates, 608+ tests
+- **Hero**: "Generate production UI with AI"
+- **Footer**: "Community" (GitHub Discussions), "Changelog" → GitHub Releases
