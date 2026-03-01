@@ -58,8 +58,13 @@ export default function GeneratorForm({
     usage.generations_count >= usage.generations_limit;
 
   const multiLlmEnabled = isFeatureEnabled('ENABLE_MULTI_LLM');
-  const [selectedProvider, setSelectedProvider] = useState<AIProvider>('google');
-  const [selectedModel, setSelectedModel] = useState('gemini-2.0-flash');
+  const sizaAiEnabled = isFeatureEnabled('ENABLE_SIZA_AI');
+  const [selectedProvider, setSelectedProvider] = useState<AIProvider>(
+    sizaAiEnabled ? 'siza' : 'google'
+  );
+  const [selectedModel, setSelectedModel] = useState(
+    sizaAiEnabled ? 'siza-auto' : 'gemini-2.0-flash'
+  );
   const providerKey = useApiKeyForProvider(selectedProvider);
 
   const handleProviderChange = (provider: AIProvider) => {

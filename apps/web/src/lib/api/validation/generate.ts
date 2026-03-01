@@ -12,7 +12,7 @@ export const generateSchema = z.object({
   style: z.enum(['modern', 'minimal', 'colorful']).optional(),
   typescript: z.boolean().optional(),
   userApiKey: z.string().min(1).optional(),
-  provider: z.enum(['google', 'openai', 'anthropic']).default('google'),
+  provider: z.enum(['google', 'openai', 'anthropic', 'siza']).default('siza'),
   model: z.string().min(1).optional(),
   useRag: z.boolean().optional(),
   imageBase64: z.string().max(MAX_IMAGE_SIZE, 'Image too large (max ~5MB)').optional(),

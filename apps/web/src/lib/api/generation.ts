@@ -10,7 +10,7 @@ export interface GenerationOptions {
   style?: 'modern' | 'minimal' | 'colorful';
   typescript?: boolean;
   userApiKey?: string;
-  provider?: 'openai' | 'anthropic' | 'google';
+  provider?: 'openai' | 'anthropic' | 'google' | 'siza';
   model?: string;
   imageBase64?: string;
   imageMimeType?: 'image/png' | 'image/jpeg' | 'image/webp';
@@ -36,7 +36,7 @@ export interface GenerationOptions {
 }
 
 export interface GenerationEvent {
-  type: 'start' | 'chunk' | 'complete' | 'error' | 'quality' | 'fallback';
+  type: 'start' | 'chunk' | 'complete' | 'error' | 'quality' | 'fallback' | 'routing';
   content?: string;
   totalLength?: number;
   message?: string;

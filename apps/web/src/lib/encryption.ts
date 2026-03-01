@@ -9,7 +9,7 @@ export interface EncryptedApiKey {
   isDefault?: boolean;
 }
 
-export type AIProvider = 'openai' | 'anthropic' | 'google';
+export type AIProvider = 'openai' | 'anthropic' | 'google' | 'siza';
 
 export interface AIProviderConfig {
   name: string;
@@ -23,6 +23,13 @@ export interface AIProviderConfig {
 const KDF_ITERATIONS = 600000;
 
 export const AI_PROVIDERS: Record<AIProvider, AIProviderConfig> = {
+  siza: {
+    name: 'Siza AI',
+    baseUrl: 'internal://siza-routing',
+    models: ['siza-auto'],
+    maxTokens: 2097152,
+    rateLimitPerMinute: 60,
+  },
   openai: {
     name: 'OpenAI',
     baseUrl: 'https://api.openai.com/v1',
@@ -100,6 +107,7 @@ export function decryptApiKey(encryptedKey: string, encryptionKey: string): stri
 
 export function validateApiKey(apiKey: string, provider: AIProvider): boolean {
   const trimmedKey = apiKey.trim();
+  if (provider === 'siza') return false;
   switch (provider) {
     case 'openai':
       return trimmedKey.startsWith('sk-') && trimmedKey.length >= 20;
