@@ -19,6 +19,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
+  weight: '400',
   variable: '--font-ibm-plex-mono',
   preload: false,
 });
