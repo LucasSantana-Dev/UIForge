@@ -98,9 +98,9 @@ export function HeroSection({ user }: HeroSectionProps) {
           }}
           className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mt-6"
         >
-          An ecosystem that enables{' '}
+          Generate production UI{' '}
           <span className="bg-gradient-to-r from-[#7C3AED] via-[#8B5CF6] to-[#6366F1] bg-clip-text text-transparent">
-            building
+            with AI
           </span>
         </motion.h1>
 
@@ -114,8 +114,8 @@ export function HeroSection({ user }: HeroSectionProps) {
           }}
           className="text-lg text-[#A1A1AA] max-w-xl mx-auto mt-6"
         >
-          From zero to production. AI-powered generation, intelligent routing, and edge deployment —
-          all open source.
+          Open-source workspace for AI-powered UI generation. Go from prompt to production-ready
+          components in seconds.
         </motion.p>
 
         <motion.div

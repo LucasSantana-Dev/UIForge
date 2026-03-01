@@ -12,6 +12,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`ENABLE_ONBOARDING` feature flag**: Gated behind flag (default `false`), enable with `NEXT_PUBLIC_ENABLE_ONBOARDING=true`
 - **`onboarding_completed_at` profile column**: Tracks when users completed onboarding, prevents re-entry
 - **`/api/onboarding/complete` endpoint**: Marks onboarding as completed in the user's profile
+- **OG image**: Branded 1200x630 social sharing image for link previews
+- **Twitter card metadata**: `summary_large_image` card with OG image for Twitter/Slack/LinkedIn previews
+- **OpenGraph metadata**: Complete `metadataBase`, `siteName`, `canonical`, and image metadata in layout
+
+### Changed
+- **Stats bar**: Replace misleading repo counts (4 Core + 6 Open) with accurate stats (7 repos, 4 frameworks, 5 quality gates, 608+ tests)
+- **Hero copy**: Sharpen headline from abstract "enables building" to concrete "Generate production UI with AI"
+- **Footer links**: Rename "Blog" to "Community" (honest label for GitHub Discussions), point "Changelog" to GitHub Releases
+
 ## [0.20.0] - 2026-03-01
 
 ### Added
