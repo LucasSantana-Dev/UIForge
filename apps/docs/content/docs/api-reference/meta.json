@@ -1,4 +1,5 @@
 {
   "title": "API Reference",
+  "icon": "Code",
   "pages": ["mcp-tools", "rest-api", "webhooks"]
 }

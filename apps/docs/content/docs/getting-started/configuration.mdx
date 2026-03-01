@@ -60,7 +60,7 @@ description: Environment variables and feature flags
 
 ## Feature Flags
 
-17 flags control features. All have sensible defaults. Override via `NEXT_PUBLIC_[FLAG_NAME]=true`.
+24 flags control features. All have sensible defaults. Override via `NEXT_PUBLIC_[FLAG_NAME]=true`.
 
 ### Authentication
 
@@ -72,10 +72,15 @@ description: Environment variables and feature flags
 
 ### Generation
 
-| Flag                          | Default | Description                     |
-| ----------------------------- | ------- | ------------------------------- |
-| `ENABLE_COMPONENT_GENERATION` | `true`  | AI-powered component generation |
-| `ENABLE_MULTI_LLM`            | `false` | Multi-provider AI selection     |
+| Flag                          | Default | Description                               |
+| ----------------------------- | ------- | ----------------------------------------- |
+| `ENABLE_COMPONENT_GENERATION` | `true`  | AI-powered component generation           |
+| `ENABLE_MULTI_LLM`            | `true`  | Multi-provider AI selection               |
+| `ENABLE_CONVERSATION_MODE`    | `true`  | Multi-turn conversation for AI generation |
+| `ENABLE_DESIGN_ANALYSIS`      | `true`  | Design analysis panel in generator        |
+| `ENABLE_DESIGN_CONTEXT`       | `true`  | Design context for generation             |
+| `ENABLE_PROMPT_AUTOCOMPLETE`  | `true`  | Autocomplete suggestions in prompt input  |
+| `ENABLE_CODE_INTELLISENSE`    | `true`  | IntelliSense in code editor               |
 
 ### Integrations
 
@@ -88,16 +93,18 @@ description: Environment variables and feature flags
 
 ### System
 
-| Flag                               | Default | Description                         |
-| ---------------------------------- | ------- | ----------------------------------- |
-| `ENABLE_REALTIME_UPDATES`          | `true`  | Supabase Realtime                   |
-| `ENABLE_DARK_MODE`                 | `true`  | Dark mode toggle                    |
-| `ENABLE_ANALYTICS`                 | `false` | Usage analytics tracking            |
-| `ENABLE_MAINTENANCE_MODE`          | `false` | Block all access                    |
-| `ENABLE_BETA_FEATURES`             | `false` | Experimental features               |
-| `ENABLE_QUALITY_GATES`             | `false` | Quality checks before PR creation   |
-| `ENABLE_CENTRALIZED_FEATURE_FLAGS` | `false` | Database-backed flags (vs env vars) |
-| `ENABLE_PROJECT_THUMBNAILS`        | `true`  | Project thumbnail uploads           |
+| Flag                               | Default | Description                          |
+| ---------------------------------- | ------- | ------------------------------------ |
+| `ENABLE_REALTIME_UPDATES`          | `true`  | Supabase Realtime                    |
+| `ENABLE_DARK_MODE`                 | `true`  | Dark mode toggle                     |
+| `ENABLE_ANALYTICS`                 | `false` | Usage analytics tracking             |
+| `ENABLE_MAINTENANCE_MODE`          | `false` | Block all access                     |
+| `ENABLE_BETA_FEATURES`             | `false` | Experimental features                |
+| `ENABLE_QUALITY_GATES`             | `false` | Quality checks before PR creation    |
+| `ENABLE_CENTRALIZED_FEATURE_FLAGS` | `false` | Database-backed flags (vs env vars)  |
+| `ENABLE_MCP_GATEWAY`               | `false` | Route generation through mcp-gateway |
+| `ENABLE_ONBOARDING`                | `false` | Post-signup onboarding wizard        |
+| `ENABLE_PROJECT_THUMBNAILS`        | `true`  | Project thumbnail uploads            |
 
 ## Pricing Plans
 

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **Docs accuracy**: Update repo count 6→7, tool count 17→21, flag count 17→24 across all docs pages
+- **Docs feature flags**: Add 7 missing flags (conversation mode, design analysis/context, autocomplete, IntelliSense, MCP gateway, onboarding), fix `ENABLE_MULTI_LLM` default from `false` to `true`
+- **Docs architecture**: Add brand-guide to mermaid diagram and repo sections, fix Node.js version requirement
+- **Docs index**: Add brand-guide to ecosystem table
+
 ## [0.21.0] - 2026-03-01
 
 ### Added

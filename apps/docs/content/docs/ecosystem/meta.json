@@ -1,4 +1,5 @@
 {
   "title": "Ecosystem",
+  "icon": "Network",
   "pages": ["architecture", "contributing"]
 }
