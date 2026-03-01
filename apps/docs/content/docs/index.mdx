@@ -9,7 +9,7 @@ Named after [Álvaro Siza Vieira](https://en.wikipedia.org/wiki/%C3%81lvaro_Siza
 
 ## What is Siza?
 
-An open-source AI workspace that connects AI models to your development workflow through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/):
+An open-source AI workspace that connects AI models to your development workflow through the [Model Context Protocol (MCP)](https://modelcontextprotocol.io):
 
 - **Web App** — generate components, manage projects, preview live, export to GitHub
 - **MCP Server** — integrate AI generation directly into Claude Desktop, Cursor, or any MCP-compatible IDE
@@ -17,20 +17,21 @@ An open-source AI workspace that connects AI models to your development workflow
 
 ## Architecture
 
-Six repositories power the ecosystem:
+Seven repositories power the ecosystem:
 
 | Repository         | Purpose                                              |
 | ------------------ | ---------------------------------------------------- |
 | **siza**           | Next.js web app + Cloudflare Workers API             |
-| **siza-mcp**       | MCP server with 17 AI generation tools               |
+| **siza-mcp**       | MCP server with 21 AI generation tools               |
 | **mcp-gateway**    | Multi-provider AI routing (Gemini, Claude, GPT)      |
 | **forge-patterns** | Shared configs, types, and security framework        |
 | **siza-gen**       | AI generation core library (extracted from siza-mcp) |
 | **branding-mcp**   | Brand identity generation tools                      |
+| **brand-guide**    | Astro-based brand identity documentation site        |
 
 ## Quick links
 
 - [Quick Start](/docs/getting-started/quick-start) — zero to first component in 5 minutes
 - [Self-Hosting](/docs/getting-started/self-hosting) — BYOK deployment guide
 - [MCP Integration](/docs/guides/mcp-integration) — connect siza-mcp to your IDE
-- [Architecture](/docs/ecosystem/architecture) — how the 6 repos connect
+- [Architecture](/docs/ecosystem/architecture) — how the 7 repos connect

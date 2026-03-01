@@ -1,9 +1,9 @@
 ---
 title: Architecture
-description: The 6-repository Forge Space ecosystem
+description: The 7-repository Forge Space ecosystem
 ---
 
-Siza is built as a distributed ecosystem of six repositories, each with a clear responsibility.
+Siza is built as a distributed ecosystem of seven repositories, each with a clear responsibility.
 
 ## Repository Map
 
@@ -14,6 +14,7 @@ graph TB
     FP --> SM[siza-mcp<br/>MCP protocol adapter]
     FP --> SZ[siza<br/>Web app & API]
     FP --> BM[branding-mcp<br/>Brand generation]
+    BM --> BG[brand-guide<br/>Brand documentation site]
     SG --> SM
     MG --> SZ
     SM --> SZ
@@ -53,7 +54,7 @@ The extracted AI brain — contains all generation logic, ML composition, qualit
 
 **GitHub:** [Forge-Space/ui-mcp](https://github.com/Forge-Space/ui-mcp)
 
-Thin MCP protocol adapter (~355 KB) that exposes 17 tools to any MCP-compatible IDE. Delegates all generation logic to `@forgespace/siza-gen`.
+Thin MCP protocol adapter that exposes 21 tools to any MCP-compatible IDE. Delegates all generation logic to `@forgespace/siza-gen`.
 
 **Key features:**
 
@@ -80,6 +81,12 @@ Shared configurations, TypeScript types, security framework, and ecosystem stand
 **GitHub:** [Forge-Space/branding-mcp](https://github.com/Forge-Space/branding-mcp)
 
 MCP server specialized in brand identity generation — logos, color palettes, typography, brand guidelines, and AI-powered brand interpretation.
+
+### brand-guide (Brand Documentation)
+
+**GitHub:** [Forge-Space/brand-guide](https://github.com/Forge-Space/brand-guide)
+
+Astro-based static site documenting the Siza brand identity. Exports design tokens in CSS, W3C JSON, Tailwind, Sass, and React formats. Generated from `branding-mcp`.
 
 ## Data Flow
 
