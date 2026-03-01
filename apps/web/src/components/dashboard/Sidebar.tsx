@@ -15,12 +15,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@siza/ui';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@siza/ui';
 import { useUIStore } from '@/stores/ui-store';
 
 const navigation = [
@@ -47,8 +42,16 @@ export default function Sidebar() {
             href="/dashboard"
             className={`flex items-center flex-shrink-0 gap-3 hover:opacity-80 transition-opacity ${collapsed ? 'justify-center px-2' : 'px-4'}`}
           >
-            <Image src="/siza-icon.png" alt="Siza" width={32} height={32} className="flex-shrink-0" />
-            {!collapsed && <h1 className="text-xl font-display font-bold text-text-primary">Siza</h1>}
+            <Image
+              src="/siza-icon.png"
+              alt="Siza"
+              width={32}
+              height={32}
+              className="flex-shrink-0"
+            />
+            {!collapsed && (
+              <h1 className="text-xl font-display font-bold text-text-primary">Siza</h1>
+            )}
           </Link>
           <div className="mt-8 flex-grow flex flex-col">
             <nav className="flex-1 px-2 space-y-1">
@@ -56,14 +59,19 @@ export default function Sidebar() {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button asChild className="w-full mb-4 px-0 justify-center">
-                      <Link href="/generate"><PlusIcon className="h-4 w-4" /></Link>
+                      <Link href="/generate">
+                        <PlusIcon className="h-4 w-4" />
+                      </Link>
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="right">Generate Component</TooltipContent>
                 </Tooltip>
               ) : (
                 <Button asChild className="w-full justify-start mb-4">
-                  <Link href="/generate"><PlusIcon className="mr-2 h-4 w-4" />Generate Component</Link>
+                  <Link href="/generate">
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    Generate Component
+                  </Link>
                 </Button>
               )}
               {navigation.map((item) => {
@@ -75,23 +83,40 @@ export default function Sidebar() {
                   return (
                     <Tooltip key={item.name}>
                       <TooltipTrigger asChild>
-                        <Button asChild variant="ghost" className={`w-full justify-center px-0 relative ${cls}`}>
-                          <Link href={item.href}><item.icon className="h-4 w-4" /></Link>
+                        <Button
+                          asChild
+                          variant="ghost"
+                          className={`w-full justify-center px-0 relative ${cls}`}
+                        >
+                          <Link href={item.href}>
+                            <item.icon className="h-4 w-4" />
+                          </Link>
                         </Button>
                       </TooltipTrigger>
                       <TooltipContent side="right">
                         {item.name}
-                        {item.shortcut && <span className="ml-2 text-text-muted text-xs">{item.shortcut}</span>}
+                        {item.shortcut && (
+                          <span className="ml-2 text-text-muted text-xs">{item.shortcut}</span>
+                        )}
                       </TooltipContent>
                     </Tooltip>
                   );
                 }
                 return (
-                  <Button key={item.name} asChild variant="ghost" className={`w-full justify-start relative ${cls}`}>
+                  <Button
+                    key={item.name}
+                    asChild
+                    variant="ghost"
+                    className={`w-full justify-start relative ${cls}`}
+                  >
                     <Link href={item.href}>
                       <item.icon className="mr-2 h-4 w-4 flex-shrink-0" />
                       <span className="overflow-hidden whitespace-nowrap">{item.name}</span>
-                      {item.shortcut && <span className="ml-auto text-xs text-text-muted opacity-60">{item.shortcut}</span>}
+                      {item.shortcut && (
+                        <span className="ml-auto text-xs text-text-muted opacity-60">
+                          {item.shortcut}
+                        </span>
+                      )}
                     </Link>
                   </Button>
                 );
@@ -110,7 +135,10 @@ export default function Sidebar() {
                   {collapsed ? (
                     <ChevronsRightIcon className="h-4 w-4" />
                   ) : (
-                    <><ChevronsLeftIcon className="h-4 w-4 mr-2" /><span className="text-xs">Collapse</span></>
+                    <>
+                      <ChevronsLeftIcon className="h-4 w-4 mr-2" />
+                      <span className="text-xs">Collapse</span>
+                    </>
                   )}
                 </button>
               </TooltipTrigger>

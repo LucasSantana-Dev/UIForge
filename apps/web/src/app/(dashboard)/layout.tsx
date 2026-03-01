@@ -22,9 +22,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopBar user={user} />
         <main id="main-content" className="flex-1 overflow-y-auto p-6">
-          <DashboardShell>
-            {children}
-          </DashboardShell>
+          <DashboardShell>{children}</DashboardShell>
         </main>
       </div>
     </div>

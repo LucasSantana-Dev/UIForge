@@ -22,17 +22,14 @@ export const useUIStore = create<UIState>()(
       sidebarCollapsed: false,
       commandPaletteOpen: false,
       theme: 'system',
-      toggleSidebar: () =>
-        set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+      toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       toggleSidebarCollapsed: () =>
         set((state) => ({
           sidebarCollapsed: !state.sidebarCollapsed,
         })),
-      setSidebarCollapsed: (collapsed) =>
-        set({ sidebarCollapsed: collapsed }),
-      setCommandPaletteOpen: (open) =>
-        set({ commandPaletteOpen: open }),
+      setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+      setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
       toggleCommandPalette: () =>
         set((state) => ({
           commandPaletteOpen: !state.commandPaletteOpen,
@@ -44,6 +41,6 @@ export const useUIStore = create<UIState>()(
       partialize: (state) => ({
         sidebarCollapsed: state.sidebarCollapsed,
       }),
-    },
-  ),
+    }
+  )
 );
