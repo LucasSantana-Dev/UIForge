@@ -68,9 +68,9 @@ const sizaUIConfig: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-outfit)', 'var(--font-inter)', 'sans-serif'],
-        mono: ['var(--font-jetbrains-mono)', 'ui-monospace', 'monospace'],
+        sans: ['var(--font-dm-sans)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-plus-jakarta)', 'var(--font-dm-sans)', 'sans-serif'],
+        mono: ['var(--font-ibm-plex-mono)', 'ui-monospace', 'monospace'],
       },
       borderRadius: {
         lg: 'var(--radius)',

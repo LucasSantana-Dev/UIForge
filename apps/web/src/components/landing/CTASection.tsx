@@ -23,7 +23,7 @@ export function CTASection({ user }: CTASectionProps) {
           <div className="relative z-10">
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-center mb-6">
               Start building{' '}
-              <span className="bg-gradient-to-r from-[#7C3AED] via-[#8B5CF6] to-[#6366F1] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-brand via-brand-light to-info bg-clip-text text-transparent">
                 the right way
               </span>
             </h2>
@@ -36,7 +36,7 @@ export function CTASection({ user }: CTASectionProps) {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href={user ? '/generate' : '/signup'}
-                className="bg-[#7C3AED] hover:bg-[#8B5CF6] text-white rounded-lg px-8 py-3 text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors"
+                className="bg-brand hover:bg-brand-light text-white rounded-lg px-8 py-3 text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors"
               >
                 {user ? 'Go to Dashboard' : 'Get Started Free'}
                 <ArrowRight className="w-4 h-4" />

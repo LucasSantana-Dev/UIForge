@@ -121,7 +121,7 @@ export default function AboutPage() {
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
             About{' '}
-            <span className="bg-gradient-to-r from-primary to-[#6366F1] bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-primary to-info bg-clip-text text-transparent">
               Siza
             </span>
           </h1>

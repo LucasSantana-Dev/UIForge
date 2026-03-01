@@ -146,7 +146,7 @@ export default function DocsPage() {
             >
               <span
                 className="bg-gradient-to-r from-primary
-                  via-[#8B5CF6] to-[#6366F1] bg-clip-text
+                  via-brand-light to-info bg-clip-text
                   text-transparent"
               >
                 Build with Siza
@@ -237,7 +237,7 @@ export default function DocsPage() {
                 >
                   <cat.icon
                     className="w-5 h-5 text-primary mb-4
-                      group-hover:text-[#8B5CF6]
+                      group-hover:text-brand-light
                       transition-colors"
                   />
                   <h3 className="font-semibold mb-3">{cat.title}</h3>
@@ -410,7 +410,7 @@ const { code } = await res.json();`}
                 >
                   <c.icon
                     className="w-5 h-5 text-primary mb-4
-                      group-hover:text-[#8B5CF6]
+                      group-hover:text-brand-light
                       transition-colors"
                   />
                   <h3 className="font-semibold mb-1.5">{c.title}</h3>
