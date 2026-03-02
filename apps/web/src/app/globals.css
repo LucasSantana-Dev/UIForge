@@ -191,6 +191,15 @@
   }
 }
 
+/* ── Code editor (design system) ── */
+.siza-code-editor .monaco-editor {
+  --monaco-editor-bg: var(--surface-0);
+}
+.siza-code-editor .monaco-editor .margin,
+.siza-code-editor .monaco-editor .monaco-editor-background {
+  background-color: var(--surface-0) !important;
+}
+
 @layer base {
   * {
     @apply border-border;

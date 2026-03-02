@@ -1,9 +1,10 @@
 # Siza Testing State
 
-## Current Stats (as of v0.8.0, 2026-02-25)
-- 376 tests passing, 26 suites on main (post-merge)
+## Current Stats (as of v0.27.0, 2026-03-01)
+- 656+ tests passing, 53+ suites on main
 - Coverage thresholds: branches 60%, functions 65%, lines 75%, statements 75%
-- CI: ALL 8 JOBS GREEN (Lint, TypeCheck, Build, UnitTests, Security, ShellLint, E2E, Deploy)
+- CI: ALL 13 JOBS GREEN (Lint, TypeCheck, Build, UnitTests, Security, ShellLint, E2E, CodeQL, etc.)
+- **Billing tests added (v0.27.0)**: 38 tests across PricingCard (16), SubscriptionStatus (9), UsageChart (9), UpgradePrompt (4)
 
 ## API Route Test Patterns
 

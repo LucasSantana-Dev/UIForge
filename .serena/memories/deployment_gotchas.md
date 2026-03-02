@@ -20,6 +20,22 @@
 - `NEXT_PUBLIC_ENABLE_STRIPE_BILLING=false`
 - `NEXT_PUBLIC_ENABLE_USAGE_LIMITS=false`
 
+## Release Automation (FIXED PR #277)
+- `release-automation.yml` now supports both merge and squash commit patterns
+- Added `create-release` job: auto-creates git tags + GitHub releases
+- Removed CHANGELOG overwrite job (we maintain CHANGELOG manually in release PRs)
+- Version-type comparison fixed: uses previous git tag instead of package.json
+
+## npm Lockfile Gotcha
+- `npm install --legacy-peer-deps` PRUNES peer dependencies from `package-lock.json`
+- CI `npm ci` then fails: `Missing: monaco-editor@0.55.1 from lock file`
+- Fix: `git checkout origin/main -- package-lock.json && npm install` (WITHOUT --legacy-peer-deps)
+
+## JSX ESLint Comment Gotcha
+- `{/* eslint-disable-next-line */}` between JSX props is INVALID (Turbopack parse error)
+- `eslint-disable-next-line` doesn't work for multi-line JSX elements
+- Use block pattern: `{/* eslint-disable rule */}` before + `{/* eslint-enable rule */}` after
+
 ## Deploy Commands
 ```bash
 NODE_ENV=production npx opennextjs-cloudflare build   # Build for Workers

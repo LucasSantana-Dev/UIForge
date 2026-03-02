@@ -81,7 +81,7 @@ export default function CodeEditor({
           </button>
         </div>
       </div>
-      <div className="flex-1">
+      <div className="flex-1 min-h-0 siza-code-editor">
         <Editor
           height="100%"
           defaultLanguage={language}
@@ -94,9 +94,14 @@ export default function CodeEditor({
             minimap: { enabled: false },
             fontSize: 14,
             lineNumbers: 'on',
+            lineHeight: 23,
+            fontFamily: 'var(--font-mono), "IBM Plex Mono", ui-monospace, monospace',
             scrollBeyondLastLine: false,
             automaticLayout: true,
             tabSize: 2,
+            insertSpaces: true,
+            detectIndentation: false,
+            padding: { top: 16, bottom: 16 },
             wordWrap: 'on',
           }}
         />

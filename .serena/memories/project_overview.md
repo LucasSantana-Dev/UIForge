@@ -43,16 +43,30 @@ Three offset rectangles — base (widest), face (wide), horn (narrow, right-shif
 Precise, confident, technical, dry, architectural. Write for engineers. No emoji in product copy. No marketing speak.
 
 ## Current State (2026-03-01)
-- **Version**: v0.25.0 (released 2026-03-01)
+- **Version**: v0.27.0 (released 2026-03-01)
 - **Domain**: `siza.forgespace.co` (Cloudflare Workers)
 - **Dev**: `dev.forgespace.co`
-- **Branch**: main — 0 open PRs, all CI green
-- **Tags**: v0.2.1 → ... → v0.24.0 → v0.25.0
-- **v0.25.0 includes**: Skills system (#256, #257), platform metrics API (#262), GitHub PR tracking (#258), GeneratorForm refactor (#261), Sentry tracking (#264), E2E fixture fix (#260), dep upgrades (#271)
-- **Dep upgrades (PR #271)**: @supabase/ssr ^0.8.0 (getAll/setAll cookie API), @anthropic-ai/sdk ^0.78.0, cmdk ^1.1.1
+- **Branch**: main — 0 open PRs, 0 open issues, all CI green
+- **Tags**: v0.2.1 → ... → v0.25.0 → v0.26.0 → v0.27.0
+- **v0.27.0 includes**: Loading skeletons (#279), actionable error messages (#278), billing tests (#280)
+- **v0.26.0 includes**: Nav shell overhaul (#263), brand-guide theme wiring (#269), Supabase SSR + Anthropic SDK upgrade (#271)
+- **v0.25.0 includes**: Skills system (#256, #257), platform metrics API (#262), GitHub PR tracking (#258), GeneratorForm refactor (#261), Sentry tracking (#264), E2E fixture fix (#260)
 - **Desktop**: v0.2.0 released (Electron + Ollama local generation)
 - **Tests**: 618 webapp + 54 API passing (49+ suites), 8 E2E spec files
 - **Supabase prod** (`nfwmwdzbnvsyziyeubqb`): Skills + GitHub PR tracking migrations applied
+
+## Nav Shell (v0.26.0)
+- Collapsible sidebar with persistent state in `ui-store.ts`
+- Command palette (`CommandPalette.tsx`) — ⌘K trigger, cmdk library
+- Keyboard shortcuts (`use-keyboard-shortcuts.ts`) — ⌘1-4 for page nav
+- `DashboardShell.tsx` layout wrapper, `use-page-meta.ts` for dynamic titles
+- @siza/ui Tooltip component (Radix UI)
+
+## Brand-Guide Theme (v0.26.0)
+- `defaults.ts` imports `identity` from `@forgespace/brand-guide`
+- ESM-only mock at `__tests__/__mocks__/brand-guide.js` for Jest CJS compatibility
+- `moduleNameMapper` in `jest.config.js` maps `@forgespace/brand-guide` to mock
+- `eslint.config.js` ignores `**/__mocks__/**` (flat config)
 
 ## Supabase SSR Cookie API (v0.8.0)
 - Old: `get(name)`, `set(name, value, options)`, `remove(name, options)` + `CookieOptions` import

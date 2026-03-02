@@ -26,6 +26,12 @@ npm run build     # Production build
 npm run test      # Jest unit tests
 ```
 
+## ESLint Configuration (ESLint 9 flat config)
+- **Config file**: `apps/web/eslint.config.js` (flat config, takes precedence over `.eslintrc.json`)
+- **Global ignores**: Must be standalone `{ ignores: [...] }` objects with NO `files` key. Ignores inside a `files`-bearing config block are LOCAL only
+- **`eslint-disable-next-line` in JSX**: Only covers the next PHYSICAL line. Multi-line JSX elements with props on separate lines need block `eslint-disable` / `eslint-enable` pairs
+- **`__mocks__/` directory**: Globally ignored in eslint.config.js to prevent TypeScript parser errors on JS mock files
+
 ## Branch Protection
 - `main` branch is protected
 - Requires PR approval

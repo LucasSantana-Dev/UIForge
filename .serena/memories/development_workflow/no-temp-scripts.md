@@ -1,0 +1,1 @@
+Do not create temporary or one-off scripts in the repo. Prefer inline terminal commands (Fish/Bash) for sync or batch tasks (e.g. brand sync across siza-mcp, mcp-gateway, core, ui-mcp). If a script is created for one-off use, delete it after usage. Keeps project clean and improves productivity.

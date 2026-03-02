@@ -80,6 +80,17 @@ Extracted from v0-siza (Next.js 16, Tailwind 4, shadcn/ui).
 | Tiny | 10-11px | 10-11px | — | — |
 | Code Block | 12-13px | 12-13px | 1.65-1.9 | — |
 
+### Code Editor (Monaco)
+
+| Token | Value | Usage |
+|-------|-------|--------|
+| Font | IBM Plex Mono (var(--font-mono)) | Editor content |
+| Font size | 14px | Editor text |
+| Line height | 23px (1.65 × 14) | Line spacing |
+| Tab/indent size | 2 spaces | insertSpaces: true, tabSize: 2 |
+| Padding | 16px top/bottom | Editor content padding |
+| Wrapper class | `.siza-code-editor` | Background uses --surface-0 |
+
 ### Font Weights
 
 - Display headings: 700 (bold)
