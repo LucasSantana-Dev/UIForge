@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Design system — Code view**: CodeEditor (Monaco) aligned to Siza design tokens: indent guides, 2-space indentation (insertSpaces, indentSize), IBM Plex Mono font, line height 23px, vertical padding 16px; `.siza-code-editor` wrapper and Monaco background use `--surface-0` in globals.css
+
 ## [0.27.0] - 2026-03-01
 
 ### Added
