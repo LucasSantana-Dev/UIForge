@@ -8,7 +8,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **design-tokens.ts** — Raw Siza token values for contexts without CSS (e.g. global-error).
+
+### Fixed
+- **Build** — Removed HeroParticlesBackground (React 19 / @react-three/fiber peer conflict). Can be reintroduced when React 19–compatible three.js stack is available.
+
+### Changed
+- **global-error** — Replaced NextError with brand-aligned custom UI (Sora/DM Sans, sizaTokens, styled Try again button). Kept Sentry reporting.
+- **Gap analysis primary cleanup** — Replaced remaining `rgba(124,58,237)` with `rgba(139,92,246)` in PhaseCard, PhaseNavigator, CTASection, EcosystemSection, DashboardPreview, and tailwind.config.ts for token consistency.
+- **UX overhaul (gap analysis)** — LandingFooter: fixed Platform → `/`, Pricing → `/pricing`. AI Keys: added Secure storage banner. Roadmap: added Desktop app (Electron/Tauri) item. Roadmap Desktop filter already present.
+- **Motion migration** — Migrated from `framer-motion` to `motion` (motion.dev); updated imports to `motion/react`. Added `useReducedMotion()` across HeroSection, EcosystemSection, CapabilitiesSection, CTASection, PhaseCard, roadmap, and about pages. Enhanced hover/tap gestures (`whileHover`, `whileTap`) on CTAs and cards per animation guidelines.
+- **Full design-system implementation pass (phase batch)** — Unified app tokens with canonical `--siza-*` aliases in `globals.css`, aligned Tailwind theme mapping (`primary`, `surface`, `foreground`, `primary-hover`), and updated display font to Sora in Tailwind config.
+- **Shared shells aligned to design-system** — Auth shell now matches centered 440px card + radial glow + subtle pattern; dashboard chrome now uses 56px top bar, breadcrumb/command search, notifications dot, and token-consistent surfaces/borders.
+- **Landing + auth + projects visual parity** — Landing nav/footer/hero moved to design-system language (beta badge, production-grade headline, docs CTA, token colors), auth forms updated to design-system card/input/button styles, projects page/cards now include design-style view toggle and metric/progress presentation while preserving real project data/actions.
+- **Brand alignment (Modern Horn)** — Primary palette updated to #8B5CF6 / #A78BFA / #6D28D9 in globals.css, theme defaults, and design context. Display font switched from Plus Jakarta Sans to Sora via `next/font/google`; CSS variable `--font-display` now uses `--font-sora`. Public logo SVGs and tests updated to new palette.
+- **Public logo SVGs (Modern Horn)** — `apps/web/public/siza-icon.svg` and `siza-logo.svg` now use the Modern Horn icon from brand-guide `/explore` (path + two rects, palette #A78BFA / #8B5CF6 / #6D28D9, Sora wordmark).
+- **Siza app UI migration foundation** — Added migration primitives (`AuthCardShell`, `MarketingSection`, `DashboardSection`) and global utility classes (`siza-shell-card`, `siza-prose`, `siza-video-bg`, `siza-scrollbar`) to align route-level visual language.
+- **Dashboard nav unification** — Sidebar, MobileNav, and page metadata now consume a single shared navigation source (`components/dashboard/navigation.ts`) to prevent route-label/icon drift.
+- **Mapped + gap route visual refresh** — Updated landing/about ambient backgrounds, auth surfaces (signin/signup/forgot/reset), roadmap desktop scope filter, templates/history pagination controls, AI Keys/Billing/Settings headers, and redesigned privacy/terms/maintenance/billing-success pages.
+- **Role-aware dashboard navigation** — Sidebar, MobileNav, and breadcrumb metadata now receive admin-aware route sets and display the `Admin` entry only for users with `profiles.role = 'admin'`.
+
+### Added
 - **Design system — Code view**: CodeEditor (Monaco) aligned to Siza design tokens: indent guides, 2-space indentation (insertSpaces, indentSize), IBM Plex Mono font, line height 23px, vertical padding 16px; `.siza-code-editor` wrapper and Monaco background use `--surface-0` in globals.css
+- **Keyboard shortcuts (generate page)** (#266): ⌘↵ submit generation, ⌘K focus prompt, ⌘S save as template, Escape close modals; `useGeneratePageShortcuts` hook, tooltips on Generate / Save as Template, ⌘K hint in prompt label, unit tests for hook
+- **Brand monogram**: Forge Space monogram.svg as app logo in Sidebar, LandingNav, error, not-found, maintenance, and loading pages
+- **Ambient route background support** — New `AmbientVideoBackground` component for media-backed hero/about backgrounds with gradient fallback layering.
+- **Admin feature flags panel** — New dashboard `Admin` page with list/toggle/create/delete controls backed by existing `/api/features` and `/api/features/[id]` routes, plus server guard in `(dashboard)/admin/layout.tsx`.
+- **Local admin bootstrap script** — Added `scripts/grant-admin-by-email.ts` and `npm run admin:grant -- <email>` to set `public.profiles.role = 'admin'` for local or staging users.
 
 ## [0.27.0] - 2026-03-01
 
