@@ -1,8 +1,6 @@
 import type { ProjectScorecard, ScorecardHistoryParams } from './types';
 
-export async function fetchLatestScorecard(
-  projectId: string
-): Promise<ProjectScorecard | null> {
+export async function fetchLatestScorecard(projectId: string): Promise<ProjectScorecard | null> {
   const res = await fetch(`/api/scorecards?projectId=${projectId}`);
   if (!res.ok) return null;
   const data = await res.json();

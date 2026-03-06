@@ -9,7 +9,7 @@
     "start": "next start",
     "lint": "eslint src --ext .ts,.tsx,.js,.jsx --max-warnings 0",
     "lint:fix": "eslint src --ext .ts,.tsx,.js,.jsx --fix",
-    "test": "jest",
+    "test": "jest --forceExit",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
