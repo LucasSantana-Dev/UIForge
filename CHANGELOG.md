@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Audit dashboard** — Admin-only governance dashboard at `/admin/audit` with event filtering, severity badges, pagination
+- **Project scorecards** — Per-project score dashboard at `/projects/[id]/scorecard` with 4-category breakdown (security, quality, performance, compliance), violations list, recommendations, trend history
+- **Scorecard API** — `/api/scorecards` route with auth + project ownership verification
+- **Audit API proxy** — `/api/audit` route proxying to MCP gateway audit events API (admin-only)
+- **Unleash proxy client** — `unleash-client.ts` for centralized feature flag management with 30s cache TTL and namespaced lookup
+- **Database migration** — `project_scorecards` table with per-category scores, JSONB breakdowns, RLS policies
+- **Feature flags** — `ENABLE_AUDIT_DASHBOARD`, `ENABLE_POLICY_ENGINE`, `ENABLE_PROJECT_SCORECARDS` governance flags
 - **design-tokens.ts** — Raw Siza token values for contexts without CSS (e.g. global-error).
 
 ### Fixed
