@@ -26,16 +26,21 @@ export async function GET(req: NextRequest) {
     .single();
 
   if (!project) {
-    return NextResponse.json({ error: 'Project not found' }, { status: 404 });
+    return NextResponse.json(
+      { error: 'Project not found or access denied' },
+      { status: 403 }
+    );
   }
 
+  const SCORECARD_COLS = 'id, project_id, overall_score, security_score, quality_score, performance_score, compliance_score, breakdowns, violations, recommendations, created_at';
   const isHistory = searchParams.get('history') === 'true';
-  const limit = Math.min(Number(searchParams.get('limit') ?? 30), 100);
+  const rawLimit = parseInt(searchParams.get('limit') ?? '30', 10);
+  const limit = Math.min(Math.max(Number.isNaN(rawLimit) ? 30 : rawLimit, 1), 100);
 
   if (isHistory) {
     const { data: scorecards, error } = await supabase
       .from('project_scorecards')
-      .select('*')
+      .select(SCORECARD_COLS)
       .eq('project_id', projectId)
       .order('created_at', { ascending: false })
       .limit(limit);
@@ -49,7 +54,7 @@ export async function GET(req: NextRequest) {
 
   const { data: scorecard, error } = await supabase
     .from('project_scorecards')
-    .select('*')
+    .select(SCORECARD_COLS)
     .eq('project_id', projectId)
     .order('created_at', { ascending: false })
     .limit(1)

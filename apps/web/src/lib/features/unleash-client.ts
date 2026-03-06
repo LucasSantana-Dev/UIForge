@@ -49,7 +49,7 @@ async function refreshToggles(config: UnleashConfig): Promise<void> {
     cachedToggles = new Map(toggles.map((t) => [t.name, t.enabled]));
     lastFetch = Date.now();
   } catch {
-    // Silently fail — fall back to custom flags
+    lastFetch = 0;
   }
 }
 

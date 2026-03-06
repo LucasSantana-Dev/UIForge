@@ -4,7 +4,10 @@ import { fetchAuditEvents, fetchAuditSummary } from '@/lib/audit/client';
 import { isLocalAuthBypassEnabled } from '@/lib/auth/local-auth-bypass';
 
 async function requireAdmin(_req: NextRequest) {
-  if (isLocalAuthBypassEnabled()) return;
+  if (isLocalAuthBypassEnabled()) {
+    console.warn('[SECURITY] Admin auth bypass active for audit endpoint');
+    return;
+  }
 
   const supabase = await createClient();
   const {

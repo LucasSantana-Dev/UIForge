@@ -16,6 +16,8 @@ const ROUTE_LIMITS: Record<string, RouteLimitConfig> = {
   '/api/generations': { limit: 60, window: 60000 },
   '/api/auth': { limit: 10, window: 60000 },
   '/api/wireframe': { limit: 10, window: 60000 },
+  '/api/audit': { limit: 30, window: 60000 },
+  '/api/scorecards': { limit: 60, window: 60000 },
 };
 
 export function getRouteLimit(pathname: string): RouteLimitConfig {
