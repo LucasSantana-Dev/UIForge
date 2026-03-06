@@ -2,16 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import {
-  Shield,
-  Code2,
-  Gauge,
-  Scale,
-  TrendingUp,
-  AlertCircle,
-  CheckCircle2,
-} from 'lucide-react';
-import { isFeatureEnabled } from '@/lib/features/client';
+import { Shield, Code2, Gauge, Scale, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { isFeatureEnabled } from '@/lib/features/flags';
 import { fetchLatestScorecard, fetchScorecardHistory } from '@/lib/scorecards/client';
 import type { ProjectScorecard } from '@/lib/scorecards/types';
 import { getScoreLevel } from '@/lib/scorecards/types';
@@ -36,7 +28,9 @@ function ScoreGauge({ score, size = 'lg' }: { score: number; size?: 'sm' | 'lg' 
   const dim = size === 'lg' ? 'w-24 h-24 text-3xl' : 'w-14 h-14 text-lg';
 
   return (
-    <div className={`${dim} rounded-full border-2 ${style} flex items-center justify-center font-bold`}>
+    <div
+      className={`${dim} rounded-full border-2 ${style} flex items-center justify-center font-bold`}
+    >
       {score}
     </div>
   );
@@ -178,7 +172,7 @@ export default function ScorecardPage() {
             {history
               .slice()
               .reverse()
-              .map((s, i) => {
+              .map((s) => {
                 const level = getScoreLevel(s.overall_score);
                 const bgColor = LEVEL_STYLES[level].split(' ')[1];
                 return (

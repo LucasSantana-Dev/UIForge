@@ -22,7 +22,10 @@ if (fs.existsSync(envFilePath)) {
     if (!trimmed || trimmed.startsWith('#') || !trimmed.includes('=')) continue;
     const [rawKey, ...rawValueParts] = trimmed.split('=');
     const key = rawKey.trim();
-    const value = rawValueParts.join('=').trim().replace(/^['"]|['"]$/g, '');
+    const value = rawValueParts
+      .join('=')
+      .trim()
+      .replace(/^['"]|['"]$/g, '');
     envMap.set(key, value);
   }
 }

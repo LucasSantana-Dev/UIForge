@@ -17,10 +17,7 @@ interface QualityScorecardProps {
   report: QualityReport;
 }
 
-const GATE_CONFIG: Record<
-  string,
-  { icon: React.ReactNode; label: string; weight: number }
-> = {
+const GATE_CONFIG: Record<string, { icon: React.ReactNode; label: string; weight: number }> = {
   security: {
     icon: <ShieldCheck className="h-4 w-4" />,
     label: 'Security',
@@ -73,18 +70,10 @@ function GateCard({ result }: { result: QualityResult }) {
   const colors = COLOR_MAP[color];
 
   return (
-    <div
-      className={cn(
-        'rounded-lg border p-3 flex flex-col gap-2',
-        colors.bg,
-        colors.border
-      )}
-    >
+    <div className={cn('rounded-lg border p-3 flex flex-col gap-2', colors.bg, colors.border)}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className={colors.text}>
-            {config?.icon || <Code2 className="h-4 w-4" />}
-          </span>
+          <span className={colors.text}>{config?.icon || <Code2 className="h-4 w-4" />}</span>
           <span className="text-sm font-medium text-text-primary">
             {config?.label || result.gate}
           </span>
@@ -100,10 +89,7 @@ function GateCard({ result }: { result: QualityResult }) {
       {result.issues.length > 0 && (
         <ul className="space-y-0.5">
           {result.issues.map((issue, i) => (
-            <li
-              key={i}
-              className="text-xs text-text-muted-foreground leading-relaxed"
-            >
+            <li key={i} className="text-xs text-text-muted-foreground leading-relaxed">
               {issue}
             </li>
           ))}
@@ -115,20 +101,12 @@ function GateCard({ result }: { result: QualityResult }) {
 
 function OverallScore({ score }: { score: number }) {
   const percent = Math.round(score * 100);
-  const label =
-    percent >= 80 ? 'Excellent' : percent >= 50 ? 'Needs Work' : 'Critical';
-  const color =
-    percent >= 80
-      ? 'text-success'
-      : percent >= 50
-        ? 'text-warning'
-        : 'text-error';
+  const label = percent >= 80 ? 'Excellent' : percent >= 50 ? 'Needs Work' : 'Critical';
+  const color = percent >= 80 ? 'text-success' : percent >= 50 ? 'text-warning' : 'text-error';
 
   return (
     <div className="flex items-center gap-3">
-      <span className={cn('text-2xl font-bold tabular-nums', color)}>
-        {percent}%
-      </span>
+      <span className={cn('text-2xl font-bold tabular-nums', color)}>{percent}%</span>
       <span className="text-sm text-text-muted-foreground">{label}</span>
     </div>
   );
@@ -141,9 +119,7 @@ export function QualityScorecard({ report }: QualityScorecardProps) {
     <div className="rounded-xl border border-surface-3 bg-surface-1 p-4 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-sm font-semibold text-text-primary">
-            Quality Scorecard
-          </h3>
+          <h3 className="text-sm font-semibold text-text-primary">Quality Scorecard</h3>
           <p className="text-xs text-text-muted-foreground">
             {passed}/{report.results.length} gates passed
           </p>

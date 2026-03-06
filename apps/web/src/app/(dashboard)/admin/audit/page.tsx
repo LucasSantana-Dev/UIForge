@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Shield, AlertTriangle, Activity, Clock } from 'lucide-react';
 import type { AuditEvent, AuditEventsResponse } from '@/lib/audit/client';
-import { isFeatureEnabled } from '@/lib/features/client';
+import { isFeatureEnabled } from '@/lib/features/flags';
 
 const SEVERITY_COLORS: Record<string, string> = {
   critical: 'text-red-400 bg-red-400/10 border-red-400/20',
@@ -15,11 +15,7 @@ const SEVERITY_COLORS: Record<string, string> = {
 
 function SeverityBadge({ severity }: { severity: string }) {
   const color = SEVERITY_COLORS[severity] ?? SEVERITY_COLORS.info;
-  return (
-    <span className={`px-2 py-0.5 rounded text-xs border ${color}`}>
-      {severity}
-    </span>
-  );
+  return <span className={`px-2 py-0.5 rounded text-xs border ${color}`}>{severity}</span>;
 }
 
 function StatCard({
@@ -94,9 +90,7 @@ export default function AuditPage() {
     <div className="p-6 space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-zinc-100">Security Audit</h1>
-        <p className="text-sm text-zinc-400 mt-1">
-          Monitor security events from the MCP Gateway
-        </p>
+        <p className="text-sm text-zinc-400 mt-1">Monitor security events from the MCP Gateway</p>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -109,7 +103,10 @@ export default function AuditPage() {
       <div className="flex gap-3">
         <select
           value={severityFilter}
-          onChange={(e) => { setSeverityFilter(e.target.value); setPage(1); }}
+          onChange={(e) => {
+            setSeverityFilter(e.target.value);
+            setPage(1);
+          }}
           className="bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-sm text-zinc-300"
         >
           <option value="">All severities</option>
@@ -121,7 +118,10 @@ export default function AuditPage() {
         </select>
         <select
           value={typeFilter}
-          onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }}
+          onChange={(e) => {
+            setTypeFilter(e.target.value);
+            setPage(1);
+          }}
           className="bg-zinc-900 border border-zinc-700 rounded px-3 py-1.5 text-sm text-zinc-300"
         >
           <option value="">All types</option>
@@ -156,19 +156,18 @@ export default function AuditPage() {
             </thead>
             <tbody className="divide-y divide-zinc-800">
               {events.map((event, i) => (
-                <tr key={`${event.request_id ?? i}-${event.timestamp}`} className="hover:bg-zinc-900/50">
+                <tr
+                  key={`${event.request_id ?? i}-${event.timestamp}`}
+                  className="hover:bg-zinc-900/50"
+                >
                   <td className="px-4 py-3 text-zinc-300 whitespace-nowrap">
                     {new Date(event.timestamp).toLocaleString()}
                   </td>
-                  <td className="px-4 py-3 text-zinc-300 font-mono text-xs">
-                    {event.event_type}
-                  </td>
+                  <td className="px-4 py-3 text-zinc-300 font-mono text-xs">{event.event_type}</td>
                   <td className="px-4 py-3">
                     <SeverityBadge severity={event.severity} />
                   </td>
-                  <td className="px-4 py-3 text-zinc-400 text-xs">
-                    {event.user_id ?? '—'}
-                  </td>
+                  <td className="px-4 py-3 text-zinc-400 text-xs">{event.user_id ?? '—'}</td>
                   <td className="px-4 py-3 text-zinc-500 text-xs max-w-xs truncate">
                     {JSON.stringify(event.details)}
                   </td>

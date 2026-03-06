@@ -21,7 +21,6 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
-    "@forgespace/brand-guide": "file:../../../brand-guide",
     "@google/generative-ai": "^0.24.1",
     "@monaco-editor/react": "^4.6.0",
     "@react-email/components": "^1.0.8",

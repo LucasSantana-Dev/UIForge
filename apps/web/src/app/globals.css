@@ -1,4 +1,49 @@
-@import "@forgespace/brand-guide/forge-tokens.css";
+/* Forge Space Design Tokens (from @forgespace/brand-guide) */
+:root {
+  --forge-bg: #121214;
+  --forge-bg-elevated: #18181b;
+  --forge-surface: #1a1a1e;
+  --forge-surface-alt: #1e1e22;
+  --forge-border: #27272a;
+  --forge-border-hover: #3f3f46;
+  --forge-primary: #8b5cf6;
+  --forge-primary-rgb: 139, 92, 246;
+  --forge-primary-hover: #a78bfa;
+  --forge-primary-pressed: #6d28d9;
+  --forge-text: #fafafa;
+  --forge-text-muted: #a1a1aa;
+  --forge-text-subtle: #71717a;
+  --forge-accent: rgba(139, 92, 246, 0.12);
+  --forge-accent-foreground: #8b5cf6;
+  --forge-destructive: #ef4444;
+  --forge-success: #22c55e;
+  --forge-warning: #eab308;
+  --forge-input: #18181b;
+  --forge-ring: #8b5cf6;
+  --forge-space-1: 4px;
+  --forge-space-2: 8px;
+  --forge-space-3: 12px;
+  --forge-space-4: 16px;
+  --forge-space-5: 20px;
+  --forge-space-6: 24px;
+  --forge-space-8: 32px;
+  --forge-space-10: 40px;
+  --forge-space-12: 48px;
+  --forge-space-16: 64px;
+  --forge-radius-sm: 8px;
+  --forge-radius-md: 10px;
+  --forge-radius-lg: 12px;
+  --forge-radius-xl: 16px;
+  --forge-glow-primary: 0 0 30px rgba(139, 92, 246, 0.3);
+  --forge-glow-primary-sm: 0 0 20px rgba(139, 92, 246, 0.25);
+  --forge-focus-ring: 0 0 0 3px rgba(139, 92, 246, 0.15), 0 0 20px rgba(139, 92, 246, 0.1);
+  --forge-duration-fast: 150ms;
+  --forge-duration-standard: 200ms;
+  --forge-duration-entrance: 400ms;
+  --forge-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --forge-gradient-hero: linear-gradient(315deg, #6d28d9 0%, #8b5cf6 50%, #a78bfa 100%);
+  --forge-gradient-button: linear-gradient(315deg, #6d28d9 0%, #8b5cf6 100%);
+}
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +51,7 @@
 
 @layer base {
   :root {
-    --forge-font-display: var(--font-sora), system-ui, sans-serif;
+    --forge-font-display: var(--font-plus-jakarta), system-ui, sans-serif;
     --forge-font-body: var(--font-dm-sans), system-ui, sans-serif;
     --forge-font-mono: var(--font-ibm-plex-mono), ui-monospace, monospace;
 

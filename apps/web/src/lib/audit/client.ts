@@ -42,9 +42,7 @@ function getGatewayJwt(): string {
   return jwt;
 }
 
-export async function fetchAuditEvents(
-  filters: AuditFilters = {}
-): Promise<AuditEventsResponse> {
+export async function fetchAuditEvents(filters: AuditFilters = {}): Promise<AuditEventsResponse> {
   const baseUrl = getGatewayUrl();
   const jwt = getGatewayJwt();
 

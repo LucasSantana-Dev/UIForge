@@ -1,8 +1,31 @@
 import type { SizaTheme } from '@/stores/theme-store';
-import { identity } from '@forgespace/brand-guide';
 
-const sizaFonts = (identity as Record<string, any>).subBrands?.siza;
-const neutralHexes = identity.colors.neutral.map((n) => n.hex);
+const FORGE_IDENTITY = {
+  name: 'Forge Space',
+  primaryHex: '#8B5CF6',
+  secondaryHex: '#A78BFA',
+  accentHex: '#6D28D9',
+  headingFont: 'Plus Jakarta Sans',
+  bodyFont: 'DM Sans',
+  semantic: {
+    success: '#22c55e',
+    warning: '#eab308',
+    error: '#ef4444',
+    info: '#3b82f6',
+  },
+  neutrals: [
+    '#fafafa',
+    '#f4f4f5',
+    '#e4e4e7',
+    '#d4d4d8',
+    '#a1a1aa',
+    '#71717a',
+    '#52525b',
+    '#3f3f46',
+    '#27272a',
+    '#18181b',
+  ],
+};
 
 export const BUILT_IN_THEMES: SizaTheme[] = [
   {
@@ -82,27 +105,22 @@ export const BUILT_IN_THEMES: SizaTheme[] = [
   },
   {
     id: 'forge-space',
-    name: identity.name || 'Forge Space',
+    name: FORGE_IDENTITY.name,
     builtIn: true,
     colorMode: 'dark',
-    primaryColor: identity.colors.primary.hex,
-    secondaryColor: identity.colors.secondary.hex,
-    accentColor: identity.colors.accent.hex,
+    primaryColor: FORGE_IDENTITY.primaryHex,
+    secondaryColor: FORGE_IDENTITY.secondaryHex,
+    accentColor: FORGE_IDENTITY.accentHex,
     animation: 'standard',
     spacing: 'default',
     borderRadius: 'medium',
     typography: 'sans',
     brandMeta: {
-      brandName: identity.name || 'Forge Space',
-      headingFont: sizaFonts?.headingFont || 'Sora',
-      bodyFont: sizaFonts?.bodyFont || 'DM Sans',
-      semanticColors: {
-        success: identity.colors.semantic.success.hex,
-        warning: identity.colors.semantic.warning.hex,
-        error: identity.colors.semantic.error.hex,
-        info: identity.colors.semantic.info.hex,
-      },
-      neutrals: neutralHexes.slice(0, 10),
+      brandName: FORGE_IDENTITY.name,
+      headingFont: FORGE_IDENTITY.headingFont,
+      bodyFont: FORGE_IDENTITY.bodyFont,
+      semanticColors: FORGE_IDENTITY.semantic,
+      neutrals: FORGE_IDENTITY.neutrals,
     },
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
