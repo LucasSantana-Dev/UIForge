@@ -6,7 +6,7 @@ export interface SizaRoutingResult {
   reason: 'default' | 'vision' | 'quality' | 'free-tier' | 'quota-fallback';
 }
 
-const VALID_PROVIDERS: AIProvider[] = ['google', 'openai', 'anthropic', 'siza'];
+const VALID_PROVIDERS: AIProvider[] = ['google', 'openai', 'anthropic'];
 
 function getDefaultProvider(): { provider: AIProvider; model: string } {
   const envProvider = process.env.DEFAULT_GENERATION_PROVIDER;
