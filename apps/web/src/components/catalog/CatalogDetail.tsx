@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 import {
   ServerIcon,
   BoxIcon,
@@ -15,15 +15,15 @@ import {
   TrashIcon,
   GitBranchIcon,
   UsersIcon,
-} from 'lucide-react';
-import TechDocsPanel from '@/components/catalog/TechDocsPanel';
+} from "lucide-react";
+import TechDocsPanel from "@/components/catalog/TechDocsPanel";
 
 interface CatalogEntry {
   id: string;
   name: string;
   display_name: string;
-  type: 'service' | 'component' | 'api' | 'library' | 'website';
-  lifecycle: 'experimental' | 'production' | 'deprecated';
+  type: "service" | "component" | "api" | "library" | "website";
+  lifecycle: "experimental" | "production" | "deprecated";
   owner_id: string;
   team?: string;
   tags?: string[];
@@ -45,17 +45,17 @@ interface CatalogDetailProps {
 }
 
 const TYPE_ICONS = {
-  service: { icon: ServerIcon, color: 'text-sky-500' },
-  component: { icon: BoxIcon, color: 'text-emerald-500' },
-  api: { icon: GlobeIcon, color: 'text-violet-500' },
-  library: { icon: BookOpenIcon, color: 'text-amber-500' },
-  website: { icon: MonitorIcon, color: 'text-rose-500' },
+  service: { icon: ServerIcon, color: "text-sky-500" },
+  component: { icon: BoxIcon, color: "text-emerald-500" },
+  api: { icon: GlobeIcon, color: "text-violet-500" },
+  library: { icon: BookOpenIcon, color: "text-amber-500" },
+  website: { icon: MonitorIcon, color: "text-rose-500" },
 };
 
 const LIFECYCLE_STYLES = {
-  experimental: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-  production: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-  deprecated: 'bg-red-500/10 text-red-500 border-red-500/20',
+  experimental: "bg-amber-500/10 text-amber-500 border-amber-500/20",
+  production: "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+  deprecated: "bg-red-500/10 text-red-500 border-red-500/20",
 };
 
 export default function CatalogDetail({ entryId }: CatalogDetailProps) {
@@ -68,7 +68,7 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
   useEffect(() => {
     fetch(`/api/catalog/${entryId}`)
       .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch catalog entry');
+        if (!res.ok) throw new Error("Failed to fetch catalog entry");
         return res.json();
       })
       .then(({ data, isOwner: owner }) => {
@@ -83,14 +83,14 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
   }, [entryId]);
 
   const handleDelete = async () => {
-    if (!window.confirm('Are you sure you want to delete this entry?')) return;
+    if (!window.confirm("Are you sure you want to delete this entry?")) return;
 
     try {
-      const res = await fetch(`/api/catalog/${entryId}`, { method: 'DELETE' });
-      if (!res.ok) throw new Error('Failed to delete entry');
-      router.push('/catalog');
+      const res = await fetch(`/api/catalog/${entryId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete entry");
+      router.push("/catalog");
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Failed to delete');
+      alert(err instanceof Error ? err.message : "Failed to delete");
     }
   };
 
@@ -99,7 +99,11 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
   }
 
   if (error || !entry) {
-    return <div className="text-center py-12 text-red-400">{error || 'Not found'}</div>;
+    return (
+      <div className="text-center py-12 text-red-400">
+        {error || "Not found"}
+      </div>
+    );
   }
 
   const TypeIcon = TYPE_ICONS[entry.type].icon;
@@ -114,12 +118,18 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
             <TypeIcon className="h-8 w-8" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-text-violet-400">{entry.display_name}</h1>
+            <h1 className="text-3xl font-bold text-text-violet-400">
+              {entry.display_name}
+            </h1>
             <div className="mt-2 flex items-center gap-3">
-              <span className={`rounded-full border px-3 py-1 text-sm ${lifecycleStyle}`}>
+              <span
+                className={`rounded-full border px-3 py-1 text-sm ${lifecycleStyle}`}
+              >
                 {entry.lifecycle}
               </span>
-              <span className="text-sm text-text-secondary capitalize">{entry.type}</span>
+              <span className="text-sm text-text-secondary capitalize">
+                {entry.type}
+              </span>
             </div>
           </div>
         </div>
@@ -145,7 +155,9 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-surface-1-1 border border-surface-3 rounded-xl p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-text-violet-400">Metadata</h2>
+          <h2 className="text-lg font-semibold text-text-violet-400">
+            Metadata
+          </h2>
           {entry.team && (
             <div className="flex items-center gap-2 text-sm">
               <UsersIcon className="h-4 w-4 text-text-secondary" />
@@ -177,8 +189,18 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
             </div>
           )}
           <div className="text-xs text-text-secondary space-y-1">
-            <p>Created {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}</p>
-            <p>Updated {formatDistanceToNow(new Date(entry.updated_at), { addSuffix: true })}</p>
+            <p>
+              Created{" "}
+              {formatDistanceToNow(new Date(entry.created_at), {
+                addSuffix: true,
+              })}
+            </p>
+            <p>
+              Updated{" "}
+              {formatDistanceToNow(new Date(entry.updated_at), {
+                addSuffix: true,
+              })}
+            </p>
           </div>
         </div>
 
@@ -221,7 +243,9 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
 
         {entry.dependents && entry.dependents.length > 0 && (
           <div className="bg-surface-1-1 border border-surface-3 rounded-xl p-6 space-y-4">
-            <h2 className="text-lg font-semibold text-text-violet-400">Dependents</h2>
+            <h2 className="text-lg font-semibold text-text-violet-400">
+              Dependents
+            </h2>
             <ul className="space-y-2">
               {entry.dependents.map((dep) => (
                 <li key={dep}>
@@ -239,15 +263,21 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
 
         {entry.scorecard && (
           <div className="bg-surface-1-1 border border-surface-3 rounded-xl p-6 space-y-4 md:col-span-2">
-            <h2 className="text-lg font-semibold text-text-violet-400">Quality Scorecard</h2>
+            <h2 className="text-lg font-semibold text-text-violet-400">
+              Quality Scorecard
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div className="text-center">
-                <div className="text-3xl font-bold text-violet-400">{entry.scorecard.overall}</div>
+                <div className="text-3xl font-bold text-violet-400">
+                  {entry.scorecard.overall}
+                </div>
                 <div className="text-sm text-text-secondary">Overall</div>
               </div>
               {entry.scorecard.categories.map((cat) => (
                 <div key={cat.name} className="text-center">
-                  <div className="text-2xl font-semibold text-text-violet-400">{cat.score}</div>
+                  <div className="text-2xl font-semibold text-text-violet-400">
+                    {cat.score}
+                  </div>
                   <div className="text-xs text-text-secondary">{cat.name}</div>
                 </div>
               ))}

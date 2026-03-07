@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { marked } from 'marked';
+import { useState, useEffect } from "react";
+import { marked } from "marked";
 import {
   FileTextIcon,
   ExternalLinkIcon,
   Loader2Icon,
   AlertTriangleIcon,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface TechDocsPanelProps {
   documentationUrl?: string;
@@ -31,7 +31,7 @@ export default function TechDocsPanel({
 
     fetch(`/api/catalog/docs?url=${encodeURIComponent(docsUrl)}`)
       .then((res) => {
-        if (!res.ok) throw new Error('Failed to fetch documentation');
+        if (!res.ok) throw new Error("Failed to fetch documentation");
         return res.json();
       })
       .then((json) => {
@@ -65,9 +65,7 @@ export default function TechDocsPanel({
     return (
       <div className="rounded-xl border border-surface-3 bg-surface-1 p-8 text-center">
         <Loader2Icon className="mx-auto h-6 w-6 text-violet-400 animate-spin mb-3" />
-        <p className="text-sm text-text-secondary">
-          Loading documentation...
-        </p>
+        <p className="text-sm text-text-secondary">Loading documentation...</p>
       </div>
     );
   }
@@ -116,7 +114,7 @@ export default function TechDocsPanel({
       </div>
       <div
         className="prose prose-invert prose-sm max-w-none p-6 prose-headings:text-text-primary prose-a:text-violet-400 prose-code:text-emerald-400 prose-code:bg-surface-2 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-pre:bg-surface-2 prose-pre:border prose-pre:border-surface-3"
-        dangerouslySetInnerHTML={{ __html: content || '' }}
+        dangerouslySetInnerHTML={{ __html: content || "" }}
       />
     </div>
   );
