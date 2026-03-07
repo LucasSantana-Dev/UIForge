@@ -34,10 +34,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} ${outfit.variable} dark`}
+      className={`${inter.variable} ${jetbrainsMono.variable} ${outfit.variable}`}
       style={
         {
-          colorScheme: 'dark',
           fontFamily: 'var(--font-inter), system-ui, sans-serif',
           '--font-heading': 'var(--font-outfit)',
         } as React.CSSProperties
@@ -57,9 +56,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        <RootProvider theme={{ defaultTheme: 'dark', forcedTheme: 'dark' }}>
-          {children}
-        </RootProvider>
+        <RootProvider theme={{ defaultTheme: 'dark' }}>{children}</RootProvider>
       </body>
     </html>
   );

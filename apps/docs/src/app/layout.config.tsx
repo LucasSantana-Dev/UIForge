@@ -2,7 +2,7 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import Image from 'next/image';
 
 export const baseOptions: BaseLayoutProps = {
-  themeSwitch: { enabled: false },
+  themeSwitch: { enabled: true },
   nav: {
     title: (
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
