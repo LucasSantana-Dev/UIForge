@@ -75,7 +75,7 @@ export async function* generateComponentStream(
       ? `${SYSTEM_PROMPT}\n\n${options.contextAddition}`
       : SYSTEM_PROMPT;
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       systemInstruction: systemPrompt,
     });
 

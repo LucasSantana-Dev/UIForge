@@ -70,7 +70,7 @@ export default function GeneratorForm({
     sizaAiEnabled ? 'siza' : 'google'
   );
   const [selectedModel, setSelectedModel] = useState(
-    sizaAiEnabled ? 'siza-auto' : 'gemini-2.0-flash'
+    sizaAiEnabled ? 'siza-auto' : 'gemini-2.5-flash'
   );
   const [selectedSkillIds, setSelectedSkillIds] = useState<string[]>([]);
   const [skillParams, setSkillParams] = useState<Record<string, Record<string, unknown>>>({});

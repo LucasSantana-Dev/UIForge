@@ -168,6 +168,6 @@ describe('GET /api/generate', () => {
 
     expect(response.status).toBe(200);
     expect(data.version).toBe('4.0.0');
-    expect(data.provider).toBe('gemini-2.0-flash');
+    expect(data.provider).toBe('gemini-2.5-flash');
   });
 });

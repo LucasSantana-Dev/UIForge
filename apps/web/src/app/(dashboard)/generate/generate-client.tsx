@@ -197,7 +197,7 @@ export default function TemplateComponent() {
           componentName: componentName || 'GeneratedComponent',
           code: generatedCode,
           prompt: description || '',
-          model: 'gemini-2.0-flash',
+          model: 'gemini-2.5-flash',
         }),
       });
 

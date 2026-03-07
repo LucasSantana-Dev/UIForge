@@ -45,11 +45,11 @@ export function routeSizaGeneration(params: {
   isFreeTier: boolean;
 }): SizaRoutingResult {
   if (params.hasImage) {
-    return { provider: 'google', model: 'gemini-2.0-flash', reason: 'vision' };
+    return { provider: 'google', model: 'gemini-2.5-flash', reason: 'vision' };
   }
 
   if (params.isFreeTier) {
-    return { provider: 'google', model: 'gemini-2.0-flash', reason: 'free-tier' };
+    return { provider: 'google', model: 'gemini-2.5-flash', reason: 'free-tier' };
   }
 
   const complexity = analyzePromptComplexity(params.prompt);
@@ -61,7 +61,7 @@ export function routeSizaGeneration(params: {
     };
   }
 
-  return { provider: 'google', model: 'gemini-2.0-flash', reason: 'default' };
+  return { provider: 'google', model: 'gemini-2.5-flash', reason: 'default' };
 }
 
 export function getQuotaFallback(currentProvider: AIProvider): SizaRoutingResult | null {
@@ -75,5 +75,5 @@ export function getQuotaFallback(currentProvider: AIProvider): SizaRoutingResult
     }
     return null;
   }
-  return { provider: 'google', model: 'gemini-2.0-flash', reason: 'quota-fallback' };
+  return { provider: 'google', model: 'gemini-2.5-flash', reason: 'quota-fallback' };
 }

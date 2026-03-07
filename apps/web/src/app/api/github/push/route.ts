@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       componentName,
       files: [{ path: filePath, content: code }],
       prompt: prompt || componentName,
-      model: model || 'gemini-2.0-flash',
+      model: model || 'gemini-2.5-flash',
     });
 
     return NextResponse.json({ pr });

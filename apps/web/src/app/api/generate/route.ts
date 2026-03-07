@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
     const correlationId = randomUUID();
     const mcpEnabled = shouldUseMcpGateway();
     const activeProvider = mcpEnabled ? 'mcp-gateway' : input.provider;
-    const activeModel = mcpEnabled ? 'mcp-specialist' : input.model || 'gemini-2.0-flash';
+    const activeModel = mcpEnabled ? 'mcp-specialist' : input.model || 'gemini-2.5-flash';
     const conversationCtx: ConversationContext | undefined =
       isRefinement && input.previousCode
         ? {
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
             imageBase64: input.imageBase64,
             imageMimeType: input.imageMimeType,
             provider: input.provider,
-            model: input.model || 'gemini-2.0-flash',
+            model: input.model || 'gemini-2.5-flash',
             correlationId,
             accessToken,
           })) {
@@ -290,7 +290,7 @@ export async function GET() {
       message: 'UI Generation API',
       version: '4.0.0',
       status: 'active',
-      provider: 'gemini-2.0-flash',
+      provider: 'gemini-2.5-flash',
       features: [
         'rag',
         'quality-gates',

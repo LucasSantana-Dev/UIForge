@@ -138,7 +138,7 @@ export function DiscoverClient() {
               {discovered.length > 0 && (
                 <>
                   <button onClick={selectAll} className="text-violet-400 hover:text-violet-300">
-                    {selected.size === discovered.length ? 'Deselect all' : 'Select all'}
+                    {selected.size === discovered.length ? 'Deselect All' : 'Select All'}
                   </button>
                   <Button
                     size="sm"

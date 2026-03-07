@@ -4,7 +4,7 @@ import type { GenerationEvent } from '@/lib/services/gemini';
 jest.mock('@/lib/services/siza-router', () => ({
   routeSizaGeneration: jest.fn().mockReturnValue({
     provider: 'google',
-    model: 'gemini-2.0-flash',
+    model: 'gemini-2.5-flash',
     reason: 'default',
   }),
   getQuotaFallback: jest.fn().mockReturnValue(null),
@@ -44,7 +44,7 @@ describe('routeGeneration', () => {
     framework: 'react',
     contextAddition: '',
     provider: 'google',
-    model: 'gemini-2.0-flash',
+    model: 'gemini-2.5-flash',
   };
 
   beforeEach(() => {

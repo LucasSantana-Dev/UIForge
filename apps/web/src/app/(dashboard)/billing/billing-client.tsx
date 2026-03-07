@@ -77,7 +77,7 @@ export function BillingClient() {
                   className="inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm font-medium hover:bg-muted disabled:opacity-50"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
-                  {portalLoading ? 'Loading...' : 'Manage plan'}
+                  {portalLoading ? 'Loading...' : 'Manage Plan'}
                 </button>
               )}
               {plan === 'free' && (
@@ -85,7 +85,7 @@ export function BillingClient() {
                   href="/pricing"
                   className="rounded-md bg-primary px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                 >
-                  Upgrade plan
+                  Upgrade Plan
                 </Link>
               )}
             </div>
