@@ -43,6 +43,12 @@ export const test = base.extend<TestFixtures>({
 
     testUser.id = createdUser.user.id;
 
+    // Mark onboarding as completed so tests aren't redirected to /onboarding
+    await adminSupabase
+      .from('profiles')
+      .update({ onboarding_completed_at: new Date().toISOString() })
+      .eq('id', testUser.id);
+
     await page.goto('/signin');
     await page.getByLabel(/email/i).fill(testUser.email);
     await page.getByLabel(/password/i).fill(testUser.password);
