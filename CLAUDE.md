@@ -54,7 +54,7 @@ supabase/
 - **Code Editor**: Monaco Editor
 - **AI**: Anthropic SDK, Google Generative AI, MCP SDK
 - **Testing**: Jest (unit) + Playwright (E2E)
-- **Deploy**: Cloudflare Workers via OpenNext (`@opennextjs/cloudflare`, `wrangler.jsonc`)
+- **Deploy**: Vercel (via `vercel` CLI in CI)
 - **Docs**: Fumadocs v16 (`fumadocs-core`, `fumadocs-ui`, `fumadocs-mdx`) — no Tailwind, uses `--color-fd-*` CSS vars for theming
 
 ## Architecture
@@ -108,24 +108,15 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 
 ## GitHub Secrets & Variables
 
-14 secrets: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `CODECOV_TOKEN`, `NEXT_PUBLIC_BASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_PRICE_ID`, `STRIPE_TEAM_PRICE_ID`, `NEXT_PUBLIC_SENTRY_DSN`
-3 variables: `CLOUDFLARE_DEPLOY_ENABLED=true`, `NEXT_PUBLIC_ENABLE_STRIPE_BILLING=true`, `NEXT_PUBLIC_ENABLE_USAGE_LIMITS=true`
+17 secrets: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `CODECOV_TOKEN`, `NEXT_PUBLIC_BASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_PRICE_ID`, `STRIPE_TEAM_PRICE_ID`, `NEXT_PUBLIC_SENTRY_DSN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
+3 variables: `NEXT_PUBLIC_ENABLE_STRIPE_BILLING=true`, `NEXT_PUBLIC_ENABLE_USAGE_LIMITS=true`, `NEXT_PUBLIC_ENABLE_ONBOARDING=true`
 
 ## Deployment Gotchas
 - **PostToolUse hooks**: Edit/Write tools get reverted AND branches get switched — use python3 via Bash for file writes
 - **apps/docs type errors**: Fumadocs `.source/server` not generated until build — blocks all pre-commit hooks. Use `HUSKY=0` for non-code commits
 - **apps/docs NODE_ENV**: Must use `NODE_ENV=production next build` — shell `NODE_ENV=development` causes `useMemo`/`useContext` null errors during SSR prerendering
-
-- **Workers free tier**: 3 MiB (3072 KiB) gzipped limit. Current bundle: ~3019 KiB
-- **@vercel/og stub required**: WASM (~1.4 MiB) + JS wrapper (~720 KiB / 158 KiB gzip) bundled by Next.js via `next/dist/compiled/` even when unused — both stubbed before build in CI and `scripts/deploy.sh`
-- **No `export const runtime`** in API routes — OpenNext handles runtime automatically
-- **middleware.ts not proxy.ts**: Next.js 16 proxy.ts is Node.js-only; OpenNext needs `middleware.ts` with `runtime = 'experimental-edge'`
-- **No `setInterval`** in Workers — rate limiter uses bounded lazy cleanup
-- **`_redirects` causes infinite loop** — deleted automatically at deploy time
+- **Vercel deploy**: Push to `main` triggers `deploy-web.yml` → `vercel build --prod` → `vercel deploy --prebuilt --prod`
 - **Turbopack is default** in Next.js 16 — add `turbopack: {}` to next.config.js if using webpack config
-- **Build command**: `cd apps/web && npx opennextjs-cloudflare build`
-- **Deploy command**: `cd apps/web && ./scripts/deploy.sh`
-- **Dev deploy**: Push to `dev` branch → auto-deploys to `dev.forgespace.co` via `--env dev`
 
 ## Documentation Governance
 - NEVER create task-specific docs in repo root or docs/ (e.g., *_COMPLETE.md, *_SUMMARY.md, STATUS_*.md, PHASE*.md, *_REPORT.md, *_CHECKLIST.md)

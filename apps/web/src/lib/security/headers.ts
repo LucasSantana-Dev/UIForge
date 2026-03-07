@@ -6,15 +6,16 @@ const ALLOWED_CONNECT_DOMAINS = [
   'https://ingest.sentry.io',
   'https://js.stripe.com',
   'https://api.stripe.com',
+  'https://cdn.jsdelivr.net',
 ];
 
 function buildCSP(): string {
   const directives = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://js.stripe.com https://cdn.jsdelivr.net",
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://unpkg.com https://static.cloudflareinsights.com",
+    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.tailwindcss.com https://fonts.googleapis.com",
     "img-src 'self' data: blob: https://*.supabase.co",
-    "font-src 'self' data: https://cdn.jsdelivr.net",
+    "font-src 'self' data: https://cdn.jsdelivr.net https://fonts.gstatic.com",
     'connect-src ' + ALLOWED_CONNECT_DOMAINS.join(' '),
     "worker-src 'self' blob:",
     "frame-src 'self' https://js.stripe.com",

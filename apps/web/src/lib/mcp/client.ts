@@ -1,4 +1,4 @@
-import type { GenerationEvent } from '@/lib/services/gemini';
+import type { GenerationEvent } from '@/lib/services/generation-types';
 import type {
   McpGatewayConfig,
   McpToolDefinition,

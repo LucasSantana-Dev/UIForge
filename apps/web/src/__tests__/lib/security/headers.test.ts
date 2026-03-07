@@ -52,6 +52,24 @@ describe('securityHeaders', () => {
     expect(headers['Content-Security-Policy']).toContain("worker-src 'self' blob:");
   });
 
+  it('CSP allows LivePreview CDNs for Babel and Tailwind', () => {
+    const headers = securityHeaders();
+    const csp = headers['Content-Security-Policy'];
+    expect(csp).toMatch(/script-src[^;]*https:\/\/cdn\.tailwindcss\.com/);
+    expect(csp).toMatch(/script-src[^;]*https:\/\/unpkg\.com/);
+    expect(csp).toMatch(/script-src[^;]*'unsafe-eval'/);
+    expect(csp).toMatch(/style-src[^;]*https:\/\/cdn\.tailwindcss\.com/);
+  });
+
+  it('CSP allows Google Fonts and Cloudflare Insights', () => {
+    const headers = securityHeaders();
+    const csp = headers['Content-Security-Policy'];
+    expect(csp).toMatch(/script-src[^;]*https:\/\/static\.cloudflareinsights\.com/);
+    expect(csp).toMatch(/style-src[^;]*https:\/\/fonts\.googleapis\.com/);
+    expect(csp).toMatch(/font-src[^;]*https:\/\/fonts\.gstatic\.com/);
+    expect(csp).toMatch(/connect-src[^;]*https:\/\/cdn\.jsdelivr\.net/);
+  });
+
   it('CSP denies frame-ancestors', () => {
     const headers = securityHeaders();
     expect(headers['Content-Security-Policy']).toContain("frame-ancestors 'none'");

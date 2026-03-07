@@ -6,6 +6,12 @@ export interface SizaRoutingResult {
   reason: 'default' | 'vision' | 'quality' | 'free-tier' | 'quota-fallback';
 }
 
+function getDefaultProvider(): { provider: AIProvider; model: string } {
+  const provider = (process.env.DEFAULT_GENERATION_PROVIDER as AIProvider) || 'google';
+  const model = process.env.DEFAULT_GENERATION_MODEL || 'gemini-2.5-flash';
+  return { provider, model };
+}
+
 const COMPLEXITY_KEYWORDS = [
   'state management',
   'animation',
@@ -44,12 +50,14 @@ export function routeSizaGeneration(params: {
   hasImage: boolean;
   isFreeTier: boolean;
 }): SizaRoutingResult {
+  const defaults = getDefaultProvider();
+
   if (params.hasImage) {
-    return { provider: 'google', model: 'gemini-2.5-flash', reason: 'vision' };
+    return { provider: defaults.provider, model: defaults.model, reason: 'vision' };
   }
 
   if (params.isFreeTier) {
-    return { provider: 'google', model: 'gemini-2.5-flash', reason: 'free-tier' };
+    return { provider: defaults.provider, model: defaults.model, reason: 'free-tier' };
   }
 
   const complexity = analyzePromptComplexity(params.prompt);
@@ -61,11 +69,13 @@ export function routeSizaGeneration(params: {
     };
   }
 
-  return { provider: 'google', model: 'gemini-2.5-flash', reason: 'default' };
+  return { provider: defaults.provider, model: defaults.model, reason: 'default' };
 }
 
 export function getQuotaFallback(currentProvider: AIProvider): SizaRoutingResult | null {
-  if (currentProvider === 'google') {
+  const defaults = getDefaultProvider();
+
+  if (currentProvider === defaults.provider || currentProvider === 'google') {
     if (process.env.ANTHROPIC_API_KEY) {
       return {
         provider: 'anthropic',
@@ -75,5 +85,5 @@ export function getQuotaFallback(currentProvider: AIProvider): SizaRoutingResult
     }
     return null;
   }
-  return { provider: 'google', model: 'gemini-2.5-flash', reason: 'quota-fallback' };
+  return { provider: defaults.provider, model: defaults.model, reason: 'quota-fallback' };
 }

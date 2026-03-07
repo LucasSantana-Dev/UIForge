@@ -803,11 +803,12 @@ export default function LivePreview({ code, framework }: LivePreviewProps) {
             <iframe
               key={refreshKey}
               srcDoc={previewHTML}
-              className="h-full border-0 bg-surface-1 transition-all duration-200"
+              className="h-full border-0 transition-all duration-200"
               style={{
                 width: VIEWPORT_WIDTHS[viewport],
                 maxWidth: '100%',
                 boxShadow: viewport !== 'desktop' ? '0 0 0 1px rgba(0,0,0,0.1)' : undefined,
+                backgroundColor: 'hsl(224, 71%, 4%)',
               }}
               sandbox="allow-scripts"
               title="Component Preview"

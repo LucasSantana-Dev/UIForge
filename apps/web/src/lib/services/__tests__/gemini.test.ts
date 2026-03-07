@@ -1,4 +1,4 @@
-import { generateComponentStream, GeminiGenerateOptions } from '../gemini';
+import { generateWithProvider, type MultiProviderOptions } from '../generation';
 
 const mockGenerateContentStream = jest.fn();
 
@@ -10,7 +10,9 @@ jest.mock('@google/generative-ai', () => ({
   })),
 }));
 
-const baseOptions: GeminiGenerateOptions = {
+const baseOptions: MultiProviderOptions = {
+  provider: 'google',
+  model: 'gemini-2.5-flash',
   prompt: 'Create a button component',
   framework: 'react',
   componentLibrary: 'tailwind',
@@ -18,7 +20,7 @@ const baseOptions: GeminiGenerateOptions = {
   apiKey: 'test-api-key',
 };
 
-describe('generateComponentStream', () => {
+describe('generateWithProvider (google)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -33,7 +35,7 @@ describe('generateComponentStream', () => {
     });
 
     const events = [];
-    for await (const event of generateComponentStream(baseOptions)) {
+    for await (const event of generateWithProvider(baseOptions)) {
       events.push(event);
     }
 
@@ -56,7 +58,7 @@ describe('generateComponentStream', () => {
 
   it('yields error when no API key provided', async () => {
     const events = [];
-    for await (const event of generateComponentStream({
+    for await (const event of generateWithProvider({
       ...baseOptions,
       apiKey: undefined,
     })) {
@@ -72,14 +74,14 @@ describe('generateComponentStream', () => {
     mockGenerateContentStream.mockRejectedValue(new Error('quota exceeded'));
 
     const events = [];
-    for await (const event of generateComponentStream(baseOptions)) {
+    for await (const event of generateWithProvider(baseOptions)) {
       events.push(event);
     }
 
     expect(events[0].type).toBe('start');
     expect(events[1]).toMatchObject({
       type: 'error',
-      message: 'Gemini generation failed: quota exceeded',
+      message: 'Google generation failed: quota exceeded',
     });
   });
 
@@ -93,7 +95,7 @@ describe('generateComponentStream', () => {
     });
 
     const events = [];
-    for await (const event of generateComponentStream(baseOptions)) {
+    for await (const event of generateWithProvider(baseOptions)) {
       events.push(event);
     }
 
@@ -111,7 +113,7 @@ describe('generateComponentStream', () => {
     });
 
     const events = [];
-    for await (const event of generateComponentStream({
+    for await (const event of generateWithProvider({
       ...baseOptions,
       apiKey: 'user-byok-key',
     })) {
@@ -129,7 +131,7 @@ describe('generateComponentStream', () => {
     });
 
     const events = [];
-    for await (const event of generateComponentStream(baseOptions)) {
+    for await (const event of generateWithProvider(baseOptions)) {
       events.push(event);
     }
 

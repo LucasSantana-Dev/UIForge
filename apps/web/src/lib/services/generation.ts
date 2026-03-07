@@ -1,5 +1,8 @@
-import { AIProvider } from '@/lib/encryption';
-import { GenerationEvent, generateComponentStream } from './gemini';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import type { AIProvider } from '@/lib/encryption';
+import type { GenerationEvent, GenerateStreamOptions } from './generation-types';
+
+export type { GenerationEvent, GenerateStreamOptions };
 
 const SYSTEM_PROMPT = `You are a UI component generator. Generate a single, self-contained React component.
 
@@ -11,26 +14,12 @@ Rules:
 - Do not include any explanation, markdown, or code fences — output ONLY the code
 - Do not wrap the code in backticks or any formatting`;
 
-export interface MultiProviderOptions {
+export interface MultiProviderOptions extends GenerateStreamOptions {
   provider: AIProvider;
   model: string;
-  prompt: string;
-  framework: string;
-  componentLibrary?: string;
-  style?: string;
-  typescript?: boolean;
-  apiKey?: string;
-  contextAddition?: string;
-  imageBase64?: string;
-  imageMimeType?: string;
-  conversationContext?: {
-    previousCode: string;
-    refinementPrompt: string;
-    originalPrompt: string;
-  };
 }
 
-function buildPrompt(options: MultiProviderOptions): string {
+function buildPrompt(options: GenerateStreamOptions): string {
   const parts = [`Generate a ${options.framework} component:`, options.prompt];
   if (options.componentLibrary && options.componentLibrary !== 'none') {
     parts.push(`Use ${options.componentLibrary} for styling.`);
@@ -76,17 +65,7 @@ export async function* generateWithProvider(
 
   switch (provider) {
     case 'google':
-      yield* generateComponentStream({
-        prompt: options.prompt,
-        framework: options.framework,
-        componentLibrary: options.componentLibrary,
-        style: options.style,
-        typescript: options.typescript,
-        apiKey: options.apiKey,
-        contextAddition: options.contextAddition,
-        imageBase64: options.imageBase64,
-        imageMimeType: options.imageMimeType,
-      });
+      yield* generateWithGoogle(options);
       break;
     case 'openai':
       yield* generateWithOpenAI(options);
@@ -97,9 +76,69 @@ export async function* generateWithProvider(
     default:
       yield {
         type: 'error',
-        message: `Unsupported provider "${provider}". Supported providers: Google, OpenAI, Anthropic.`,
+        message: `Unsupported provider "${provider}". Supported: Google, OpenAI, Anthropic.`,
         timestamp: Date.now(),
       };
+  }
+}
+
+async function* generateWithGoogle(
+  options: GenerateStreamOptions
+): AsyncGenerator<GenerationEvent> {
+  const apiKey = options.apiKey || process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    yield {
+      type: 'error',
+      message: 'Google API key is required. Set GEMINI_API_KEY or provide your own key.',
+      timestamp: Date.now(),
+    };
+    return;
+  }
+
+  yield { type: 'start', timestamp: Date.now() };
+
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const systemPrompt = getSystemPrompt(options.contextAddition);
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-2.5-flash',
+      systemInstruction: systemPrompt,
+    });
+
+    const userPrompt = buildPrompt(options);
+
+    const content =
+      options.imageBase64 && options.imageMimeType
+        ? [
+            { text: userPrompt },
+            {
+              inlineData: {
+                mimeType: options.imageMimeType,
+                data: options.imageBase64,
+              },
+            },
+          ]
+        : userPrompt;
+
+    const result = await model.generateContentStream(content);
+
+    for await (const chunk of result.stream) {
+      const text = chunk.text();
+      if (text) {
+        yield { type: 'chunk', content: text, timestamp: Date.now() };
+      }
+    }
+
+    yield { type: 'complete', timestamp: Date.now() };
+  } catch (error) {
+    const detail =
+      error instanceof Error ? error.message : 'Please try again or use a different provider.';
+    yield {
+      type: 'error',
+      message: `Google generation failed: ${detail}`,
+      timestamp: Date.now(),
+    };
   }
 }
 

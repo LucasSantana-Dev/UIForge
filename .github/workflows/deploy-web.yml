@@ -1,8 +1,8 @@
-name: Deploy Web to Cloudflare Workers
+name: Deploy Web to Vercel
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -13,7 +13,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     name: Deploy
-    if: ${{ vars.CLOUDFLARE_DEPLOY_ENABLED == 'true' }}
     permissions:
       contents: read
       deployments: write
@@ -26,42 +25,33 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - run: npm ci --legacy-peer-deps
+      - run: npm install -g vercel@latest
 
-      - name: Stub unused @vercel/og before build
-        run: |
-          OG_DIR="node_modules/next/dist/compiled/@vercel/og"
-          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > "$OG_DIR/resvg.wasm"
-          printf '\x00\x61\x73\x6d\x01\x00\x00\x00' > "$OG_DIR/yoga.wasm"
-          echo 'module.exports={ImageResponse:class ImageResponse{constructor(){throw new Error("@vercel/og stubbed out")}}}' > "$OG_DIR/index.edge.js"
-          echo 'module.exports={ImageResponse:class ImageResponse{constructor(){throw new Error("@vercel/og stubbed out")}}}' > "$OG_DIR/index.node.js"
-
-      - name: Build with OpenNext
-        working-directory: apps/web
-        run: npx opennextjs-cloudflare build
+      - name: Pull Vercel environment
+        run: vercel pull --yes --environment=production --token="${VERCEL_TOKEN}"
         env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Build
+        run: vercel build --prod --token="${VERCEL_TOKEN}"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_BASE_URL: ${{ github.ref == 'refs/heads/dev' && 'https://dev.forgespace.co' || secrets.NEXT_PUBLIC_BASE_URL }}
+          NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
           NEXT_PUBLIC_ENABLE_STRIPE_BILLING: ${{ vars.NEXT_PUBLIC_ENABLE_STRIPE_BILLING }}
           NEXT_PUBLIC_ENABLE_USAGE_LIMITS: ${{ vars.NEXT_PUBLIC_ENABLE_USAGE_LIMITS }}
           NEXT_PUBLIC_ENABLE_ONBOARDING: ${{ vars.NEXT_PUBLIC_ENABLE_ONBOARDING }}
           NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
-          IS_DEV_DEPLOY: ${{ github.ref == 'refs/heads/dev' && 'true' || 'false' }}
 
-      - name: Post-build cleanup for Workers size limit
-        run: |
-          rm -f apps/web/.open-next/assets/_redirects 2>/dev/null || true
-          find apps/web/.open-next -name "*.wasm" -size +100k -exec sh -c 'printf "\x00\x61\x73\x6d\x01\x00\x00\x00" > "$1"' _ {} \;
-          echo "Worker size after cleanup:"
-          du -sh apps/web/.open-next/worker.js 2>/dev/null || true
-          gzip -c apps/web/.open-next/worker.js 2>/dev/null | wc -c | awk '{printf "Gzipped: %.1f KiB\n", $1/1024}'
-
-      - name: Deploy to Cloudflare Workers
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: apps/web
-          command: deploy --keep-vars ${{ github.ref == 'refs/heads/dev' && '--env dev' || '' }}
+      - name: Deploy to Vercel
+        run: vercel deploy --prebuilt --prod --token="${VERCEL_TOKEN}"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}

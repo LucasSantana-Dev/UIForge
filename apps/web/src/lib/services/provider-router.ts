@@ -1,7 +1,6 @@
 import type { AIProvider } from '@/lib/encryption';
 import { routeSizaGeneration, getQuotaFallback } from './siza-router';
-import type { GenerationEvent } from './gemini';
-import { generateComponentStream } from './gemini';
+import type { GenerationEvent } from './generation-types';
 import { generateWithProvider } from './generation';
 import { generateComponentStream as mcpStream } from '@/lib/mcp/client';
 import { captureServerError } from '@/lib/sentry/server';
@@ -130,18 +129,23 @@ async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<Genera
   } catch (mcpError) {
     captureServerError(mcpError, {
       route: '/api/generate',
-      extra: { fallback: 'mcp-to-gemini' },
+      extra: { fallback: 'mcp-to-default' },
     });
   }
 
   if (!hasOutput) {
+    const fallbackProvider = (process.env.DEFAULT_GENERATION_PROVIDER as AIProvider) || 'google';
+    const fallbackModel = process.env.DEFAULT_GENERATION_MODEL || 'gemini-2.5-flash';
+
     yield {
       type: 'fallback',
-      provider: 'gemini',
-      message: 'MCP gateway unavailable, falling back to Gemini',
+      provider: fallbackProvider,
+      message: `MCP gateway unavailable, falling back to ${fallbackProvider}`,
       timestamp: Date.now(),
     };
-    for await (const event of generateComponentStream({
+    for await (const event of generateWithProvider({
+      provider: fallbackProvider,
+      model: fallbackModel,
       prompt: opts.prompt,
       framework: opts.framework,
       componentLibrary: opts.componentLibrary,

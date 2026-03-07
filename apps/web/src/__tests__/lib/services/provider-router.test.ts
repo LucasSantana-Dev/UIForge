@@ -1,5 +1,5 @@
 import { routeGeneration, type RouteGenerationOptions } from '@/lib/services/provider-router';
-import type { GenerationEvent } from '@/lib/services/gemini';
+import type { GenerationEvent } from '@/lib/services/generation-types';
 
 jest.mock('@/lib/services/siza-router', () => ({
   routeSizaGeneration: jest.fn().mockReturnValue({
@@ -8,10 +8,6 @@ jest.mock('@/lib/services/siza-router', () => ({
     reason: 'default',
   }),
   getQuotaFallback: jest.fn().mockReturnValue(null),
-}));
-
-jest.mock('@/lib/services/gemini', () => ({
-  generateComponentStream: jest.fn(),
 }));
 
 jest.mock('@/lib/services/generation', () => ({
@@ -77,16 +73,16 @@ describe('routeGeneration', () => {
       expect(events.some((e) => e.type === 'chunk')).toBe(true);
     });
 
-    it('yields fallback event and falls back to Gemini on MCP failure', async () => {
+    it('yields fallback event on MCP failure and falls back to default provider', async () => {
       const { generateComponentStream: mcpStream } = require('@/lib/mcp/client');
-      const { generateComponentStream: geminiStream } = require('@/lib/services/gemini');
+      const { generateWithProvider } = require('@/lib/services/generation');
       const { captureServerError } = require('@/lib/sentry/server');
 
       // eslint-disable-next-line require-yield
       mcpStream.mockImplementation(async function* () {
         throw new Error('Gateway down');
       });
-      geminiStream.mockImplementation(async function* () {
+      generateWithProvider.mockImplementation(async function* () {
         yield { type: 'start', timestamp: 10 };
         yield { type: 'chunk', content: 'fallback-code', timestamp: 11 };
       });
@@ -98,7 +94,6 @@ describe('routeGeneration', () => {
       expect(captureServerError).toHaveBeenCalled();
       const fallbackEvent = events.find((e) => e.type === 'fallback');
       expect(fallbackEvent).toBeDefined();
-      expect(fallbackEvent!.provider).toBe('gemini');
       expect(events.some((e) => e.type === 'chunk' && e.content === 'fallback-code')).toBe(true);
     });
 

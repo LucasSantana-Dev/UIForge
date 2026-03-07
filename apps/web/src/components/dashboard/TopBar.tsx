@@ -1,13 +1,13 @@
 'use client';
 
 import type { User } from '@supabase/supabase-js';
-import { MenuIcon, SearchIcon, ChevronRightIcon, BellIcon } from 'lucide-react';
+import { MenuIcon, SearchIcon, ChevronRightIcon, BellIcon, InboxIcon } from 'lucide-react';
 import Link from 'next/link';
 import UserMenu from './UserMenu';
 import MobileNav from './MobileNav';
 import { usePageMeta } from '@/hooks/use-page-meta';
 import { useUIStore } from '@/stores/ui-store';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface TopBarProps {
   user: User;
@@ -16,8 +16,22 @@ interface TopBarProps {
 
 export default function TopBar({ user, isAdmin }: TopBarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const notificationsRef = useRef<HTMLDivElement>(null);
   const { title, icon: PageIcon, breadcrumbs } = usePageMeta(isAdmin);
   const setCommandPaletteOpen = useUIStore((s) => s.setCommandPaletteOpen);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (notificationsRef.current && !notificationsRef.current.contains(e.target as Node)) {
+        setNotificationsOpen(false);
+      }
+    }
+    if (notificationsOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [notificationsOpen]);
 
   return (
     <>
@@ -71,14 +85,32 @@ export default function TopBar({ user, isAdmin }: TopBarProps) {
               <h2 className="md:hidden text-base font-semibold text-foreground">{title}</h2>
             </div>
             <div className="flex items-center gap-2">
-              <button
-                type="button"
-                className="relative rounded-md p-2 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
-                aria-label="Notifications"
-              >
-                <BellIcon className="h-4 w-4" />
-                <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-primary ring-2 ring-background" />
-              </button>
+              <div className="relative" ref={notificationsRef}>
+                <button
+                  type="button"
+                  className="relative rounded-md p-2 text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
+                  aria-label="Notifications"
+                  aria-expanded={notificationsOpen}
+                  onClick={() => setNotificationsOpen((o) => !o)}
+                >
+                  <BellIcon className="h-4 w-4" />
+                </button>
+                {notificationsOpen && (
+                  <div className="absolute right-0 top-full mt-2 w-80 rounded-lg border border-surface-3 bg-surface-0 shadow-xl z-50">
+                    <div className="flex items-center justify-between px-4 py-3 border-b border-surface-3">
+                      <h3 className="text-sm font-medium text-text-primary">Notifications</h3>
+                      <span className="text-xs text-text-muted">0 unread</span>
+                    </div>
+                    <div className="flex flex-col items-center justify-center py-10 px-4">
+                      <InboxIcon className="h-8 w-8 text-text-muted mb-2" />
+                      <p className="text-sm text-text-secondary">No notifications yet</p>
+                      <p className="text-xs text-text-muted mt-1">
+                        Build events, CI results, and team activity will appear here.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
               <UserMenu user={user} />
             </div>
           </div>
