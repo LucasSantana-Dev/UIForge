@@ -1,0 +1,19 @@
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: siza
+  description: Open-source Internal Developer Platform — AI code generation with governance
+  tags:
+    - nextjs
+    - typescript
+    - idp
+    - supabase
+  links:
+    - url: https://siza.forgespace.co
+      title: Live App
+    - url: https://forgespace.co
+      title: Marketing Site
+spec:
+  owner: forge-space
+  domain: forge-platform
+  lifecycle: production

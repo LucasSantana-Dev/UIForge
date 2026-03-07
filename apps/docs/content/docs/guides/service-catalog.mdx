@@ -1,0 +1,172 @@
+---
+title: Service Catalog
+description: Browse and manage your software entities in Siza's IDP service catalog.
+icon: Package
+---
+
+## Overview
+
+The Service Catalog is Siza's central registry for all software entities in your organization. Inspired by Backstage, it provides a unified view of domains, systems, services, components, APIs, libraries, and websites.
+
+Think of it as a living map of your software landscape — making it easy to discover what exists, understand dependencies, and maintain ownership.
+
+## Entity Types
+
+The catalog supports 7 entity types organized in a logical hierarchy:
+
+| Type      | Description                                      | Example                    |
+| --------- | ------------------------------------------------ | -------------------------- |
+| Domain    | High-level business area or product             | "Payments", "Authentication" |
+| System    | Group of related services/components            | "Payment Processing System" |
+| Service   | Independently deployable backend service        | "Stripe Integration API"   |
+| Component | Frontend component or shared module             | "CheckoutForm"             |
+| API       | API definition (REST, GraphQL, gRPC)            | "Payments REST API v2"     |
+| Library   | Shared code package or SDK                      | "@forgespace/core"         |
+| Website   | Static site or documentation                    | "brand.forgespace.co"      |
+
+### Entity Hierarchy
+
+Entities can reference parents to model relationships:
+
+```
+Domain: Payments
+  └─ System: Payment Processing
+       ├─ Service: Stripe Integration
+       │    └─ API: Stripe REST API
+       └─ Component: PaymentForm
+```
+
+## Browsing the Catalog
+
+### Grid and List Views
+
+The catalog UI offers two visualization modes:
+
+- **Grid view**: Card-based layout showing entity name, type, lifecycle, and description
+- **List view**: Compact table format for scanning many entities
+
+Toggle views using the buttons in the top-right corner.
+
+### Filtering
+
+Filter entities by:
+
+- **Type**: Show only services, components, APIs, etc.
+- **Lifecycle**: Filter by production, experimental, or deprecated
+- **Tags**: Custom labels like "backend", "frontend", "ml"
+- **Owner**: Filter by team or individual
+
+### Dependency Graph
+
+Click the "View Graph" button to visualize entity dependencies. The graph shows:
+
+- **Nodes**: Colored by entity type
+- **Edges**: Dependencies declared in `dependsOn`
+- **Clusters**: Grouping by system or domain
+
+Hover over nodes to see details, click to navigate to the entity page.
+
+### Dashboard Stats Card
+
+The dashboard shows catalog metrics:
+
+- **Total entities**: Count of all registered items
+- **By type**: Breakdown across 7 entity types
+- **Recent additions**: Entities added in the last 7 days
+- **Ownership coverage**: Percentage of entities with assigned owners
+
+## Feature Flag
+
+The Service Catalog is gated by the `ENABLE_SOFTWARE_CATALOG` feature flag. Enable it in your environment:
+
+```bash
+# .env.local
+NEXT_PUBLIC_ENABLE_SOFTWARE_CATALOG=true
+```
+
+Or toggle it in the database via the feature flags admin panel.
+
+## API Endpoints
+
+### List Entities
+
+```typescript
+GET /api/catalog
+
+Response:
+{
+  "entities": [
+    {
+      "id": "abc123",
+      "name": "checkout-form",
+      "kind": "component",
+      "lifecycle": "production",
+      "owner": "payments-team",
+      "description": "User-facing payment checkout component",
+      "tags": ["frontend", "payments"],
+      "dependsOn": ["stripe-integration"],
+      "system": "payment-processing"
+    }
+  ]
+}
+```
+
+### Create Entity
+
+```typescript
+POST /api/catalog
+Content-Type: application/json
+
+{
+  "name": "auth-service",
+  "kind": "service",
+  "lifecycle": "production",
+  "owner": "platform-team",
+  "description": "OAuth 2.0 authentication service",
+  "tags": ["backend", "security"],
+  "dependsOn": ["user-db", "redis-cache"]
+}
+```
+
+### Dependency Graph
+
+```typescript
+GET /api/catalog/graph
+
+Response:
+{
+  "nodes": [
+    { "id": "abc123", "name": "checkout-form", "type": "component" }
+  ],
+  "edges": [
+    { "from": "abc123", "to": "def456" }
+  ]
+}
+```
+
+### Catalog Stats
+
+```typescript
+GET /api/catalog/stats
+
+Response:
+{
+  "total": 127,
+  "byType": {
+    "component": 45,
+    "service": 32,
+    "api": 18,
+    "library": 12,
+    "system": 9,
+    "domain": 6,
+    "website": 5
+  },
+  "recentCount": 8,
+  "ownershipCoverage": 94.5
+}
+```
+
+## Next Steps
+
+- **[Golden Path Templates](/docs/guides/golden-path-templates)** — Scaffold new entities with pre-configured templates
+- **[catalog-info.yaml Reference](/docs/guides/catalog-info-yaml)** — Import entities from Backstage YAML files

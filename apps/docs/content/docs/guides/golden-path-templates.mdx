@@ -1,0 +1,241 @@
+---
+title: Golden Path Templates
+description: Scaffold standardized projects with Siza's pre-configured templates.
+icon: Sparkles
+---
+
+## Overview
+
+Golden Path Templates provide standardized project scaffolding for common use cases. Instead of starting from scratch, teams can use battle-tested templates that follow organizational best practices.
+
+Inspired by Backstage's Scaffolder, Siza templates generate complete project structures — complete with dependencies, configuration, tests, and CI/CD pipelines.
+
+## Built-In Templates
+
+Siza ships with 5 production-ready templates:
+
+### 1. Next.js App
+
+**Framework**: Next.js 15 (App Router)  
+**Includes**: TypeScript, Tailwind CSS, ESLint, Prettier, Supabase auth, Radix UI components  
+**Use case**: Full-stack web applications with authentication
+
+### 2. MCP Server
+
+**Framework**: TypeScript (Node.js)  
+**Includes**: MCP SDK, stdio transport, tool handlers, Jest tests  
+**Use case**: Custom Model Context Protocol servers for Claude
+
+### 3. React Library
+
+**Framework**: React + TypeScript  
+**Includes**: tsup bundler, dual CJS/ESM exports, Storybook, Vitest  
+**Use case**: Shared component libraries for monorepos
+
+### 4. Python API
+
+**Framework**: FastAPI  
+**Includes**: Uvicorn, Pydantic models, pytest, ruff linting, Docker config  
+**Use case**: RESTful APIs and microservices
+
+### 5. Cloudflare Worker
+
+**Framework**: Hono + TypeScript  
+**Includes**: Wrangler, D1 database bindings, Miniflare dev server, Vitest  
+**Use case**: Edge functions and serverless APIs
+
+## Template Structure
+
+Each template has the following metadata:
+
+```typescript
+{
+  name: "next-app",
+  description: "Next.js App Router with Supabase auth",
+  framework: "nextjs",
+  includes_auth: true,
+  includes_database: true,
+  includes_testing: true,
+  includes_cicd: true,
+  is_official: true
+}
+```
+
+### Template Fields
+
+| Field              | Description                                    |
+| ------------------ | ---------------------------------------------- |
+| `name`             | Unique template identifier (kebab-case)        |
+| `description`      | Short summary of what the template provides   |
+| `framework`        | Primary framework (nextjs, fastapi, react, etc.) |
+| `includes_auth`    | Whether authentication is pre-configured       |
+| `includes_database`| Whether database migrations are included       |
+| `includes_testing` | Whether test setup and examples exist          |
+| `includes_cicd`    | Whether GitHub Actions workflows are included  |
+| `is_official`      | Maintained by Forge Space team                 |
+
+## Using Templates
+
+### Web App
+
+1. Navigate to `/golden-paths` in the Siza dashboard
+2. Browse available templates (grid or list view)
+3. Click "Use Template" on your desired template
+4. Fill in project details:
+   - Project name
+   - Description
+   - Repository name (optional)
+   - Additional options (database type, auth provider, etc.)
+5. Click "Scaffold Project"
+
+The generated project will be created in your workspace with all files and configuration ready to run.
+
+### API
+
+```typescript
+POST /api/golden-paths/scaffold
+Content-Type: application/json
+
+{
+  "templateId": "next-app",
+  "projectName": "my-saas-app",
+  "options": {
+    "auth": "supabase",
+    "database": "postgres",
+    "styling": "tailwind"
+  }
+}
+
+Response:
+{
+  "projectId": "proj_abc123",
+  "files": [
+    { "path": "package.json", "content": "..." },
+    { "path": "app/page.tsx", "content": "..." }
+  ],
+  "catalogEntity": {
+    "name": "my-saas-app",
+    "kind": "component",
+    "lifecycle": "experimental"
+  }
+}
+```
+
+## Creating Custom Templates
+
+Custom templates can be added via the API:
+
+```typescript
+POST /api/golden-paths
+Content-Type: application/json
+
+{
+  "name": "django-api",
+  "description": "Django REST Framework API with PostgreSQL",
+  "framework": "django",
+  "includes_auth": true,
+  "includes_database": true,
+  "includes_testing": true,
+  "includes_cicd": false,
+  "is_official": false,
+  "files": [
+    {
+      "path": "requirements.txt",
+      "content": "django==5.0\ndjango-rest-framework==3.14"
+    },
+    {
+      "path": "manage.py",
+      "content": "#!/usr/bin/env python..."
+    }
+  ]
+}
+```
+
+## Backstage Integration
+
+Scaffolded projects include a `catalog-info.yaml` file for Backstage compatibility:
+
+```yaml
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: my-saas-app
+  description: Full-stack SaaS application
+  tags:
+    - nextjs
+    - typescript
+    - saas
+spec:
+  type: website
+  lifecycle: experimental
+  owner: platform-team
+  dependsOn:
+    - component:auth-service
+    - resource:postgres-db
+```
+
+This file can be imported into Backstage or Siza's Service Catalog via:
+
+```typescript
+POST /api/catalog/import
+Content-Type: application/json
+
+{
+  "yaml": "...",  // catalog-info.yaml content
+  "source": "golden-paths"
+}
+```
+
+## Feature Flags
+
+Golden Path Templates require two flags:
+
+```bash
+# Enable browsing templates
+NEXT_PUBLIC_ENABLE_GOLDEN_PATHS=true
+
+# Enable creating custom templates
+NEXT_PUBLIC_ENABLE_GOLDEN_PATHS_CREATE=true
+```
+
+## API Reference
+
+### List Templates
+
+```typescript
+GET /api/golden-paths
+
+Response:
+{
+  "templates": [
+    {
+      "id": "tpl_abc123",
+      "name": "next-app",
+      "description": "Next.js App Router with Supabase auth",
+      "framework": "nextjs",
+      "is_official": true
+    }
+  ]
+}
+```
+
+### Scaffold Project
+
+```typescript
+POST /api/golden-paths/scaffold
+```
+
+See usage example above.
+
+### Create Template
+
+```typescript
+POST /api/golden-paths
+```
+
+See custom template example above.
+
+## Next Steps
+
+- **[Service Catalog](/docs/guides/service-catalog)** — View all scaffolded entities
+- **[catalog-info.yaml Reference](/docs/guides/catalog-info-yaml)** — Customize entity metadata
