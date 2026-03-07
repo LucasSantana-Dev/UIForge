@@ -1,5 +1,10 @@
 import { verifyAdmin } from '@/lib/api/admin';
 
+jest.mock('@/lib/auth/local-auth-bypass', () => ({
+  isLocalAuthBypassEnabled: () => false,
+  getLocalAuthBypassUser: jest.fn(),
+}));
+
 describe('verifyAdmin', () => {
   it('returns null when no authenticated user is present', async () => {
     const supabase = {
