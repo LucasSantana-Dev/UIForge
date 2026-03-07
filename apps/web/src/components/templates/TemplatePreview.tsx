@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -23,23 +23,6 @@ export function TemplatePreview({
 }: TemplatePreviewProps) {
   const [showCode, setShowCode] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [highlightedHtml, setHighlightedHtml] = useState('');
-
-  useEffect(() => {
-    if (!template?.code) return;
-    let cancelled = false;
-    import('shiki').then(({ codeToHtml }) => {
-      codeToHtml(template.code!, {
-        lang: 'tsx',
-        theme: 'rose-pine-moon',
-      }).then((html) => {
-        if (!cancelled) setHighlightedHtml(html);
-      });
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [template?.code]);
 
   if (!template) return null;
 
@@ -166,18 +149,11 @@ export function TemplatePreview({
                     </Button>
                   </div>
                   <div className="bg-[#232136] p-4 rounded-b-lg">
-                    {highlightedHtml ? (
-                      <div
-                        className="text-xs overflow-x-auto [&_pre]:!bg-transparent [&_pre]:!m-0 [&_pre]:!p-0"
-                        dangerouslySetInnerHTML={{ __html: highlightedHtml }}
-                      />
-                    ) : (
-                      <pre className="text-xs overflow-x-auto whitespace-pre-wrap text-gray-300">
-                        <code>
-                          {template.code || '// Code will be available when template is used'}
-                        </code>
-                      </pre>
-                    )}
+                    <pre className="text-xs overflow-x-auto whitespace-pre-wrap text-gray-300">
+                      <code>
+                        {template.code || '// Code will be available when template is used'}
+                      </code>
+                    </pre>
                   </div>
                 </div>
               )}

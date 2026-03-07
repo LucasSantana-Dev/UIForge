@@ -121,7 +121,7 @@ const techStack = [
 export default function AboutPage() {
   return (
     <div className="relative isolate min-h-screen bg-background overflow-hidden">
-      <AmbientVideoBackground src="/f555b164-a132-4354-8ff5-afc0336c3baf-ezgif.com-gif-maker.webm" />
+      <AmbientVideoBackground src="/ambient-bg.webm" />
       <FadeIn className="pt-24 pb-16 px-6">
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold tracking-tight mb-6">
