@@ -15,12 +15,7 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-      - run: npm ci
+      - uses: Forge-Space/.github/.github/actions/setup-node@main
       - run: npm run lint
       - run: npm run format:check
 
@@ -28,24 +23,14 @@ jobs:
     name: Type Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-      - run: npm ci
+      - uses: Forge-Space/.github/.github/actions/setup-node@main
       - run: npm run type-check
 
   test:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-      - run: npm ci
+      - uses: Forge-Space/.github/.github/actions/setup-node@main
       - run: npm run test -- --filter=!@siza/desktop -- --coverage
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
@@ -59,24 +44,14 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-      - run: npm ci
+      - uses: Forge-Space/.github/.github/actions/setup-node@main
       - run: npm run build -- --filter=!@siza/desktop
 
   security:
     name: Security Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-      - run: npm ci
+      - uses: Forge-Space/.github/.github/actions/setup-node@main
       - name: Run security audit
         run: npm audit --audit-level=moderate
         continue-on-error: true
@@ -119,14 +94,7 @@ jobs:
       - name: Skip E2E for dependabot
         if: github.actor == 'dependabot[bot]'
         run: echo 'Skipping E2E — dependabot PRs lack secrets access'
-      - uses: actions/checkout@v4
-        if: github.actor != 'dependabot[bot]'
-      - uses: actions/setup-node@v4
-        if: github.actor != 'dependabot[bot]'
-        with:
-          node-version: '22'
-          cache: 'npm'
-      - run: npm ci
+      - uses: Forge-Space/.github/.github/actions/setup-node@main
         if: github.actor != 'dependabot[bot]'
       - run: npx playwright install --with-deps chromium
         if: github.actor != 'dependabot[bot]'

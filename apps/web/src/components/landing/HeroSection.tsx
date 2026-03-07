@@ -36,7 +36,7 @@ export function HeroSection({ user }: HeroSectionProps) {
 
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      <AmbientVideoBackground src="/ambient-bg.webm" />
+      <AmbientVideoBackground />
       <div
         className="absolute w-[1000px] h-[1000px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{
