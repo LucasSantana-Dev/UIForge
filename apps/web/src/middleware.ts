@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { isLocalAuthBypassEnabled } from '@/lib/auth/local-auth-bypass';
 import { securityHeaders } from '@/lib/security/headers';
 
-export const runtime = 'edge';
+export const runtime = 'experimental-edge';
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
