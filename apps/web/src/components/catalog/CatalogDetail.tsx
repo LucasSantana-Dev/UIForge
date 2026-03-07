@@ -16,6 +16,7 @@ import {
   GitBranchIcon,
   UsersIcon,
 } from 'lucide-react';
+import TechDocsPanel from '@/components/catalog/TechDocsPanel';
 
 interface CatalogEntry {
   id: string;
@@ -254,6 +255,11 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
           </div>
         )}
       </div>
+
+      <TechDocsPanel
+        documentationUrl={entry.documentation_url}
+        repositoryUrl={entry.repository_url}
+      />
     </div>
   );
 }
