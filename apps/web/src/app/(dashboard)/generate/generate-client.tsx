@@ -15,12 +15,16 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import {
   ArrowLeft,
   Code,
+  Eye,
   Github,
   Loader2,
   Check,
   AlertTriangle,
   Save,
   HistoryIcon,
+  Sparkles,
+  PanelLeftClose,
+  PanelLeftOpen,
 } from 'lucide-react';
 import FeedbackPanel from '@/components/generator/FeedbackPanel';
 import { QualityBadge } from '@/components/generator/QualityBadge';
@@ -32,12 +36,14 @@ import { useGeneratePageShortcuts } from '@/hooks/use-generate-page-shortcuts';
 import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog';
 import { FolderPlus } from 'lucide-react';
 
+type OutputTab = 'preview' | 'code';
+
 function GeneratePageClient() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const projectId = searchParams.get('projectId');
   const framework = searchParams.get('framework') || 'react';
-  const componentLibrary = searchParams.get('componentLibrary') || 'tailwind';
+
   const template = searchParams.get('template');
   const description = searchParams.get('description');
 
@@ -59,6 +65,8 @@ function GeneratePageClient() {
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [lastFormOptions, setLastFormOptions] = useState<any>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const [activeTab, setActiveTab] = useState<OutputTab>('preview');
+  const [configCollapsed, setConfigCollapsed] = useState(false);
 
   const githubEnabled = isFeatureEnabled('ENABLE_GITHUB_APP');
 
@@ -92,7 +100,10 @@ function GeneratePageClient() {
 
       if (description) {
         setGeneratedCode(
-          `import React from 'react';\nexport default function TemplateComponent() {\n  return <div className="p-4"><h2>${template}</h2><p>${description}</p></div>;\n}`
+          `import React from 'react';
+export default function TemplateComponent() {
+  return <div className="p-4"><h2>${template}</h2><p>${description}</p></div>;
+}`
         );
         setIsTemplateMode(true);
       }
@@ -123,6 +134,7 @@ function GeneratePageClient() {
       setRagEnriched(settings?.ragEnriched ?? false);
       setQualityReport(settings?.qualityReport ?? null);
       if (settings?.formOptions) setLastFormOptions(settings.formOptions);
+      setActiveTab('code');
     },
     []
   );
@@ -158,6 +170,7 @@ function GeneratePageClient() {
       setGeneratedCode(code);
       setGenerationId(id);
       generation.reset();
+      setActiveTab('code');
     },
     [generation]
   );
@@ -227,14 +240,23 @@ function GeneratePageClient() {
   if (!projectId) {
     return (
       <div className="flex items-center justify-center h-full">
-        <Card className="p-6 max-w-md text-center">
-          <FolderPlus className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
-          <h2 className="text-lg font-semibold mb-2">No Project Selected</h2>
-          <p className="text-sm text-muted-foreground mb-4">
+        <Card className="p-8 max-w-md text-center border-surface-3">
+          <div className="mx-auto w-14 h-14 rounded-xl bg-violet-500/10 flex items-center justify-center mb-4">
+            <FolderPlus className="w-7 h-7 text-violet-400" />
+          </div>
+          <h2 className="text-lg font-semibold font-display text-text-primary mb-2">
+            No Project Selected
+          </h2>
+          <p className="text-sm text-text-secondary mb-6">
             Create a project to start generating components.
           </p>
-          <div className="flex gap-2 justify-center">
-            <Button onClick={() => setCreateDialogOpen(true)}>Create Project</Button>
+          <div className="flex gap-3 justify-center">
+            <Button
+              onClick={() => setCreateDialogOpen(true)}
+              className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)]"
+            >
+              Create Project
+            </Button>
             <Button variant="outline" onClick={() => router.push('/projects')}>
               Browse Projects
             </Button>
@@ -250,167 +272,224 @@ function GeneratePageClient() {
     );
   }
 
+  const tabCls = (tab: OutputTab) =>
+    `flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+      activeTab === tab
+        ? 'border-violet-500 text-violet-300'
+        : 'border-transparent text-text-secondary hover:text-text-primary'
+    }`;
+
   return (
-    <div className="h-full flex flex-col">
-      <div className="mb-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">Generate Component</h1>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Describe your component and let AI generate the code for you
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            {isTemplateMode && (
-              <>
-                <Button variant="outline" onClick={() => router.push('/templates')}>
-                  <ArrowLeft className="w-4 h-4 mr-2" />
-                  Back to Templates
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => {
-                    setGeneratedCode('');
-                    setIsTemplateMode(false);
-                  }}
-                >
-                  Clear Template
-                </Button>
-              </>
+    <div className="h-full flex flex-col -m-4 sm:-m-6 lg:-m-8">
+      {/* Workspace Header */}
+      <div className="flex items-center justify-between px-4 h-12 border-b border-surface-3 bg-surface-0 flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setConfigCollapsed(!configCollapsed)}
+            className="p-1.5 rounded-md text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors"
+            aria-label={configCollapsed ? 'Show config panel' : 'Hide config panel'}
+          >
+            {configCollapsed ? (
+              <PanelLeftOpen className="w-4 h-4" />
+            ) : (
+              <PanelLeftClose className="w-4 h-4" />
             )}
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="sm">
-                  <HistoryIcon className="w-4 h-4 mr-2" />
-                  History
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[380px] sm:w-[420px] p-0">
-                <SheetHeader className="p-4 border-b">
-                  <SheetTitle>Generation History</SheetTitle>
-                </SheetHeader>
-                <div className="overflow-y-auto h-[calc(100%-60px)]">
-                  <GenerationHistory
-                    projectId={projectId}
-                    onSelectGeneration={handleSelectFromHistory}
-                    onForkGeneration={handleForkFromHistory}
+          </button>
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-violet-400" />
+            <span className="text-sm font-medium text-text-primary">Generate</span>
+          </div>
+          {isTemplateMode && (
+            <Badge
+              variant="secondary"
+              className="bg-violet-500/15 text-violet-300 border-0 text-xs"
+            >
+              Template: {template}
+            </Badge>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {isTemplateMode && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push('/templates')}
+              className="text-xs"
+            >
+              <ArrowLeft className="w-3 h-3 mr-1" />
+              Templates
+            </Button>
+          )}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-text-secondary hover:text-text-primary"
+              >
+                <HistoryIcon className="w-4 h-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[380px] sm:w-[420px] p-0">
+              <SheetHeader className="p-4 border-b">
+                <SheetTitle>Generation History</SheetTitle>
+              </SheetHeader>
+              <div className="overflow-y-auto h-[calc(100%-60px)]">
+                <GenerationHistory
+                  projectId={projectId}
+                  onSelectGeneration={handleSelectFromHistory}
+                  onForkGeneration={handleForkFromHistory}
+                />
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+      </div>
+
+      {/* Workspace Body */}
+      <div className="flex-1 flex min-h-0">
+        {/* Left: Config Panel */}
+        <div
+          className={`flex-shrink-0 border-r border-surface-3 bg-surface-0 overflow-y-auto transition-[width] duration-200 ease-siza ${
+            configCollapsed ? 'w-0 overflow-hidden' : 'w-full lg:w-[400px]'
+          }`}
+        >
+          <GeneratorForm
+            projectId={projectId}
+            framework={framework}
+            onGenerate={handleGenerate}
+            onGenerating={handleGenerating}
+            isGenerating={isGenerating}
+            initialDescription={isTemplateMode ? description || undefined : undefined}
+            formRef={formRef}
+          />
+        </div>
+
+        {/* Right: Output Panel */}
+        <div className="flex-1 flex flex-col min-h-0 min-w-0">
+          {/* Output Tab Bar */}
+          <div className="flex items-center justify-between border-b border-surface-3 bg-surface-0 flex-shrink-0 px-2">
+            <div className="flex items-center">
+              <button onClick={() => setActiveTab('preview')} className={tabCls('preview')}>
+                <Eye className="w-3.5 h-3.5" />
+                Preview
+              </button>
+              <button onClick={() => setActiveTab('code')} className={tabCls('code')}>
+                <Code className="w-3.5 h-3.5" />
+                Code
+              </button>
+              {qualityReport && (
+                <div className="ml-3">
+                  <QualityBadge report={qualityReport} />
+                </div>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5">
+              {generatedCode && (
+                <>
+                  <Button
+                    onClick={() => setSaveDialogOpen(true)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-text-secondary hover:text-text-primary"
+                    title="Save as template (⌘S)"
+                  >
+                    <Save className="w-3.5 h-3.5 mr-1" />
+                    Save
+                  </Button>
+                  {githubEnabled && pushState === 'idle' && (
+                    <Button
+                      onClick={handlePushToGitHub}
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-text-secondary hover:text-text-primary"
+                    >
+                      <Github className="w-3.5 h-3.5 mr-1" />
+                      Push
+                    </Button>
+                  )}
+                  {githubEnabled && pushState === 'pushing' && (
+                    <Button disabled variant="ghost" size="sm" className="text-xs">
+                      <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" />
+                      Pushing...
+                    </Button>
+                  )}
+                  {githubEnabled && pushState === 'success' && prUrl && (
+                    <a
+                      href={prUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:text-emerald-300"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                      View PR
+                    </a>
+                  )}
+                  {githubEnabled && (pushState === 'error' || pushState === 'no-repo') && (
+                    <span className="inline-flex items-center gap-1 text-xs text-amber-400">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      {pushError}
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          <div className="flex-1 min-h-0 relative">
+            {!generatedCode && !isGenerating ? (
+              <div className="flex flex-col items-center justify-center h-full text-center px-8">
+                <div className="w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-4">
+                  <Sparkles className="w-8 h-8 text-violet-400" />
+                </div>
+                <h3 className="text-lg font-semibold font-display text-text-primary mb-2">
+                  Ready to generate
+                </h3>
+                <p className="text-sm text-text-secondary max-w-sm">
+                  Describe your component in the config panel and hit Generate. Your code and
+                  preview will appear here.
+                </p>
+              </div>
+            ) : (
+              <div className="h-full">
+                <div className={activeTab === 'preview' ? 'h-full' : 'hidden'}>
+                  <LivePreview code={generatedCode} framework={framework} />
+                </div>
+                <div className={activeTab === 'code' ? 'h-full' : 'hidden'}>
+                  <CodeEditor
+                    code={generatedCode}
+                    onChange={handleCodeChange}
+                    language={
+                      framework === 'react' || framework === 'angular' ? 'typescript' : framework
+                    }
                   />
                 </div>
-              </SheetContent>
-            </Sheet>
+              </div>
+            )}
           </div>
-        </div>
 
-        {isTemplateMode && (
-          <div className="mt-4 p-3 bg-brand-muted border border-brand/30 rounded-lg">
-            <div className="flex items-center gap-2">
-              <Code className="w-4 h-4 text-text-brand" />
-              <span className="text-sm font-medium text-text-brand">Template Mode: {template}</span>
-              <Badge variant="secondary" className="text-xs">
-                {framework}
-              </Badge>
-              <Badge variant="outline" className="text-xs">
-                {componentLibrary}
-              </Badge>
+          {/* Bottom Bar: Refinement + Feedback */}
+          {generatedCode && !isGenerating && (
+            <div className="border-t border-surface-3 bg-surface-0 flex-shrink-0">
+              {conversationEnabled && generationId && (
+                <div className="px-4 pt-3">
+                  <RefinementInput
+                    onRefine={handleRefine}
+                    onNewGeneration={handleNewGeneration}
+                    isGenerating={generation.isGenerating}
+                    conversationTurn={generation.conversationTurn}
+                    maxTurns={generation.maxConversationTurns}
+                  />
+                </div>
+              )}
+              <div className="flex items-center justify-between px-4 py-2">
+                <FeedbackPanel generationId={generationId} ragEnriched={ragEnriched} />
+              </div>
             </div>
-          </div>
-        )}
-      </div>
-
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
-        <div className="lg:col-span-1">
-          <Card className="h-full overflow-hidden">
-            <GeneratorForm
-              projectId={projectId}
-              framework={framework}
-              onGenerate={handleGenerate}
-              onGenerating={handleGenerating}
-              isGenerating={isGenerating}
-              initialDescription={isTemplateMode ? description || undefined : undefined}
-              formRef={formRef}
-            />
-          </Card>
-        </div>
-
-        <div className="lg:col-span-1">
-          <Card className="h-full overflow-hidden">
-            <CodeEditor
-              code={generatedCode}
-              onChange={handleCodeChange}
-              language={framework === 'react' || framework === 'angular' ? 'typescript' : framework}
-            />
-          </Card>
-        </div>
-
-        <div className="lg:col-span-1">
-          <Card className="h-full overflow-hidden">
-            <LivePreview code={generatedCode} framework={framework} />
-          </Card>
-        </div>
-      </div>
-
-      {generatedCode && !isGenerating && (
-        <div className="mt-4 space-y-3">
-          {conversationEnabled && generationId && (
-            <RefinementInput
-              onRefine={handleRefine}
-              onNewGeneration={handleNewGeneration}
-              isGenerating={generation.isGenerating}
-              conversationTurn={generation.conversationTurn}
-              maxTurns={generation.maxConversationTurns}
-            />
           )}
-
-          <div className="flex items-center justify-between gap-3 p-3 rounded-lg border bg-card">
-            <div className="flex items-center gap-3">
-              <FeedbackPanel generationId={generationId} ragEnriched={ragEnriched} />
-              <QualityBadge report={qualityReport} />
-            </div>
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={() => setSaveDialogOpen(true)}
-                variant="outline"
-                size="sm"
-                title="Save as template (⌘S)"
-              >
-                <Save className="mr-2 h-4 w-4" />
-                Save as Template (⌘S)
-              </Button>
-              {githubEnabled && pushState === 'idle' && (
-                <Button onClick={handlePushToGitHub} variant="outline" size="sm">
-                  <Github className="mr-2 h-4 w-4" />
-                  Push to GitHub
-                </Button>
-              )}
-              {githubEnabled && pushState === 'pushing' && (
-                <Button disabled variant="outline" size="sm">
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Creating PR...
-                </Button>
-              )}
-              {githubEnabled && pushState === 'success' && prUrl && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Check className="h-4 w-4 text-green-500" />
-                  <a
-                    href={prUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary underline"
-                  >
-                    View PR
-                  </a>
-                </div>
-              )}
-              {githubEnabled && (pushState === 'error' || pushState === 'no-repo') && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                  {pushError}
-                </div>
-              )}
-            </div>
-          </div>
         </div>
-      )}
+      </div>
 
       <SaveTemplateDialog
         open={saveDialogOpen}
@@ -424,33 +503,27 @@ function GeneratePageClient() {
 
 function GenerateLoadingSkeleton() {
   return (
-    <div className="h-full flex flex-col">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <Skeleton className="h-9 w-64 mb-2" />
-          <Skeleton className="h-4 w-96" />
-        </div>
-        <Skeleton className="h-9 w-24" />
+    <div className="h-full flex -m-4 sm:-m-6 lg:-m-8">
+      <div className="w-[400px] border-r border-surface-3 p-6 space-y-4">
+        <Skeleton className="h-5 w-32" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
       </div>
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-3 gap-6 min-h-0">
-        <Card className="h-full p-4 space-y-4">
-          <Skeleton className="h-5 w-32" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-          <Skeleton className="h-10 w-full" />
-        </Card>
-        <Card className="h-full p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-5 w-24" />
-            <Skeleton className="h-8 w-20" />
+      <div className="flex-1 flex flex-col">
+        <div className="h-10 border-b border-surface-3 flex items-center px-4 gap-4">
+          <Skeleton className="h-5 w-16" />
+          <Skeleton className="h-5 w-16" />
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center">
+            <Skeleton className="h-16 w-16 rounded-2xl mx-auto mb-4" />
+            <Skeleton className="h-5 w-40 mx-auto mb-2" />
+            <Skeleton className="h-4 w-64 mx-auto" />
           </div>
-          <Skeleton className="h-full min-h-[200px] w-full" />
-        </Card>
-        <Card className="h-full p-4 space-y-3">
-          <Skeleton className="h-5 w-28" />
-          <Skeleton className="h-full min-h-[200px] w-full" />
-        </Card>
+        </div>
       </div>
     </div>
   );
