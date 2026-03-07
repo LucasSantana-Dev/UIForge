@@ -135,6 +135,12 @@ async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<Genera
   }
 
   if (!hasOutput) {
+    yield {
+      type: 'fallback',
+      provider: 'gemini',
+      message: 'MCP gateway unavailable, falling back to Gemini',
+      timestamp: Date.now(),
+    };
     for await (const event of generateComponentStream({
       prompt: opts.prompt,
       framework: opts.framework,

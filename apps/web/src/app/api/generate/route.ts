@@ -39,7 +39,11 @@ async function getAccessToken(): Promise<string | undefined> {
     const supabase = await createClient();
     const { data } = await supabase.auth.getSession();
     return data.session?.access_token;
-  } catch {
+  } catch (error) {
+    captureServerError(error, {
+      route: '/api/generate',
+      extra: { context: 'getAccessToken' },
+    });
     return undefined;
   }
 }
