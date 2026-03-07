@@ -121,7 +121,7 @@ const techStack = [
 export default function AboutPage() {
   return (
     <div className="relative isolate min-h-screen bg-background overflow-hidden">
-      <AmbientVideoBackground src="/ambient-bg.webm" />
+      <AmbientVideoBackground />
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div
           className="absolute w-[900px] h-[900px] left-1/2 top-[20%] -translate-x-1/2 -translate-y-1/2"
