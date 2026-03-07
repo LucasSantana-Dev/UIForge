@@ -89,11 +89,17 @@ describe('DashboardClient', () => {
     jest.clearAllMocks();
     mockUseAIKeys.mockReturnValue([]);
     mockUseCatalog.mockReturnValue({
-      data: { entries: [], pagination: { page: 1, limit: 20, total: 0, pages: 0 } },
+      data: {
+        entries: [],
+        pagination: { page: 1, limit: 20, total: 0, pages: 0 },
+      },
       isLoading: false,
     } as any);
     mockUseGoldenPaths.mockReturnValue({
-      data: { data: [], pagination: { page: 1, limit: 20, total: 0, pages: 0 } },
+      data: {
+        data: [],
+        pagination: { page: 1, limit: 20, total: 0, pages: 0 },
+      },
       isLoading: false,
     } as any);
   });
@@ -538,8 +544,10 @@ describe('DashboardClient', () => {
 
       renderWithQueryClient(<DashboardClient />);
 
-      expect(screen.getByText('No projects yet')).toBeInTheDocument();
-      expect(screen.getByText('Create your first project to get started')).toBeInTheDocument();
+      expect(screen.getByText('Ready to build something?')).toBeInTheDocument();
+      expect(
+        screen.getByText('Describe what you need and Siza generates production-ready code.')
+      ).toBeInTheDocument();
     });
   });
 

@@ -217,7 +217,9 @@ function GoldenPathCard({ path }: { path: GoldenPathRow }) {
 function GovernanceOverview() {
   const catalogEnabled = isFeatureEnabled('ENABLE_SOFTWARE_CATALOG');
   const goldenPathsEnabled = isFeatureEnabled('ENABLE_GOLDEN_PATHS');
-  const { data: catalogData, isLoading: catalogLoading } = useCatalog({ limit: 100 });
+  const { data: catalogData, isLoading: catalogLoading } = useCatalog({
+    limit: 100,
+  });
   const { data: goldenPathData, isLoading: goldenPathLoading } = useGoldenPaths({ limit: 100 });
 
   if (!catalogEnabled && !goldenPathsEnabled) return null;
@@ -466,18 +468,33 @@ export function DashboardClient() {
           {recentProjects.length === 0 ? (
             <div className="rounded-xl border border-surface-3 bg-surface-1 p-8 text-center">
               <div className="mx-auto w-12 h-12 rounded-xl bg-violet-500/10 flex items-center justify-center">
-                <FolderIcon className="h-6 w-6 text-violet-400" />
+                <SparklesIcon className="h-6 w-6 text-violet-400" />
               </div>
-              <p className="mt-4 text-sm font-medium text-text-primary">No projects yet</p>
-              <p className="mt-1 text-xs text-text-secondary">
-                Create your first project to get started
+              <p className="mt-4 text-sm font-medium text-text-primary">
+                Ready to build something?
               </p>
-              <Button asChild className="mt-4 bg-violet-600 hover:bg-violet-500" size="sm">
-                <Link href="/projects/new">
-                  <PlusIcon className="mr-2 h-4 w-4" />
-                  New Project
-                </Link>
-              </Button>
+              <p className="mt-1 text-xs text-text-secondary">
+                Describe what you need and Siza generates production-ready code.
+              </p>
+              <div className="mt-4 flex items-center justify-center gap-3">
+                <Button asChild className="bg-violet-600 hover:bg-violet-500" size="sm">
+                  <Link href="/generate">
+                    <SparklesIcon className="mr-2 h-4 w-4" />
+                    Generate Component
+                  </Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="border-surface-3 text-text-secondary hover:text-text-primary"
+                >
+                  <Link href="/projects/new">
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    New Project
+                  </Link>
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="space-y-2">
