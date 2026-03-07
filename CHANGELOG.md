@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.35.0] - 2026-03-07
+
+### Added
+- **Golden Path Templates** — Backstage-inspired project scaffolding blueprints for IDP
+- **Golden Paths API** — REST endpoints (GET/POST /api/golden-paths, GET/PATCH/DELETE /api/golden-paths/[id]) with Zod validation
+- **Golden Paths UI** — Template grid with search, type filters, lifecycle badges, step/param counts
+- **Parametric scaffolding** — Templates define parameters (string/boolean/number/select) and ordered steps
+- **Template lifecycle** — draft → beta → ga → deprecated status tracking
+- **5 seed templates** — Next.js Service, MCP Server, React Library, Python API, Cloudflare Worker
+- **ENABLE_GOLDEN_PATHS feature flag** — Toggle golden paths visibility (default: enabled)
+- **Catalog YAML import** — Backstage catalog-info.yaml parser for service discovery import
+- **Tests** — 25 new tests (10 service + 15 validation)
+
+---
+
 ## [0.34.0] - 2026-03-07
 
 ### Added
