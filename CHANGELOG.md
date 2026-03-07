@@ -8,15 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.34.0] - 2026-03-07
 
 ### Added
-- **Software Catalog** — Backstage-inspired service registry for IDP (catalog_entries table, RLS, GIN-indexed tags)
-- **Catalog API** — REST endpoints (GET/POST /api/catalog, GET/PATCH/DELETE /api/catalog/[id]) with Zod validation and rate limiting
+- **Software Catalog** — Backstage-inspired service registry for IDP with 7 entity kinds (Domain, System, Service, Component, API, Library, Website)
+- **Entity hierarchy** — Parent-child relationships via `parent_id`, supporting Domain → System → Component nesting
+- **Dependency graph** — Interactive SVG-based visualization with hover highlighting, color-coded nodes, zero external dependencies
+- **Catalog API** — REST endpoints (CRUD + /graph + /stats) with Zod validation and rate limiting
 - **Catalog UI** — Grid/list views, search, type/lifecycle filters, pagination, detail page, create/edit forms
-- **Dashboard governance card** — Catalog stats (total services, production/experimental counts) on dashboard
+- **Dashboard governance card** — 4-column stats (total entries, production, services & APIs, libs & components) with graph link
 - **ENABLE_SOFTWARE_CATALOG feature flag** — Toggle catalog visibility (default: enabled)
-- **Catalog hook** — `useCatalog` TanStack Query hook with `useCatalogEntry`, `useCreateCatalogEntry`, `useDeleteCatalogEntry`
-- **Navigation** — Catalog link in sidebar navigation (inserted after Projects)
+- **React Query hooks** — `useCatalog`, `useCatalogGraph`, `useCatalogStats` with 30s stale times
+- **Supabase migrations** — Base catalog schema + hierarchy extension (parent_id, description, metadata JSONB)
 - **Seed data** — 9 Forge Space repos pre-seeded in catalog (siza, mcp-gateway, core, etc.)
-- **Tests** — 32 new tests (validation 15, service 9, CatalogCard 8) — 800 total passing
+- **Tests** — 754+ lines across 4 test suites (API routes, validation, service layer)
 
 ---
 
