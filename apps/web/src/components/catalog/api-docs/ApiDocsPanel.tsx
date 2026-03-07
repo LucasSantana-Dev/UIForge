@@ -121,7 +121,7 @@ export default function ApiDocsPanel({ spec }: ApiDocsPanelProps) {
                 )}
                 <div className="space-y-2">
                   {eps.map((ep) => (
-                    <EndpointCard key={`${ep.method}-${ep.path}`} endpoint={ep} />
+                    <EndpointCard key={`${ep.method}-${ep.path}`} endpoint={ep} baseUrl={server} />
                   ))}
                 </div>
               </div>

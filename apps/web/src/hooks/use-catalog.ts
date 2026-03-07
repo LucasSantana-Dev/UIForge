@@ -87,6 +87,8 @@ export interface DiscoveredRepo {
   installationId: number;
   entityCount: number;
   entities: Array<{ name: string; kind: string; type: string }>;
+  docsDetected: boolean;
+  docsUrl: string | null;
 }
 
 interface DiscoveryResponse {

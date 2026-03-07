@@ -1,13 +1,20 @@
+'use client';
+
+import { useState } from 'react';
+import { PlayIcon } from 'lucide-react';
 import MethodBadge from './MethodBadge';
 import SchemaViewer from './SchemaViewer';
+import TryItPanel from './TryItPanel';
 import type { Endpoint, Schema } from '@/lib/openapi/types';
 
 interface EndpointCardProps {
   endpoint: Endpoint;
+  baseUrl?: string;
 }
 
-export default function EndpointCard({ endpoint }: EndpointCardProps) {
+export default function EndpointCard({ endpoint, baseUrl }: EndpointCardProps) {
   const { method, path, operation } = endpoint;
+  const [tryItOpen, setTryItOpen] = useState(false);
   const params = operation.parameters || [];
   const requestBody = operation.requestBody;
   const responses = operation.responses || {};
@@ -36,9 +43,22 @@ export default function EndpointCard({ endpoint }: EndpointCardProps) {
           {path}
         </code>
         {operation.summary && (
-          <span className="text-sm text-text-secondary ml-auto truncate max-w-[50%]">
+          <span className="text-sm text-text-secondary truncate max-w-[40%]">
             {operation.summary}
           </span>
+        )}
+        {baseUrl && (
+          <button
+            onClick={() => setTryItOpen(!tryItOpen)}
+            className={`ml-auto flex items-center gap-1 rounded px-2 py-0.5 text-[10px] font-medium transition-colors ${
+              tryItOpen
+                ? 'bg-violet-500/20 text-violet-300'
+                : 'bg-surface-2 text-text-muted hover:text-text-secondary'
+            }`}
+          >
+            <PlayIcon className="w-3 h-3" />
+            Try it
+          </button>
         )}
       </div>
 
@@ -127,6 +147,8 @@ export default function EndpointCard({ endpoint }: EndpointCardProps) {
           </details>
         )}
       </div>
+
+      {tryItOpen && baseUrl && <TryItPanel endpoint={endpoint} baseUrl={baseUrl} />}
     </div>
   );
 }
