@@ -35,7 +35,10 @@ const mockEntry = {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  (global.fetch as jest.Mock) = jest.fn();
+  (global.fetch as jest.Mock) = jest.fn().mockResolvedValue({
+    ok: true,
+    json: () => Promise.resolve({ data: null }),
+  });
 });
 
 describe('CatalogDetail', () => {
