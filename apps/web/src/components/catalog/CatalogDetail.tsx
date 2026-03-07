@@ -17,6 +17,7 @@ import {
   UsersIcon,
 } from 'lucide-react';
 import TechDocsPanel from '@/components/catalog/TechDocsPanel';
+import CicdPanel from '@/components/catalog/CicdPanel';
 import ApiDocsPanel from '@/components/catalog/api-docs/ApiDocsPanel';
 
 interface CatalogEntry {
@@ -272,6 +273,8 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
         documentationUrl={entry.documentation_url}
         repositoryUrl={entry.repository_url}
       />
+
+      <CicdPanel repositoryUrl={entry.repository_url} />
 
       {entry.metadata?.openapi_spec != null && (
         <div className="md:col-span-2">

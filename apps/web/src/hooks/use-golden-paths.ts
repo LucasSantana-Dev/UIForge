@@ -104,13 +104,18 @@ export function useDeleteGoldenPath() {
 export function useScaffoldProject() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (params: { goldenPathId: string; projectName: string }) => {
+    mutationFn: async (params: {
+      goldenPathId: string;
+      projectName: string;
+      parameters?: Record<string, unknown>;
+    }) => {
       const res = await fetch('/api/golden-paths/scaffold', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           golden_path_id: params.goldenPathId,
           project_name: params.projectName,
+          parameters: params.parameters,
         }),
       });
       if (!res.ok) {

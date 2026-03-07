@@ -8,9 +8,42 @@ import { findGoldenPathById } from '@/lib/repositories/golden-path.repo';
 import { createClient } from '@/lib/supabase/server';
 import { captureServerError } from '@/lib/sentry/server';
 
+interface ParameterDef {
+  name: string;
+  type: string;
+  required?: boolean;
+  default?: unknown;
+  options?: string[];
+}
+
+function resolveParameters(
+  defs: ParameterDef[],
+  values: Record<string, unknown>
+): Record<string, unknown> {
+  const resolved: Record<string, unknown> = {};
+  for (const def of defs) {
+    const value = values[def.name] ?? def.default;
+    if (def.required && value === undefined) {
+      throw new ValidationError(`Parameter "${def.name}" is required`, {
+        parameter: def.name,
+      });
+    }
+    if (def.type === 'select' && def.options && value !== undefined) {
+      if (!def.options.includes(String(value))) {
+        throw new ValidationError(
+          `Parameter "${def.name}" must be one of: ${def.options.join(', ')}`
+        );
+      }
+    }
+    if (value !== undefined) resolved[def.name] = value;
+  }
+  return resolved;
+}
+
 const scaffoldSchema = z.object({
   golden_path_id: z.string().uuid(),
   project_name: z.string().min(1).max(100),
+  parameters: z.record(z.string(), z.unknown()).optional(),
 });
 
 export async function POST(request: NextRequest) {
@@ -36,12 +69,21 @@ export async function POST(request: NextRequest) {
       throw new ValidationError('Invalid scaffold request', parseResult.error.flatten());
     }
 
-    const { golden_path_id, project_name } = parseResult.data;
+    const { golden_path_id, project_name, parameters: paramValues } = parseResult.data;
 
     const goldenPath = await findGoldenPathById(golden_path_id);
     if (!goldenPath) {
       return errorResponse('Golden path not found', 404);
     }
+
+    const resolvedParams = resolveParameters(
+      goldenPath.parameters || [],
+      paramValues || {}
+    );
+
+    const description = resolvedParams.description
+      ? String(resolvedParams.description)
+      : `Scaffolded from ${goldenPath.display_name}`;
 
     const supabase = await createClient();
 
@@ -49,8 +91,10 @@ export async function POST(request: NextRequest) {
       .from('projects')
       .insert({
         name: project_name,
-        description: `Scaffolded from ${goldenPath.display_name}`,
-        framework: goldenPath.framework,
+        description,
+        framework: resolvedParams.framework
+          ? String(resolvedParams.framework)
+          : goldenPath.framework,
         user_id: user.id,
       })
       .select()
@@ -71,6 +115,10 @@ export async function POST(request: NextRequest) {
       owner_id: user.id,
       project_id: project.id,
       tags: goldenPath.tags,
+      metadata: {
+        golden_path: goldenPath.name,
+        parameters: resolvedParams,
+      },
     });
 
     if (catalogError) {
@@ -90,6 +138,7 @@ export async function POST(request: NextRequest) {
         project,
         catalog_registered: !catalogError,
         golden_path: goldenPath.display_name,
+        parameters: resolvedParams,
       },
     });
     setRateLimitHeaders(response, { allowed, remaining, resetAt }, 10);

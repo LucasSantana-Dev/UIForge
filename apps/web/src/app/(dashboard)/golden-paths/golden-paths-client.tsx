@@ -23,6 +23,15 @@ import { useGoldenPaths, useScaffoldProject } from '@/hooks/use-golden-paths';
 import type { GoldenPathFilters } from '@/hooks/use-golden-paths';
 import type { GoldenPathRow } from '@/lib/repositories/golden-path.repo';
 
+interface ParameterDef {
+  name: string;
+  type: string;
+  required?: boolean;
+  default?: unknown;
+  description?: string;
+  options?: string[];
+}
+
 const STACK_META: Record<string, { icon: typeof ServerIcon; label: string }> = {
   nextjs: { icon: GlobeIcon, label: 'Next.js' },
   'api-service': { icon: ServerIcon, label: 'API Service' },
@@ -86,6 +95,7 @@ export function GoldenPathsClient() {
   const [searchInput, setSearchInput] = useState('');
   const [scaffoldTarget, setScaffoldTarget] = useState<string | null>(null);
   const [projectName, setProjectName] = useState('');
+  const [paramValues, setParamValues] = useState<Record<string, unknown>>({});
   const { data, isLoading } = useGoldenPaths(filters);
   const scaffold = useScaffoldProject();
 
@@ -103,14 +113,33 @@ export function GoldenPathsClient() {
   const handleScaffold = () => {
     if (!scaffoldTarget || !projectName.trim()) return;
     scaffold.mutate(
-      { goldenPathId: scaffoldTarget, projectName: projectName.trim() },
+      {
+        goldenPathId: scaffoldTarget,
+        projectName: projectName.trim(),
+        parameters: Object.keys(paramValues).length > 0 ? paramValues : undefined,
+      },
       {
         onSuccess: () => {
           setScaffoldTarget(null);
           setProjectName('');
+          setParamValues({});
         },
       }
     );
+  };
+
+  const openScaffoldForm = (pathId: string) => {
+    setScaffoldTarget(pathId);
+    setProjectName('');
+    setParamValues({});
+    const path = paths.find((p: GoldenPathRow) => p.id === pathId);
+    if (path?.parameters?.length) {
+      const defaults: Record<string, unknown> = {};
+      for (const param of path.parameters as ParameterDef[]) {
+        if (param.default !== undefined) defaults[param.name] = param.default;
+      }
+      setParamValues(defaults);
+    }
   };
 
   return (
@@ -265,37 +294,22 @@ export function GoldenPathsClient() {
 
                 <div className="mt-auto">
                   {scaffoldTarget === path.id ? (
-                    <div className="space-y-2">
-                      <Input
-                        value={projectName}
-                        onChange={(e) => setProjectName(e.target.value)}
-                        placeholder="Project name"
-                        className="text-xs h-8 bg-surface-2 border-surface-3"
-                        onKeyDown={(e) => e.key === 'Enter' && handleScaffold()}
-                      />
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={handleScaffold}
-                          disabled={!projectName.trim() || scaffold.isPending}
-                          className="flex-1 bg-violet-600 hover:bg-violet-500 text-xs h-7"
-                        >
-                          {scaffold.isPending ? 'Creating...' : 'Create'}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setScaffoldTarget(null)}
-                          className="text-xs h-7"
-                        >
-                          Cancel
-                        </Button>
-                      </div>
-                    </div>
+                    <ScaffoldForm
+                      parameters={(path.parameters || []) as ParameterDef[]}
+                      projectName={projectName}
+                      paramValues={paramValues}
+                      isPending={scaffold.isPending}
+                      onProjectNameChange={setProjectName}
+                      onParamChange={(name, value) =>
+                        setParamValues((prev) => ({ ...prev, [name]: value }))
+                      }
+                      onSubmit={handleScaffold}
+                      onCancel={() => setScaffoldTarget(null)}
+                    />
                   ) : (
                     <Button
                       size="sm"
-                      onClick={() => setScaffoldTarget(path.id)}
+                      onClick={() => openScaffoldForm(path.id)}
                       className="w-full bg-violet-600 hover:bg-violet-500 text-white text-xs h-8"
                     >
                       <RocketIcon className="w-3.5 h-3.5 mr-1.5" />
@@ -360,5 +374,139 @@ export function GoldenPathsClient() {
         </div>
       )}
     </div>
+  );
+}
+
+interface ScaffoldFormProps {
+  parameters: ParameterDef[];
+  projectName: string;
+  paramValues: Record<string, unknown>;
+  isPending: boolean;
+  onProjectNameChange: (name: string) => void;
+  onParamChange: (name: string, value: unknown) => void;
+  onSubmit: () => void;
+  onCancel: () => void;
+}
+
+function ScaffoldForm({
+  parameters,
+  projectName,
+  paramValues,
+  isPending,
+  onProjectNameChange,
+  onParamChange,
+  onSubmit,
+  onCancel,
+}: ScaffoldFormProps) {
+  return (
+    <div className="space-y-2">
+      <Input
+        value={projectName}
+        onChange={(e) => onProjectNameChange(e.target.value)}
+        placeholder="Project name *"
+        className="text-xs h-8 bg-surface-2 border-surface-3"
+        onKeyDown={(e) =>
+          e.key === 'Enter' && parameters.length === 0 && onSubmit()
+        }
+      />
+      {parameters.map((param) => (
+        <ParameterInput
+          key={param.name}
+          param={param}
+          value={paramValues[param.name]}
+          onChange={(v) => onParamChange(param.name, v)}
+        />
+      ))}
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          onClick={onSubmit}
+          disabled={!projectName.trim() || isPending}
+          className="flex-1 bg-violet-600 hover:bg-violet-500 text-xs h-7"
+        >
+          {isPending ? 'Creating...' : 'Create'}
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={onCancel}
+          className="text-xs h-7"
+        >
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function ParameterInput({
+  param,
+  value,
+  onChange,
+}: {
+  param: ParameterDef;
+  value: unknown;
+  onChange: (v: unknown) => void;
+}) {
+  const label = param.description || param.name;
+  const required = param.required ? ' *' : '';
+
+  if (param.type === 'boolean') {
+    return (
+      <label className="flex items-center gap-2 text-xs text-text-secondary cursor-pointer">
+        <input
+          type="checkbox"
+          checked={Boolean(value)}
+          onChange={(e) => onChange(e.target.checked)}
+          className="rounded border-surface-3 bg-surface-2 text-violet-500 focus:ring-violet-500"
+        />
+        {label}
+      </label>
+    );
+  }
+
+  if (param.type === 'select' && param.options) {
+    return (
+      <select
+        value={String(value ?? '')}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full h-8 rounded-md border border-surface-3 bg-surface-2 px-2 text-xs text-text-primary"
+        title={label}
+      >
+        <option value="">
+          {label}
+          {required}
+        </option>
+        {param.options.map((opt) => (
+          <option key={opt} value={opt}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    );
+  }
+
+  if (param.type === 'number') {
+    return (
+      <Input
+        type="number"
+        value={value !== undefined ? String(value) : ''}
+        onChange={(e) =>
+          onChange(e.target.value ? Number(e.target.value) : undefined)
+        }
+        placeholder={`${label}${required}`}
+        className="text-xs h-8 bg-surface-2 border-surface-3"
+      />
+    );
+  }
+
+  return (
+    <Input
+      type="text"
+      value={String(value ?? '')}
+      onChange={(e) => onChange(e.target.value || undefined)}
+      placeholder={`${label}${required}`}
+      className="text-xs h-8 bg-surface-2 border-surface-3"
+    />
   );
 }
