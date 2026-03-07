@@ -116,6 +116,9 @@ function parseSimpleYaml(text: string): Record<string, any> {
     if (content.startsWith('- ')) {
       const arrayItem = content.slice(2).trim();
       const lastKey = Object.keys(parent).pop();
+      if (lastKey && !Array.isArray(parent[lastKey])) {
+        parent[lastKey] = [];
+      }
       if (lastKey && Array.isArray(parent[lastKey])) {
         if (arrayItem.includes(': ')) {
           const obj: Record<string, any> = {};
