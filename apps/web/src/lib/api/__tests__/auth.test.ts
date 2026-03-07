@@ -6,9 +6,13 @@ import { verifySession, getSession, verifyOwnership } from '../auth';
 import { UnauthorizedError, ForbiddenError } from '../errors';
 import { createClient } from '@/lib/supabase/server';
 
-// Mock Supabase client
 jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(),
+}));
+
+jest.mock('@/lib/auth/local-auth-bypass', () => ({
+  isLocalAuthBypassEnabled: () => false,
+  getLocalAuthBypassUser: jest.fn(),
 }));
 
 const mockCreateClient = createClient as jest.MockedFunction<typeof createClient>;
