@@ -75,7 +75,7 @@ describe('GET /api/catalog', () => {
     const request = new NextRequest('http://localhost/api/catalog');
     await GET(request);
 
-    expect(mockListCatalogEntries).toHaveBeenCalledWith('user-1', {});
+    expect(mockListCatalogEntries).toHaveBeenCalledWith({});
     expect(mockSuccessResponse).toHaveBeenCalledWith({
       entries: mockPaginatedResult.data,
       pagination: mockPaginatedResult.pagination,
@@ -90,7 +90,7 @@ describe('GET /api/catalog', () => {
     const request = new NextRequest('http://localhost/api/catalog?type=service');
     await GET(request);
 
-    expect(mockListCatalogEntries).toHaveBeenCalledWith('user-1', {
+    expect(mockListCatalogEntries).toHaveBeenCalledWith({
       type: 'service',
     });
   });

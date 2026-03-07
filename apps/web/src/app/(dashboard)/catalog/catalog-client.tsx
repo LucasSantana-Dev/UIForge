@@ -77,7 +77,7 @@ function CatalogCard({ entry }: { entry: CatalogEntryRow }) {
 
   return (
     <Link
-      href={entry.project_id ? `/projects/${entry.project_id}` : '#'}
+      href={`/catalog/${entry.id}`}
       className="group relative rounded-xl border border-surface-3 bg-surface-1 p-5 transition-all duration-200 hover:border-violet-500/30 hover:shadow-[0_0_24px_rgba(124,58,237,0.08)] overflow-hidden"
     >
       <div className="absolute inset-0 bg-gradient-to-br from-violet-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -137,7 +137,7 @@ function CatalogListItem({ entry }: { entry: CatalogEntryRow }) {
 
   return (
     <Link
-      href={entry.project_id ? `/projects/${entry.project_id}` : '#'}
+      href={`/catalog/${entry.id}`}
       className="group flex items-center gap-4 rounded-lg border border-surface-3 bg-surface-1 p-4 transition-all duration-200 hover:border-violet-500/30 hover:bg-surface-1/80"
     >
       <TypeIcon type={entry.type} />
