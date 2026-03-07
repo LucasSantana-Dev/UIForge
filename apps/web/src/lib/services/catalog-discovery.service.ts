@@ -14,6 +14,8 @@ export interface DiscoveredRepo {
   catalogYaml: string;
   entityCount: number;
   entities: Array<{ name: string; kind: string; type: string }>;
+  docsDetected: boolean;
+  docsUrl: string | null;
 }
 
 export interface DiscoveryResult {
@@ -23,6 +25,13 @@ export interface DiscoveryResult {
 }
 
 const CATALOG_FILE_PATHS = ['catalog-info.yaml', 'catalog-info.yml'];
+const DOCS_INDICATORS = [
+  'docs/index.md',
+  'docs/README.md',
+  'mkdocs.yml',
+  'docusaurus.config.js',
+  'docusaurus.config.ts',
+];
 
 async function fetchFileContent(
   installationId: number,
@@ -114,6 +123,14 @@ export async function discoverCatalogFiles(userId: string): Promise<DiscoveryRes
 
         if (content) {
           const entities = extractEntitiesPreview(content);
+          let docsUrl: string | null = null;
+          for (const docPath of DOCS_INDICATORS) {
+            const docFile = await fetchFileContent(inst.installation_id, owner, name, docPath);
+            if (docFile !== null) {
+              docsUrl = `https://github.com/${repo.fullName}/blob/${repo.defaultBranch}/${docPath}`;
+              break;
+            }
+          }
           result.discovered.push({
             repoId: repo.id,
             fullName: repo.fullName,
@@ -124,6 +141,8 @@ export async function discoverCatalogFiles(userId: string): Promise<DiscoveryRes
             catalogYaml: content,
             entityCount: entities.length,
             entities,
+            docsDetected: docsUrl !== null,
+            docsUrl,
           });
           break;
         }

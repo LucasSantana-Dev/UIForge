@@ -248,6 +248,12 @@ function RepoCard({
             {repo.entities.map((e) => (
               <EntityBadge key={e.name} kind={e.kind} type={e.type} />
             ))}
+            {repo.docsDetected && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                <BookOpenIcon className="w-2.5 h-2.5" />
+                Docs
+              </span>
+            )}
           </div>
         </div>
         <span className="text-xs text-text-secondary flex-shrink-0 ml-3">
