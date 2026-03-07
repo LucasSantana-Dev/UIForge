@@ -1,0 +1,42 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "jest": false,
+  "next": false,
+  "workspaces": {
+    ".": {
+      "entry": ["scripts/**/*.ts"]
+    },
+    "apps/web": {
+      "entry": [
+        "src/app/**/*.{ts,tsx}",
+        "src/middleware.ts",
+        "next.config.{js,ts,mjs}",
+        "e2e/**/*.spec.ts"
+      ],
+      "project": ["src/**/*.{ts,tsx}", "e2e/**/*.ts"]
+    },
+    "apps/desktop": {
+      "entry": ["src/main/index.ts", "src/renderer/index.tsx", "electron.vite.config.ts"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "apps/api": {
+      "entry": ["src/**/*.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "apps/docs": {
+      "entry": ["src/app/**/*.{ts,tsx}", "next.config.{js,ts,mjs}", "src/lib/source.ts"],
+      "project": ["src/**/*.{ts,tsx}", "content/**/*.mdx"]
+    },
+    "packages/ui": {
+      "entry": ["src/index.ts"],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "packages/eslint-config": {
+      "entry": ["*.js"],
+      "project": ["*.js"]
+    }
+  },
+  "ignore": ["**/__mocks__/**", "**/*.test.{ts,tsx}", "**/*.spec.{ts,tsx}", "apps/docs/.source/**"],
+  "ignoreDependencies": ["lint-staged", "turbo", "@opennextjs/cloudflare", "wrangler"],
+  "ignoreExportsUsedInFile": true
+}
