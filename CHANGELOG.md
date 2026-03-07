@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.37.0] - 2026-03-07
+
+### Added
+- **Keyboard shortcuts dialog** — Press ⌘? to see all shortcuts (#349)
+- **TechDocsPanel** — Catalog entity documentation panel with markdown rendering (#351)
+- **Dependency graph enhancements** — Navigation, lifecycle indicators, and auth-aware edges (#355)
+- **Generation error categorization** — Structured error messages with icons, titles, and suggestions (#353)
+- **Docs site theme toggle** — Dark/light theme support for documentation (#346)
+- **ARCHITECTURE.md** — Contributor onboarding guide with system architecture overview (#339)
+
+### Changed
+- **Empty dashboard CTA** — Improved call-to-action with direct generate action (#354)
+- **Docs site rebrand** — Forge Space identity applied to documentation site (#356)
+- **Onboarding redirect** — Incomplete onboarding users redirected to wizard (#345)
+
+### Security
+- **Semgrep CE + Trivy scanning** — CI security scanning pipeline (#352)
+
+### Internal
+- **Replace depcheck with knip** — Better dead code detection (#357)
+
+---
+
 ## [0.36.0] - 2026-03-07
 
 ### Added
