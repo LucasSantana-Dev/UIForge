@@ -1,0 +1,346 @@
+---
+title: catalog-info.yaml Reference
+description: Backstage-compatible entity definitions for the Siza Service Catalog.
+icon: FileCode
+---
+
+## Overview
+
+`catalog-info.yaml` is the standard format for declaring software entities in Backstage and Siza. These YAML files describe components, APIs, systems, and other entities in a machine-readable format.
+
+Siza fully supports the Backstage schema, making it easy to import existing catalog files or export Siza entities to Backstage.
+
+## Basic Structure
+
+A `catalog-info.yaml` file contains one or more entity definitions separated by `---`:
+
+```yaml
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: checkout-form
+  description: User-facing payment checkout component
+  tags:
+    - frontend
+    - payments
+spec:
+  type: website
+  lifecycle: production
+  owner: payments-team
+  dependsOn:
+    - component:stripe-integration
+```
+
+## Entity Kinds
+
+Siza maps Backstage kinds to internal entity types:
+
+| Backstage Kind | Siza Type  | Description                      |
+| -------------- | ---------- | -------------------------------- |
+| `Component`    | component  | Service, library, or website     |
+| `API`          | api        | API definition (REST/GraphQL)    |
+| `System`       | system     | Group of related components      |
+| `Domain`       | domain     | High-level business area         |
+| `Resource`     | library    | Infrastructure or shared package |
+| `Group`        | website    | Static site or docs              |
+
+## Full Schema
+
+### Component
+
+```yaml
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: auth-service
+  description: OAuth 2.0 authentication service
+  labels:
+    tier: backend
+    team: platform
+  tags:
+    - security
+    - authentication
+  annotations:
+    github.com/project-slug: forge-space/auth-service
+    docs.url: https://docs.forgespace.co/auth
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: authentication-system
+  dependsOn:
+    - component:user-db
+    - component:redis-cache
+  providesApis:
+    - oauth-api
+```
+
+### API
+
+```yaml
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: payments-rest-api
+  description: RESTful API for payment processing
+  tags:
+    - rest
+    - openapi
+spec:
+  type: openapi
+  lifecycle: production
+  owner: payments-team
+  system: payment-processing
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Payments API
+      version: 2.0.0
+```
+
+### System
+
+```yaml
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: payment-processing
+  description: Complete payment processing pipeline
+  tags:
+    - payments
+    - stripe
+spec:
+  owner: payments-team
+  domain: commerce
+```
+
+### Domain
+
+```yaml
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: commerce
+  description: E-commerce and payment processing domain
+spec:
+  owner: product-team
+```
+
+### Resource (Library)
+
+```yaml
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: core-library
+  description: Shared TypeScript utilities
+  tags:
+    - typescript
+    - npm
+spec:
+  type: library
+  lifecycle: production
+  owner: platform-team
+```
+
+## Field Reference
+
+### metadata
+
+| Field         | Required | Description                              |
+| ------------- | -------- | ---------------------------------------- |
+| `name`        | Yes      | Unique identifier (lowercase, hyphens)   |
+| `description` | No       | Human-readable summary                   |
+| `labels`      | No       | Key-value pairs for querying             |
+| `tags`        | No       | Array of searchable keywords             |
+| `annotations` | No       | External metadata (GitHub, docs URLs)    |
+
+### spec
+
+| Field          | Required | Description                              |
+| -------------- | -------- | ---------------------------------------- |
+| `type`         | No       | Entity subtype (service, website, etc.)  |
+| `lifecycle`    | No       | production, experimental, deprecated     |
+| `owner`        | No       | Team or individual responsible           |
+| `system`       | No       | Parent system reference                  |
+| `domain`       | No       | Parent domain reference                  |
+| `dependsOn`    | No       | Array of dependencies                    |
+| `providesApis` | No       | Array of API names                       |
+
+## Lifecycle Mapping
+
+Backstage lifecycle values are normalized to Siza's 3-stage model:
+
+| Backstage Lifecycle | Siza Lifecycle |
+| ------------------- | -------------- |
+| `production`        | production     |
+| `experimental`      | experimental   |
+| `alpha`, `beta`     | experimental   |
+| `deprecated`        | deprecated     |
+| (no value)          | production     |
+
+## Dependencies
+
+Use `dependsOn` to declare relationships:
+
+```yaml
+spec:
+  dependsOn:
+    - component:auth-service
+    - component:user-db
+    - resource:core-library
+```
+
+References use the format `<kind>:<name>`. Siza resolves these to internal entity IDs.
+
+## Parent Resolution
+
+Entities can reference parent systems or domains:
+
+```yaml
+metadata:
+  name: checkout-form
+spec:
+  system: payment-processing  # Parent system
+```
+
+The catalog UI renders this hierarchy in breadcrumbs and the dependency graph.
+
+## Importing YAML Files
+
+Use the import API to bulk-load entities:
+
+```typescript
+POST /api/catalog/import
+Content-Type: application/json
+
+{
+  "yaml": "...",  // catalog-info.yaml content
+  "source": "github"
+}
+
+Response:
+{
+  "imported": 3,
+  "entities": [
+    { "name": "auth-service", "kind": "component" },
+    { "name": "oauth-api", "kind": "api" },
+    { "name": "authentication-system", "kind": "system" }
+  ]
+}
+```
+
+### Multi-Entity Files
+
+Separate multiple entities with `---`:
+
+```yaml
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: commerce
+spec:
+  owner: product-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: payment-processing
+spec:
+  owner: payments-team
+  domain: commerce
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: stripe-integration
+spec:
+  type: service
+  lifecycle: production
+  owner: payments-team
+  system: payment-processing
+```
+
+## Name Normalization
+
+Siza normalizes entity names for consistency:
+
+- Converted to lowercase
+- Spaces replaced with hyphens
+- Non-alphanumeric characters removed
+
+Examples:
+
+| Input Name           | Normalized Name      |
+| -------------------- | -------------------- |
+| `CheckoutForm`       | `checkoutform`       |
+| `Stripe Integration` | `stripe-integration` |
+| `oauth-2.0-service`  | `oauth-20-service`   |
+
+## Example: Complete Catalog File
+
+```yaml
+apiVersion: backstage.io/v1alpha1
+kind: Domain
+metadata:
+  name: commerce
+  description: E-commerce and payment processing
+spec:
+  owner: product-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: payment-processing
+  description: Complete payment pipeline
+  tags:
+    - payments
+    - stripe
+spec:
+  owner: payments-team
+  domain: commerce
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: payments-rest-api
+  description: RESTful API for payment operations
+spec:
+  type: openapi
+  lifecycle: production
+  owner: payments-team
+  system: payment-processing
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: stripe-integration
+  description: Stripe API client service
+  tags:
+    - backend
+    - nodejs
+spec:
+  type: service
+  lifecycle: production
+  owner: payments-team
+  system: payment-processing
+  providesApis:
+    - payments-rest-api
+  dependsOn:
+    - resource:stripe-sdk
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: stripe-sdk
+  description: Stripe Node.js SDK
+spec:
+  type: library
+  lifecycle: production
+  owner: platform-team
+```
+
+## Next Steps
+
+- **[Service Catalog](/docs/guides/service-catalog)** — Browse imported entities
+- **[Golden Path Templates](/docs/guides/golden-path-templates)** — Auto-generate catalog-info.yaml
