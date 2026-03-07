@@ -94,7 +94,7 @@ export function SignInClient() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
+                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500"
                 placeholder="name@example.com"
               />
             </div>
@@ -109,7 +109,7 @@ export function SignInClient() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-primary"
+                className="w-full rounded-lg border border-border bg-input px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500"
                 placeholder="Enter your password"
               />
             </div>
@@ -117,7 +117,7 @@ export function SignInClient() {
             <div className="flex justify-end">
               <Link
                 href="/forgot-password"
-                className="text-xs text-primary hover:text-primary-hover"
+                className="text-xs text-violet-400 hover:text-violet-300"
               >
                 Forgot password?
               </Link>
@@ -126,7 +126,7 @@ export function SignInClient() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-primary-hover disabled:opacity-50"
+              className="w-full rounded-lg bg-violet-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.2)] hover:shadow-[0_0_28px_rgba(124,58,237,0.3)] disabled:opacity-50 transition-all"
             >
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
@@ -156,7 +156,7 @@ export function SignInClient() {
 
           <p className="mt-6 text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="font-medium text-primary hover:underline">
+            <Link href="/signup" className="font-medium text-violet-400 hover:text-violet-300">
               Sign up
             </Link>
           </p>
