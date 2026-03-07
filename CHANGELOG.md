@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.29.0] - 2026-03-07
+
+### Added
+- **Workspace UI overhaul** — 2-column generate page layout with sidebar panel, enriched dashboard with usage stats/plan badge/usage bars, redesigned template cards with visual preview and framework badges
+- **Auth pages polish** — Brand violet accents on signin/signup pages
+
+### Dependencies
+- npm_and_yarn group updates (#284)
+
 ## [0.28.0] - 2026-03-07
 
 ### Added
