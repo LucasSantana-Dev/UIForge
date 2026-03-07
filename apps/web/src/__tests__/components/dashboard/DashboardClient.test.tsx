@@ -538,8 +538,8 @@ describe('DashboardClient', () => {
 
       renderWithQueryClient(<DashboardClient />);
 
-      expect(screen.getByText('No projects yet')).toBeInTheDocument();
-      expect(screen.getByText('Create your first project to get started')).toBeInTheDocument();
+      expect(screen.getByText('Ready to build something?')).toBeInTheDocument();
+      expect(screen.getByText('Describe what you need and Siza generates production-ready code.')).toBeInTheDocument();
     });
   });
 
