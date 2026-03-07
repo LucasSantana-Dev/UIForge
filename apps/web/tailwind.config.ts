@@ -29,10 +29,10 @@ const config: Config = {
           4: 'var(--surface-4)',
         },
         brand: {
-          DEFAULT: 'var(--brand)',
-          light: 'var(--brand-light)',
-          dark: 'var(--brand-dark)',
-          muted: 'var(--brand-muted)',
+          DEFAULT: 'rgb(var(--forge-primary-rgb) / <alpha-value>)',
+          light: '#a78bfa',
+          dark: '#6d28d9',
+          muted: '#4c1d95',
         },
         'text-primary': 'var(--text-primary)',
         'text-secondary': 'var(--text-secondary)',
@@ -43,7 +43,7 @@ const config: Config = {
         error: 'var(--error)',
         info: 'var(--info)',
         primary: {
-          DEFAULT: 'var(--forge-primary)',
+          DEFAULT: 'rgb(var(--forge-primary-rgb) / <alpha-value>)',
           foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {

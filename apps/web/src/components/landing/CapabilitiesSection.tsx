@@ -60,12 +60,12 @@ const iconColors: Record<string, string> = {
 };
 
 const iconBgs: Record<string, string> = {
-  'Architecture-First': 'bg-purple-500/10',
-  'Security by Default': 'bg-emerald-500/10',
-  'Quality Gates': 'bg-blue-500/10',
-  'Full-Stack Scaffolds': 'bg-amber-500/10',
-  'Context-Aware Generation': 'bg-indigo-500/10',
-  'Multi-Provider AI': 'bg-rose-500/10',
+  'Architecture-First': 'bg-purple-500/20',
+  'Security by Default': 'bg-emerald-500/20',
+  'Quality Gates': 'bg-blue-500/20',
+  'Full-Stack Scaffolds': 'bg-amber-500/20',
+  'Context-Aware Generation': 'bg-indigo-500/20',
+  'Multi-Provider AI': 'bg-rose-500/20',
 };
 
 export function CapabilitiesSection() {
@@ -76,7 +76,7 @@ export function CapabilitiesSection() {
       <div className={CONTAINER}>
         <FadeIn>
           <div className="text-center">
-            <p className="text-sm font-mono text-brand tracking-wider uppercase mb-4">
+            <p className="text-sm font-mono text-violet-400 tracking-wider uppercase mb-4">
               Capabilities
             </p>
             <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-4">
@@ -96,7 +96,7 @@ export function CapabilitiesSection() {
                 <motion.div
                   whileHover={prefersReducedMotion ? undefined : { y: -2 }}
                   whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
-                  className="group bg-[#18181B] border border-[#27272A] rounded-xl p-6 transition-all duration-200 ease-siza hover:border-[var(--border-hover)] hover:shadow-card-hover"
+                  className="group bg-[#18181B] border border-[#27272A] rounded-xl p-6 transition-all duration-200 ease-siza hover:border-violet-500/30 hover:shadow-card-hover"
                 >
                   <div
                     className={`w-10 h-10 flex items-center justify-center rounded-lg ${iconBgs[cap.title] || 'bg-brand/10'} mb-4 transition-transform duration-200 group-hover:scale-110`}

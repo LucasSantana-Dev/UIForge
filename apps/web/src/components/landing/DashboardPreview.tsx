@@ -9,7 +9,7 @@ export function DashboardPreview() {
     <section className={`${SECTION_PADDING} border-t border-[#27272A]`}>
       <div className={CONTAINER}>
         <div className="text-center">
-          <div className="text-sm font-mono text-brand tracking-wider uppercase mb-4">Preview</div>
+          <div className="text-sm font-mono text-violet-400 tracking-wider uppercase mb-4">Preview</div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-4">
             Your AI workspace
           </h2>
@@ -27,9 +27,9 @@ export function DashboardPreview() {
           >
             <div className="flex items-center gap-2 px-4 py-3 bg-[#18181B] border-b border-[#27272A]">
               <div className="flex gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-[#3F3F46]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#3F3F46]" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#3F3F46]" />
+                <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
               </div>
               <div className="text-xs text-[#71717A] font-mono mx-auto">
                 siza.forgespace.co/generate
@@ -42,7 +42,7 @@ export function DashboardPreview() {
                   <Sparkles className="w-4 h-4" />
                   <span>Generate</span>
                 </div>
-                <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-brand/10 text-brand-light border-l-2 border-brand">
+                <div className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm bg-violet-500/15 text-violet-300 border-l-2 border-violet-500">
                   <Layers className="w-4 h-4" />
                   <span>Components</span>
                 </div>
@@ -67,7 +67,7 @@ export function DashboardPreview() {
               <div className="flex-1 p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-[#FAFAFA]">Components</h3>
-                  <span className="text-xs bg-brand/10 text-brand-light rounded-md px-2 py-0.5">
+                  <span className="text-xs bg-violet-500/15 text-violet-300 rounded-md px-2 py-0.5">
                     24 items
                   </span>
                 </div>
@@ -76,16 +76,16 @@ export function DashboardPreview() {
                   <div className="rounded-lg border border-[#27272A] bg-[#18181B] p-4">
                     <div className="text-sm font-medium text-[#FAFAFA] mb-3">Button</div>
                     <div className="flex gap-2">
-                      <div className="h-7 w-16 rounded bg-brand" />
+                      <div className="h-7 w-16 rounded bg-violet-600" />
                       <div className="h-7 w-16 rounded border border-[#27272A]" />
                     </div>
                   </div>
                   <div className="rounded-lg border border-[#27272A] bg-[#18181B] p-4">
                     <div className="text-sm font-medium text-[#FAFAFA] mb-3">Badge</div>
                     <div className="flex gap-2">
-                      <div className="h-5 w-12 rounded-full bg-[#3F3F46]" />
-                      <div className="h-5 w-12 rounded-full bg-[#3F3F46]" />
-                      <div className="h-5 w-12 rounded-full bg-[#3F3F46]" />
+                      <div className="h-5 w-12 rounded-full bg-violet-500/20 border border-violet-500/30" />
+                      <div className="h-5 w-12 rounded-full bg-emerald-500/20 border border-emerald-500/30" />
+                      <div className="h-5 w-12 rounded-full bg-amber-500/20 border border-amber-500/30" />
                     </div>
                   </div>
                   <div className="rounded-lg border border-[#27272A] bg-[#18181B] p-4">
