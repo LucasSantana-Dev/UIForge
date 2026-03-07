@@ -66,9 +66,7 @@ export default function CatalogForm({ mode, initialData, entryId, onSuccess }: C
       repository_url: formData.repository_url || undefined,
       documentation_url: formData.documentation_url || undefined,
       project_id: formData.project_id || undefined,
-      metadata: formData.openapi_spec
-        ? { openapi_spec: formData.openapi_spec }
-        : undefined,
+      metadata: formData.openapi_spec ? { openapi_spec: formData.openapi_spec } : undefined,
     };
 
     try {
@@ -266,9 +264,7 @@ export default function CatalogForm({ mode, initialData, entryId, onSuccess }: C
               id="catalog-openapi"
               rows={8}
               value={formData.openapi_spec}
-              onChange={(e) =>
-                setFormData({ ...formData, openapi_spec: e.target.value })
-              }
+              onChange={(e) => setFormData({ ...formData, openapi_spec: e.target.value })}
               className="w-full px-4 py-2 bg-surface-1 border border-surface-3 rounded-lg font-mono text-sm"
               placeholder="Paste OpenAPI 3.x spec (YAML or JSON)"
             />

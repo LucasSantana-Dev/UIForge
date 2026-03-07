@@ -15,10 +15,7 @@ export default function ApiDocsPanel({ spec }: ApiDocsPanelProps) {
 
   const { parsed, endpoints, error } = useMemo(() => {
     try {
-      const content =
-        typeof spec === 'string'
-          ? spec
-          : JSON.stringify(spec);
+      const content = typeof spec === 'string' ? spec : JSON.stringify(spec);
       const parsed = parseSpec(content);
       const endpoints = getEndpoints(parsed);
       return { parsed, endpoints, error: null };
@@ -26,10 +23,7 @@ export default function ApiDocsPanel({ spec }: ApiDocsPanelProps) {
       return {
         parsed: null,
         endpoints: [] as Endpoint[],
-        error:
-          e instanceof Error
-            ? e.message
-            : 'Failed to parse spec',
+        error: e instanceof Error ? e.message : 'Failed to parse spec',
       };
     }
   }, [spec]);
@@ -37,9 +31,7 @@ export default function ApiDocsPanel({ spec }: ApiDocsPanelProps) {
   if (error) {
     return (
       <div className="rounded-xl border border-red-500/20 bg-red-500/5 p-6">
-        <p className="text-sm text-red-400">
-          Invalid OpenAPI spec: {error}
-        </p>
+        <p className="text-sm text-red-400">Invalid OpenAPI spec: {error}</p>
       </div>
     );
   }
@@ -48,9 +40,7 @@ export default function ApiDocsPanel({ spec }: ApiDocsPanelProps) {
     return (
       <div className="rounded-xl border border-surface-3 bg-surface-1 p-6 text-center">
         <GlobeIcon className="h-8 w-8 text-text-secondary mx-auto mb-2" />
-        <p className="text-sm text-text-secondary">
-          No endpoints found in spec
-        </p>
+        <p className="text-sm text-text-secondary">No endpoints found in spec</p>
       </div>
     );
   }
@@ -58,31 +48,21 @@ export default function ApiDocsPanel({ spec }: ApiDocsPanelProps) {
   const filtered = search
     ? endpoints.filter(
         (ep) =>
-          ep.path
-            .toLowerCase()
-            .includes(search.toLowerCase()) ||
+          ep.path.toLowerCase().includes(search.toLowerCase()) ||
           ep.method.includes(search.toLowerCase()) ||
-          ep.operation.summary
-            ?.toLowerCase()
-            .includes(search.toLowerCase())
+          ep.operation.summary?.toLowerCase().includes(search.toLowerCase())
       )
     : endpoints;
 
-  const tags = new Set(
-    endpoints.flatMap((ep) => ep.operation.tags || [])
-  );
+  const tags = new Set(endpoints.flatMap((ep) => ep.operation.tags || []));
   const hasTags = tags.size > 0;
 
   const grouped: Record<string, Endpoint[]> = {};
   if (hasTags) {
     for (const tag of tags) {
-      grouped[tag] = filtered.filter((ep) =>
-        ep.operation.tags?.includes(tag)
-      );
+      grouped[tag] = filtered.filter((ep) => ep.operation.tags?.includes(tag));
     }
-    const untagged = filtered.filter(
-      (ep) => !ep.operation.tags?.length
-    );
+    const untagged = filtered.filter((ep) => !ep.operation.tags?.length);
     if (untagged.length > 0) {
       grouped['Other'] = untagged;
     }
@@ -90,8 +70,7 @@ export default function ApiDocsPanel({ spec }: ApiDocsPanelProps) {
     grouped[''] = filtered;
   }
 
-  const server =
-    parsed.servers?.[0]?.url || '';
+  const server = parsed.servers?.[0]?.url || '';
 
   return (
     <div className="rounded-xl border border-surface-3 bg-surface-1">
@@ -100,9 +79,7 @@ export default function ApiDocsPanel({ spec }: ApiDocsPanelProps) {
           <div className="flex items-center gap-3">
             <GlobeIcon className="h-5 w-5 text-violet-400" />
             <div>
-              <h2 className="text-lg font-semibold text-text-primary">
-                {parsed.info.title}
-              </h2>
+              <h2 className="text-lg font-semibold text-text-primary">{parsed.info.title}</h2>
               <div className="flex items-center gap-2 text-xs text-text-secondary">
                 <span>v{parsed.info.version}</span>
                 {server && (
@@ -144,10 +121,7 @@ export default function ApiDocsPanel({ spec }: ApiDocsPanelProps) {
                 )}
                 <div className="space-y-2">
                   {eps.map((ep) => (
-                    <EndpointCard
-                      key={`${ep.method}-${ep.path}`}
-                      endpoint={ep}
-                    />
+                    <EndpointCard key={`${ep.method}-${ep.path}`} endpoint={ep} />
                   ))}
                 </div>
               </div>

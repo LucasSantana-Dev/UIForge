@@ -1,9 +1,4 @@
-export type HttpMethod =
-  | 'get'
-  | 'post'
-  | 'put'
-  | 'patch'
-  | 'delete';
+export type HttpMethod = 'get' | 'post' | 'put' | 'patch' | 'delete';
 
 export const METHOD_COLORS: Record<HttpMethod, string> = {
   get: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',

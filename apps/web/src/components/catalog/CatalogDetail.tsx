@@ -275,9 +275,7 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
 
       {entry.metadata?.openapi_spec != null && (
         <div className="md:col-span-2">
-          <ApiDocsPanel
-            spec={entry.metadata.openapi_spec as string | Record<string, unknown>}
-          />
+          <ApiDocsPanel spec={entry.metadata.openapi_spec as string | Record<string, unknown>} />
         </div>
       )}
     </div>

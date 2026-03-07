@@ -1,9 +1,4 @@
-import {
-  detectFormat,
-  parseSpec,
-  validateSpec,
-  getEndpoints,
-} from '@/lib/openapi/parser';
+import { detectFormat, parseSpec, validateSpec, getEndpoints } from '@/lib/openapi/parser';
 
 const VALID_JSON_SPEC = JSON.stringify({
   openapi: '3.0.3',
@@ -170,19 +165,14 @@ describe('parseSpec', () => {
   });
 
   it('throws on valid JSON but invalid spec', () => {
-    expect(() => parseSpec('{"name":"test"}')).toThrow(
-      'Invalid OpenAPI specification'
-    );
+    expect(() => parseSpec('{"name":"test"}')).toThrow('Invalid OpenAPI specification');
   });
 });
 
 describe('resolveRefs', () => {
   it('resolves $ref to component schemas', () => {
     const spec = parseSpec(VALID_JSON_SPEC);
-    const postBody =
-      spec.paths['/pets']?.post?.requestBody?.content?.[
-        'application/json'
-      ]?.schema;
+    const postBody = spec.paths['/pets']?.post?.requestBody?.content?.['application/json']?.schema;
     expect(postBody).toBeDefined();
     expect(postBody?.type).toBe('object');
     expect(postBody?.properties?.name?.type).toBe('string');
@@ -203,9 +193,7 @@ describe('getEndpoints', () => {
   it('marks deprecated endpoints', () => {
     const spec = parseSpec(VALID_JSON_SPEC);
     const endpoints = getEndpoints(spec);
-    const deprecated = endpoints.find(
-      (e) => e.path === '/pets/{id}'
-    );
+    const deprecated = endpoints.find((e) => e.path === '/pets/{id}');
     expect(deprecated?.operation.deprecated).toBe(true);
   });
 });
