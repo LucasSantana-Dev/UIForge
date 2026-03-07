@@ -35,11 +35,13 @@ export function usePageMeta(isAdmin = false): PageMetaResult {
   }
 
   const segments = pathname.split('/').filter(Boolean);
+  const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   if (matchedKey && segments.length > 1) {
     const remaining = segments.slice(1);
     for (let i = 0; i < remaining.length; i++) {
       const seg = remaining[i];
       const href = '/' + segments.slice(0, i + 2).join('/');
+      if (uuidPattern.test(seg)) continue;
       const label = seg.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
       breadcrumbs.push({ label, href });
     }

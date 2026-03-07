@@ -33,8 +33,6 @@ export function useKeyboardShortcuts(options?: ShortcutOptions) {
         return;
       }
 
-      if (isEditableTarget(e.target)) return;
-
       if (e.key === 'b') {
         e.preventDefault();
         toggleSidebarCollapsed();
@@ -46,6 +44,8 @@ export function useKeyboardShortcuts(options?: ShortcutOptions) {
         options?.onShowShortcuts?.();
         return;
       }
+
+      if (isEditableTarget(e.target)) return;
 
       const navMap: Record<string, string> = {
         '1': '/projects',

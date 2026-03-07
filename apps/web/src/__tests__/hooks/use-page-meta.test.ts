@@ -56,6 +56,21 @@ describe('usePageMeta', () => {
     expect(result.current.breadcrumbs[2].label).toBe('Abc 123');
   });
 
+  it('skips UUID segments in breadcrumbs', () => {
+    mockPathname.mockReturnValue('/projects/a39c4406-75ed-43c2-ba5e-f27a6f88f2f5');
+    const { result } = renderHook(() => usePageMeta());
+    expect(result.current.title).toBe('Projects');
+    expect(result.current.breadcrumbs).toHaveLength(2);
+    expect(result.current.breadcrumbs[1].label).toBe('Projects');
+  });
+
+  it('skips UUID but keeps named segments', () => {
+    mockPathname.mockReturnValue('/projects/a39c4406-75ed-43c2-ba5e-f27a6f88f2f5/generate');
+    const { result } = renderHook(() => usePageMeta());
+    expect(result.current.breadcrumbs).toHaveLength(3);
+    expect(result.current.breadcrumbs[2].label).toBe('Generate');
+  });
+
   it('falls back to Dashboard for unknown paths', () => {
     mockPathname.mockReturnValue('/unknown');
     const { result } = renderHook(() => usePageMeta());
