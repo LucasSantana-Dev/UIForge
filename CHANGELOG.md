@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.36.0] - 2026-03-07
+
+### Added
+- **Dashboard generation count** — Shows all-time total generations in stat card with monthly count as subtitle (#333)
+- **Catalog scorecard integration** — Quality badges on catalog entries with linked scorecards (#337)
+- **Governance guides** — Scorecard, policy packs, and BYOK documentation (#335)
+- **catalog-info.yaml** — Backstage-compatible service metadata for IDP self-registration (#338)
+
+### Changed
+- **lucide-react** bumped to 0.577.0 (#334)
+
+---
+
 ## [0.35.0] - 2026-03-07
 
 ### Added
