@@ -5,11 +5,24 @@ export interface QualityResult {
   severity: 'info' | 'warning' | 'error';
 }
 
+export interface PostGenScoreResult {
+  score: number;
+  grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  passed: boolean;
+  checks: Array<{
+    name: string;
+    passed: boolean;
+    message: string;
+    weight: number;
+  }>;
+}
+
 export interface QualityReport {
   passed: boolean;
   results: QualityResult[];
   score: number;
   timestamp: string;
+  postGenScore?: PostGenScoreResult;
 }
 
 const XSS_PATTERN_STRINGS = [

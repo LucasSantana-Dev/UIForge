@@ -181,7 +181,7 @@ export async function POST(request: NextRequest) {
             controller.enqueue(encoder.encode(createSseEvent(event)));
           }
 
-          const qualityReport = runQualityGates(fullCode);
+          const qualityReport = runQualityGates(fullCode, input.framework);
           controller.enqueue(
             encoder.encode(
               createSseEvent({

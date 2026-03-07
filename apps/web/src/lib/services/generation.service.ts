@@ -1,7 +1,7 @@
 import { createGeneration, updateGeneration } from '@/lib/repositories/generation.repo';
 import { enrichPromptWithContext } from './context-enrichment';
 import { storeGenerationEmbedding } from './embeddings';
-import { runAllGates, type QualityReport } from '@/lib/quality/gates';
+import { runAllGates, type QualityReport, type PostGenScoreResult } from '@/lib/quality/gates';
 import { incrementGenerationCount } from '@/lib/usage/tracker';
 import { assembleContext } from '@forgespace/siza-gen/lite';
 import { getFeatureFlag } from '@/lib/features/flags';
@@ -139,8 +139,41 @@ export async function failGeneration(generationId: string, errorMessage: string)
   });
 }
 
-export function runQualityGates(code: string): QualityReport {
-  return runAllGates(code);
+export function runQualityGates(code: string, framework?: string): QualityReport {
+  const report = runAllGates(code);
+
+  if (getFeatureFlag('ENABLE_POST_GEN_SCORING')) {
+    try {
+      const {
+        scoreGeneratedCode,
+      } = require('@forgespace/core/dist/patterns/idp/scorecards/post-gen-scorer');
+      const result = scoreGeneratedCode(code, { framework });
+      const gradeMap: Record<string, PostGenScoreResult['grade']> = {
+        A: 'A',
+        B: 'B',
+        C: 'C',
+        D: 'D',
+        F: 'F',
+      };
+      report.postGenScore = {
+        score: result.score,
+        grade: gradeMap[result.grade] ?? 'F',
+        passed: result.passed,
+        checks: result.checks.map(
+          (c: { name: string; passed: boolean; message: string; weight: number }) => ({
+            name: c.name,
+            passed: c.passed,
+            message: c.message,
+            weight: c.weight,
+          })
+        ),
+      };
+    } catch {
+      // Non-blocking — post-gen scoring is optional
+    }
+  }
+
+  return report;
 }
 
 export async function postGenerationTasks(

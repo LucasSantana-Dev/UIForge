@@ -44,6 +44,22 @@ export function QualityBadge({ report }: QualityBadgeProps) {
         {icon}
         {label}
       </button>
+      {report.postGenScore && (
+        <span
+          className={`inline-flex items-center px-2 py-1 text-xs font-bold rounded-md border ${
+            report.postGenScore.grade === 'A'
+              ? 'text-green-400 border-green-800 bg-green-900/30'
+              : report.postGenScore.grade === 'B'
+                ? 'text-blue-400 border-blue-800 bg-blue-900/30'
+                : report.postGenScore.grade === 'C'
+                  ? 'text-yellow-400 border-yellow-800 bg-yellow-900/30'
+                  : 'text-red-400 border-red-800 bg-red-900/30'
+          }`}
+          title={`Post-gen score: ${report.postGenScore.score}/100`}
+        >
+          {report.postGenScore.grade}
+        </span>
+      )}
       {panelOpen && <QualityPanel report={report} open={panelOpen} onOpenChange={setPanelOpen} />}
     </>
   );

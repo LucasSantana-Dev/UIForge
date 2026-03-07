@@ -33,6 +33,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_SIZA_GEN_CONTEXT: true,
   ENABLE_SOFTWARE_CATALOG: true,
   ENABLE_GOLDEN_PATHS: true,
+  ENABLE_POST_GEN_SCORING: true,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -227,6 +228,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_GOLDEN_PATHS,
     description: 'Enable golden path templates for project scaffolding with governance',
     category: 'governance',
+  },
+  {
+    name: 'ENABLE_POST_GEN_SCORING',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_POST_GEN_SCORING,
+    description: 'Run post-generation quality scoring and show A-F grade in preview',
+    category: 'quality',
   },
 ];
 

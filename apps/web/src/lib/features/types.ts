@@ -30,7 +30,8 @@ export type FeatureFlagName =
   | 'ENABLE_PROJECT_SCORECARDS'
   | 'ENABLE_SIZA_GEN_CONTEXT'
   | 'ENABLE_SOFTWARE_CATALOG'
-  | 'ENABLE_GOLDEN_PATHS';
+  | 'ENABLE_GOLDEN_PATHS'
+  | 'ENABLE_POST_GEN_SCORING';
 
 export type FeatureFlagCategory =
   | 'auth'
