@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { GoldenPathRow } from '@/lib/repositories/golden-path.repo';
 
 export interface GoldenPathsResponse {
-  templates: GoldenPathRow[];
+  data: GoldenPathRow[];
   pagination: {
     page: number;
     limit: number;
@@ -13,11 +13,15 @@ export interface GoldenPathsResponse {
   };
 }
 
+export type GoldenPathFilters = GoldenPathsParams;
+
 interface GoldenPathsParams {
   search?: string;
   type?: string;
   lifecycle?: string;
   framework?: string;
+  stack?: string;
+  language?: string;
   tags?: string;
   page?: number;
   limit?: number;
@@ -93,6 +97,35 @@ export function useDeleteGoldenPath() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['golden-paths'] });
+    },
+  });
+}
+
+
+export function useScaffoldProject() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      goldenPathId: string;
+      projectName: string;
+    }) => {
+      const res = await fetch('/api/golden-paths/scaffold', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          golden_path_id: params.goldenPathId,
+          project_name: params.projectName,
+        }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Failed to scaffold project');
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['golden-paths'] });
+      queryClient.invalidateQueries({ queryKey: ['projects'] });
     },
   });
 }

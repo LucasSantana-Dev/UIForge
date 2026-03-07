@@ -10,7 +10,17 @@ export interface GoldenPathRow {
   lifecycle: string;
   framework: string;
   language: string;
+  stack: string;
   tags: string[];
+  is_official: boolean;
+  includes_ci: boolean;
+  includes_testing: boolean;
+  includes_linting: boolean;
+  includes_monitoring: boolean;
+  includes_docker: boolean;
+  catalog_type: string;
+  catalog_lifecycle: string;
+  usage_count: number;
   parameters: Array<{
     name: string;
     type: string;

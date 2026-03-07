@@ -21,6 +21,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@siza/ui';
 import { useGoldenPaths, useScaffoldProject } from '@/hooks/use-golden-paths';
 import type { GoldenPathFilters } from '@/hooks/use-golden-paths';
+import type { GoldenPathRow } from '@/lib/repositories/golden-path.repo';
 
 const STACK_META: Record<string, { icon: typeof ServerIcon; label: string }> = {
   nextjs: { icon: GlobeIcon, label: 'Next.js' },
@@ -92,7 +93,7 @@ export function GoldenPathsClient() {
   const pagination = data?.pagination;
 
   const handleSearch = () => {
-    setFilters((prev) => ({
+    setFilters((prev: GoldenPathFilters) => ({
       ...prev,
       search: searchInput || undefined,
       page: 1,
@@ -140,7 +141,7 @@ export function GoldenPathsClient() {
           <select
             value={filters.stack || ''}
             onChange={(e) =>
-              setFilters((prev) => ({
+              setFilters((prev: GoldenPathFilters) => ({
                 ...prev,
                 stack: e.target.value || undefined,
                 page: 1,
@@ -158,7 +159,7 @@ export function GoldenPathsClient() {
           <select
             value={filters.language || ''}
             onChange={(e) =>
-              setFilters((prev) => ({
+              setFilters((prev: GoldenPathFilters) => ({
                 ...prev,
                 language: e.target.value || undefined,
                 page: 1,
@@ -193,7 +194,7 @@ export function GoldenPathsClient() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {paths.map((path) => {
+          {paths.map((path: GoldenPathRow) => {
             const stackMeta = STACK_META[path.stack] || STACK_META.nextjs;
             const StackIcon = stackMeta.icon;
             const langColor = LANGUAGE_COLORS[path.language] || 'bg-surface-2 text-text-muted';
@@ -317,7 +318,7 @@ export function GoldenPathsClient() {
               size="sm"
               disabled={pagination.page <= 1}
               onClick={() =>
-                setFilters((prev) => ({
+                setFilters((prev: GoldenPathFilters) => ({
                   ...prev,
                   page: (prev.page || 1) - 1,
                 }))
@@ -334,7 +335,7 @@ export function GoldenPathsClient() {
               size="sm"
               disabled={pagination.page >= pagination.pages}
               onClick={() =>
-                setFilters((prev) => ({
+                setFilters((prev: GoldenPathFilters) => ({
                   ...prev,
                   page: (prev.page || 1) + 1,
                 }))
