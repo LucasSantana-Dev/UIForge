@@ -111,5 +111,11 @@ export async function getCatalogStats(): Promise<{
   servicesAndApis: number;
   libsAndComponents: number;
 }> {
-  return repoGetCatalogStats();
+  const stats = await repoGetCatalogStats();
+  return {
+    total: stats.total,
+    production: stats.byLifecycle['production'] || 0,
+    servicesAndApis: (stats.byType['service'] || 0) + (stats.byType['api'] || 0),
+    libsAndComponents: (stats.byType['library'] || 0) + (stats.byType['component'] || 0),
+  };
 }
