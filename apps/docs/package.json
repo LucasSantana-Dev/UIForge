@@ -11,10 +11,10 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
-    "fumadocs-core": "^16.6.5",
-    "fumadocs-mdx": "^14.2.8",
-    "fumadocs-ui": "^16.6.5",
-    "lucide-react": "^0.564.0",
+    "fumadocs-core": "^16.6.10",
+    "fumadocs-mdx": "^14.2.9",
+    "fumadocs-ui": "^16.6.10",
+    "lucide-react": "^0.577.0",
     "next": "^16.1.5",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -27,7 +27,7 @@
     "eslint": "^9.17.0",
     "eslint-config-next": "^16.1.5",
     "typescript": "^5.7.2",
-    "wrangler": "^4.0.0"
+    "wrangler": "^4.71.0"
   },
   "engines": {
     "node": ">=22"
