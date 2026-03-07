@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import type { CatalogEntryRow, CatalogGraphData } from '@/lib/repositories/catalog.repo';
 
 export interface CatalogFilters {
@@ -75,5 +75,58 @@ export function useCatalogStats() {
     queryKey: ['catalog-stats'],
     queryFn: fetchCatalogStats,
     staleTime: 30_000,
+  });
+}
+
+export interface DiscoveredRepo {
+  repoId: number;
+  fullName: string;
+  defaultBranch: string;
+  description: string | null;
+  language: string | null;
+  installationId: number;
+  entityCount: number;
+  entities: Array<{ name: string; kind: string; type: string }>;
+}
+
+interface DiscoveryResponse {
+  data: {
+    discovered: DiscoveredRepo[];
+    scanned: number;
+    errors: Array<{ repo: string; error: string }>;
+  };
+}
+
+async function fetchDiscovery(): Promise<DiscoveryResponse> {
+  const res = await fetch('/api/catalog/discover');
+  if (!res.ok) throw new Error('Failed to scan repositories');
+  return res.json();
+}
+
+export function useCatalogDiscovery() {
+  return useQuery({
+    queryKey: ['catalog-discovery'],
+    queryFn: fetchDiscovery,
+    enabled: false,
+  });
+}
+
+export function useImportDiscovered() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (repos: Array<{ installationId: number; fullName: string }>) => {
+      const res = await fetch('/api/catalog/discover', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repos }),
+      });
+      if (!res.ok) throw new Error('Failed to import');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['catalog'] });
+      queryClient.invalidateQueries({ queryKey: ['catalog-stats'] });
+    },
   });
 }

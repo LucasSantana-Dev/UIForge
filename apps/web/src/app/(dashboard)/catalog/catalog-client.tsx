@@ -318,6 +318,15 @@ export function CatalogClient() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Link href="/catalog/discover">
+            <Button
+              variant="outline"
+              className="border-surface-3 text-text-secondary hover:text-text-primary"
+            >
+              <SearchIcon className="mr-2 h-4 w-4" />
+              Discover
+            </Button>
+          </Link>
           <Link href="/catalog/graph">
             <Button
               variant="outline"
