@@ -32,6 +32,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_PROJECT_SCORECARDS: true,
   ENABLE_SIZA_GEN_CONTEXT: true,
   ENABLE_SOFTWARE_CATALOG: true,
+  ENABLE_GOLDEN_PATHS: true,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -219,6 +220,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     name: 'ENABLE_SOFTWARE_CATALOG',
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_SOFTWARE_CATALOG,
     description: 'Enable software catalog for service discovery and tracking',
+    category: 'governance',
+  },
+  {
+    name: 'ENABLE_GOLDEN_PATHS',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_GOLDEN_PATHS,
+    description: 'Enable golden path templates for project scaffolding with governance',
     category: 'governance',
   },
 ];

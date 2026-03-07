@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { verifySession } from '@/lib/api';
+import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { getGoldenPathDetail, verifyGoldenPathOwnership } from '@/lib/services/golden-path.service';
@@ -12,10 +12,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     const { allowed, remaining, resetAt } = await checkRateLimit(request, 120, 60_000);
     if (!allowed) {
-      return errorResponse('Rate limit exceeded', 429, {
-        remaining,
-        resetAt,
-      });
+      const resp = errorResponse('Rate limit exceeded', 429);
+      setRateLimitHeaders(resp, { allowed, remaining, resetAt }, 120);
+      return resp;
     }
 
     const { id } = await params;
@@ -37,10 +36,9 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   try {
     const { allowed, remaining, resetAt } = await checkRateLimit(request, 30, 60_000);
     if (!allowed) {
-      return errorResponse('Rate limit exceeded', 429, {
-        remaining,
-        resetAt,
-      });
+      const resp = errorResponse('Rate limit exceeded', 429);
+      setRateLimitHeaders(resp, { allowed, remaining, resetAt }, 120);
+      return resp;
     }
 
     const { user } = await verifySession();
@@ -57,9 +55,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const parseResult = updateGoldenPathSchema.safeParse(body);
     if (!parseResult.success) {
-      return errorResponse('Invalid request body', 400, {
-        errors: parseResult.error.issues,
-      });
+      return errorResponse('Invalid request body', 400);
     }
 
     const updated = await updateGoldenPath(id, parseResult.data);
@@ -86,10 +82,9 @@ export async function DELETE(
   try {
     const { allowed, remaining, resetAt } = await checkRateLimit(request, 30, 60_000);
     if (!allowed) {
-      return errorResponse('Rate limit exceeded', 429, {
-        remaining,
-        resetAt,
-      });
+      const resp = errorResponse('Rate limit exceeded', 429);
+      setRateLimitHeaders(resp, { allowed, remaining, resetAt }, 120);
+      return resp;
     }
 
     const { user } = await verifySession();

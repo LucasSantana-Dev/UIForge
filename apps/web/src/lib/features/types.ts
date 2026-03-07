@@ -29,7 +29,8 @@ export type FeatureFlagName =
   | 'ENABLE_POLICY_ENGINE'
   | 'ENABLE_PROJECT_SCORECARDS'
   | 'ENABLE_SIZA_GEN_CONTEXT'
-  | 'ENABLE_SOFTWARE_CATALOG';
+  | 'ENABLE_SOFTWARE_CATALOG'
+  | 'ENABLE_GOLDEN_PATHS';
 
 export type FeatureFlagCategory =
   | 'auth'

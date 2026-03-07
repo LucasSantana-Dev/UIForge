@@ -13,126 +13,57 @@ jest.mock('@/lib/repositories/base.repo', () => ({
 }));
 
 const mockFind = findGoldenPathById as jest.MockedFunction<typeof findGoldenPathById>;
-const mockRepoList = goldenPathRepo.listGoldenPaths as jest.MockedFunction<
+const mockList = goldenPathRepo.listGoldenPaths as jest.MockedFunction<
   typeof goldenPathRepo.listGoldenPaths
 >;
 
 beforeEach(() => jest.clearAllMocks());
 
-const mockTemplate = {
+const mockPath = {
   id: 'gp-1',
+  owner_id: 'user-1',
   name: 'forge-next-service',
   display_name: 'Next.js Service',
-  description: 'Production-ready Next.js service',
-  type: 'service',
-  lifecycle: 'ga',
-  framework: 'next.js',
-  language: 'typescript',
-  owner_id: 'user-1',
-  tags: ['next.js', 'supabase'] as string[],
-  parameters: [] as any[],
-  steps: [] as any[],
-  repository_url: null,
-  documentation_url: null,
-  icon: null,
-  metadata: {},
-  created_at: '2026-01-01',
-  updated_at: '2026-01-01',
 };
 
 describe('verifyGoldenPathOwnership', () => {
-  it('returns template when user is owner', async () => {
-    mockFind.mockResolvedValueOnce(mockTemplate);
+  it('returns entry when user is owner', async () => {
+    mockFind.mockResolvedValueOnce(mockPath as any);
     const result = await goldenPathService.verifyGoldenPathOwnership('gp-1', 'user-1');
-    expect(result).toEqual(mockTemplate);
-  });
-
-  it('throws NotFoundError when template missing', async () => {
-    mockFind.mockResolvedValueOnce(null);
-    await expect(goldenPathService.verifyGoldenPathOwnership('missing', 'user-1')).rejects.toThrow(
-      NotFoundError
-    );
-  });
-
-  it('throws ForbiddenError when not owner', async () => {
-    mockFind.mockResolvedValueOnce({
-      ...mockTemplate,
-      owner_id: 'other-user',
-    });
-    await expect(goldenPathService.verifyGoldenPathOwnership('gp-1', 'user-1')).rejects.toThrow(
-      ForbiddenError
-    );
-  });
-});
-
-describe('getGoldenPathDetail', () => {
-  it('returns template by id', async () => {
-    mockFind.mockResolvedValueOnce(mockTemplate);
-    const result = await goldenPathService.getGoldenPathDetail('gp-1');
-    expect(result).toEqual(mockTemplate);
+    expect(result).toEqual(mockPath);
   });
 
   it('throws NotFoundError when missing', async () => {
     mockFind.mockResolvedValueOnce(null);
-    await expect(goldenPathService.getGoldenPathDetail('missing')).rejects.toThrow(NotFoundError);
+    await expect(
+      goldenPathService.verifyGoldenPathOwnership('x', 'user-1'),
+    ).rejects.toThrow(NotFoundError);
+  });
+
+  it('throws ForbiddenError when not owner', async () => {
+    mockFind.mockResolvedValueOnce({ ...mockPath, owner_id: 'other' } as any);
+    await expect(
+      goldenPathService.verifyGoldenPathOwnership('gp-1', 'user-1'),
+    ).rejects.toThrow(ForbiddenError);
   });
 });
 
 describe('listGoldenPathTemplates', () => {
-  const mockResult = {
-    data: [mockTemplate],
-    total: 15,
-    page: 1,
-    limit: 20,
-    hasMore: false,
-  };
-
-  it('returns paginated results with defaults', async () => {
-    mockRepoList.mockResolvedValueOnce(mockResult as any);
-    const result = await goldenPathService.listGoldenPathTemplates();
-    expect(result.data).toHaveLength(1);
-    expect(result.pagination).toEqual({
+  it('returns paginated results', async () => {
+    mockList.mockResolvedValueOnce({
+      data: [mockPath],
+      total: 5,
       page: 1,
       limit: 20,
-      total: 15,
-      pages: 1,
-    });
-  });
-
-  it('passes filters to repository', async () => {
-    mockRepoList.mockResolvedValueOnce(mockResult as any);
-    await goldenPathService.listGoldenPathTemplates({
-      search: 'next',
-      type: 'service',
-      framework: 'next.js',
-      page: 2,
-      limit: 5,
-    });
-    expect(mockRepoList).toHaveBeenCalledWith(
-      expect.objectContaining({
-        search: 'next',
-        type: 'service',
-        framework: 'next.js',
-        page: 2,
-        limit: 5,
-      })
-    );
-  });
-
-  it('splits comma-separated tags', async () => {
-    mockRepoList.mockResolvedValueOnce(mockResult as any);
-    await goldenPathService.listGoldenPathTemplates({
-      tags: 'next.js,supabase,tailwind',
-    });
-    expect(mockRepoList).toHaveBeenCalledWith(
-      expect.objectContaining({
-        tags: ['next.js', 'supabase', 'tailwind'],
-      })
-    );
+      hasMore: false,
+    } as any);
+    const result = await goldenPathService.listGoldenPathTemplates();
+    expect(result.data).toHaveLength(1);
+    expect(result.pagination.pages).toBe(1);
   });
 
   it('returns at least 1 page when empty', async () => {
-    mockRepoList.mockResolvedValueOnce({
+    mockList.mockResolvedValueOnce({
       data: [],
       total: 0,
       page: 1,

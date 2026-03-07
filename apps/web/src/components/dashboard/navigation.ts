@@ -6,6 +6,7 @@ import {
   KeyIcon,
   LayoutDashboardIcon,
   PlusIcon,
+  RocketIcon,
   SettingsIcon,
   ClockIcon,
   ShieldIcon,
@@ -33,18 +34,25 @@ const catalogNavigation: DashboardNavItem[] = [
   { name: 'Catalog', href: '/catalog', icon: BookOpenIcon },
 ];
 
+const goldenPathsNavigation: DashboardNavItem[] = [
+  { name: 'Golden Paths', href: '/golden-paths', icon: RocketIcon },
+];
+
 const adminDashboardNavigation: DashboardNavItem[] = [
   { name: 'Admin', href: '/admin', icon: ShieldIcon },
 ];
 
 export function getDashboardNavigation(isAdmin: boolean): DashboardNavItem[] {
   const isCatalogEnabled = getFeatureFlag('ENABLE_SOFTWARE_CATALOG');
+  const isGoldenPathsEnabled = getFeatureFlag('ENABLE_GOLDEN_PATHS');
   const catalogItems = isCatalogEnabled ? catalogNavigation : [];
+  const goldenPathItems = isGoldenPathsEnabled ? goldenPathsNavigation : [];
 
   const projectsIndex = baseDashboardNavigation.findIndex((item) => item.name === 'Projects');
   const navItems = [
     ...baseDashboardNavigation.slice(0, projectsIndex + 1),
     ...catalogItems,
+    ...goldenPathItems,
     ...baseDashboardNavigation.slice(projectsIndex + 1),
   ];
 

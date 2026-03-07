@@ -7,6 +7,7 @@ describe('dashboard navigation', () => {
     expect(items.map((item) => item.name)).toEqual([
       'Projects',
       'Catalog',
+      'Golden Paths',
       'Templates',
       'History',
       'AI Keys',

@@ -1,5 +1,5 @@
 import type { NextRequest } from 'next/server';
-import { verifySession } from '@/lib/api';
+import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, createdResponse, errorResponse } from '@/lib/api/response';
 import { listGoldenPathTemplates } from '@/lib/services/golden-path.service';
@@ -11,10 +11,9 @@ export async function GET(request: NextRequest) {
   try {
     const { allowed, remaining, resetAt } = await checkRateLimit(request, 120, 60_000);
     if (!allowed) {
-      return errorResponse('Rate limit exceeded', 429, {
-        remaining,
-        resetAt,
-      });
+      const resp = errorResponse('Rate limit exceeded', 429);
+      setRateLimitHeaders(resp, { allowed, remaining, resetAt }, 120);
+      return resp;
     }
 
     const { searchParams } = new URL(request.url);
@@ -39,10 +38,9 @@ export async function POST(request: NextRequest) {
   try {
     const { allowed, remaining, resetAt } = await checkRateLimit(request, 30, 60_000);
     if (!allowed) {
-      return errorResponse('Rate limit exceeded', 429, {
-        remaining,
-        resetAt,
-      });
+      const resp = errorResponse('Rate limit exceeded', 429);
+      setRateLimitHeaders(resp, { allowed, remaining, resetAt }, 120);
+      return resp;
     }
 
     const { user } = await verifySession();
@@ -66,7 +64,7 @@ export async function POST(request: NextRequest) {
       owner_id: user.id,
     });
 
-    const response = createdResponse(template, 'Golden path template created successfully');
+    const response = createdResponse({ data: template });
     setRateLimitHeaders(response, { allowed, remaining, resetAt }, 30);
     return response;
   } catch (error) {
