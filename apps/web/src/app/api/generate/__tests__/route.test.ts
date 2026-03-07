@@ -28,6 +28,7 @@ jest.mock('@/lib/services/provider-router', () => ({
 jest.mock('@/lib/services/generation.service', () => ({
   buildDesignContext: jest.fn().mockReturnValue(''),
   enrichWithRag: jest.fn().mockResolvedValue(''),
+  buildSizaGenContext: jest.fn().mockReturnValue(''),
   createGenerationRecord: jest.fn().mockResolvedValue('gen-1'),
   completeGeneration: jest.fn().mockResolvedValue(undefined),
   failGeneration: jest.fn().mockResolvedValue(undefined),
