@@ -2,24 +2,65 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Shield, Code2, Gauge, Scale, TrendingUp, AlertCircle, CheckCircle2 } from 'lucide-react';
+import {
+  Shield,
+  Code2,
+  Gauge,
+  Scale,
+  TrendingUp,
+  AlertCircle,
+  CheckCircle2,
+  ArrowLeftIcon,
+} from 'lucide-react';
+import Link from 'next/link';
 import { isFeatureEnabled } from '@/lib/features/flags';
 import { fetchLatestScorecard, fetchScorecardHistory } from '@/lib/scorecards/client';
 import type { ProjectScorecard } from '@/lib/scorecards/types';
 import { getScoreLevel } from '@/lib/scorecards/types';
+import { Skeleton } from '@siza/ui';
 
 const CATEGORY_META = {
-  security: { icon: Shield, label: 'Security', color: 'text-red-400' },
-  quality: { icon: Code2, label: 'Quality', color: 'text-blue-400' },
-  performance: { icon: Gauge, label: 'Performance', color: 'text-yellow-400' },
-  compliance: { icon: Scale, label: 'Compliance', color: 'text-purple-400' },
+  security: { icon: Shield, label: 'Security', color: 'text-red-400', bg: 'bg-red-500/10' },
+  quality: { icon: Code2, label: 'Quality', color: 'text-sky-400', bg: 'bg-sky-500/10' },
+  performance: {
+    icon: Gauge,
+    label: 'Performance',
+    color: 'text-amber-400',
+    bg: 'bg-amber-500/10',
+  },
+  compliance: {
+    icon: Scale,
+    label: 'Compliance',
+    color: 'text-violet-400',
+    bg: 'bg-violet-500/10',
+  },
 } as const;
 
 const LEVEL_STYLES = {
-  excellent: 'text-green-400 bg-green-400/10 border-green-400/30',
-  good: 'text-blue-400 bg-blue-400/10 border-blue-400/30',
-  'needs-work': 'text-yellow-400 bg-yellow-400/10 border-yellow-400/30',
-  critical: 'text-red-400 bg-red-400/10 border-red-400/30',
+  excellent: {
+    text: 'text-emerald-400',
+    bg: 'bg-emerald-500/10',
+    border: 'border-emerald-500/30',
+    bar: 'bg-emerald-400',
+  },
+  good: {
+    text: 'text-sky-400',
+    bg: 'bg-sky-500/10',
+    border: 'border-sky-500/30',
+    bar: 'bg-sky-400',
+  },
+  'needs-work': {
+    text: 'text-amber-400',
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-500/30',
+    bar: 'bg-amber-400',
+  },
+  critical: {
+    text: 'text-red-400',
+    bg: 'bg-red-500/10',
+    border: 'border-red-500/30',
+    bar: 'bg-red-400',
+  },
 };
 
 function ScoreGauge({ score, size = 'lg' }: { score: number; size?: 'sm' | 'lg' }) {
@@ -29,7 +70,7 @@ function ScoreGauge({ score, size = 'lg' }: { score: number; size?: 'sm' | 'lg' 
 
   return (
     <div
-      className={`${dim} rounded-full border-2 ${style} flex items-center justify-center font-bold`}
+      className={`${dim} rounded-full border-2 ${style.border} ${style.bg} ${style.text} flex items-center justify-center font-display font-bold`}
     >
       {score}
     </div>
@@ -46,16 +87,19 @@ function CategoryCard({
   const meta = CATEGORY_META[category];
   const Icon = meta.icon;
   const level = getScoreLevel(score);
+  const style = LEVEL_STYLES[level];
 
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4 flex items-center gap-4">
+    <div className="bg-surface-1 border border-surface-3 rounded-xl p-5 flex items-center gap-4 transition-colors hover:border-violet-500/20">
       <ScoreGauge score={score} size="sm" />
       <div>
-        <div className="flex items-center gap-2">
-          <Icon className={`h-4 w-4 ${meta.color}`} />
-          <span className="text-sm font-medium text-zinc-200">{meta.label}</span>
+        <div className="flex items-center gap-2 mb-1">
+          <div className={`w-7 h-7 rounded-lg ${meta.bg} flex items-center justify-center`}>
+            <Icon className={`h-3.5 w-3.5 ${meta.color}`} />
+          </div>
+          <span className="text-sm font-semibold text-text-primary">{meta.label}</span>
         </div>
-        <span className={`text-xs capitalize ${LEVEL_STYLES[level].split(' ')[0]}`}>
+        <span className={`text-xs font-medium capitalize ${style.text}`}>
           {level.replace('-', ' ')}
         </span>
       </div>
@@ -91,32 +135,74 @@ export default function ScorecardPage() {
 
   if (!enabled) {
     return (
-      <div className="p-8 text-center text-zinc-500">
-        Project scorecards are not enabled. Set ENABLE_PROJECT_SCORECARDS flag.
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-12 h-12 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-4">
+          <Gauge className="w-6 h-6 text-violet-400" />
+        </div>
+        <h3 className="text-lg font-display font-semibold text-text-primary mb-2">
+          Project Scorecard
+        </h3>
+        <p className="text-sm text-text-secondary">
+          Enable the <code className="font-mono text-violet-400">ENABLE_PROJECT_SCORECARDS</code>{' '}
+          flag.
+        </p>
       </div>
     );
   }
 
   if (loading) {
-    return <div className="p-8 text-center text-zinc-500">Loading scorecard...</div>;
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-8 w-48" />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-xl" />
+          ))}
+        </div>
+        <Skeleton className="h-40 w-full rounded-xl" />
+      </div>
+    );
   }
 
   if (!scorecard) {
     return (
-      <div className="p-8 text-center text-zinc-500">
-        No scorecard data yet. Scorecards are generated after code generation.
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <div className="w-12 h-12 rounded-2xl bg-violet-500/10 flex items-center justify-center mb-4">
+          <Gauge className="w-6 h-6 text-violet-400" />
+        </div>
+        <h3 className="text-lg font-display font-semibold text-text-primary mb-2">
+          No Scorecard Data
+        </h3>
+        <p className="text-sm text-text-secondary max-w-sm">
+          Scorecards are generated after code generation. Generate a component to see quality
+          scores.
+        </p>
+        <Link
+          href={`/generate?projectId=${projectId}`}
+          className="mt-4 text-sm text-violet-400 hover:text-violet-300 transition-colors"
+        >
+          Generate a component &rarr;
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold text-zinc-100">Project Scorecard</h1>
-          <p className="text-sm text-zinc-400 mt-1">
-            Last updated {new Date(scorecard.created_at).toLocaleDateString()}
-          </p>
+        <div className="flex items-center gap-3">
+          <Link
+            href={`/projects/${projectId}`}
+            className="p-1.5 rounded-md text-text-muted hover:text-text-primary hover:bg-surface-2 transition-colors"
+          >
+            <ArrowLeftIcon className="w-4 h-4" />
+          </Link>
+          <div>
+            <h1 className="text-3xl font-display font-bold text-text-primary">Project Scorecard</h1>
+            <p className="text-sm text-text-secondary mt-1">
+              Last updated {new Date(scorecard.created_at).toLocaleDateString()}
+            </p>
+          </div>
         </div>
         <ScoreGauge score={scorecard.overall_score} />
       </div>
@@ -129,15 +215,15 @@ export default function ScorecardPage() {
       </div>
 
       {scorecard.violations.length > 0 && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-zinc-200 flex items-center gap-2 mb-3">
+        <div className="bg-surface-1 border border-surface-3 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-3">
             <AlertCircle className="h-4 w-4 text-red-400" />
             Violations ({scorecard.violations.length})
           </h3>
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {scorecard.violations.map((v, i) => (
-              <li key={i} className="text-sm text-zinc-400 flex items-start gap-2">
-                <span className="text-red-400 mt-0.5">-</span>
+              <li key={i} className="text-sm text-text-secondary flex items-start gap-2">
+                <span className="text-red-400 mt-0.5 font-mono text-xs">&minus;</span>
                 {v}
               </li>
             ))}
@@ -146,15 +232,15 @@ export default function ScorecardPage() {
       )}
 
       {scorecard.recommendations.length > 0 && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-zinc-200 flex items-center gap-2 mb-3">
-            <CheckCircle2 className="h-4 w-4 text-green-400" />
+        <div className="bg-surface-1 border border-surface-3 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-3">
+            <CheckCircle2 className="h-4 w-4 text-emerald-400" />
             Recommendations
           </h3>
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {scorecard.recommendations.map((r, i) => (
-              <li key={i} className="text-sm text-zinc-400 flex items-start gap-2">
-                <span className="text-green-400 mt-0.5">+</span>
+              <li key={i} className="text-sm text-text-secondary flex items-start gap-2">
+                <span className="text-emerald-400 mt-0.5 font-mono text-xs">+</span>
                 {r}
               </li>
             ))}
@@ -163,27 +249,31 @@ export default function ScorecardPage() {
       )}
 
       {history.length > 1 && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-          <h3 className="text-sm font-medium text-zinc-200 flex items-center gap-2 mb-3">
-            <TrendingUp className="h-4 w-4 text-blue-400" />
+        <div className="bg-surface-1 border border-surface-3 rounded-xl p-5">
+          <h3 className="text-sm font-semibold text-text-primary flex items-center gap-2 mb-4">
+            <TrendingUp className="h-4 w-4 text-violet-400" />
             Score History
           </h3>
-          <div className="flex items-end gap-1 h-20">
+          <div className="flex items-end gap-1.5 h-24">
             {history
               .slice()
               .reverse()
               .map((s) => {
                 const level = getScoreLevel(s.overall_score);
-                const bgColor = LEVEL_STYLES[level].split(' ')[1];
+                const barColor = LEVEL_STYLES[level].bar;
                 return (
                   <div
                     key={s.id}
-                    className={`flex-1 rounded-t ${bgColor}`}
+                    className={`flex-1 rounded-t-md ${barColor} transition-all hover:opacity-80`}
                     style={{ height: `${s.overall_score}%` }}
-                    title={`${s.overall_score} — ${new Date(s.created_at).toLocaleDateString()}`}
+                    title={`${s.overall_score} \u2014 ${new Date(s.created_at).toLocaleDateString()}`}
                   />
                 );
               })}
+          </div>
+          <div className="flex justify-between mt-2 text-[10px] text-text-muted">
+            <span>Oldest</span>
+            <span>Latest</span>
           </div>
         </div>
       )}
