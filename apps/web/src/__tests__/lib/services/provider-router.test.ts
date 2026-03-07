@@ -53,9 +53,7 @@ describe('routeGeneration', () => {
 
   describe('MCP routing', () => {
     it('yields error when accessToken is missing', async () => {
-      const events = await collectEvents(
-        routeGeneration({ ...baseOpts, mcpEnabled: true })
-      );
+      const events = await collectEvents(routeGeneration({ ...baseOpts, mcpEnabled: true }));
       expect(events).toHaveLength(1);
       expect(events[0].type).toBe('error');
       expect(events[0].message).toContain('authentication');
@@ -76,7 +74,7 @@ describe('routeGeneration', () => {
       );
 
       expect(events[0].type).toBe('start');
-      expect(events.some(e => e.type === 'chunk')).toBe(true);
+      expect(events.some((e) => e.type === 'chunk')).toBe(true);
     });
 
     it('yields fallback event and falls back to Gemini on MCP failure', async () => {
@@ -98,10 +96,10 @@ describe('routeGeneration', () => {
       );
 
       expect(captureServerError).toHaveBeenCalled();
-      const fallbackEvent = events.find(e => e.type === 'fallback');
+      const fallbackEvent = events.find((e) => e.type === 'fallback');
       expect(fallbackEvent).toBeDefined();
       expect(fallbackEvent!.provider).toBe('gemini');
-      expect(events.some(e => e.type === 'chunk' && e.content === 'fallback-code')).toBe(true);
+      expect(events.some((e) => e.type === 'chunk' && e.content === 'fallback-code')).toBe(true);
     });
 
     it('does not yield fallback when MCP succeeds', async () => {
@@ -116,7 +114,7 @@ describe('routeGeneration', () => {
         routeGeneration({ ...baseOpts, mcpEnabled: true, accessToken: 'tok-123' })
       );
 
-      expect(events.find(e => e.type === 'fallback')).toBeUndefined();
+      expect(events.find((e) => e.type === 'fallback')).toBeUndefined();
     });
 
     it('filters out complete events from MCP stream', async () => {
@@ -131,7 +129,7 @@ describe('routeGeneration', () => {
         routeGeneration({ ...baseOpts, mcpEnabled: true, accessToken: 'tok-123' })
       );
 
-      expect(events.find(e => e.type === 'complete')).toBeUndefined();
+      expect(events.find((e) => e.type === 'complete')).toBeUndefined();
     });
   });
 
@@ -147,7 +145,7 @@ describe('routeGeneration', () => {
 
       const events = await collectEvents(routeGeneration(baseOpts));
 
-      expect(events.some(e => e.type === 'chunk')).toBe(true);
+      expect(events.some((e) => e.type === 'chunk')).toBe(true);
       expect(generateWithProvider).toHaveBeenCalledWith(
         expect.objectContaining({ provider: 'google' })
       );
@@ -173,7 +171,7 @@ describe('routeGeneration', () => {
       const events = await collectEvents(routeGeneration(baseOpts));
       delete process.env.ANTHROPIC_API_KEY;
 
-      const fallback = events.find(e => e.type === 'fallback');
+      const fallback = events.find((e) => e.type === 'fallback');
       expect(fallback).toBeDefined();
       expect(fallback!.provider).toBe('anthropic');
     });
@@ -189,9 +187,7 @@ describe('routeGeneration', () => {
         yield { type: 'complete', timestamp: 3 };
       });
 
-      const events = await collectEvents(
-        routeGeneration({ ...baseOpts, provider: 'siza' })
-      );
+      const events = await collectEvents(routeGeneration({ ...baseOpts, provider: 'siza' }));
 
       expect(events[0].type).toBe('routing');
     });
