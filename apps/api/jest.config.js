@@ -10,6 +10,9 @@ module.exports = {
   transform: {
     '^.+\\.ts$': 'ts-jest',
   },
+  moduleNameMapper: {
+    '^@forgespace/siza-gen/lite$': '<rootDir>/__mocks__/siza-gen-lite.js',
+  },
   collectCoverageFrom: [
     'src/**/*.{js,ts}',
     '!src/**/*.d.ts',
