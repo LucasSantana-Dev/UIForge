@@ -13,7 +13,11 @@ function isEditableTarget(target: EventTarget | null): boolean {
   return false;
 }
 
-export function useKeyboardShortcuts() {
+interface ShortcutOptions {
+  onShowShortcuts?: () => void;
+}
+
+export function useKeyboardShortcuts(options?: ShortcutOptions) {
   const router = useRouter();
   const toggleCommandPalette = useUIStore((s) => s.toggleCommandPalette);
   const toggleSidebarCollapsed = useUIStore((s) => s.toggleSidebarCollapsed);
@@ -34,6 +38,12 @@ export function useKeyboardShortcuts() {
       if (e.key === 'b') {
         e.preventDefault();
         toggleSidebarCollapsed();
+        return;
+      }
+
+      if (e.key === '?' && e.shiftKey) {
+        e.preventDefault();
+        options?.onShowShortcuts?.();
         return;
       }
 
@@ -64,5 +74,5 @@ export function useKeyboardShortcuts() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [router, toggleCommandPalette, toggleSidebarCollapsed]);
+  }, [router, toggleCommandPalette, toggleSidebarCollapsed, options]);
 }
