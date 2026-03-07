@@ -1,3 +1,4 @@
+import yaml from 'js-yaml';
 import { upsertCatalogEntry, findCatalogEntryByName } from '@/lib/repositories/catalog.repo';
 
 interface CatalogInfoSpec {
@@ -51,7 +52,11 @@ const VALID_TYPES = new Set([
 const VALID_LIFECYCLES = new Set(['experimental', 'production', 'deprecated']);
 
 export interface ImportResult {
-  imported: Array<{ name: string; type: string; action: 'created' | 'updated' }>;
+  imported: Array<{
+    name: string;
+    type: string;
+    action: 'created' | 'updated';
+  }>;
   errors: Array<{ name?: string; error: string }>;
 }
 
@@ -97,86 +102,22 @@ function extractDependencies(spec?: CatalogInfoSpec): string[] {
   return [...new Set(deps)];
 }
 
-function parseSimpleYaml(text: string): Record<string, any> {
-  const result: Record<string, any> = {};
-  const lines = text.split('\n');
-  const stack: Array<{ indent: number; obj: any; key?: string }> = [{ indent: -1, obj: result }];
-
-  for (const line of lines) {
-    if (!line.trim() || line.trim().startsWith('#')) continue;
-
-    const indent = line.search(/\S/);
-    const content = line.trim();
-
-    while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {
-      stack.pop();
-    }
-
-    if (content.startsWith('- ')) {
-      const arrayItem = content.slice(2).trim();
-      const frame = stack[stack.length - 1];
-      const grandparent = stack.length > 1 ? stack[stack.length - 2] : null;
-
-      if (
-        grandparent &&
-        frame.key &&
-        !Array.isArray(frame.obj) &&
-        typeof frame.obj === 'object' &&
-        Object.keys(frame.obj).length === 0
-      ) {
-        const arr: any[] = [];
-        grandparent.obj[frame.key] = arr;
-        stack[stack.length - 1] = { indent: frame.indent, obj: arr, key: frame.key };
-      }
-
-      const target = Array.isArray(stack[stack.length - 1].obj)
-        ? (stack[stack.length - 1].obj as any[])
-        : null;
-
-      if (target) {
-        if (arrayItem.includes(': ')) {
-          const obj: Record<string, any> = {};
-          const [k, ...vParts] = arrayItem.split(': ');
-          obj[k.trim()] = vParts
-            .join(': ')
-            .trim()
-            .replace(/^['"]|['"]$/g, '');
-          target.push(obj);
-        } else {
-          target.push(arrayItem.replace(/^['"]|['"]$/g, ''));
-        }
-      }
-      continue;
-    }
-
-    const parent = stack[stack.length - 1].obj;
-    const colonIdx = content.indexOf(':');
-    if (colonIdx === -1) continue;
-
-    const key = content.slice(0, colonIdx).trim();
-    const value = content.slice(colonIdx + 1).trim();
-
-    if (!value) {
-      parent[key] = {};
-      stack.push({ indent, obj: parent[key], key });
-    } else if (value === '[]') {
-      parent[key] = [];
-    } else {
-      parent[key] = value.replace(/^['"]|['"]$/g, '');
-    }
-  }
-
-  return result;
-}
-
 function parseEntities(yamlContent: string): CatalogInfoEntity[] {
-  const documents = yamlContent.split(/^---$/m).filter((d) => d.trim());
+  const docs = yaml.loadAll(yamlContent) as Record<string, unknown>[];
   const entities: CatalogInfoEntity[] = [];
 
-  for (const doc of documents) {
-    const entity = parseSimpleYaml(doc.trim());
-    if (entity && entity.apiVersion && entity.kind && entity.metadata?.name) {
-      entities.push(entity as CatalogInfoEntity);
+  for (const doc of docs) {
+    if (
+      doc &&
+      typeof doc === 'object' &&
+      'apiVersion' in doc &&
+      'kind' in doc &&
+      'metadata' in doc
+    ) {
+      const meta = doc.metadata as Record<string, unknown>;
+      if (meta && typeof meta === 'object' && 'name' in meta) {
+        entities.push(doc as unknown as CatalogInfoEntity);
+      }
     }
   }
 
@@ -190,6 +131,13 @@ export async function importCatalogYaml(
 ): Promise<ImportResult> {
   const result: ImportResult = { imported: [], errors: [] };
 
+  if (!yamlContent.trim()) {
+    result.errors.push({
+      error: 'No valid catalog entities found in YAML',
+    });
+    return result;
+  }
+
   let entities: CatalogInfoEntity[];
   try {
     entities = parseEntities(yamlContent);
@@ -199,7 +147,9 @@ export async function importCatalogYaml(
   }
 
   if (entities.length === 0) {
-    result.errors.push({ error: 'No valid catalog entities found in YAML' });
+    result.errors.push({
+      error: 'No valid catalog entities found in YAML',
+    });
     return result;
   }
 
@@ -221,8 +171,7 @@ export async function importCatalogYaml(
       const tags = entity.metadata.tags || [];
       const links = entity.metadata.links || [];
       const docUrl = links.find(
-        (l: { url: string; title?: string }) =>
-          l.title?.toLowerCase().includes('doc') || l.url.includes('docs')
+        (l) => l.title?.toLowerCase().includes('doc') || l.url.includes('docs')
       )?.url;
 
       const data: Record<string, unknown> = {
@@ -231,7 +180,7 @@ export async function importCatalogYaml(
         type,
         lifecycle,
         owner_id: ownerId,
-        tags: tags.slice(0, 20),
+        tags: Array.isArray(tags) ? tags.slice(0, 20) : [],
         dependencies: dependencies.slice(0, 50),
         description: entity.metadata.description || null,
         parent_id: parentId,
@@ -242,7 +191,7 @@ export async function importCatalogYaml(
           namespace: entity.metadata.namespace || 'default',
           annotations: entity.metadata.annotations || {},
           labels: entity.metadata.labels || {},
-          links,
+          links: Array.isArray(links) ? links : [],
         },
       };
 

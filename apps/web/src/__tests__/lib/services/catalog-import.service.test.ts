@@ -99,7 +99,10 @@ describe('importCatalogYaml', () => {
   });
 
   it('marks existing entries as updated', async () => {
-    findCatalogEntryByName.mockResolvedValueOnce({ id: 'existing-id', name: 'my-service' });
+    findCatalogEntryByName.mockResolvedValueOnce({
+      id: 'existing-id',
+      name: 'my-service',
+    });
 
     const result = await importCatalogYaml(SAMPLE_YAML, ownerId);
 
@@ -113,15 +116,17 @@ describe('importCatalogYaml', () => {
   });
 
   it('normalizes entity names to lowercase with hyphens', async () => {
-    const yaml = `apiVersion: backstage.io/v1alpha1
-kind: Component
-metadata:
-  name: My_Service.Name
-spec:
-  type: service
-  lifecycle: production`;
+    const yamlStr = [
+      'apiVersion: backstage.io/v1alpha1',
+      'kind: Component',
+      'metadata:',
+      '  name: My_Service.Name',
+      'spec:',
+      '  type: service',
+      '  lifecycle: production',
+    ].join('\n');
 
-    await importCatalogYaml(yaml, ownerId);
+    await importCatalogYaml(yamlStr, ownerId);
 
     expect(upsertCatalogEntry).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'my-service-name' })
@@ -129,27 +134,31 @@ spec:
   });
 
   it('maps Backstage kinds to Siza types', async () => {
-    const yaml = `apiVersion: backstage.io/v1alpha1
-kind: API
-metadata:
-  name: user-api
-spec:
-  lifecycle: production`;
+    const yamlStr = [
+      'apiVersion: backstage.io/v1alpha1',
+      'kind: API',
+      'metadata:',
+      '  name: user-api',
+      'spec:',
+      '  lifecycle: production',
+    ].join('\n');
 
-    await importCatalogYaml(yaml, ownerId);
+    await importCatalogYaml(yamlStr, ownerId);
 
     expect(upsertCatalogEntry).toHaveBeenCalledWith(expect.objectContaining({ type: 'api' }));
   });
 
   it('defaults lifecycle to experimental when unknown', async () => {
-    const yaml = `apiVersion: backstage.io/v1alpha1
-kind: Component
-metadata:
-  name: test-comp
-spec:
-  lifecycle: beta`;
+    const yamlStr = [
+      'apiVersion: backstage.io/v1alpha1',
+      'kind: Component',
+      'metadata:',
+      '  name: test-comp',
+      'spec:',
+      '  lifecycle: beta',
+    ].join('\n');
 
-    await importCatalogYaml(yaml, ownerId);
+    await importCatalogYaml(yamlStr, ownerId);
 
     expect(upsertCatalogEntry).toHaveBeenCalledWith(
       expect.objectContaining({ lifecycle: 'experimental' })
@@ -157,19 +166,22 @@ spec:
   });
 
   it('resolves parent_id from spec.system', async () => {
-    findCatalogEntryByName
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce({ id: 'parent-uuid', name: 'platform-system' });
+    findCatalogEntryByName.mockResolvedValueOnce(null).mockResolvedValueOnce({
+      id: 'parent-uuid',
+      name: 'platform-system',
+    });
 
-    const yaml = `apiVersion: backstage.io/v1alpha1
-kind: Component
-metadata:
-  name: web-frontend
-spec:
-  system: platform-system
-  lifecycle: production`;
+    const yamlStr = [
+      'apiVersion: backstage.io/v1alpha1',
+      'kind: Component',
+      'metadata:',
+      '  name: web-frontend',
+      'spec:',
+      '  system: platform-system',
+      '  lifecycle: production',
+    ].join('\n');
 
-    await importCatalogYaml(yaml, ownerId);
+    await importCatalogYaml(yamlStr, ownerId);
 
     expect(upsertCatalogEntry).toHaveBeenCalledWith(
       expect.objectContaining({ parent_id: 'parent-uuid' })
