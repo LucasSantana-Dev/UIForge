@@ -100,9 +100,7 @@ function extractDependencies(spec?: CatalogInfoSpec): string[] {
 function parseSimpleYaml(text: string): Record<string, any> {
   const result: Record<string, any> = {};
   const lines = text.split('\n');
-  const stack: Array<{ indent: number; obj: any; key?: string }> = [
-    { indent: -1, obj: result },
-  ];
+  const stack: Array<{ indent: number; obj: any; key?: string }> = [{ indent: -1, obj: result }];
 
   for (const line of lines) {
     if (!line.trim() || line.trim().startsWith('#')) continue;
@@ -139,7 +137,10 @@ function parseSimpleYaml(text: string): Record<string, any> {
         if (arrayItem.includes(': ')) {
           const obj: Record<string, any> = {};
           const [k, ...vParts] = arrayItem.split(': ');
-          obj[k.trim()] = vParts.join(': ').trim().replace(/^['"]|['"]$/g, '');
+          obj[k.trim()] = vParts
+            .join(': ')
+            .trim()
+            .replace(/^['"]|['"]$/g, '');
           target.push(obj);
         } else {
           target.push(arrayItem.replace(/^['"]|['"]$/g, ''));
