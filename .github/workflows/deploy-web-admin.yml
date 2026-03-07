@@ -30,7 +30,7 @@ jobs:
       url: ${{ github.event.inputs.environment == 'production' && 'https://siza.com' || 'https://preview.siza.com' }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
