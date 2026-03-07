@@ -7,7 +7,6 @@ jest.mock('@/lib/services/siza-router', () => ({
     model: 'gemini-2.5-flash',
     reason: 'default',
   }),
-  getQuotaFallback: jest.fn().mockReturnValue(null),
 }));
 
 jest.mock('@/lib/services/generation', () => ({
@@ -20,11 +19,6 @@ jest.mock('@/lib/mcp/client', () => ({
 
 jest.mock('@/lib/sentry/server', () => ({
   captureServerError: jest.fn(),
-}));
-
-jest.mock('@/lib/services/fallback-limiter', () => ({
-  canUseFallback: jest.fn().mockReturnValue(true),
-  recordFallback: jest.fn(),
 }));
 
 async function collectEvents(gen: AsyncGenerator<GenerationEvent>): Promise<GenerationEvent[]> {
@@ -146,29 +140,17 @@ describe('routeGeneration', () => {
       );
     });
 
-    it('handles quota error fallback to anthropic', async () => {
+    it('propagates errors without fallback', async () => {
       const { generateWithProvider } = require('@/lib/services/generation');
 
-      let callCount = 0;
       generateWithProvider.mockImplementation(async function* () {
-        callCount++;
-        if (callCount === 1) {
-          yield { type: 'start', timestamp: 1 };
-          yield { type: 'error', message: 'quota exceeded 429', timestamp: 2 };
-        } else {
-          yield { type: 'start', timestamp: 3 };
-          yield { type: 'chunk', content: 'anthropic-code', timestamp: 4 };
-          yield { type: 'complete', timestamp: 5 };
-        }
+        yield { type: 'error', message: 'quota exceeded 429', timestamp: 1 };
       });
 
-      process.env.ANTHROPIC_API_KEY = 'test-key';
       const events = await collectEvents(routeGeneration(baseOpts));
-      delete process.env.ANTHROPIC_API_KEY;
 
-      const fallback = events.find((e) => e.type === 'fallback');
-      expect(fallback).toBeDefined();
-      expect(fallback!.provider).toBe('anthropic');
+      expect(events).toHaveLength(1);
+      expect(events[0].type).toBe('error');
     });
   });
 
@@ -185,6 +167,21 @@ describe('routeGeneration', () => {
       const events = await collectEvents(routeGeneration({ ...baseOpts, provider: 'siza' }));
 
       expect(events[0].type).toBe('routing');
+    });
+
+    it('always routes to default provider (Gemini)', async () => {
+      const { generateWithProvider } = require('@/lib/services/generation');
+
+      generateWithProvider.mockImplementation(async function* () {
+        yield { type: 'start', timestamp: 1 };
+        yield { type: 'complete', timestamp: 2 };
+      });
+
+      await collectEvents(routeGeneration({ ...baseOpts, provider: 'siza' }));
+
+      expect(generateWithProvider).toHaveBeenCalledWith(
+        expect.objectContaining({ provider: 'google', model: 'gemini-2.5-flash' })
+      );
     });
   });
 });

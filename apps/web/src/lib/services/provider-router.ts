@@ -1,10 +1,9 @@
 import type { AIProvider } from '@/lib/encryption';
-import { routeSizaGeneration, getQuotaFallback } from './siza-router';
+import { routeSizaGeneration } from './siza-router';
 import type { GenerationEvent } from './generation-types';
 import { generateWithProvider } from './generation';
 import { generateComponentStream as mcpStream } from '@/lib/mcp/client';
 import { captureServerError } from '@/lib/sentry/server';
-import { canUseFallback, recordFallback } from './fallback-limiter';
 
 export interface RouteGenerationOptions {
   mcpEnabled: boolean;
@@ -50,47 +49,11 @@ async function* routeViaSizaAI(opts: RouteGenerationOptions): AsyncGenerator<Gen
     timestamp: Date.now(),
   } as GenerationEvent;
 
-  const resolvedOpts = {
+  yield* routeViaProvider({
     ...opts,
     provider: routing.provider,
     model: routing.model,
-  };
-
-  let quotaError: GenerationEvent | null = null;
-  for await (const event of routeViaProvider(resolvedOpts)) {
-    if (event.type === 'error' && isQuotaError(event.message)) {
-      quotaError = event;
-      break;
-    }
-    yield event;
-  }
-
-  if (!quotaError) return;
-
-  const fallback = getQuotaFallback(routing.provider);
-  if (!fallback || !canUseFallback()) {
-    yield quotaError;
-    return;
-  }
-
-  recordFallback();
-  yield {
-    type: 'fallback',
-    provider: fallback.provider,
-    message: 'Siza AI routing to alternate provider',
-    timestamp: Date.now(),
-  };
-
-  const fallbackOpts = {
-    ...opts,
-    provider: fallback.provider,
-    model: fallback.model,
-  };
-
-  for await (const event of routeViaProvider(fallbackOpts)) {
-    if (event.type === 'complete') break;
-    yield event;
-  }
+  });
 }
 
 async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
@@ -208,12 +171,10 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
   if (!quotaError) return;
 
   const serverKeyAvailable = opts.provider !== 'anthropic' && !!process.env.ANTHROPIC_API_KEY;
-  if (!serverKeyAvailable || !canUseFallback()) {
+  if (!serverKeyAvailable) {
     yield quotaError;
     return;
   }
-
-  recordFallback();
 
   captureServerError(new Error(quotaError.message), {
     route: '/api/generate',
