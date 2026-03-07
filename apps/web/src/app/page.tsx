@@ -20,7 +20,7 @@ export default async function HomePage() {
 
   return (
     <div className="relative isolate overflow-hidden">
-      <AmbientVideoBackground src="/f555b164-a132-4354-8ff5-afc0336c3baf-ezgif.com-gif-maker.webm" />
+      <AmbientVideoBackground src="/ambient-bg.webm" />
       <LandingNav user={user} />
       <main id="main-content" className="relative z-10">
         <HeroSection user={user} />

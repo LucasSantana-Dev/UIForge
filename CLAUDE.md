@@ -116,8 +116,8 @@ Auth: Email/Password + Google/GitHub OAuth via `@supabase/ssr`
 - **apps/docs type errors**: Fumadocs `.source/server` not generated until build — blocks all pre-commit hooks. Use `HUSKY=0` for non-code commits
 - **apps/docs NODE_ENV**: Must use `NODE_ENV=production next build` — shell `NODE_ENV=development` causes `useMemo`/`useContext` null errors during SSR prerendering
 
-- **Workers free tier**: 3 MiB (3072 KiB) gzipped limit. Current bundle: ~2882 KiB
-- **WASM stub required**: `@vercel/og` WASM (~1.4 MiB) bundled by Next.js via `next/dist/compiled/` even when unused — stub at deploy time (automated in CI and `scripts/deploy.sh`)
+- **Workers free tier**: 3 MiB (3072 KiB) gzipped limit. Current bundle: ~3019 KiB
+- **@vercel/og stub required**: WASM (~1.4 MiB) + JS wrapper (~720 KiB / 158 KiB gzip) bundled by Next.js via `next/dist/compiled/` even when unused — both stubbed before build in CI and `scripts/deploy.sh`
 - **No `export const runtime`** in API routes — OpenNext handles runtime automatically
 - **middleware.ts not proxy.ts**: Next.js 16 proxy.ts is Node.js-only; OpenNext needs `middleware.ts` with `runtime = 'experimental-edge'`
 - **No `setInterval`** in Workers — rate limiter uses bounded lazy cleanup
