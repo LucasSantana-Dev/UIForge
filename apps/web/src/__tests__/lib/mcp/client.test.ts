@@ -29,15 +29,11 @@ describe('listTools', () => {
   });
 
   it('fetches and returns tools array', async () => {
-    const mockTools = [
-      { name: 'tool1', description: 'Test', inputSchema: {} },
-    ];
-    global.fetch = jest
-      .fn()
-      .mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve(mockTools),
-      });
+    const mockTools = [{ name: 'tool1', description: 'Test', inputSchema: {} }];
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(mockTools),
+    });
     const tools = await listTools('test-token');
     expect(tools).toEqual(mockTools);
     expect(fetch).toHaveBeenCalledWith(
@@ -49,9 +45,7 @@ describe('listTools', () => {
   });
 
   it('handles nested tools response', async () => {
-    const mockTools = [
-      { name: 'tool1', description: 'T', inputSchema: {} },
-    ];
+    const mockTools = [{ name: 'tool1', description: 'T', inputSchema: {} }];
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ tools: mockTools }),
@@ -60,19 +54,13 @@ describe('listTools', () => {
   });
 
   it('throws on non-ok response', async () => {
-    global.fetch = jest
-      .fn()
-      .mockResolvedValue({ ok: false, status: 500 });
-    await expect(listTools('test-token')).rejects.toThrow(
-      'MCP gateway is unavailable (HTTP 500)'
-    );
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 500 });
+    await expect(listTools('test-token')).rejects.toThrow('MCP gateway is unavailable (HTTP 500)');
   });
 
   it('throws when not configured', async () => {
     delete process.env.MCP_GATEWAY_URL;
-    await expect(listTools('test-token')).rejects.toThrow(
-      'MCP gateway is not configured'
-    );
+    await expect(listTools('test-token')).rejects.toThrow('MCP gateway is not configured');
   });
 });
 
@@ -94,15 +82,9 @@ describe('callTool', () => {
           result: mockResult,
         }),
     });
-    const result = await callTool(
-      'test_tool',
-      { arg: 'value' },
-      'test-token'
-    );
+    const result = await callTool('test_tool', { arg: 'value' }, 'test-token');
     expect(result).toEqual(mockResult);
-    const callBody = JSON.parse(
-      (fetch as jest.Mock).mock.calls[0][1].body
-    );
+    const callBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
     expect(callBody.method).toBe('tools/call');
     expect(callBody.params.name).toBe('test_tool');
     expect(callBody.params.arguments).toEqual({ arg: 'value' });
@@ -118,20 +100,19 @@ describe('callTool', () => {
           error: { code: -32600, message: 'Invalid request' },
         }),
     });
-    await expect(
-      callTool('bad', {}, 'test-token')
-    ).rejects.toThrow('MCP tool error (-32600): Invalid request');
+    await expect(callTool('bad', {}, 'test-token')).rejects.toThrow(
+      'MCP tool error (-32600): Invalid request'
+    );
   });
 
   it('throws on empty result', async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
-      json: () =>
-        Promise.resolve({ jsonrpc: '2.0', id: 1 }),
+      json: () => Promise.resolve({ jsonrpc: '2.0', id: 1 }),
     });
-    await expect(
-      callTool('empty', {}, 'test-token')
-    ).rejects.toThrow('MCP gateway returned an empty result');
+    await expect(callTool('empty', {}, 'test-token')).rejects.toThrow(
+      'MCP gateway returned an empty result'
+    );
   });
 
   it('throws on HTTP error', async () => {
@@ -140,9 +121,9 @@ describe('callTool', () => {
       status: 401,
       statusText: 'Unauthorized',
     });
-    await expect(
-      callTool('test', {}, 'test-token')
-    ).rejects.toThrow('MCP gateway returned 401: Unauthorized');
+    await expect(callTool('test', {}, 'test-token')).rejects.toThrow(
+      'MCP gateway returned 401: Unauthorized'
+    );
   });
 
   it('strips trailing slash from URL', async () => {
@@ -159,9 +140,7 @@ describe('callTool', () => {
         }),
     });
     await callTool('test', {}, 'test-token');
-    expect((fetch as jest.Mock).mock.calls[0][0]).toBe(
-      'http://localhost:4444/rpc'
-    );
+    expect((fetch as jest.Mock).mock.calls[0][0]).toBe('http://localhost:4444/rpc');
   });
 });
 
@@ -171,8 +150,7 @@ describe('generateComponent', () => {
   });
 
   it('generates via execute_specialist_task', async () => {
-    const code =
-      'export default function Button() { return <button>Click</button>; }';
+    const code = 'export default function Button() { return <button>Click</button>; }';
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: () =>
@@ -194,13 +172,9 @@ describe('generateComponent', () => {
         'test-token'
       )
     ).toBe(code);
-    const callBody = JSON.parse(
-      (fetch as jest.Mock).mock.calls[0][1].body
-    );
+    const callBody = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
     expect(callBody.params.name).toBe('execute_specialist_task');
-    const prefs = JSON.parse(
-      callBody.params.arguments.user_preferences
-    );
+    const prefs = JSON.parse(callBody.params.arguments.user_preferences);
     expect(prefs.design_system).toBe('tailwind_ui');
   });
 
@@ -220,9 +194,7 @@ describe('generateComponent', () => {
     );
     expect(
       JSON.parse(
-        JSON.parse(
-          (fetch as jest.Mock).mock.calls[0][1].body
-        ).params.arguments.user_preferences
+        JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).params.arguments.user_preferences
       ).design_system
     ).toBe('material_design');
   });
@@ -240,10 +212,7 @@ describe('generateComponent', () => {
         }),
     });
     await expect(
-      generateComponent(
-        { prompt: 't', framework: 'react' },
-        'test-token'
-      )
+      generateComponent({ prompt: 't', framework: 'react' }, 'test-token')
     ).rejects.toThrow('The AI model did not produce any code');
   });
 
@@ -265,10 +234,8 @@ describe('generateComponent', () => {
       },
       'test-token'
     );
-    expect(
-      JSON.parse(
-        (fetch as jest.Mock).mock.calls[0][1].body
-      ).params.arguments.task
-    ).toContain('Use brand colors');
+    expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).params.arguments.task).toContain(
+      'Use brand colors'
+    );
   });
 });

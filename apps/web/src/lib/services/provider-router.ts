@@ -36,9 +36,7 @@ export async function* routeGeneration(
   }
 }
 
-async function* routeViaSizaAI(
-  opts: RouteGenerationOptions
-): AsyncGenerator<GenerationEvent> {
+async function* routeViaSizaAI(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
   const routing = routeSizaGeneration({
     prompt: opts.prompt,
     hasImage: !!opts.imageBase64,
@@ -96,14 +94,11 @@ async function* routeViaSizaAI(
   }
 }
 
-async function* routeViaMcp(
-  opts: RouteGenerationOptions
-): AsyncGenerator<GenerationEvent> {
+async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
   if (!opts.accessToken) {
     yield {
       type: 'error',
-      message:
-        'MCP gateway requires authentication. No access token available.',
+      message: 'MCP gateway requires authentication. No access token available.',
       timestamp: Date.now(),
     };
     return;
@@ -172,9 +167,7 @@ function isQuotaError(message?: string): boolean {
   return QUOTA_ERROR_PATTERNS.some((p) => lower.includes(p));
 }
 
-async function* routeViaProvider(
-  opts: RouteGenerationOptions
-): AsyncGenerator<GenerationEvent> {
+async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
   let quotaError: GenerationEvent | null = null;
 
   for await (const event of generateWithProvider({
@@ -200,8 +193,7 @@ async function* routeViaProvider(
 
   if (!quotaError) return;
 
-  const serverKeyAvailable =
-    opts.provider !== 'anthropic' && !!process.env.ANTHROPIC_API_KEY;
+  const serverKeyAvailable = opts.provider !== 'anthropic' && !!process.env.ANTHROPIC_API_KEY;
   if (!serverKeyAvailable || !canUseFallback()) {
     yield quotaError;
     return;

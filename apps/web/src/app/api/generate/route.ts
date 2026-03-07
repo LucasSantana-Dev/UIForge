@@ -88,9 +88,7 @@ export async function POST(request: NextRequest) {
     }
 
     const input = parsed.data;
-    const isRefinement = !!(
-      input.parentGenerationId && input.refinementPrompt
-    );
+    const isRefinement = !!(input.parentGenerationId && input.refinementPrompt);
 
     if (isRefinement) {
       await validateConversation(input.parentGenerationId!);
@@ -99,11 +97,8 @@ export async function POST(request: NextRequest) {
     const designContext = buildDesignContext(input);
     const skillsEnabled = getFeatureFlag('ENABLE_SKILLS');
     const skillContext =
-      skillsEnabled && input.skillIds?.length
-        ? await buildSkillContext(input.skillIds)
-        : '';
-    const enrichedDescription =
-      input.description + designContext + skillContext;
+      skillsEnabled && input.skillIds?.length ? await buildSkillContext(input.skillIds) : '';
+    const enrichedDescription = input.description + designContext + skillContext;
     const ragContext =
       input.useRag !== false
         ? await enrichWithRag(enrichedDescription, {
@@ -111,20 +106,13 @@ export async function POST(request: NextRequest) {
             apiKey: input.userApiKey,
           })
         : '';
-    const sizaGenContext = buildSizaGenContext(
-      input.framework,
-      input.componentLibrary
-    );
-    const contextAddition = [ragContext, sizaGenContext]
-      .filter(Boolean)
-      .join('\n\n');
+    const sizaGenContext = buildSizaGenContext(input.framework, input.componentLibrary);
+    const contextAddition = [ragContext, sizaGenContext].filter(Boolean).join('\n\n');
 
     const correlationId = randomUUID();
     const mcpEnabled = shouldUseMcpGateway();
     const activeProvider = mcpEnabled ? 'mcp-gateway' : input.provider;
-    const activeModel = mcpEnabled
-      ? 'mcp-specialist'
-      : input.model || 'gemini-2.0-flash';
+    const activeModel = mcpEnabled ? 'mcp-specialist' : input.model || 'gemini-2.0-flash';
     const conversationCtx: ConversationContext | undefined =
       isRefinement && input.previousCode
         ? {
@@ -136,10 +124,7 @@ export async function POST(request: NextRequest) {
     const accessToken = mcpEnabled ? await getAccessToken() : undefined;
 
     const encoder = new TextEncoder();
-    const streamPrompt = buildStreamPrompt(
-      enrichedDescription,
-      conversationCtx
-    );
+    const streamPrompt = buildStreamPrompt(enrichedDescription, conversationCtx);
 
     const stream = new ReadableStream({
       async start(controller) {
@@ -147,9 +132,7 @@ export async function POST(request: NextRequest) {
         try {
           generationId = await createGenerationRecord({
             userId: user.id,
-            prompt: isRefinement
-              ? input.refinementPrompt!
-              : input.description,
+            prompt: isRefinement ? input.refinementPrompt! : input.description,
             framework: input.framework,
             provider: activeProvider,
             model: activeModel,
@@ -214,18 +197,9 @@ export async function POST(request: NextRequest) {
               routedProvider,
               routingReason
             );
-            void postGenerationTasks(
-              generationId,
-              input.description,
-              user.id,
-              input.userApiKey
-            );
+            void postGenerationTasks(generationId, input.description, user.id, input.userApiKey);
             if (skillsEnabled && input.skillIds?.length) {
-              trackSkillUsage(
-                generationId,
-                input.skillIds,
-                input.skillParams
-              ).catch(() => {});
+              trackSkillUsage(generationId, input.skillIds, input.skillParams).catch(() => {});
             }
           }
 
@@ -248,9 +222,7 @@ export async function POST(request: NextRequest) {
           if (generationId) {
             await failGeneration(
               generationId,
-              error instanceof Error
-                ? error.message
-                : 'Generation failed'
+              error instanceof Error ? error.message : 'Generation failed'
             );
           }
           captureServerError(error, {
@@ -292,9 +264,7 @@ export async function POST(request: NextRequest) {
       });
     }
     captureServerError(error, { route: '/api/generate' });
-    const isAuthError =
-      error instanceof Error &&
-      error.message === 'Authentication required';
+    const isAuthError = error instanceof Error && error.message === 'Authentication required';
     const message = isAuthError
       ? 'Authentication required. Please sign in to generate components.'
       : error instanceof Error
