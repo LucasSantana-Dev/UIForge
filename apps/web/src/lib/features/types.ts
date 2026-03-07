@@ -28,7 +28,8 @@ export type FeatureFlagName =
   | 'ENABLE_AUDIT_DASHBOARD'
   | 'ENABLE_POLICY_ENGINE'
   | 'ENABLE_PROJECT_SCORECARDS'
-  | 'ENABLE_SIZA_GEN_CONTEXT';
+  | 'ENABLE_SIZA_GEN_CONTEXT'
+  | 'ENABLE_SOFTWARE_CATALOG';
 
 export type FeatureFlagCategory =
   | 'auth'

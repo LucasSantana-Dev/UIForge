@@ -1,4 +1,5 @@
 import {
+  BookOpenIcon,
   CreditCardIcon,
   FileTextIcon,
   FolderIcon,
@@ -10,6 +11,7 @@ import {
   ShieldIcon,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { getFeatureFlag } from '@/lib/features/flags';
 
 export interface DashboardNavItem {
   name: string;
@@ -27,14 +29,26 @@ const baseDashboardNavigation: DashboardNavItem[] = [
   { name: 'Settings', href: '/settings', icon: SettingsIcon, shortcut: '⌘4' },
 ];
 
+const catalogNavigation: DashboardNavItem[] = [
+  { name: 'Catalog', href: '/catalog', icon: BookOpenIcon },
+];
+
 const adminDashboardNavigation: DashboardNavItem[] = [
   { name: 'Admin', href: '/admin', icon: ShieldIcon },
 ];
 
 export function getDashboardNavigation(isAdmin: boolean): DashboardNavItem[] {
-  return isAdmin
-    ? [...baseDashboardNavigation, ...adminDashboardNavigation]
-    : baseDashboardNavigation;
+  const isCatalogEnabled = getFeatureFlag('ENABLE_SOFTWARE_CATALOG');
+  const catalogItems = isCatalogEnabled ? catalogNavigation : [];
+
+  const projectsIndex = baseDashboardNavigation.findIndex((item) => item.name === 'Projects');
+  const navItems = [
+    ...baseDashboardNavigation.slice(0, projectsIndex + 1),
+    ...catalogItems,
+    ...baseDashboardNavigation.slice(projectsIndex + 1),
+  ];
+
+  return isAdmin ? [...navItems, ...adminDashboardNavigation] : navItems;
 }
 
 export function getDashboardPages(isAdmin: boolean): DashboardNavItem[] {

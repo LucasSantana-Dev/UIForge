@@ -29,8 +29,9 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_SKILLS: false,
   ENABLE_AUDIT_DASHBOARD: false,
   ENABLE_POLICY_ENGINE: false,
-  ENABLE_PROJECT_SCORECARDS: false,
+  ENABLE_PROJECT_SCORECARDS: true,
   ENABLE_SIZA_GEN_CONTEXT: true,
+  ENABLE_SOFTWARE_CATALOG: true,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -213,6 +214,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_SIZA_GEN_CONTEXT,
     description: 'Enrich generation prompts with siza-gen context assembly',
     category: 'generation',
+  },
+  {
+    name: 'ENABLE_SOFTWARE_CATALOG',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_SOFTWARE_CATALOG,
+    description: 'Enable software catalog for service discovery and tracking',
+    category: 'governance',
   },
 ];
 

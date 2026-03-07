@@ -2,6 +2,8 @@
 
 import { useProjects } from '@/hooks/use-projects';
 import { useSubscription } from '@/hooks/use-subscription';
+import { useCatalog } from '@/hooks/use-catalog';
+import { isFeatureEnabled } from '@/lib/features/flags';
 import { Skeleton } from '@siza/ui';
 import {
   FolderIcon,
@@ -13,6 +15,8 @@ import {
   TrendingUpIcon,
   LayoutTemplateIcon,
   KeyIcon,
+  BookOpenIcon,
+  ShieldCheckIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -166,6 +170,68 @@ function UsageBar({ used, limit, label }: { used: number; limit: number; label: 
   );
 }
 
+function GovernanceCard() {
+  const catalogEnabled = isFeatureEnabled('ENABLE_SOFTWARE_CATALOG');
+  const { data, isLoading } = useCatalog({ limit: 100 });
+
+  if (!catalogEnabled) return null;
+
+  const entries = data?.entries || [];
+  const production = entries.filter((e) => e.lifecycle === 'production').length;
+  const experimental = entries.filter((e) => e.lifecycle === 'experimental').length;
+  const total = data?.pagination?.total ?? 0;
+
+  if (isLoading) {
+    return (
+      <div className="rounded-xl border border-surface-3 bg-surface-1 p-5">
+        <Skeleton className="h-5 w-32 mb-4" />
+        <div className="grid grid-cols-3 gap-4">
+          <Skeleton className="h-16" />
+          <Skeleton className="h-16" />
+          <Skeleton className="h-16" />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      href="/catalog"
+      className="group block rounded-xl border border-surface-3 bg-surface-1 p-5 transition-all hover:border-violet-500/30 hover:shadow-[0_0_24px_rgba(124,58,237,0.08)]"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
+            <ShieldCheckIcon className="h-4 w-4 text-violet-400" />
+          </div>
+          <h2 className="text-sm font-semibold text-text-primary">Service Catalog</h2>
+        </div>
+        <ArrowRightIcon className="h-4 w-4 text-text-muted opacity-0 group-hover:opacity-100 transition-opacity" />
+      </div>
+      {total === 0 ? (
+        <p className="text-sm text-text-secondary">
+          Register services to track health and compliance
+        </p>
+      ) : (
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <p className="text-2xl font-semibold font-display text-text-primary">{total}</p>
+            <p className="text-xs text-text-secondary mt-0.5">Total services</p>
+          </div>
+          <div>
+            <p className="text-2xl font-semibold font-display text-emerald-400">{production}</p>
+            <p className="text-xs text-text-secondary mt-0.5">Production</p>
+          </div>
+          <div>
+            <p className="text-2xl font-semibold font-display text-amber-400">{experimental}</p>
+            <p className="text-xs text-text-secondary mt-0.5">Experimental</p>
+          </div>
+        </div>
+      )}
+    </Link>
+  );
+}
+
 export function DashboardClient() {
   const { data: projects, isLoading: projectsLoading } = useProjects();
   const { usage, subscription, isLoading: usageLoading } = useSubscription();
@@ -301,6 +367,9 @@ export function DashboardClient() {
         )}
       </div>
 
+      {/* Governance */}
+      <GovernanceCard />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Projects */}
         <div className="lg:col-span-2">
@@ -374,6 +443,13 @@ export function DashboardClient() {
               label="Browse Templates"
               description="Pre-built component library"
               accent="text-amber-400"
+            />
+            <QuickAction
+              href="/catalog"
+              icon={BookOpenIcon}
+              label="Service Catalog"
+              description="Track health and compliance"
+              accent="text-violet-400"
             />
             <QuickAction
               href="/history"

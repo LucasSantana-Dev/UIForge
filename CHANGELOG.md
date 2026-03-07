@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.34.0] - 2026-03-07
+
+### Added
+- **Software Catalog** — Backstage-inspired service registry for IDP with 5 entity types (Service, Component, API, Library, Website)
+- **Catalog API** — REST endpoints (GET/POST /catalog, GET/PATCH/DELETE /catalog/[id]) with Zod validation, rate limiting, ownership verification
+- **Catalog UI** — Grid/list views, search, type/lifecycle filters, pagination, detail page, create/edit forms
+- **Dashboard governance card** — Catalog stats in governance dashboard section
+- **ENABLE_SOFTWARE_CATALOG feature flag** — Toggle catalog visibility in sidebar navigation (default: enabled)
+- **Dependency tracking** — Track inter-service dependencies with forward/reverse resolution
+- **Supabase migration** — catalog_entries table with RLS, GIN-indexed tags, btree indexes
+- **Seed data** — 9 Forge Space repos pre-seeded in catalog
+- **Tests** — 27 new tests across validation, service, and integration suites
+
+---
+
 ## [0.33.0] - 2026-03-07
 
 ### Added

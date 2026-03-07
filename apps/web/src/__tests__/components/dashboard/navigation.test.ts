@@ -6,6 +6,7 @@ describe('dashboard navigation', () => {
     expect(items.some((item) => item.href === '/admin')).toBe(false);
     expect(items.map((item) => item.name)).toEqual([
       'Projects',
+      'Catalog',
       'Templates',
       'History',
       'AI Keys',
