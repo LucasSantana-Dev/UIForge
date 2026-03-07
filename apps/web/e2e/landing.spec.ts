@@ -14,9 +14,9 @@ test.describe('Landing Page', () => {
 
   test('should render hero section with headline and CTAs', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect(page.getByText(/vibe code/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: /get started free/i }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: /view on github/i }).first()).toBeVisible();
+    await expect(page.getByText(/production-grade/i)).toBeVisible();
+    await expect(page.getByRole('link', { name: /start generating free/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /read the docs/i }).first()).toBeVisible();
   });
 
   test('should render stats bar with counters', async ({ page }) => {
@@ -53,17 +53,17 @@ test.describe('Landing Page', () => {
     await expect(page).toHaveURL('/signin');
   });
 
-  test('should navigate to sign in from Get Started CTA', async ({ page }) => {
+  test('should navigate to sign up from Get Started CTA', async ({ page }) => {
     await page
       .getByRole('link', { name: /get started free/i })
       .first()
       .click();
-    await expect(page).toHaveURL('/signin');
+    await expect(page).toHaveURL('/signup');
   });
 
   test('should render responsive mobile layout', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-    await expect(page.getByRole('link', { name: /get started free/i }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: /start generating free/i }).first()).toBeVisible();
   });
 });
