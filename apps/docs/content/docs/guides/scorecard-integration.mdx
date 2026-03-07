@@ -1,0 +1,129 @@
+---
+title: Scorecard Integration
+description: Add quality scorecards to your CI pipeline and review generated code quality.
+icon: BarChart3
+---
+
+## Overview
+
+Forge Space scorecards evaluate codebases across four dimensions: **security**, **quality**, **compliance**, and **operations**. Each dimension produces a weighted score, aggregated into an A-F grade.
+
+Scorecards run in two contexts:
+
+1. **Post-generation** — inline in Siza after every AI generation
+2. **CI pipeline** — as a GitHub Actions check on pull requests
+
+## Install
+
+Scorecards are built into `@forgespace/core`. Install it as a dev dependency:
+
+```bash
+npm install -D @forgespace/core
+```
+
+Or initialize a new project with governance files:
+
+```bash
+npx forge-init
+```
+
+This creates `.forge/scorecard.json` with default thresholds.
+
+## Configuration
+
+Edit `.forge/scorecard.json` to set minimum thresholds:
+
+```json
+{
+  "minScore": 70,
+  "weights": {
+    "security": 30,
+    "quality": 30,
+    "compliance": 20,
+    "operations": 20
+  }
+}
+```
+
+### Weights
+
+| Dimension | Default | What it measures |
+| --- | --- | --- |
+| Security | 30% | Zero secrets, dependency vulnerabilities, safe patterns |
+| Quality | 30% | Lint compliance, test coverage, code structure |
+| Compliance | 20% | License headers, audit trail presence |
+| Operations | 20% | Structured logging, health checks, runbook presence |
+
+## CLI Usage
+
+Run a scorecard from the terminal:
+
+```bash
+npx forge-scorecard
+```
+
+Options:
+
+| Flag | Description |
+| --- | --- |
+| `--json` | Output raw JSON instead of summary |
+| `--threshold <n>` | Override minimum score (exit 1 if below) |
+| `--dir <path>` | Target directory (default: cwd) |
+
+Example with threshold:
+
+```bash
+npx forge-scorecard --threshold 80
+```
+
+## CI Integration
+
+Add a GitHub Actions workflow to run scorecards on every PR:
+
+```yaml
+name: Scorecard
+on: [pull_request]
+
+jobs:
+  scorecard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npx forge-scorecard --threshold 70
+```
+
+If you ran `npx forge-init`, this workflow is already at `.github/workflows/scorecard.yml`.
+
+## Post-Generation Scoring
+
+When the `ENABLE_POST_GEN_SCORING` feature flag is enabled in Siza, every AI generation automatically receives an A-F grade. The score appears as a badge next to the generated output.
+
+Grades map to score ranges:
+
+| Grade | Range | Meaning |
+| --- | --- | --- |
+| A | 90-100 | Production-ready |
+| B | 80-89 | Minor improvements suggested |
+| C | 70-79 | Review before shipping |
+| D | 60-69 | Significant issues |
+| F | 0-59 | Regeneration recommended |
+
+## Programmatic API
+
+Use the scorer in your own tools:
+
+```typescript
+import { scoreGeneratedCode } from "@forgespace/core";
+
+const result = scoreGeneratedCode(code, "react");
+// { score: 87, grade: "B", checks: [...] }
+```
+
+## Next Steps
+
+- [Policy Packs](/docs/guides/policy-packs) — enforce rules that block merges
+- [Quality Gates](/docs/guides/quality-gates) — runtime validation during generation

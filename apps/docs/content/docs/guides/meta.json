@@ -7,6 +7,9 @@
     "templates",
     "mcp-integration",
     "quality-gates",
+    "scorecard-integration",
+    "policy-packs",
+    "byok-setup",
     "github-export",
     "desktop-app",
     "troubleshooting"

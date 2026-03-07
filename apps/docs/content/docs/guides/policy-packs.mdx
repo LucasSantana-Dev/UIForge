@@ -1,0 +1,138 @@
+---
+title: Policy Packs
+description: Define and enforce governance rules across your projects with policy packs.
+icon: ShieldAlert
+---
+
+## Overview
+
+Policy packs are collections of rules that evaluate project artifacts and decide whether to **allow**, **warn**, or **block**. They enforce governance at two checkpoints:
+
+1. **Pre-merge** — CI blocks PRs that violate policies
+2. **Post-generation** — Siza flags violations in generated code
+
+## Built-in Policies
+
+Forge Space ships three default policy packs:
+
+### Security Policy
+
+| Rule | Severity | What it checks |
+| --- | --- | --- |
+| no-secrets | block | No hardcoded credentials or API keys |
+| dep-vulnerabilities | block | No high/critical CVEs in dependencies |
+| safe-html | warn | No unsafe innerHTML injection with user input |
+| secure-links | warn | External links use `rel="noopener noreferrer"` |
+
+### Quality Policy
+
+| Rule | Severity | What it checks |
+| --- | --- | --- |
+| lint-clean | warn | ESLint passes with zero errors |
+| format-consistent | warn | Prettier formatting is consistent |
+| tests-present | warn | New modules have at least one test file |
+| no-large-functions | warn | Functions under 50 lines |
+
+### Compliance Policy
+
+| Rule | Severity | What it checks |
+| --- | --- | --- |
+| license-header | warn | Source files include license header |
+| audit-trail | warn | Generation logs are preserved |
+| feature-flagged | warn | New features behind feature flags |
+
+## Setup
+
+Initialize governance files in your project:
+
+```bash
+npx forge-init
+```
+
+This creates `.forge/policies/` with the three default packs as JSON files.
+
+## Custom Policies
+
+Create a `.forge/policies/custom.policy.json`:
+
+```json
+{
+  "name": "custom",
+  "version": "1.0.0",
+  "rules": [
+    {
+      "id": "max-bundle-size",
+      "description": "Bundle must stay under 3 MiB gzipped",
+      "severity": "block",
+      "check": "bundle-size",
+      "threshold": 3072
+    }
+  ]
+}
+```
+
+### Rule Severities
+
+| Severity | CI Behavior | UI Indicator |
+| --- | --- | --- |
+| `block` | Fails the check, PR cannot merge | Red badge |
+| `warn` | Passes with warning comment | Yellow badge |
+| `info` | Logged only | Grey badge |
+
+## CLI Usage
+
+Evaluate policies from the terminal:
+
+```bash
+npx forge-policy
+```
+
+Options:
+
+| Flag | Description |
+| --- | --- |
+| `--fail-on-block` | Exit 1 if any rule with severity "block" fails |
+| `--policy <path>` | Evaluate a specific policy file |
+| `--dir <path>` | Target directory (default: cwd) |
+| `--json` | Output raw JSON |
+
+## CI Integration
+
+Add a policy check workflow:
+
+```yaml
+name: Policy Check
+on: [pull_request]
+
+jobs:
+  policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npx forge-policy --fail-on-block
+```
+
+If you ran `npx forge-init`, this workflow is already at `.github/workflows/policy-check.yml`.
+
+## Programmatic API
+
+Use the policy engine in your own tools:
+
+```typescript
+import { PolicyLoader, PolicyEvaluator } from "@forgespace/core";
+
+const loader = new PolicyLoader();
+const policies = await loader.loadFromDirectory(".forge/policies");
+const evaluator = new PolicyEvaluator();
+const results = await evaluator.evaluate(policies, projectContext);
+// [{ ruleId: "no-secrets", passed: true }, ...]
+```
+
+## Next Steps
+
+- [Scorecard Integration](/docs/guides/scorecard-integration) — aggregate scores across dimensions
+- [Quality Gates](/docs/guides/quality-gates) — runtime validation during generation

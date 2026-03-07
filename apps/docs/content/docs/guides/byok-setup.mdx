@@ -1,0 +1,103 @@
+---
+title: BYOK Setup
+description: Bring your own API keys for AI providers in Siza.
+icon: Key
+---
+
+## Overview
+
+Siza supports **Bring Your Own Key (BYOK)** — use your personal API keys for AI providers instead of shared quota. This gives you:
+
+- **No generation limits** beyond your provider's rate limits
+- **Direct billing** from the AI provider
+- **Choice of model** across supported providers
+
+## Supported Providers
+
+| Provider | Models | Key Format |
+| --- | --- | --- |
+| Anthropic | Claude Sonnet 4, Claude Haiku | `sk-ant-api03-...` |
+| OpenAI | GPT-4o, GPT-4o-mini | `sk-...` |
+| Google | Gemini 2.5 Flash, Gemini 2.5 Pro | `AIza...` |
+
+## Adding a Key
+
+### Web App
+
+1. Go to **Settings** > **AI Providers**
+2. Click **Add Provider**
+3. Select the provider from the dropdown
+4. Paste your API key
+5. Click **Save**
+
+Your key is encrypted at rest using AES-256-GCM before storage. It is never logged or sent to any service other than the selected provider.
+
+### Environment Variable
+
+For self-hosted deployments, set the key as an environment variable:
+
+```bash
+ANTHROPIC_API_KEY=sk-ant-api03-...
+OPENAI_API_KEY=sk-...
+GOOGLE_AI_API_KEY=AIza...
+```
+
+## Key Security
+
+Siza follows a **zero secrets** policy:
+
+- Keys are encrypted before database storage
+- Keys are decrypted only at the moment of API call
+- Keys never appear in logs, error messages, or audit trails
+- Keys are scoped to your user account — no cross-user access
+- The `no-secrets` policy rule scans generated code to prevent accidental key exposure
+
+### Rotation
+
+To rotate a key:
+
+1. Generate a new key from your provider's dashboard
+2. Update the key in **Settings** > **AI Providers**
+3. The old key is immediately overwritten
+
+## Model Selection
+
+Once a BYOK key is configured, you can select specific models during generation:
+
+```text
+Generate a dashboard component using Claude Sonnet 4
+```
+
+The model is passed through the MCP gateway to the appropriate provider. If no model is specified, Siza uses the default for the configured provider.
+
+## Rate Limits
+
+BYOK keys use your provider's rate limits, not Siza's. If you hit a rate limit:
+
+- The error message includes the provider's retry-after header
+- Siza does not retry automatically — you control the pacing
+- Switch to a different provider key to continue generating
+
+## Self-Hosting with BYOK
+
+For self-hosted Siza deployments, BYOK is the primary configuration:
+
+1. Run `npx forge-init` to scaffold governance files
+2. Set provider environment variables in your `.env`
+3. Start Siza — it detects configured providers automatically
+
+No shared API quota is used in self-hosted mode.
+
+## Troubleshooting
+
+| Issue | Fix |
+| --- | --- |
+| "Invalid API key" | Verify the key format matches the provider |
+| "Rate limit exceeded" | Wait for the retry-after period, or switch providers |
+| "Model not available" | Check your provider plan supports the requested model |
+| Key not saving | Ensure the `ENABLE_BYOK_KEYS` feature flag is enabled |
+
+## Next Steps
+
+- [Quality Gates](/docs/guides/quality-gates) — validation applied to all generations regardless of provider
+- [Scorecard Integration](/docs/guides/scorecard-integration) — monitor quality across providers
