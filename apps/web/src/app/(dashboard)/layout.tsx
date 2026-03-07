@@ -29,10 +29,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
     user = sessionUser;
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role')
+      .select('role, onboarding_completed_at')
       .eq('id', sessionUser.id)
       .single();
     isAdmin = profile?.role === 'admin';
+
+    if (!profile?.onboarding_completed_at) {
+      redirect('/onboarding');
+    }
   }
 
   return (
