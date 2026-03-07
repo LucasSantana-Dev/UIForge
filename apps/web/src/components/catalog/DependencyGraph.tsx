@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import type { CatalogEntryRow, CatalogGraphData } from '@/lib/repositories/catalog.repo';
 import { useCatalogGraph } from '@/hooks/use-catalog';
 import { Skeleton } from '@siza/ui';
@@ -15,10 +16,16 @@ const TYPE_COLORS: Record<string, { fill: string; stroke: string }> = {
   website: { fill: '#ec4899', stroke: '#f9a8d4' },
 };
 
-const NODE_W = 160;
-const NODE_H = 48;
-const COL_GAP = 220;
-const ROW_GAP = 72;
+const LIFECYCLE_COLORS: Record<string, string> = {
+  production: '#10b981',
+  experimental: '#f59e0b',
+  deprecated: '#ef4444',
+};
+
+const NODE_W = 180;
+const NODE_H = 56;
+const COL_GAP = 240;
+const ROW_GAP = 76;
 const PAD = 40;
 
 interface LayoutNode {
@@ -64,6 +71,7 @@ function layoutGraph(graph: CatalogGraphData) {
 }
 
 export function DependencyGraph() {
+  const router = useRouter();
   const { data: graph, isLoading } = useCatalogGraph();
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
@@ -82,6 +90,17 @@ export function DependencyGraph() {
     }
     return ids;
   }, [hoveredId, graph]);
+
+  const depCounts = useMemo(() => {
+    if (!graph) return new Map<string, number>();
+    const counts = new Map<string, number>();
+    for (const edge of graph.edges) {
+      if (edge.type === 'dependency') {
+        counts.set(edge.source, (counts.get(edge.source) || 0) + 1);
+      }
+    }
+    return counts;
+  }, [graph]);
 
   if (isLoading) {
     return (
@@ -112,6 +131,19 @@ export function DependencyGraph() {
               <span className="text-[10px] text-text-muted capitalize">{type}</span>
             </div>
           ))}
+          <div className="w-px h-3 bg-surface-3 mx-1" />
+          <div className="flex items-center gap-1.5">
+            <svg width="16" height="2">
+              <line x1="0" y1="1" x2="16" y2="1" stroke="#6b7280" strokeDasharray="3,2" />
+            </svg>
+            <span className="text-[10px] text-text-muted">dependency</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <svg width="16" height="2">
+              <line x1="0" y1="1" x2="16" y2="1" stroke="#7c3aed" />
+            </svg>
+            <span className="text-[10px] text-text-muted">hierarchy</span>
+          </div>
         </div>
       </div>
       <svg
@@ -132,6 +164,17 @@ export function DependencyGraph() {
           >
             <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280" />
           </marker>
+          <marker
+            id="arrow-hierarchy"
+            viewBox="0 0 10 10"
+            refX="10"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed" />
+          </marker>
         </defs>
         {graph?.edges.map((edge: { source: string; target: string; type: string }, i: number) => {
           const source = nodeMap.get(edge.source);
@@ -150,19 +193,22 @@ export function DependencyGraph() {
               strokeDasharray={edge.type === 'dependency' ? '4,4' : 'none'}
               opacity={highlighted ? 0.8 : 0.15}
               style={{ transition: 'opacity 0.2s' }}
-              markerEnd="url(#arrow)"
+              markerEnd={edge.type === 'hierarchy' ? 'url(#arrow-hierarchy)' : 'url(#arrow)'}
             />
           );
         })}
         {layout.nodes.map((node: LayoutNode) => {
           const colors = TYPE_COLORS[node.entry.type] || TYPE_COLORS.service;
+          const lifecycleColor = LIFECYCLE_COLORS[node.entry.lifecycle] || '#6b7280';
           const opacity = connectedIds.has(node.id) ? 1 : 0.4;
+          const deps = depCounts.get(node.id) || 0;
           return (
             <g
               key={node.id}
               transform={`translate(${node.x}, ${node.y})`}
               onMouseEnter={() => setHoveredId(node.id)}
               onMouseLeave={() => setHoveredId(null)}
+              onClick={() => router.push(`/catalog/${node.id}`)}
               style={{ cursor: 'pointer', opacity, transition: 'opacity 0.2s' }}
             >
               <rect
@@ -172,15 +218,17 @@ export function DependencyGraph() {
                 fill={colors.fill}
                 fillOpacity={0.15}
                 stroke={colors.stroke}
-                strokeWidth={1.5}
+                strokeWidth={hoveredId === node.id ? 2 : 1.5}
               />
-              <text x={12} y={20} fill={colors.stroke} fontSize={12} fontWeight={600}>
-                {node.entry.display_name.length > 18
-                  ? node.entry.display_name.slice(0, 16) + '...'
+              <circle cx={NODE_W - 12} cy={12} r={4} fill={lifecycleColor} />
+              <text x={12} y={22} fill={colors.stroke} fontSize={12} fontWeight={600}>
+                {node.entry.display_name.length > 20
+                  ? node.entry.display_name.slice(0, 18) + '...'
                   : node.entry.display_name}
               </text>
-              <text x={12} y={36} fill="#9ca3af" fontSize={10} fontFamily="monospace">
+              <text x={12} y={42} fill="#9ca3af" fontSize={10} fontFamily="monospace">
                 {node.entry.type}
+                {deps > 0 ? ` \u00b7 ${deps} dep${deps > 1 ? 's' : ''}` : ''}
               </text>
             </g>
           );

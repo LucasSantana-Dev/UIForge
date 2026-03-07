@@ -17,6 +17,7 @@ import {
   LayoutGridIcon,
   ListIcon,
   ArrowUpRightIcon,
+  NetworkIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -316,10 +317,21 @@ export function CatalogClient() {
             )}
           </p>
         </div>
-        <Button className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all">
-          <PlusIcon className="mr-2 h-4 w-4" />
-          Register
-        </Button>
+        <div className="flex items-center gap-2">
+          <Link href="/catalog/graph">
+            <Button
+              variant="outline"
+              className="border-surface-3 text-text-secondary hover:text-text-primary"
+            >
+              <NetworkIcon className="mr-2 h-4 w-4" />
+              Graph
+            </Button>
+          </Link>
+          <Button className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all">
+            <PlusIcon className="mr-2 h-4 w-4" />
+            Register
+          </Button>
+        </div>
       </div>
 
       {/* Search and Filters */}
