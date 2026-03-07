@@ -100,7 +100,9 @@ function extractDependencies(spec?: CatalogInfoSpec): string[] {
 function parseSimpleYaml(text: string): Record<string, any> {
   const result: Record<string, any> = {};
   const lines = text.split('\n');
-  const stack: Array<{ indent: number; obj: Record<string, any> }> = [{ indent: -1, obj: result }];
+  const stack: Array<{ indent: number; obj: any; key?: string }> = [
+    { indent: -1, obj: result },
+  ];
 
   for (const line of lines) {
     if (!line.trim() || line.trim().startsWith('#')) continue;
@@ -111,30 +113,42 @@ function parseSimpleYaml(text: string): Record<string, any> {
     while (stack.length > 1 && stack[stack.length - 1].indent >= indent) {
       stack.pop();
     }
-    const parent = stack[stack.length - 1].obj;
 
     if (content.startsWith('- ')) {
       const arrayItem = content.slice(2).trim();
-      const lastKey = Object.keys(parent).pop();
-      if (lastKey && !Array.isArray(parent[lastKey])) {
-        parent[lastKey] = [];
+      const frame = stack[stack.length - 1];
+      const grandparent = stack.length > 1 ? stack[stack.length - 2] : null;
+
+      if (
+        grandparent &&
+        frame.key &&
+        !Array.isArray(frame.obj) &&
+        typeof frame.obj === 'object' &&
+        Object.keys(frame.obj).length === 0
+      ) {
+        const arr: any[] = [];
+        grandparent.obj[frame.key] = arr;
+        stack[stack.length - 1] = { indent: frame.indent, obj: arr, key: frame.key };
       }
-      if (lastKey && Array.isArray(parent[lastKey])) {
+
+      const target = Array.isArray(stack[stack.length - 1].obj)
+        ? (stack[stack.length - 1].obj as any[])
+        : null;
+
+      if (target) {
         if (arrayItem.includes(': ')) {
           const obj: Record<string, any> = {};
           const [k, ...vParts] = arrayItem.split(': ');
-          obj[k.trim()] = vParts
-            .join(': ')
-            .trim()
-            .replace(/^['"]|['"]$/g, '');
-          parent[lastKey].push(obj);
+          obj[k.trim()] = vParts.join(': ').trim().replace(/^['"]|['"]$/g, '');
+          target.push(obj);
         } else {
-          parent[lastKey].push(arrayItem.replace(/^['"]|['"]$/g, ''));
+          target.push(arrayItem.replace(/^['"]|['"]$/g, ''));
         }
       }
       continue;
     }
 
+    const parent = stack[stack.length - 1].obj;
     const colonIdx = content.indexOf(':');
     if (colonIdx === -1) continue;
 
@@ -143,12 +157,11 @@ function parseSimpleYaml(text: string): Record<string, any> {
 
     if (!value) {
       parent[key] = {};
-      stack.push({ indent, obj: parent[key] });
+      stack.push({ indent, obj: parent[key], key });
     } else if (value === '[]') {
       parent[key] = [];
     } else {
-      const cleanValue = value.replace(/^['"]|['"]$/g, '');
-      parent[key] = cleanValue;
+      parent[key] = value.replace(/^['"]|['"]$/g, '');
     }
   }
 
