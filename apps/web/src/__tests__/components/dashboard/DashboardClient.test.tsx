@@ -539,7 +539,9 @@ describe('DashboardClient', () => {
       renderWithQueryClient(<DashboardClient />);
 
       expect(screen.getByText('Ready to build something?')).toBeInTheDocument();
-      expect(screen.getByText('Describe what you need and Siza generates production-ready code.')).toBeInTheDocument();
+      expect(
+        screen.getByText('Describe what you need and Siza generates production-ready code.')
+      ).toBeInTheDocument();
     });
   });
 
