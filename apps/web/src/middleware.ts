@@ -3,7 +3,9 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { isLocalAuthBypassEnabled } from '@/lib/auth/local-auth-bypass';
 import { securityHeaders } from '@/lib/security/headers';
 
-export async function proxy(request: NextRequest) {
+export const runtime = 'edge';
+
+export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
