@@ -8,17 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.34.0] - 2026-03-07
 
 ### Added
-- **Software Catalog** — Backstage-inspired service registry for IDP with 7 entity kinds (Domain, System, Service, Component, API, Library, Website)
-- **Entity hierarchy** — Parent-child relationships via `parent_id`, supporting Domain → System → Component nesting
-- **Dependency graph** — Interactive SVG-based visualization with hover highlighting, color-coded nodes, zero external dependencies
-- **Catalog API** — REST endpoints (CRUD + /graph + /stats) with Zod validation and rate limiting
+- **Software Catalog** — Backstage-inspired service registry for IDP with 5 entity types (Service, Component, API, Library, Website)
+- **Catalog API** — REST endpoints (GET/POST /catalog, GET/PATCH/DELETE /catalog/[id]) with Zod validation, rate limiting, ownership verification
 - **Catalog UI** — Grid/list views, search, type/lifecycle filters, pagination, detail page, create/edit forms
-- **Dashboard governance card** — 4-column stats (total entries, production, services & APIs, libs & components) with graph link
-- **ENABLE_SOFTWARE_CATALOG feature flag** — Toggle catalog visibility (default: enabled)
-- **React Query hooks** — `useCatalog`, `useCatalogGraph`, `useCatalogStats` with 30s stale times
-- **Supabase migrations** — Base catalog schema + hierarchy extension (parent_id, description, metadata JSONB)
-- **Seed data** — 9 Forge Space repos pre-seeded in catalog (siza, mcp-gateway, core, etc.)
-- **Tests** — 754+ lines across 4 test suites (API routes, validation, service layer)
+- **Dashboard governance card** — Catalog stats in governance dashboard section
+- **ENABLE_SOFTWARE_CATALOG feature flag** — Toggle catalog visibility in sidebar navigation (default: enabled)
+- **Dependency tracking** — Track inter-service dependencies with forward/reverse resolution
+- **Supabase migration** — catalog_entries table with RLS, GIN-indexed tags, btree indexes
+- **Seed data** — 9 Forge Space repos pre-seeded in catalog
+- **Tests** — 27 new tests across validation, service, and integration suites
 
 ---
 
