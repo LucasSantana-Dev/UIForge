@@ -11,6 +11,7 @@ import { APIError } from '@/lib/api/errors';
 import { validateConversation } from '@/lib/services/conversation.service';
 import {
   buildDesignContext,
+  buildSizaGenContext,
   enrichWithRag,
   createGenerationRecord,
   completeGeneration,
@@ -80,13 +81,15 @@ export async function POST(request: NextRequest) {
     const skillContext =
       skillsEnabled && input.skillIds?.length ? await buildSkillContext(input.skillIds) : '';
     const enrichedDescription = input.description + designContext + skillContext;
-    const contextAddition =
+    const ragContext =
       input.useRag !== false
         ? await enrichWithRag(enrichedDescription, {
             framework: input.framework,
             apiKey: input.userApiKey,
           })
         : '';
+    const sizaGenContext = buildSizaGenContext(input.framework, input.componentLibrary);
+    const contextAddition = [ragContext, sizaGenContext].filter(Boolean).join('\n\n');
 
     const correlationId = randomUUID();
     const mcpEnabled = shouldUseMcpGateway();

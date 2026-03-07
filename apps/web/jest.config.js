@@ -22,6 +22,7 @@ const customJestConfig = {
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@shared/(.*)$': '<rootDir>/../../packages/shared/src/$1',
     '^@forgespace/brand-guide$': '<rootDir>/src/__tests__/__mocks__/brand-guide.js',
+    '^@forgespace/siza-gen/lite$': '<rootDir>/src/__tests__/__mocks__/siza-gen-lite.js',
   },
   collectCoverageFrom: [
     'src/lib/api/*.{ts,tsx}',

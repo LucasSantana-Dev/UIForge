@@ -17,6 +17,7 @@ import {
 } from './gemini';
 import { logger } from '../utils/logger';
 import type { GenerateComponentOptions, ComponentGenerationResult } from '../types/ai';
+import { getEnrichedSystemPrompt } from './prompt-enrichment';
 
 /**
  * Generate component with AI provider selection and fallback
@@ -25,6 +26,11 @@ export async function generateComponent(
   options: GenerateComponentOptions
 ): Promise<ComponentGenerationResult> {
   const { aiProvider = 'auto', useUserKey = false, userApiKey, ...generationOptions } = options;
+  generationOptions.description = getEnrichedSystemPrompt(
+    generationOptions.description,
+    generationOptions.framework,
+    generationOptions.componentLibrary
+  );
 
   // Determine provider strategy
   const providers = getProviderStrategy(aiProvider, useUserKey, !!userApiKey);
@@ -73,6 +79,11 @@ export async function* streamComponentGeneration(
   options: GenerateComponentOptions
 ): AsyncGenerator<string, void, unknown> {
   const { aiProvider = 'auto', useUserKey = false, userApiKey, ...generationOptions } = options;
+  generationOptions.description = getEnrichedSystemPrompt(
+    generationOptions.description,
+    generationOptions.framework,
+    generationOptions.componentLibrary
+  );
 
   // Determine provider strategy
   const providers = getProviderStrategy(aiProvider, useUserKey, !!userApiKey);

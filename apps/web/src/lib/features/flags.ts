@@ -30,6 +30,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_AUDIT_DASHBOARD: false,
   ENABLE_POLICY_ENGINE: false,
   ENABLE_PROJECT_SCORECARDS: false,
+  ENABLE_SIZA_GEN_CONTEXT: true,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -206,6 +207,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_PROJECT_SCORECARDS,
     description: 'Show per-project quality and compliance scorecards',
     category: 'governance',
+  },
+  {
+    name: 'ENABLE_SIZA_GEN_CONTEXT',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_SIZA_GEN_CONTEXT,
+    description: 'Enrich generation prompts with siza-gen context assembly',
+    category: 'generation',
   },
 ];
 

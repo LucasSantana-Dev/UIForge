@@ -24,6 +24,7 @@
     "@google/generative-ai": "^0.24.1",
     "@monaco-editor/react": "^4.6.0",
     "@react-email/components": "^1.0.8",
+    "@forgespace/siza-gen": "^0.8.0",
     "@siza/ui": "*",
     "@stripe/stripe-js": "^8.8.0",
     "@supabase/ssr": "^0.5.2",

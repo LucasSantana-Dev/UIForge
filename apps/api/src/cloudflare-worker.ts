@@ -4,6 +4,7 @@
  */
 
 import { streamComponentGeneration } from './services/gemini';
+import { getEnrichedSystemPrompt } from './services/prompt-enrichment';
 import { logger } from './utils/logger';
 
 // Environment interface for Cloudflare Workers
@@ -178,11 +179,17 @@ async function handleGenerate(request: Request, env: Env): Promise<Response> {
       },
     };
 
+    // Enrich description with siza-gen context
+    const enrichedBody = {
+      ...body,
+      description: getEnrichedSystemPrompt(body.description, body.framework, body.componentLibrary),
+    };
+
     // Stream component generation
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          for await (const chunk of streamComponentGeneration(body)) {
+          for await (const chunk of streamComponentGeneration(enrichedBody)) {
             controller.enqueue(new TextEncoder().encode(chunk));
           }
           controller.close();

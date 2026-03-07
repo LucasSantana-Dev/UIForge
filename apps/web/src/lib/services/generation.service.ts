@@ -3,6 +3,8 @@ import { enrichPromptWithContext } from './context-enrichment';
 import { storeGenerationEmbedding } from './embeddings';
 import { runAllGates, type QualityReport } from '@/lib/quality/gates';
 import { incrementGenerationCount } from '@/lib/usage/tracker';
+import { assembleContext } from '@forgespace/siza-gen/lite';
+import { getFeatureFlag } from '@/lib/features/flags';
 
 const BORDER_RADIUS_MAP: Record<string, string> = {
   none: '0',
@@ -167,4 +169,18 @@ export function buildStreamPrompt(description: string, ctx?: ConversationContext
     );
   }
   return description;
+}
+
+export function buildSizaGenContext(framework: string, componentLibrary?: string): string {
+  if (!getFeatureFlag('ENABLE_SIZA_GEN_CONTEXT')) return '';
+  try {
+    const result = assembleContext({
+      framework,
+      componentLibrary,
+      tokenBudget: 2000,
+    });
+    return result.systemPrompt;
+  } catch {
+    return '';
+  }
 }
