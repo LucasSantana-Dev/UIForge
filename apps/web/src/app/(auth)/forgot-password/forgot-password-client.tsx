@@ -55,7 +55,7 @@ export function ForgotPasswordClient() {
               href="/signin"
               className="mt-6 block w-full rounded-lg bg-primary px-4 py-2 text-center text-sm font-medium text-white hover:bg-primary-hover"
             >
-              Back to sign in
+              Back to Sign In
             </Link>
           </div>
         </div>
