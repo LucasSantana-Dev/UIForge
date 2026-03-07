@@ -2,12 +2,20 @@ import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 import Image from 'next/image';
 
 export const baseOptions: BaseLayoutProps = {
-  themeSwitch: { enabled: true },
+  themeSwitch: { enabled: false },
   nav: {
     title: (
       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <Image src="/siza-logo.svg" alt="Siza" width={20} height={20} />
-        <span style={{ fontWeight: 700, letterSpacing: '-0.02em' }}>Siza</span>
+        <Image src="/siza-logo.svg" alt="Forge Space" width={20} height={20} />
+        <span
+          style={{
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+            fontFamily: "var(--font-sora, 'Sora', sans-serif)",
+          }}
+        >
+          Forge Space
+        </span>
       </div>
     ),
   },
