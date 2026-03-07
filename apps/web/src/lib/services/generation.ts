@@ -1,6 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import type { AIProvider } from '@/lib/encryption';
 import type { GenerationEvent, GenerateStreamOptions } from './generation-types';
+import { captureServerError } from '@/lib/sentry/server';
 
 export type { GenerationEvent, GenerateStreamOptions };
 
@@ -92,9 +93,7 @@ export async function* generateWithProvider(
   }
 }
 
-async function* generateWithGoogle(
-  options: GenerateStreamOptions
-): AsyncGenerator<GenerationEvent> {
+async function* generateWithGoogle(options: MultiProviderOptions): AsyncGenerator<GenerationEvent> {
   const apiKey = options.apiKey || process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
@@ -112,7 +111,7 @@ async function* generateWithGoogle(
     const genAI = new GoogleGenerativeAI(apiKey);
     const systemPrompt = getSystemPrompt(options.contextAddition);
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
+      model: options.model || 'gemini-2.5-flash',
       systemInstruction: systemPrompt,
     });
 
@@ -142,6 +141,10 @@ async function* generateWithGoogle(
 
     yield { type: 'complete', timestamp: Date.now() };
   } catch (error) {
+    captureServerError(error, {
+      route: '/api/generate',
+      extra: { provider: 'google', model: options.model },
+    });
     const detail =
       error instanceof Error ? error.message : 'Please try again or use a different provider.';
     yield {
@@ -222,8 +225,11 @@ async function* generateWithOpenAI(options: MultiProviderOptions): AsyncGenerato
             if (content) {
               yield { type: 'chunk', content, timestamp: Date.now() };
             }
-          } catch {
-            // skip malformed lines
+          } catch (parseError) {
+            captureServerError(parseError, {
+              route: '/api/generate',
+              extra: { provider: 'openai', phase: 'sse-parse' },
+            });
           }
         }
       }
@@ -233,6 +239,10 @@ async function* generateWithOpenAI(options: MultiProviderOptions): AsyncGenerato
 
     yield { type: 'complete', timestamp: Date.now() };
   } catch (error) {
+    captureServerError(error, {
+      route: '/api/generate',
+      extra: { provider: 'openai', model: options.model },
+    });
     const detail = error instanceof Error ? error.message : 'Check your API key and try again.';
     yield {
       type: 'error',
@@ -315,8 +325,11 @@ async function* generateWithAnthropic(
                 yield { type: 'chunk', content: text, timestamp: Date.now() };
               }
             }
-          } catch {
-            // skip malformed lines
+          } catch (parseError) {
+            captureServerError(parseError, {
+              route: '/api/generate',
+              extra: { provider: 'anthropic', phase: 'sse-parse' },
+            });
           }
         }
       }
@@ -326,6 +339,10 @@ async function* generateWithAnthropic(
 
     yield { type: 'complete', timestamp: Date.now() };
   } catch (error) {
+    captureServerError(error, {
+      route: '/api/generate',
+      extra: { provider: 'anthropic', model: options.model },
+    });
     const detail = error instanceof Error ? error.message : 'Check your API key and try again.';
     yield {
       type: 'error',

@@ -134,7 +134,7 @@ async function* routeViaMcp(opts: RouteGenerationOptions): AsyncGenerator<Genera
   }
 
   if (!hasOutput) {
-    const validProviders: AIProvider[] = ['google', 'openai', 'anthropic', 'siza'];
+    const validProviders: AIProvider[] = ['google', 'openai', 'anthropic'];
     const envProvider = process.env.DEFAULT_GENERATION_PROVIDER;
     const fallbackProvider: AIProvider =
       envProvider && validProviders.includes(envProvider as AIProvider)
