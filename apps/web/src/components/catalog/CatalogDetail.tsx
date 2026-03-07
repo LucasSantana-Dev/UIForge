@@ -16,6 +16,7 @@ import {
   GitBranchIcon,
   UsersIcon,
 } from 'lucide-react';
+import TechDocsPanel from '@/components/catalog/TechDocsPanel';
 
 interface CatalogEntry {
   id: string;
@@ -176,8 +177,18 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
             </div>
           )}
           <div className="text-xs text-text-secondary space-y-1">
-            <p>Created {formatDistanceToNow(new Date(entry.created_at), { addSuffix: true })}</p>
-            <p>Updated {formatDistanceToNow(new Date(entry.updated_at), { addSuffix: true })}</p>
+            <p>
+              Created{' '}
+              {formatDistanceToNow(new Date(entry.created_at), {
+                addSuffix: true,
+              })}
+            </p>
+            <p>
+              Updated{' '}
+              {formatDistanceToNow(new Date(entry.updated_at), {
+                addSuffix: true,
+              })}
+            </p>
           </div>
         </div>
 
@@ -254,6 +265,11 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
           </div>
         )}
       </div>
+
+      <TechDocsPanel
+        documentationUrl={entry.documentation_url}
+        repositoryUrl={entry.repository_url}
+      />
     </div>
   );
 }
