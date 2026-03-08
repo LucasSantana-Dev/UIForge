@@ -42,38 +42,13 @@ Three offset rectangles — base (widest), face (wide), horn (narrow, right-shif
 ## Brand Voice
 Precise, confident, technical, dry, architectural. Write for engineers. No emoji in product copy. No marketing speak.
 
-## Current State (2026-03-08)
-- **Version**: v0.40.0 (released 2026-03-08)
-- **Domain**: `siza.forgespace.co` (Vercel production)
-- **Branch**: main — 0 open PRs, 0 open issues, all CI green
-- **v0.40.0**: RBAC + Teams UI + Entity Permissions + Anthropic Agent Skills (PRs #386-#393)
-- **v0.39.0**: IDP Phase 3 — Plugin System, Entity Relationships, TechDocs TOC, Search Federation
-- **v0.38.0**: Supabase rate limiting, conversation context, stream timeout
-- **IDP Core Parity**: ALL GAPS CLOSED — Software Catalog, TechDocs, Golden Paths, Scorecards, Dep Graph, API Docs, Plugins, RBAC
+## Current State (2026-03-07)
+- **Version**: v0.39.0 (released 2026-03-07)
+- **Domain**: `siza.forgespace.co` (Cloudflare Workers)
+- **Branch**: main — 2 open PRs (#388 Skills spec, #391 Entity permissions)
+- **Tags**: v0.2.1 → ... → v0.33.0 → v0.39.0
+- **Tests**: 763+ webapp + 54 API passing, 64+ suites, 8 E2E spec files
+- **RBAC**: Team-based RBAC with entity permissions (see `rbac_entity_permissions` memory)
+- **IDP**: All 4 phases complete — Plugin System, TechDocs, Search Federation, Entity Relationships
 - **Desktop**: v0.2.0 released (Electron + Ollama local generation)
-- **Tests**: 1024+ passing (91 suites), 8 E2E spec files
-- **Feature flags**: 36 flags (latest: ENABLE_SKILL_MARKETPLACE, ENABLE_RBAC)
-
-## Nav Shell (v0.26.0)
-- Collapsible sidebar with persistent state in `ui-store.ts`
-- Command palette (`CommandPalette.tsx`) — ⌘K trigger, cmdk library
-- Keyboard shortcuts (`use-keyboard-shortcuts.ts`) — ⌘1-4 for page nav
-- `DashboardShell.tsx` layout wrapper, `use-page-meta.ts` for dynamic titles
-- @siza/ui Tooltip component (Radix UI)
-
-## Brand-Guide Theme (v0.26.0)
-- `defaults.ts` imports `identity` from `@forgespace/brand-guide`
-- ESM-only mock at `__tests__/__mocks__/brand-guide.js` for Jest CJS compatibility
-- `moduleNameMapper` in `jest.config.js` maps `@forgespace/brand-guide` to mock
-- `eslint.config.js` ignores `**/__mocks__/**` (flat config)
-
-## Supabase SSR Cookie API (v0.8.0)
-- Old: `get(name)`, `set(name, value, options)`, `remove(name, options)` + `CookieOptions` import
-- New: `getAll()`, `setAll(cookiesToSet)` — bulk operations, no CookieOptions needed
-- Files: `apps/web/src/lib/supabase/server.ts`, `apps/web/src/middleware.ts`
-
-## Landing Page
-- **OG image**: `apps/web/public/og-image.png` — branded 1200x630, 102 KB static PNG
-- **Metadata**: Complete OpenGraph + Twitter card in `layout.tsx`
-- **Stats bar**: 8 repos, 4 frameworks, 5 quality gates, 618+ tests
-- **Hero**: "Generate production UI with AI"
+- **Deploy**: Restored via @vercel/og stub (PR #298). Bundle 2975 KiB gzipped
