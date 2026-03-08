@@ -49,6 +49,7 @@ export default function Sidebar({ isAdmin }: SidebarProps) {
                 <TooltipTrigger asChild>
                   <Button
                     asChild
+                    data-tour="generate"
                     className={`w-full mb-3 bg-brand hover:bg-brand-light shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all ${collapsed ? 'px-0 justify-center' : 'justify-start'}`}
                   >
                     <Link href="/generate">
@@ -76,6 +77,7 @@ export default function Sidebar({ isAdmin }: SidebarProps) {
                       <Button
                         asChild
                         variant="ghost"
+                        data-tour={item.href.slice(1)}
                         className={`w-full relative h-10 ${activeCls} ${collapsed ? 'justify-center px-0' : 'justify-start px-3'}`}
                       >
                         <Link href={item.href}>
