@@ -38,6 +38,9 @@ export async function listSkills(filters?: SkillFilters): Promise<SkillRow[]> {
   if (filters?.search) {
     query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
   }
+  if (filters?.tag) {
+    query = query.contains('tags', [filters.tag]);
+  }
 
   const { data } = await query;
   return (data as unknown as SkillRow[]) ?? [];
@@ -53,6 +56,28 @@ export async function getSkillById(id: string): Promise<SkillRow | null> {
   const skill = data as unknown as SkillRow | null;
   if (skill) setCache(id, skill);
   return skill;
+}
+
+export async function getSkillBySlug(slug: string): Promise<SkillRow | null> {
+  const supabase = await getClient();
+  const { data } = await supabase
+    .from('skills')
+    .select('*')
+    .eq('slug', slug)
+    .single();
+  return data as unknown as SkillRow | null;
+}
+
+export async function upsertSkill(
+  skill: Partial<SkillRow> & { slug: string }
+): Promise<SkillRow | null> {
+  const supabase = await getClient();
+  const { data } = await supabase
+    .from('skills')
+    .upsert(skill as any, { onConflict: 'slug' })
+    .select()
+    .single();
+  return data as unknown as SkillRow | null;
 }
 
 export async function getSkillsByIds(ids: string[]): Promise<SkillRow[]> {

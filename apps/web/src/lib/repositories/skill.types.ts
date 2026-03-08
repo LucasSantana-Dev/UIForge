@@ -30,6 +30,14 @@ export interface SkillRow {
   created_by: string | null;
   created_at: string;
   updated_at: string;
+  version: string | null;
+  author: string | null;
+  license: string | null;
+  tags: string[];
+  allowed_tools: string[];
+  argument_hint: string | null;
+  invocation_mode: 'user' | 'auto' | 'background';
+  raw_frontmatter: Record<string, unknown> | null;
 }
 
 export interface SkillFilters {
@@ -37,4 +45,5 @@ export interface SkillFilters {
   sourceType?: SkillSourceType;
   framework?: string;
   search?: string;
+  tag?: string;
 }

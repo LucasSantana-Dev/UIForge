@@ -36,6 +36,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_POST_GEN_SCORING: true,
   ENABLE_PLUGIN_SYSTEM: true,
   ENABLE_RBAC: false,
+  ENABLE_SKILL_MARKETPLACE: false,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -248,6 +249,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_RBAC,
     description: 'Enable team-based RBAC with roles and entity permissions',
     category: 'auth',
+  },
+  {
+    name: 'ENABLE_SKILL_MARKETPLACE',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_SKILL_MARKETPLACE,
+    description: 'Enable community skill marketplace for browsing and importing skills',
+    category: 'generation',
   },
 ];
 

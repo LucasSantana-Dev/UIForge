@@ -1,10 +1,12 @@
 import {
   listSkills as repoListSkills,
   getSkillsByIds,
+  getSkillBySlug,
   insertGenerationSkills,
   type SkillRow,
   type SkillFilters,
 } from '@/lib/repositories/skill.repo';
+import { substituteArguments } from '@/lib/skills/parser';
 
 const MAX_SKILLS_PER_GENERATION = 3;
 
