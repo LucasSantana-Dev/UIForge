@@ -35,6 +35,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_GOLDEN_PATHS: true,
   ENABLE_POST_GEN_SCORING: true,
   ENABLE_PLUGIN_SYSTEM: true,
+  ENABLE_RBAC: false,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [
@@ -241,6 +242,12 @@ export const FEATURE_FLAGS: FeatureFlag[] = [
     enabled: DEFAULT_FEATURE_FLAGS.ENABLE_PLUGIN_SYSTEM,
     description: 'Enable governance plugin marketplace and widget slot system',
     category: 'governance',
+  },
+  {
+    name: 'ENABLE_RBAC',
+    enabled: DEFAULT_FEATURE_FLAGS.ENABLE_RBAC,
+    description: 'Enable team-based RBAC with roles and entity permissions',
+    category: 'auth',
   },
 ];
 

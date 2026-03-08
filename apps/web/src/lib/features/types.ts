@@ -32,7 +32,8 @@ export type FeatureFlagName =
   | 'ENABLE_SOFTWARE_CATALOG'
   | 'ENABLE_GOLDEN_PATHS'
   | 'ENABLE_POST_GEN_SCORING'
-  | 'ENABLE_PLUGIN_SYSTEM';
+  | 'ENABLE_PLUGIN_SYSTEM'
+  | 'ENABLE_RBAC';
 
 export type FeatureFlagCategory =
   | 'auth'

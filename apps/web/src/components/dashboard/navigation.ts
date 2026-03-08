@@ -11,6 +11,7 @@ import {
   SettingsIcon,
   ClockIcon,
   ShieldIcon,
+  UsersIcon,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { getFeatureFlag } from '@/lib/features/flags';
@@ -43,6 +44,8 @@ const pluginsNavigation: DashboardNavItem[] = [
   { name: 'Plugins', href: '/plugins', icon: PuzzleIcon },
 ];
 
+const teamsNavigation: DashboardNavItem[] = [{ name: 'Teams', href: '/teams', icon: UsersIcon }];
+
 const adminDashboardNavigation: DashboardNavItem[] = [
   { name: 'Admin', href: '/admin', icon: ShieldIcon },
 ];
@@ -51,9 +54,11 @@ export function getDashboardNavigation(isAdmin: boolean): DashboardNavItem[] {
   const isCatalogEnabled = getFeatureFlag('ENABLE_SOFTWARE_CATALOG');
   const isGoldenPathsEnabled = getFeatureFlag('ENABLE_GOLDEN_PATHS');
   const isPluginsEnabled = getFeatureFlag('ENABLE_PLUGIN_SYSTEM');
+  const isRbacEnabled = getFeatureFlag('ENABLE_RBAC');
   const catalogItems = isCatalogEnabled ? catalogNavigation : [];
   const goldenPathItems = isGoldenPathsEnabled ? goldenPathsNavigation : [];
   const pluginItems = isPluginsEnabled ? pluginsNavigation : [];
+  const teamItems = isRbacEnabled ? teamsNavigation : [];
 
   const projectsIndex = baseDashboardNavigation.findIndex((item) => item.name === 'Projects');
   const navItems = [
@@ -61,6 +66,7 @@ export function getDashboardNavigation(isAdmin: boolean): DashboardNavItem[] {
     ...catalogItems,
     ...goldenPathItems,
     ...pluginItems,
+    ...teamItems,
     ...baseDashboardNavigation.slice(projectsIndex + 1),
   ];
 
