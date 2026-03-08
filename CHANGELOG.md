@@ -7,24 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [0.38.0] - 2026-03-08
+
 ### Added
-- **CI/CD Visibility Panel** — Inline GitHub Actions workflow runs on catalog entity detail pages with status badges, duration, branch info, and authenticated/public fallback strategy (~3.5 KB gzipped, zero new dependencies)
-- **Catalog Auto-Discovery** — Scan connected GitHub repos for `catalog-info.yaml` files, preview entities, and batch import into service catalog. Closes the biggest IDP gap vs Backstage (#363)
-- **Parameterized Golden Path Templates** — Dynamic scaffold form with 4 input types (string, number, boolean, select), parameter validation, and default values. Seeds updated with CSS framework selector and port config (#363)
-- **Global Search (⌘K)** — Command palette now searches across projects, catalog entries, golden paths, and templates with debounced API queries, grouped results, and loading states (#363)
-- **API Playground** — Interactive "Try It" panel on API documentation endpoints with parameter forms, request body editor, live requests, response viewer with status/timing, and copy button. Zero new dependencies
-- **TechDocs Auto-Detection** — Catalog discovery now scans for docs indicators (docs/index.md, mkdocs.yml, docusaurus.config) and shows "Docs" badge on discovered repos
-- **API Documentation Viewer** — Inline OpenAPI 3.x renderer for catalog API entities with method badges, parameter tables, schema tree, endpoint search, and tag grouping (~4 KB gzipped, zero new dependencies)
+- **Supabase-backed rate limiting** — Replace in-memory Map with database-backed rate limits; free tier tightened to 5 gen/month (#372)
+- **Conversation context** — Multi-turn refinement via `conversationContext` in `buildPrompt()` (#380)
+- **SSE stream timeout** — 30s `Promise.race` timeout prevents UI freezes when providers stop sending (#380)
+- **Sentry error logging** — All generation providers now log errors via `captureServerError()` (#371)
+- **Skills system enabled** — `ENABLE_SKILLS` feature flag now true by default (#379)
+- **Audit dashboard enabled** — `ENABLE_AUDIT_DASHBOARD` feature flag now true by default (#379)
+- **Catalog Auto-Discovery** — Scan GitHub repos for `catalog-info.yaml`, preview and batch import (#363)
+- **Parameterized Golden Path Templates** — Dynamic scaffold form with 4 input types (#363)
+- **Global Search (⌘K)** — Command palette searches across projects, catalog, golden paths, templates (#363)
+- **API Playground** — Interactive "Try It" panel on API docs with live requests (#365)
+- **TechDocs Auto-Detection** — Docs indicator scanning with badges on discovered repos (#365)
+- **API Documentation Viewer** — Inline OpenAPI 3.x renderer (~4 KB gzipped, zero deps) (#361)
+- **CI/CD Visibility Panel** — Inline GitHub Actions workflow runs on catalog entities
 
 ### Changed
-- **Provider-agnostic generation** — Decoupled from Gemini; providers configurable via `DEFAULT_GENERATION_PROVIDER` / `DEFAULT_GENERATION_MODEL` env vars. Deleted `gemini.ts`, unified all providers in `generation.ts` with exhaustive switch + env var validation
-- **Generate page simplification** — Collapsed AI Provider and Advanced sections into accordions, reducing visible form fields from 8+ to 2 (Component Name + Prompt)
+- **Provider-agnostic generation** — Decoupled from Gemini; configurable via `DEFAULT_GENERATION_PROVIDER` / `DEFAULT_GENERATION_MODEL` env vars (#370)
+- **Generate page simplification** — Collapsed AI Provider and Advanced sections into accordions (#370)
+- **Vercel deployment** — Migrated from Cloudflare Workers to Vercel (#369)
+- **Siza AI routing** — Always routes to Gemini Flash, removed Anthropic quality escalation (#372)
+- **CI reusable workflows** — Replaced security workflows with org composite actions (#359, #360)
 
 ### Fixed
-- **Background video optimization** — Replaced 1.7 MB ambient-bg.webm with CSS noise texture + animated gradients (zero network cost) (#362)
-- **CSP headers** — Added `unsafe-eval` for Babel standalone in LivePreview
-- **LivePreview hydration** — Fixed SSR mismatch with client-only mounting
-- **Sidebar/TopBar layout** — Fixed overflow and responsive issues
+- **BYOK fallback** — User API keys now passed through Anthropic quota fallback path (#380)
+- **Usage API 401** — Proper `UnauthorizedError` handling instead of 500 (#379)
+- **Quota detection** — Upgraded from substring to word-boundary regex (#379)
+- **Hardcoded model** — Fixed `generateWithGoogle` ignoring model parameter (#371)
+- **Background video** — Replaced 1.7 MB video with CSS noise + animated gradients (#362)
+- **Production bugs** — Usage count, breadcrumb UUID, keyboard shortcuts (#366)
+- **Gemini model** — Updated deprecated `gemini-2.0-flash` to `gemini-2.5-flash` (#367)
+- **Auth page** — Capitalized "Back to Sign In" on forgot-password (#368)
 
 ---
 
