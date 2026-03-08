@@ -19,6 +19,7 @@ import {
 import TechDocsPanel from '@/components/catalog/TechDocsPanel';
 import CicdPanel from '@/components/catalog/CicdPanel';
 import ApiDocsPanel from '@/components/catalog/api-docs/ApiDocsPanel';
+import { RelationshipsPanel } from '@/components/catalog/RelationshipsPanel';
 import { PluginSlot } from '@/components/plugins/PluginSlot';
 
 interface CatalogEntry {
@@ -269,6 +270,8 @@ export default function CatalogDetail({ entryId }: CatalogDetailProps) {
           </div>
         )}
       </div>
+
+      <RelationshipsPanel entityId={entryId} isOwner={isOwner} />
 
       <TechDocsPanel
         documentationUrl={entry.documentation_url}

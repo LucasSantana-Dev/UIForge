@@ -25,7 +25,7 @@ export interface CatalogGraphData {
   edges: Array<{
     source: string;
     target: string;
-    type: 'dependency' | 'hierarchy';
+    type: string;
   }>;
 }
 
@@ -199,19 +199,18 @@ export async function findCatalogChildren(parentId: string): Promise<CatalogEntr
 
 export async function getCatalogGraphData(): Promise<CatalogGraphData> {
   const supabase = await getClient();
-  const { data, error } = await supabase
-    .from('catalog_entries')
-    .select('*')
-    .order('type')
-    .order('name');
 
-  if (error) {
-    handleRepoError(error, 'getCatalogGraphData');
+  const [entriesResult, relationsResult] = await Promise.all([
+    supabase.from('catalog_entries').select('*').order('type').order('name'),
+    supabase.from('entity_relationships').select('source_id, target_id, type'),
+  ]);
+
+  if (entriesResult.error) {
+    handleRepoError(entriesResult.error, 'getCatalogGraphData');
   }
 
-  const nodes = (data || []) as CatalogEntryRow[];
+  const nodes = (entriesResult.data || []) as CatalogEntryRow[];
   const edges: CatalogGraphData['edges'] = [];
-
   const nameToId = new Map(nodes.map((n) => [n.name, n.id]));
 
   for (const node of nodes) {
@@ -233,6 +232,19 @@ export async function getCatalogGraphData(): Promise<CatalogGraphData> {
         });
       }
     }
+  }
+
+  const relations = (relationsResult.data || []) as Array<{
+    source_id: string;
+    target_id: string;
+    type: string;
+  }>;
+  for (const rel of relations) {
+    edges.push({
+      source: rel.source_id,
+      target: rel.target_id,
+      type: rel.type,
+    });
   }
 
   return { nodes, edges };

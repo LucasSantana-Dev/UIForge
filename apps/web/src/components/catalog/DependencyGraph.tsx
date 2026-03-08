@@ -22,6 +22,20 @@ const LIFECYCLE_COLORS: Record<string, string> = {
   deprecated: '#ef4444',
 };
 
+const EDGE_COLORS: Record<string, string> = {
+  hierarchy: '#7c3aed',
+  dependency: '#6b7280',
+  dependsOn: '#38bdf8',
+  consumesAPI: '#a78bfa',
+  providesAPI: '#34d399',
+  ownedBy: '#fbbf24',
+  partOf: '#60a5fa',
+  hasPart: '#60a5fa',
+  implements: '#22d3ee',
+  deployedTo: '#4ade80',
+  monitoredBy: '#fb7185',
+};
+
 const NODE_W = 180;
 const NODE_H = 56;
 const COL_GAP = 240;
@@ -182,7 +196,8 @@ export function DependencyGraph() {
           if (!source || !target) return null;
           const highlighted = connectedIds.has(edge.source) && connectedIds.has(edge.target);
           const midX = (source.x + NODE_W + target.x) / 2;
-          const color = edge.type === 'hierarchy' ? '#7c3aed' : '#6b7280';
+          const color = EDGE_COLORS[edge.type] || '#6b7280';
+          const isDashed = edge.type === 'dependency' || edge.type === 'dependsOn';
           return (
             <path
               key={i}
@@ -190,7 +205,7 @@ export function DependencyGraph() {
               fill="none"
               stroke={color}
               strokeWidth={1.5}
-              strokeDasharray={edge.type === 'dependency' ? '4,4' : 'none'}
+              strokeDasharray={isDashed ? '4,4' : 'none'}
               opacity={highlighted ? 0.8 : 0.15}
               style={{ transition: 'opacity 0.2s' }}
               markerEnd={edge.type === 'hierarchy' ? 'url(#arrow-hierarchy)' : 'url(#arrow)'}
