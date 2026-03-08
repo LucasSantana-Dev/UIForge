@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Plugin System enabled** — Governance plugins marketplace with install/uninstall/configure, widget slots on catalog entities, 6 official plugins (Tech Debt Scanner, Architecture Guard, Security Posture, Scalability Analyzer, Planning Enforcer, Dependency Health)
+- **Plugin API routes** — GET/POST/DELETE/PATCH `/api/plugins/[slug]` with auth, Sentry error capture
+- **Plugin widget slots** — Extensible `<PluginSlot>` component renders active plugins on entity pages
+
 ---
 
 ## [0.38.0] - 2026-03-08

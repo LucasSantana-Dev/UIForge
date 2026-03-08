@@ -34,7 +34,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_SOFTWARE_CATALOG: true,
   ENABLE_GOLDEN_PATHS: true,
   ENABLE_POST_GEN_SCORING: true,
-  ENABLE_PLUGIN_SYSTEM: false,
+  ENABLE_PLUGIN_SYSTEM: true,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [

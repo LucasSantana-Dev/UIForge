@@ -41,6 +41,7 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 - **Self-Hostable** — Run everything locally with Docker, MIT licensed
 - **Multi-LLM** — Swap between Gemini, Claude, GPT without code changes
 - **Production Ready** — Monaco editor, live preview, Stripe billing, feature flags
+- **IDP Governance** — Software catalog, golden path templates, post-gen scorecard, dependency graph, API docs viewer, CI/CD visibility, governance plugins
 
 ## UI Migration Status (March 2026)
 
