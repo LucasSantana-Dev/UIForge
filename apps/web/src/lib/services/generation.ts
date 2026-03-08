@@ -21,6 +21,23 @@ export interface MultiProviderOptions extends GenerateStreamOptions {
 }
 
 function buildPrompt(options: GenerateStreamOptions): string {
+  if (options.conversationContext) {
+    const { previousCode, refinementPrompt, originalPrompt } = options.conversationContext;
+    const parts = [
+      `Refine this ${options.framework} component based on feedback.`,
+      `Original request: ${originalPrompt}`,
+      `Current code:\n\`\`\`\n${previousCode}\n\`\`\``,
+      `Refinement: ${refinementPrompt}`,
+    ];
+    if (options.componentLibrary && options.componentLibrary !== 'none') {
+      parts.push(`Use ${options.componentLibrary} for styling.`);
+    }
+    if (options.typescript) {
+      parts.push('Use TypeScript with proper type annotations.');
+    }
+    return parts.join('\n');
+  }
+
   const parts = [`Generate a ${options.framework} component:`, options.prompt];
   if (options.componentLibrary && options.componentLibrary !== 'none') {
     parts.push(`Use ${options.componentLibrary} for styling.`);
@@ -38,6 +55,22 @@ function buildPrompt(options: GenerateStreamOptions): string {
 
 function getSystemPrompt(contextAddition?: string): string {
   return contextAddition ? `${SYSTEM_PROMPT}\n\n${contextAddition}` : SYSTEM_PROMPT;
+}
+
+const STREAM_TIMEOUT_MS = 30_000;
+
+function readWithTimeout(
+  reader: ReadableStreamDefaultReader<Uint8Array>
+): Promise<ReadableStreamReadResult<Uint8Array>> {
+  return Promise.race([
+    reader.read(),
+    new Promise<never>((_, reject) =>
+      setTimeout(
+        () => reject(new Error('Stream timeout — no data received for 30s')),
+        STREAM_TIMEOUT_MS
+      )
+    ),
+  ]);
 }
 
 export const PROVIDER_MODELS: Record<AIProvider, { id: string; name: string }[]> = {
@@ -213,7 +246,7 @@ async function* generateWithOpenAI(options: MultiProviderOptions): AsyncGenerato
 
     try {
       while (true) {
-        const { done, value } = await reader.read();
+        const { done, value } = await readWithTimeout(reader);
         if (done) break;
 
         const chunk = decoder.decode(value);
@@ -311,7 +344,7 @@ async function* generateWithAnthropic(
 
     try {
       while (true) {
-        const { done, value } = await reader.read();
+        const { done, value } = await readWithTimeout(reader);
         if (done) break;
 
         const chunk = decoder.decode(value);

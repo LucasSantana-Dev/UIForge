@@ -235,6 +235,7 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
     componentLibrary: opts.componentLibrary,
     style: opts.style,
     typescript: opts.typescript,
+    apiKey: opts.userApiKey,
     contextAddition: opts.contextAddition,
     imageBase64: opts.imageBase64,
     imageMimeType: opts.imageMimeType,
