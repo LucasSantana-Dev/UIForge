@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Team-based RBAC** — Teams table, team_members with roles (viewer/editor/admin/owner), entity permissions with hierarchy (view < edit < admin < delete), Supabase RLS policies, repository layer, API routes, TanStack Query hooks, ENABLE_RBAC feature flag, Teams sidebar navigation
+
 ---
 
 ## [0.39.0] - 2026-03-08
