@@ -7,10 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- **Team-based RBAC** — Teams table, team_members with roles (viewer/editor/admin/owner), entity permissions with hierarchy (view < edit < admin < delete), Supabase RLS policies, repository layer, API routes, TanStack Query hooks, ENABLE_RBAC feature flag, Teams sidebar navigation
-
 ---
+
+## [0.40.0] - 2026-03-08
+
+### Added
+- **Anthropic Agent Skills spec** — SKILL.md parser with YAML frontmatter, Skills Marketplace page (/skills) with category pills, tag filter, search, import/export, Skill Creator GUI (/skills/create) with live SKILL.md preview, Editor/Preview tabs, DB migration (8 new columns: version, author, license, tags, allowed_tools, argument_hint, invocation_mode, raw_frontmatter), API routes for list/import/export, ENABLE_SKILL_MARKETPLACE feature flag, 10 parser tests
+- **Entity Permissions UI** — CRUD repository (getEntityPermissions, grantEntityPermission, revokeEntityPermission), /api/permissions route (GET/POST/DELETE admin-only), React Query hooks, EntityPermissionsPanel component, 13 tests
+- **Teams UI pages** — Teams list with create form, team detail with member management (add, remove, inline role editing), 4 new pages in /teams
+- **RBAC API tests** — 20 route tests for /api/teams (5) and /api/teams/[slug] (15) with role checks
 
 ## [0.39.0] - 2026-03-08
 
