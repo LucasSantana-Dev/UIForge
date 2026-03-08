@@ -82,6 +82,9 @@ client_id = "env(GITHUB_CLIENT_ID)"
 secret = "env(GITHUB_CLIENT_SECRET)"
 redirect_uri = "http://localhost:54321/auth/v1/callback"
 
+[analytics]
+enabled = false
+
 # [edge_functions]
 # enabled = false
 # Enable when needed for backend logic (commented out for CLI compatibility)

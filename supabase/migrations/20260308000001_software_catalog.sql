@@ -58,16 +58,26 @@ create trigger catalog_entries_updated_at
   execute function handle_catalog_updated_at();
 
 -- Seed: 9 Forge Space repos
--- Note: owner_id must be set to an actual user UUID after deployment
--- These use a placeholder that should be updated
-insert into catalog_entries (name, display_name, type, lifecycle, owner_id, repository_url, tags, dependencies) values
-  ('siza', 'Siza Platform', 'website', 'production', '00000000-0000-0000-0000-000000000000', 'https://github.com/Forge-Space/siza', array['idp', 'platform', 'next.js'], array['core', 'siza-gen', 'brand-guide']),
-  ('ui-mcp', 'UI MCP Server', 'service', 'production', '00000000-0000-0000-0000-000000000000', 'https://github.com/Forge-Space/ui-mcp', array['mcp', 'ai', 'generation'], array['core', 'siza-gen']),
-  ('mcp-gateway', 'MCP Gateway', 'service', 'production', '00000000-0000-0000-0000-000000000000', 'https://github.com/Forge-Space/mcp-gateway', array['gateway', 'routing', 'python'], array['core']),
-  ('core', 'Forge Patterns Core', 'library', 'production', '00000000-0000-0000-0000-000000000000', 'https://github.com/Forge-Space/core', array['patterns', 'shared', 'typescript'], array[]::text[]),
-  ('branding-mcp', 'Branding MCP', 'service', 'production', '00000000-0000-0000-0000-000000000000', 'https://github.com/Forge-Space/branding-mcp', array['mcp', 'branding', 'design'], array['core', 'brand-guide']),
-  ('siza-gen', 'Siza Gen', 'library', 'production', '00000000-0000-0000-0000-000000000000', 'https://github.com/Forge-Space/siza-gen', array['generation', 'ai', 'context'], array['core']),
-  ('brand-guide', 'Brand Guide', 'library', 'production', '00000000-0000-0000-0000-000000000000', 'https://github.com/Forge-Space/brand-guide', array['brand', 'design', 'astro'], array[]::text[]),
-  ('forgespace-web', 'Forge Space Website', 'website', 'production', '00000000-0000-0000-0000-000000000000', 'https://github.com/Forge-Space/forgespace-web', array['marketing', 'next.js', 'three.js'], array['brand-guide']),
-  ('siza-desktop', 'Siza Desktop', 'component', 'experimental', '00000000-0000-0000-0000-000000000000', 'https://github.com/Forge-Space/siza-desktop', array['desktop', 'electron', 'ollama'], array['core'])
-on conflict (name) do nothing;
+-- Seeds catalog entries using the first available profile as owner
+-- In local dev, this runs after auth user creation via the app
+do $$
+declare
+  seed_owner_id uuid;
+begin
+  select id into seed_owner_id from profiles limit 1;
+  if seed_owner_id is null then
+    return;
+  end if;
+  insert into catalog_entries (name, display_name, type, lifecycle, owner_id, repository_url, tags, dependencies) values
+    ('siza', 'Siza Platform', 'website', 'production', seed_owner_id, 'https://github.com/Forge-Space/siza', array['idp', 'platform', 'next.js'], array['core', 'siza-gen', 'brand-guide']),
+    ('ui-mcp', 'UI MCP Server', 'service', 'production', seed_owner_id, 'https://github.com/Forge-Space/ui-mcp', array['mcp', 'ai', 'generation'], array['core', 'siza-gen']),
+    ('mcp-gateway', 'MCP Gateway', 'service', 'production', seed_owner_id, 'https://github.com/Forge-Space/mcp-gateway', array['gateway', 'routing', 'python'], array['core']),
+    ('core', 'Forge Patterns Core', 'library', 'production', seed_owner_id, 'https://github.com/Forge-Space/core', array['patterns', 'shared', 'typescript'], array[]::text[]),
+    ('branding-mcp', 'Branding MCP', 'service', 'production', seed_owner_id, 'https://github.com/Forge-Space/branding-mcp', array['mcp', 'branding', 'design'], array['core', 'brand-guide']),
+    ('siza-gen', 'Siza Gen', 'library', 'production', seed_owner_id, 'https://github.com/Forge-Space/siza-gen', array['generation', 'ai', 'context'], array['core']),
+    ('brand-guide', 'Brand Guide', 'library', 'production', seed_owner_id, 'https://github.com/Forge-Space/brand-guide', array['brand', 'design', 'astro'], array[]::text[]),
+    ('forgespace-web', 'Forge Space Website', 'website', 'production', seed_owner_id, 'https://github.com/Forge-Space/forgespace-web', array['marketing', 'next.js', 'three.js'], array['brand-guide']),
+    ('siza-desktop', 'Siza Desktop', 'component', 'experimental', seed_owner_id, 'https://github.com/Forge-Space/siza-desktop', array['desktop', 'electron', 'ollama'], array['core'])
+  on conflict (name) do nothing;
+end;
+$$;

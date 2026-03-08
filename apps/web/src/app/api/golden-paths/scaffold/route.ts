@@ -16,6 +16,28 @@ interface ParameterDef {
   options?: string[];
 }
 
+const FRAMEWORK_MAP: Record<string, string> = {
+  'next.js': 'nextjs',
+  'node.js': 'react',
+  fastapi: 'html',
+  cloudflare: 'html',
+};
+
+const LIFECYCLE_MAP: Record<string, string> = {
+  draft: 'experimental',
+  beta: 'experimental',
+  ga: 'production',
+  deprecated: 'deprecated',
+};
+
+function mapFramework(framework: string): string {
+  return FRAMEWORK_MAP[framework] ?? framework;
+}
+
+function mapLifecycle(lifecycle: string): string {
+  return LIFECYCLE_MAP[lifecycle] ?? lifecycle;
+}
+
 function resolveParameters(
   defs: ParameterDef[],
   values: Record<string, unknown>
@@ -89,9 +111,9 @@ export async function POST(request: NextRequest) {
       .insert({
         name: project_name,
         description,
-        framework: resolvedParams.framework
-          ? String(resolvedParams.framework)
-          : goldenPath.framework,
+        framework: mapFramework(
+          resolvedParams.framework ? String(resolvedParams.framework) : goldenPath.framework
+        ),
         user_id: user.id,
       })
       .select()
@@ -108,7 +130,7 @@ export async function POST(request: NextRequest) {
       name: project_name.toLowerCase().replace(/\s+/g, '-'),
       display_name: project_name,
       type: goldenPath.catalog_type,
-      lifecycle: goldenPath.catalog_lifecycle,
+      lifecycle: mapLifecycle(goldenPath.catalog_lifecycle),
       owner_id: user.id,
       project_id: project.id,
       tags: goldenPath.tags,
