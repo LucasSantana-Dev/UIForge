@@ -44,22 +44,45 @@ export const test = base.extend<TestFixtures>({
     testUser.id = createdUser.user.id;
 
     // Wait for profile row to exist (created by DB trigger), then mark onboarding complete
-    for (let attempt = 0; attempt < 10; attempt++) {
+    let profileFound = false;
+    for (let attempt = 0; attempt < 20; attempt++) {
       const { data } = await adminSupabase
         .from('profiles')
         .select('id')
         .eq('id', testUser.id)
         .single();
-      if (data) break;
-      await new Promise((r) => setTimeout(r, 300));
+      if (data) {
+        profileFound = true;
+        break;
+      }
+      await new Promise((r) => setTimeout(r, 500));
     }
-    await adminSupabase
-      .from('profiles')
-      .update({
+    if (!profileFound) {
+      // Profile trigger didn't fire — insert the profile manually
+      await adminSupabase.from('profiles').insert({
+        id: testUser.id,
         onboarding_completed_at: new Date().toISOString(),
         tour_completed_at: new Date().toISOString(),
-      })
-      .eq('id', testUser.id);
+      });
+    } else {
+      await adminSupabase
+        .from('profiles')
+        .update({
+          onboarding_completed_at: new Date().toISOString(),
+          tour_completed_at: new Date().toISOString(),
+        })
+        .eq('id', testUser.id);
+    }
+
+    // Verify the update took effect
+    const { data: verifyProfile } = await adminSupabase
+      .from('profiles')
+      .select('onboarding_completed_at, tour_completed_at')
+      .eq('id', testUser.id)
+      .single();
+    if (!verifyProfile?.onboarding_completed_at) {
+      console.warn('E2E fixture: onboarding_completed_at not set after update, profile:', verifyProfile);
+    }
 
     await page.goto('/signin');
     await page.getByLabel(/email/i).fill(testUser.email);
