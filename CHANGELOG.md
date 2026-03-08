@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Bundle optimization** — removed 4 dead dependencies (@monaco-editor/react, react-icons, react-email, next-themes), moved 9 misplaced root deps to proper workspaces, added serverExternalPackages for 5 server-only libs, lazy-load 3 below-fold landing sections, optimizePackageImports for lucide-react/motion/supabase
+
 ---
 
 ## [0.41.0] - 2026-03-08
