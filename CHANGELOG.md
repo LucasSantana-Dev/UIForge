@@ -9,6 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [0.41.0] - 2026-03-08
+
+### Added
+- **AI-specific quality gates** — 5 new post-gen scoring gates targeting common AI code generation anti-patterns: architecture (god components >300 LOC, function sprawl, prop bloat, deep nesting), error-handling (empty catch, console-only catch, unhandled promises), scalability (N+1 queries in loops, missing pagination), hardcoded-values (production URLs, secrets, magic numbers, TODO sprawl), engineering (@ts-ignore, sync I/O, inline styles, index-as-key)
+- **Updated gate weight system** — 10 gates total with weighted scoring: security 3x, accessibility/architecture/error-handling 2x, scalability/hardcoded-values/engineering 1.5x, lint/type-check 1x, responsive 0.5x
+- **60 new quality gate tests** — comprehensive coverage for all 10 gates (1080 total tests passing)
+
 ## [0.40.0] - 2026-03-08
 
 ### Added
