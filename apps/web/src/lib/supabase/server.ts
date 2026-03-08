@@ -1,7 +1,16 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import { isLocalAuthBypassEnabled } from '@/lib/auth/local-auth-bypass';
 
 export async function createClient() {
+  if (isLocalAuthBypassEnabled() && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY,
+    );
+  }
+
   const cookieStore = await cookies();
 
   return createServerClient(
