@@ -17,6 +17,7 @@ import {
   BookOpenIcon,
   LayersIcon,
   LoaderIcon,
+  PuzzleIcon,
 } from 'lucide-react';
 import { useUIStore } from '@/stores/ui-store';
 
@@ -32,7 +33,7 @@ interface SearchResult {
   id: string;
   title: string;
   subtitle?: string;
-  type: 'project' | 'catalog' | 'golden-path' | 'template';
+  type: 'project' | 'catalog' | 'golden-path' | 'template' | 'plugin';
   href: string;
 }
 
@@ -41,6 +42,7 @@ const TYPE_ICONS: Record<string, React.ElementType> = {
   catalog: LayersIcon,
   'golden-path': RocketIcon,
   template: FileTextIcon,
+  plugin: PuzzleIcon,
 };
 
 const TYPE_LABELS: Record<string, string> = {
@@ -48,6 +50,7 @@ const TYPE_LABELS: Record<string, string> = {
   catalog: 'Catalog',
   'golden-path': 'Golden Paths',
   template: 'Templates',
+  plugin: 'Plugins',
 };
 
 const items: CommandItem[] = [

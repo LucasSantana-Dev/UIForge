@@ -10,7 +10,7 @@ interface SearchResult {
   id: string;
   title: string;
   subtitle?: string;
-  type: 'project' | 'catalog' | 'golden-path' | 'template';
+  type: 'project' | 'catalog' | 'golden-path' | 'template' | 'plugin';
   href: string;
   icon?: string;
 }
@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const pattern = `%${q}%`;
 
-    const [projects, catalog, goldenPaths, templates] = await Promise.all([
+    const [projects, catalog, goldenPaths, templates, plugins] = await Promise.all([
       supabase
         .from('projects')
         .select('id, name, description, framework')
@@ -54,6 +54,12 @@ export async function GET(request: NextRequest) {
       supabase
         .from('templates')
         .select('id, name, description, category')
+        .or(`name.ilike.${pattern},description.ilike.${pattern}`)
+        .limit(5),
+      supabase
+        .from('plugins')
+        .select('slug, name, description, category')
+        .eq('enabled', true)
         .or(`name.ilike.${pattern},description.ilike.${pattern}`)
         .limit(5),
     ]);
@@ -97,6 +103,16 @@ export async function GET(request: NextRequest) {
         subtitle: t.category,
         type: 'template',
         href: '/templates',
+      });
+    }
+
+    for (const p of plugins.data || []) {
+      results.push({
+        id: p.slug,
+        title: p.name,
+        subtitle: p.category,
+        type: 'plugin',
+        href: '/plugins',
       });
     }
 
