@@ -36,7 +36,7 @@ export const DEFAULT_FEATURE_FLAGS: Record<FeatureFlagName, boolean> = {
   ENABLE_POST_GEN_SCORING: true,
   ENABLE_PLUGIN_SYSTEM: true,
   ENABLE_RBAC: false,
-  ENABLE_SKILL_MARKETPLACE: false,
+  ENABLE_SKILL_MARKETPLACE: true,
 };
 
 export const FEATURE_FLAGS: FeatureFlag[] = [

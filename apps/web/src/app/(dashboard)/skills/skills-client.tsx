@@ -189,6 +189,12 @@ export function SkillsMarketplaceClient() {
             standard.
           </p>
         </div>
+        <Button asChild className="gap-2">
+          <Link href="/skills/create">
+            <WandSparklesIcon className="h-4 w-4" />
+            Create Skill
+          </Link>
+        </Button>
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3">
