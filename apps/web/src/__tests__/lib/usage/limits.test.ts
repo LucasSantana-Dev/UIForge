@@ -36,7 +36,7 @@ describe('checkGenerationQuota', () => {
     mockGetFeatureFlag.mockReturnValue(true);
     mockSingle.mockResolvedValue({ data: null });
     const result = await checkGenerationQuota('user-1');
-    expect(result).toEqual({ allowed: true, current: 0, limit: 10, remaining: 10 });
+    expect(result).toEqual({ allowed: true, current: 0, limit: 5, remaining: 5 });
   });
 
   it('returns unlimited for unlimited plan', async () => {
