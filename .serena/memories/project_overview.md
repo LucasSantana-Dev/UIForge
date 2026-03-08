@@ -42,19 +42,17 @@ Three offset rectangles — base (widest), face (wide), horn (narrow, right-shif
 ## Brand Voice
 Precise, confident, technical, dry, architectural. Write for engineers. No emoji in product copy. No marketing speak.
 
-## Current State (2026-03-02)
-- **Version**: v0.27.0 (released 2026-03-01)
-- **Domain**: `siza.forgespace.co` (Cloudflare Workers)
-- **Dev**: `dev.forgespace.co`
+## Current State (2026-03-08)
+- **Version**: v0.40.0 (released 2026-03-08)
+- **Domain**: `siza.forgespace.co` (Vercel production)
 - **Branch**: main — 0 open PRs, 0 open issues, all CI green
-- **Tags**: v0.2.1 → ... → v0.26.0 → v0.27.0
-- **v0.27.0 includes**: Loading skeletons (#279), actionable error messages (#278), billing tests (#280)
-- **PR #282 MERGED (2026-03-02)**: CodeEditor aligned to Siza design system (Monaco), keyboard shortcuts ⌘1-4 (use-generate-page-shortcuts.test.tsx, 8 tests), Serena docs update
-- **v0.26.0 includes**: Nav shell overhaul (#263), brand-guide theme wiring (#269), Supabase SSR + Anthropic SDK upgrade (#271)
-- **v0.25.0 includes**: Skills system (#256, #257), platform metrics API (#262), GitHub PR tracking (#258), GeneratorForm refactor (#261), Sentry tracking (#264), E2E fixture fix (#260)
+- **v0.40.0**: RBAC + Teams UI + Entity Permissions + Anthropic Agent Skills (PRs #386-#393)
+- **v0.39.0**: IDP Phase 3 — Plugin System, Entity Relationships, TechDocs TOC, Search Federation
+- **v0.38.0**: Supabase rate limiting, conversation context, stream timeout
+- **IDP Core Parity**: ALL GAPS CLOSED — Software Catalog, TechDocs, Golden Paths, Scorecards, Dep Graph, API Docs, Plugins, RBAC
 - **Desktop**: v0.2.0 released (Electron + Ollama local generation)
-- **Tests**: 618 webapp + 54 API passing (49+ suites), 8 E2E spec files
-- **Supabase prod** (`nfwmwdzbnvsyziyeubqb`): Skills + GitHub PR tracking migrations applied
+- **Tests**: 1024+ passing (91 suites), 8 E2E spec files
+- **Feature flags**: 36 flags (latest: ENABLE_SKILL_MARKETPLACE, ENABLE_RBAC)
 
 ## Nav Shell (v0.26.0)
 - Collapsible sidebar with persistent state in `ui-store.ts`
