@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **E2E test coverage expansion** — 4 new spec files (closes #399)
+  - `catalog.spec.ts` — 10 tests: list, search, create entry, detail view, edit, graph, discover, tags
+  - `teams.spec.ts` — 9 tests: list, create team, detail, slug preview, members, validation
+  - `golden-paths.spec.ts` — 7 tests: list, search, filters, scaffold form toggle
+  - `onboarding.spec.ts` — 7 tests: redirect, welcome step, feature cards, project creation, skip
+
 ### Changed
 - **Bundle optimization** — removed 4 dead dependencies (@monaco-editor/react, react-icons, react-email, next-themes), moved 9 misplaced root deps to proper workspaces, added serverExternalPackages for 5 server-only libs, lazy-load 3 below-fold landing sections, optimizePackageImports for lucide-react/motion/supabase
 
