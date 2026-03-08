@@ -5,6 +5,17 @@ jest.mock('marked', () => ({
   marked: { parse: (content) => '<div>' + content + '</div>' },
 }));
 
+jest.mock('@/hooks/use-relationships', () => ({
+  useRelationships: () => ({ data: null, isLoading: false }),
+  useCreateRelationship: () => ({ mutate: jest.fn() }),
+  useDeleteRelationship: () => ({ mutate: jest.fn() }),
+}));
+
+jest.mock('@/components/plugins/PluginSlot', () => ({
+  __esModule: true,
+  PluginSlot: () => null,
+}));
+
 const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush, back: jest.fn() }),

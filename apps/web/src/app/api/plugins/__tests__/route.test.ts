@@ -4,7 +4,6 @@
 
 import { NextRequest } from 'next/server';
 import { GET } from '../route';
-import { listPluginsForUser } from '@/lib/services/plugin.service';
 
 const mockCreateClient = jest.fn();
 const mockListPluginsForUser = jest.fn();

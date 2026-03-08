@@ -4,13 +4,6 @@
 
 import { NextRequest } from 'next/server';
 import { GET, POST, DELETE, PATCH } from '../route';
-import {
-  getPluginDetail,
-  installPluginForUser,
-  uninstallPluginForUser,
-  updatePluginConfigForUser,
-} from '@/lib/services/plugin.service';
-import { captureServerError } from '@/lib/sentry/server';
 
 const mockCreateClient = jest.fn();
 const mockGetPluginDetail = jest.fn();
