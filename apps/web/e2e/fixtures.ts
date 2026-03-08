@@ -46,7 +46,7 @@ export const test = base.extend<TestFixtures>({
     // Mark onboarding as completed so tests aren't redirected to /onboarding
     await adminSupabase
       .from('profiles')
-      .update({ onboarding_completed_at: new Date().toISOString() })
+      .update({ onboarding_completed_at: new Date().toISOString(), tour_completed_at: new Date().toISOString() })
       .eq('id', testUser.id);
 
     await page.goto('/signin');
