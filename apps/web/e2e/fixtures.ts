@@ -43,7 +43,16 @@ export const test = base.extend<TestFixtures>({
 
     testUser.id = createdUser.user.id;
 
-    // Mark onboarding as completed so tests aren't redirected to /onboarding
+    // Wait for profile row to exist (created by DB trigger), then mark onboarding complete
+    for (let attempt = 0; attempt < 10; attempt++) {
+      const { data } = await adminSupabase
+        .from('profiles')
+        .select('id')
+        .eq('id', testUser.id)
+        .single();
+      if (data) break;
+      await new Promise((r) => setTimeout(r, 300));
+    }
     await adminSupabase
       .from('profiles')
       .update({
