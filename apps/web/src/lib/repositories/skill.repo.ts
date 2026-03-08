@@ -60,11 +60,7 @@ export async function getSkillById(id: string): Promise<SkillRow | null> {
 
 export async function getSkillBySlug(slug: string): Promise<SkillRow | null> {
   const supabase = await getClient();
-  const { data } = await supabase
-    .from('skills')
-    .select('*')
-    .eq('slug', slug)
-    .single();
+  const { data } = await supabase.from('skills').select('*').eq('slug', slug).single();
   return data as unknown as SkillRow | null;
 }
 

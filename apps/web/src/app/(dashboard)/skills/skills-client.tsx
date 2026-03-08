@@ -52,9 +52,7 @@ function SkillMarketplaceCard({ skill }: { skill: SkillRow }) {
         <div className="flex items-center gap-2">
           <WandSparklesIcon className="h-5 w-5 text-brand shrink-0" />
           <div>
-            <h3 className="text-sm font-semibold text-text-primary">
-              {skill.name}
-            </h3>
+            <h3 className="text-sm font-semibold text-text-primary">{skill.name}</h3>
             <div className="flex items-center gap-1.5 mt-0.5">
               {skill.source_type === 'official' ? (
                 <span className="inline-flex items-center gap-1 text-[10px] font-medium text-brand uppercase tracking-wider">
@@ -68,9 +66,7 @@ function SkillMarketplaceCard({ skill }: { skill: SkillRow }) {
                 </span>
               )}
               {skill.version && (
-                <span className="text-[10px] text-text-muted">
-                  v{skill.version}
-                </span>
+                <span className="text-[10px] text-text-muted">v{skill.version}</span>
               )}
             </div>
           </div>
@@ -81,9 +77,7 @@ function SkillMarketplaceCard({ skill }: { skill: SkillRow }) {
         </div>
       </div>
 
-      <p className="text-xs text-text-secondary line-clamp-2">
-        {skill.description}
-      </p>
+      <p className="text-xs text-text-secondary line-clamp-2">{skill.description}</p>
 
       {skill.tags && skill.tags.length > 0 && (
         <div className="flex flex-wrap gap-1">
@@ -182,20 +176,16 @@ export function SkillsMarketplaceClient() {
     }
   };
 
-  const allTags = Array.from(
-    new Set(skills.flatMap((s) => s.tags ?? []))
-  ).sort();
+  const allTags = Array.from(new Set(skills.flatMap((s) => s.tags ?? []))).sort();
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-display font-bold text-text-primary">
-            Skills Marketplace
-          </h1>
+          <h1 className="text-2xl font-display font-bold text-text-primary">Skills Marketplace</h1>
           <p className="text-sm text-text-secondary mt-1">
-            Browse and manage AI generation skills. Compatible with the
-            Anthropic Agent Skills standard.
+            Browse and manage AI generation skills. Compatible with the Anthropic Agent Skills
+            standard.
           </p>
         </div>
       </div>
@@ -247,10 +237,7 @@ export function SkillsMarketplaceClient() {
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div
-              key={i}
-              className="h-48 rounded-xl bg-surface-1 animate-pulse"
-            />
+            <div key={i} className="h-48 rounded-xl bg-surface-1 animate-pulse" />
           ))}
         </div>
       ) : skills.length === 0 ? (
@@ -278,9 +265,7 @@ export function SkillsMarketplaceClient() {
             placeholder="Skill slug (e.g. my-custom-skill)"
             value={importSlug}
             onChange={(e) =>
-              setImportSlug(
-                e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-')
-              )
+              setImportSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-'))
             }
             className="w-full px-3 py-2 text-sm bg-surface-1 text-text-primary border border-surface-3 rounded-lg focus:ring-brand focus:border-brand"
           />

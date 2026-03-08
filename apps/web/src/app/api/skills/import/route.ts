@@ -5,7 +5,9 @@ import { upsertSkill } from '@/lib/repositories/skill.repo';
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -14,10 +16,7 @@ export async function POST(request: NextRequest) {
   const { content, slug } = body as { content: string; slug: string };
 
   if (!content || !slug) {
-    return NextResponse.json(
-      { error: 'Missing content or slug' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Missing content or slug' }, { status: 400 });
   }
 
   const parsed = parseSkillMd(content);

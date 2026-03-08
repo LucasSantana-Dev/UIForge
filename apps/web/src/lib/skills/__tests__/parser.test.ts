@@ -65,18 +65,12 @@ Body.`;
 
 describe('substituteArguments', () => {
   it('replaces $ARGUMENTS with joined args', () => {
-    const result = substituteArguments(
-      'Create a $ARGUMENTS component',
-      ['DataTable', 'sortable']
-    );
+    const result = substituteArguments('Create a $ARGUMENTS component', ['DataTable', 'sortable']);
     expect(result).toBe('Create a DataTable sortable component');
   });
 
   it('replaces positional $0, $1 placeholders', () => {
-    const result = substituteArguments(
-      'Generate $0 with $1 validation',
-      ['LoginForm', 'Zod']
-    );
+    const result = substituteArguments('Generate $0 with $1 validation', ['LoginForm', 'Zod']);
     expect(result).toBe('Generate LoginForm with Zod validation');
   });
 
@@ -105,10 +99,7 @@ describe('generateSkillMd', () => {
   });
 
   it('skips null/undefined values', () => {
-    const md = generateSkillMd(
-      { name: 'Test', description: 'Desc', license: null },
-      'Body'
-    );
+    const md = generateSkillMd({ name: 'Test', description: 'Desc', license: null }, 'Body');
     expect(md).not.toContain('license');
   });
 
@@ -123,10 +114,7 @@ tags: [a, b, c]
 Instructions here.`;
 
     const parsed = parseSkillMd(original);
-    const regenerated = generateSkillMd(
-      parsed.rawFrontmatter,
-      parsed.instructions
-    );
+    const regenerated = generateSkillMd(parsed.rawFrontmatter, parsed.instructions);
     const reparsed = parseSkillMd(regenerated);
 
     expect(reparsed.frontmatter.name).toBe('Roundtrip');
