@@ -112,9 +112,7 @@ export async function POST(request: NextRequest) {
         name: project_name,
         description,
         framework: mapFramework(
-          resolvedParams.framework
-            ? String(resolvedParams.framework)
-            : goldenPath.framework
+          resolvedParams.framework ? String(resolvedParams.framework) : goldenPath.framework
         ),
         user_id: user.id,
       })
