@@ -29,11 +29,24 @@ export default async function DashboardLayout({ children }: { children: React.Re
     }
 
     user = sessionUser;
-    const { data: profile } = await supabase
+    let profile: Record<string, unknown> | null = null;
+    const { data: profileData, error: profileError } = await supabase
       .from('profiles')
       .select('role, onboarding_completed_at, tour_completed_at')
       .eq('id', sessionUser.id)
       .single();
+
+    if (profileError) {
+      const { data: fallback } = await supabase
+        .from('profiles')
+        .select('role, onboarding_completed_at')
+        .eq('id', sessionUser.id)
+        .single();
+      profile = fallback;
+    } else {
+      profile = profileData;
+    }
+
     isAdmin = profile?.role === 'admin';
 
     if (!profile?.onboarding_completed_at) {
