@@ -168,3 +168,61 @@ export async function checkEntityPermission(
 
   return (memberships && memberships.length > 0) || false;
 }
+
+export interface EntityPermissionRow {
+  id: string;
+  entity_type: EntityType;
+  entity_id: string;
+  team_id: string | null;
+  user_id: string | null;
+  permission: EntityPermission;
+  granted_by: string | null;
+  granted_at: string;
+  team?: { id: string; name: string; slug: string };
+  profile?: { id: string; full_name: string; avatar_url: string | null };
+}
+
+export async function getEntityPermissions(
+  entityType: EntityType,
+  entityId: string
+): Promise<EntityPermissionRow[]> {
+  const supabase = await getClient();
+  const { data, error } = await supabase
+    .from('entity_permissions')
+    .select(
+      '*, team:teams(id, name, slug), profile:profiles!entity_permissions_user_id_fkey(id, full_name, avatar_url)'
+    )
+    .eq('entity_type', entityType)
+    .eq('entity_id', entityId)
+    .order('granted_at', { ascending: false });
+
+  if (error) throw error;
+  return (data || []) as EntityPermissionRow[];
+}
+
+export async function grantEntityPermission(
+  entityType: EntityType,
+  entityId: string,
+  permission: EntityPermission,
+  grantedBy: string,
+  target: { teamId?: string; userId?: string }
+): Promise<void> {
+  const supabase = await getClient();
+  const { error } = await supabase.from('entity_permissions').insert({
+    entity_type: entityType,
+    entity_id: entityId,
+    permission,
+    granted_by: grantedBy,
+    team_id: target.teamId || null,
+    user_id: target.userId || null,
+  });
+
+  if (error) throw error;
+}
+
+export async function revokeEntityPermission(permissionId: string): Promise<void> {
+  const supabase = await getClient();
+  const { error } = await supabase.from('entity_permissions').delete().eq('id', permissionId);
+
+  if (error) throw error;
+}
