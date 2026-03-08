@@ -9,13 +9,8 @@ const frontmatterSchema = z.object({
   tags: z.array(z.string()).optional(),
   'allowed-tools': z.array(z.string()).optional(),
   'argument-hint': z.string().optional(),
-  'invocation-mode': z
-    .enum(['user', 'auto', 'background'])
-    .optional()
-    .default('user'),
-  compatibility: z
-    .record(z.string(), z.unknown())
-    .optional(),
+  'invocation-mode': z.enum(['user', 'auto', 'background']).optional().default('user'),
+  compatibility: z.record(z.string(), z.unknown()).optional(),
   metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
@@ -43,9 +38,7 @@ function parseYamlValue(raw: string): unknown {
   return trimmed.replace(/^['"]|['"]$/g, '');
 }
 
-function extractFrontmatter(
-  content: string
-): { data: Record<string, unknown>; body: string } {
+function extractFrontmatter(content: string): { data: Record<string, unknown>; body: string } {
   const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
   if (!match) return { data: {}, body: content };
 
@@ -73,10 +66,7 @@ export function parseSkillMd(content: string): ParsedSkill {
   };
 }
 
-export function substituteArguments(
-  instructions: string,
-  args: string[]
-): string {
+export function substituteArguments(instructions: string, args: string[]): string {
   let result = instructions.replace(/\$ARGUMENTS/g, args.join(' '));
   for (let i = 0; i < args.length; i++) {
     result = result.replace(new RegExp(`\\$${i}`, 'g'), args[i]);
