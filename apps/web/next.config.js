@@ -21,6 +21,16 @@ const nextConfig = {
       },
     ],
   },
+  serverExternalPackages: [
+    'stripe',
+    'resend',
+    'octokit',
+    '@google/generative-ai',
+    '@react-email/components',
+  ],
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'motion', '@supabase/supabase-js'],
+  },
   turbopack: {},
 };
 

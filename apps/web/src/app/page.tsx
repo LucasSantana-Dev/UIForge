@@ -1,13 +1,24 @@
+import nextDynamic from 'next/dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { StatsBar } from '@/components/landing/StatsBar';
-import { CapabilitiesSection } from '@/components/landing/CapabilitiesSection';
 import { CodeShowcase } from '@/components/landing/CodeShowcase';
-import { EcosystemSection } from '@/components/landing/EcosystemSection';
 import { DashboardPreview } from '@/components/landing/DashboardPreview';
-import { CTASection } from '@/components/landing/CTASection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+
+const CapabilitiesSection = nextDynamic(
+  () => import('@/components/landing/CapabilitiesSection').then((m) => m.CapabilitiesSection),
+  { ssr: true }
+);
+const EcosystemSection = nextDynamic(
+  () => import('@/components/landing/EcosystemSection').then((m) => m.EcosystemSection),
+  { ssr: true }
+);
+const CTASection = nextDynamic(
+  () => import('@/components/landing/CTASection').then((m) => m.CTASection),
+  { ssr: true }
+);
 
 export const dynamic = 'force-dynamic';
 
