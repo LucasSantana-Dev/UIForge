@@ -8,9 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- **Plugin System enabled** — Governance plugins marketplace with install/uninstall/configure, widget slots on catalog entities, 6 official plugins (Tech Debt Scanner, Architecture Guard, Security Posture, Scalability Analyzer, Planning Enforcer, Dependency Health)
-- **Plugin API routes** — GET/POST/DELETE/PATCH `/api/plugins/[slug]` with auth, Sentry error capture
-- **Plugin widget slots** — Extensible `<PluginSlot>` component renders active plugins on entity pages
+- **Plugin System** — Governance plugins marketplace with install/uninstall/configure, widget slots on catalog entities, 6 official plugins (Tech Debt Scanner, Architecture Guard, Security Posture, Scalability Analyzer, Planning Enforcer, Dependency Health)
+- **Plugin API routes** — GET/POST/DELETE/PATCH `/api/plugins` and `/api/plugins/[slug]` with auth, Sentry error capture, pagination
+- **Plugin widget slots** — Extensible `<PluginSlot>` component renders active plugins on entity detail pages
+- **Entity Relationships** — Backstage-inspired typed directional relations (9 types: dependsOn, consumesAPI, providesAPI, ownedBy, partOf, hasPart, implements, deployedTo, monitoredBy) with DB migration, repository, API, hooks, and UI panel
+- **Dependency Graph relationships** — Catalog graph now includes entity relationships with color-coded edges by type
+- **TechDocs v2** — Table of contents sidebar with heading extraction, toggle button, anchor-linked headings via custom `marked` renderer
+- **Search Federation** — Plugins added to global search API and ⌘K command palette with PuzzleIcon
 
 ---
 
