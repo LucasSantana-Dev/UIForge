@@ -37,7 +37,7 @@
     "node": ">=20"
   },
   "dependencies": {
-    "commander": "^13.0.0",
+    "commander": "^14.0.3",
     "enquirer": "^2.4.1",
     "kleur": "^4.1.5",
     "fs-extra": "^11.3.4",
