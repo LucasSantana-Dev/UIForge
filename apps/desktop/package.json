@@ -33,7 +33,7 @@
     "vitest": "^2.0.0",
     "@modelcontextprotocol/sdk": "^1.26.0",
     "@siza/ui": "*",
-    "electron-store": "^10.0.0",
+    "electron-store": "^11.0.2",
     "electron-updater": "^6.0.0",
     "lucide-react": "^0.577.0",
     "react": "^19.0.0",
