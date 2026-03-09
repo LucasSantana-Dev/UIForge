@@ -21,11 +21,11 @@
     "wrangler:dev": "wrangler dev"
   },
   "dependencies": {
-    "@forgespace/siza-gen": "^0.8.1",
+    "@forgespace/siza-gen": "^0.10.0",
     "@anthropic-ai/sdk": "^0.78.0",
     "@google/generative-ai": "^0.24.1",
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "@supabase/supabase-js": "^2.95.3",
+    "@supabase/supabase-js": "^2.99.0",
     "@types/supertest": "^6.0.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
