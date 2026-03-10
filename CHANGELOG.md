@@ -13,12 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `teams.spec.ts` — 9 tests: list, create team, detail, slug preview, members, validation
   - `golden-paths.spec.ts` — 7 tests: list, search, filters, scaffold form toggle
   - `onboarding.spec.ts` — 7 tests: redirect, welcome step, feature cards, project creation, skip
+- **Live ecosystem sync module (marketing)** — Server-only GitHub metadata fetch with 11-repo allowlist, latest release enrichment, resilient fallback snapshot, and 6-hour revalidation
+- **Marketing ecosystem tests** — Coverage for mapping, release fallback, and full fallback snapshot behavior
 
 ### Changed
 - **Contributor guidance** — Added `AGENTS.md` project operations guide and linked it from README development docs.
-
-### Changed
 - **Bundle optimization** — removed 4 dead dependencies (@monaco-editor/react, react-icons, react-email, next-themes), moved 9 misplaced root deps to proper workspaces, added serverExternalPackages for 5 server-only libs, lazy-load 3 below-fold landing sections, optimizePackageImports for lucide-react/motion/supabase
+- **Marketing data model refresh** — Home (`StatsBar`, `EcosystemSection`), About, and Roadmap now consume a live ecosystem snapshot instead of stale hardcoded repo/capability claims
+- **Marketing UI polish** — Improved label/card rhythm, metadata chips, focus-visible states, and contrast consistency across ecosystem and stats surfaces
+- **Docs refresh** — Updated README ecosystem narrative to 11 product repositories and documented `FORGE_SPACE_GITHUB_TOKEN` with `GITHUB_TOKEN` fallback
 
 ---
 

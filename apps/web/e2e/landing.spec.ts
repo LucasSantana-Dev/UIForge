@@ -20,8 +20,8 @@ test.describe('Landing Page', () => {
   });
 
   test('should render stats bar with counters', async ({ page }) => {
-    await expect(page.getByText(/tests across ecosystem/i).first()).toBeVisible();
-    await expect(page.getByText(/quality validation gates/i).first()).toBeVisible();
+    await expect(page.getByText(/live github ecosystem sync/i).first()).toBeVisible();
+    await expect(page.getByText(/product repos/i).first()).toBeVisible();
   });
 
   test('should render capabilities section', async ({ page }) => {
@@ -36,8 +36,8 @@ test.describe('Landing Page', () => {
   });
 
   test('should render ecosystem section', async ({ page }) => {
-    await expect(page.getByText(/seven repos/i)).toBeVisible();
-    await expect(page.getByText(/siza-mcp/i).first()).toBeVisible();
+    await expect(page.getByText(/11 repos\\. one vision\\./i)).toBeVisible();
+    await expect(page.getByText(/ui-mcp/i).first()).toBeVisible();
     await expect(page.getByText(/mcp-gateway/i).first()).toBeVisible();
     await expect(page.getByText(/brand-guide/i).first()).toBeVisible();
   });

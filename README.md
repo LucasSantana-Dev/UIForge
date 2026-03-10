@@ -35,7 +35,7 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 ## Features
 
 - **AI-Powered Generation** — Natural language or screenshot to production-ready UI components
-- **MCP-Native** — 21 UI/backend tools, 9 branding tools, 20+ gateway servers, all composable via Model Context Protocol
+- **MCP-Native** — Generation, governance, migration, and branding capabilities composed via MCP
 - **Privacy-First BYOK** — Bring Your Own Key with client-side AES-256 encryption
 - **Generous Free Tier** — Cloudflare Workers + Supabase + Gemini free tiers give you a generous starting point at $0/month
 - **Self-Hostable** — Run everything locally with Docker, MIT licensed
@@ -97,8 +97,8 @@ This updates `public.profiles.role` to `admin` for that email.
 forge-patterns (shared standards)
     |
     v
-mcp-gateway (AI tool routing) --> siza-mcp (12 UI tools)
-    |                              branding-mcp (7 brand tools)
+mcp-gateway (AI tool routing) --> siza-mcp (UI/backend generation tools)
+    |                              branding-mcp (brand identity tools)
     v
 siza (this repo)
 ├── apps/web      — Next.js 16 frontend (Cloudflare Workers)
@@ -154,6 +154,23 @@ npm run type-check      # TypeScript
 Project operation notes for AI agents and contributors are in
 [AGENTS.md](AGENTS.md).
 
+## Live Ecosystem Sync (Marketing)
+
+Marketing pages consume a server-only GitHub metadata sync for the Forge Space
+ecosystem (`repo count`, `latest release tag`, `recent activity`).
+
+- Sync source: GitHub REST API (`Forge-Space` org)
+- Cache strategy: `revalidate: 21600` (6 hours)
+- Resilience: static fallback snapshot if GitHub is unavailable/rate-limited
+
+Optional authentication (for higher GitHub API limits):
+
+```env
+FORGE_SPACE_GITHUB_TOKEN=ghp_...
+# fallback when FORGE_SPACE_GITHUB_TOKEN is unset
+GITHUB_TOKEN=ghp_...
+```
+
 ## Pricing
 
 Free for individuals, paid for scale and convenience.
@@ -167,16 +184,22 @@ Free for individuals, paid for scale and convenience.
 
 ## The Forge Space Ecosystem
 
-Siza is part of [Forge Space](https://github.com/Forge-Space) — six open-source repos designed to work together:
+Siza is part of [Forge Space](https://github.com/Forge-Space) — 11 product
+repositories that ship as one open platform:
 
 | Repo | Purpose |
 |------|---------|
 | **[siza](https://github.com/Forge-Space/siza)** | AI workspace (this repo) |
-| **[siza-mcp](https://github.com/Forge-Space/ui-mcp)** | 21 MCP tools for UI and backend generation |
-| **[siza-gen](https://github.com/Forge-Space/siza-gen)** | AI generation engine (502-snippet registry, ML quality) |
-| **[mcp-gateway](https://github.com/Forge-Space/mcp-gateway)** | AI-powered tool routing hub |
-| **[forge-patterns](https://github.com/Forge-Space/core)** | Shared standards and MCP context server |
-| **[branding-mcp](https://github.com/Forge-Space/branding-mcp)** | Brand identity generation |
+| **[core](https://github.com/Forge-Space/core)** | Shared standards and governance contracts |
+| **[mcp-gateway](https://github.com/Forge-Space/mcp-gateway)** | MCP routing and reliability hub |
+| **[ui-mcp](https://github.com/Forge-Space/ui-mcp)** | MCP protocol adapter for generation/migration |
+| **[siza-gen](https://github.com/Forge-Space/siza-gen)** | AI generation engine and quality context |
+| **[forge-ai-init](https://github.com/Forge-Space/forge-ai-init)** | Governance CLI and migration analysis |
+| **[forge-ai-action](https://github.com/Forge-Space/forge-ai-action)** | CI quality gates for pull requests |
+| **[branding-mcp](https://github.com/Forge-Space/branding-mcp)** | Brand identity MCP toolkit |
+| **[brand-guide](https://github.com/Forge-Space/brand-guide)** | Design tokens and identity source |
+| **[forgespace-web](https://github.com/Forge-Space/forgespace-web)** | Forge Space marketing website |
+| **[siza-desktop](https://github.com/Forge-Space/siza-desktop)** | Local-first desktop companion app |
 
 ## Deployment
 

@@ -6,6 +6,7 @@ import { StatsBar } from '@/components/landing/StatsBar';
 import { CodeShowcase } from '@/components/landing/CodeShowcase';
 import { DashboardPreview } from '@/components/landing/DashboardPreview';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { getEcosystemSnapshot } from '@/lib/marketing/ecosystem-data';
 
 const CapabilitiesSection = nextDynamic(
   () => import('@/components/landing/CapabilitiesSection').then((m) => m.CapabilitiesSection),
@@ -27,16 +28,17 @@ export default async function HomePage() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const snapshot = await getEcosystemSnapshot();
 
   return (
     <div className="relative isolate overflow-hidden">
       <LandingNav user={user} />
       <main id="main-content" className="relative z-10">
         <HeroSection user={user} />
-        <StatsBar />
+        <StatsBar snapshot={snapshot} />
         <CapabilitiesSection />
         <CodeShowcase />
-        <EcosystemSection />
+        <EcosystemSection snapshot={snapshot} />
         <DashboardPreview />
         <CTASection user={user} />
       </main>

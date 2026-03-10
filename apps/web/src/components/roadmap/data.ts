@@ -1,66 +1,53 @@
 import type { Phase } from './types';
 
-export const phases: Phase[] = [
-  {
-    number: 1,
-    title: 'Foundation',
-    subtitle: 'Core platform, deployment, and developer experience',
-    status: 'active',
-    estimatedDate: 'Q1 2026',
-    items: [
-      { label: 'Dark mode design system with Siza tokens', status: 'done' },
-      { label: 'Brand identity v2.0', status: 'done' },
-      { label: 'Authentication (Email + OAuth)', status: 'done' },
-      { label: 'Project CRUD with Row Level Security', status: 'done' },
-      { label: 'Stripe billing integration (Free/Pro/Team)', status: 'done' },
-      { label: 'Feature flags system (17 flags)', status: 'done' },
-      { label: 'Cloudflare Workers deployment', status: 'done' },
-      { label: 'AI component generation with streaming', status: 'done' },
-      { label: 'Live component preview (iframe sandbox)', status: 'done' },
-      {
-        label: 'Export to GitHub (one-click push)',
-        status: 'done',
-        githubUrl: 'https://github.com/Forge-Space/siza/issues',
-      },
-      {
-        label: 'Template library (20 starter templates)',
-        status: 'done',
-        githubUrl: 'https://github.com/Forge-Space/siza/issues',
-      },
-    ],
-  },
-  {
-    number: 2,
-    title: 'Community',
-    subtitle: 'Open-source growth and developer ecosystem',
-    status: 'planned',
-    estimatedDate: 'Q2 2026',
-    items: [
-      { label: 'Documentation site (docs.forgespace.co)', status: 'planned' },
-      { label: 'Public roadmap (GitHub Projects)', status: 'planned' },
-      { label: 'Discord community launch', status: 'planned' },
-      { label: 'CONTRIBUTING.md in all repos', status: 'done' },
-      { label: 'MCP server directory (community servers)', status: 'planned' },
-      { label: 'Template marketplace (creator submissions)', status: 'planned' },
-      { label: 'CLI tool: npx create-siza-app', status: 'planned' },
-      { label: 'Desktop app (Electron/Tauri)', status: 'planned' },
-      { label: 'Prompt autocomplete (history + templates)', status: 'planned' },
-      { label: 'Code editor IntelliSense (framework-aware snippets)', status: 'planned' },
-    ],
-  },
-  {
-    number: 3,
-    title: 'Scale',
-    subtitle: 'Enterprise features, marketplace, and partnerships',
-    status: 'future',
-    estimatedDate: 'Q3 2026',
-    items: [
-      { label: 'Managed MCP Gateway (hosted service)', status: 'planned' },
-      { label: 'Enterprise SSO and audit logs', status: 'planned' },
-      { label: 'Self-host installer (Docker Compose)', status: 'planned' },
-      { label: 'IDE plugins (VS Code, Cursor)', status: 'planned' },
-      { label: 'Framework partnerships (Next.js, Nuxt, SvelteKit)', status: 'planned' },
-      { label: 'University / bootcamp free Pro program', status: 'planned' },
-    ],
-  },
-];
+export function buildPhases(repoCount: number): Phase[] {
+  return [
+    {
+      number: 1,
+      title: 'Foundation',
+      subtitle: 'Core generation, governance, and platform operations now in production',
+      status: 'active',
+      estimatedDate: 'Live now',
+      items: [
+        { label: 'Authentication, billing, and project workspace flows', status: 'done' },
+        { label: 'AI generation with streaming and live preview', status: 'done' },
+        { label: 'Software catalog, relationships, and CI visibility panels', status: 'done' },
+        { label: 'Post-generation scorecards with governance quality gates', status: 'done' },
+        { label: 'Golden Path templates and migration planning toolkit', status: 'done' },
+        {
+          label: `${repoCount} product repositories aligned with shared governance standards`,
+          status: 'done',
+          githubUrl: 'https://github.com/Forge-Space',
+        },
+      ],
+    },
+    {
+      number: 2,
+      title: 'Adoption',
+      subtitle: 'Improve onboarding, discoverability, and operating clarity for teams',
+      status: 'planned',
+      estimatedDate: 'In progress',
+      items: [
+        { label: 'Live ecosystem metadata sync across marketing surfaces', status: 'in-progress' },
+        { label: 'Expanded docs for governance and migration workflows', status: 'in-progress' },
+        { label: 'Contributor onboarding and examples for faster team setup', status: 'planned' },
+        { label: 'Community showcase and reusable prompt patterns', status: 'planned' },
+        { label: 'Cross-repo release narrative and changelog curation', status: 'planned' },
+      ],
+    },
+    {
+      number: 3,
+      title: 'Scale',
+      subtitle: 'Extend collaboration and enterprise controls while preserving open architecture',
+      status: 'future',
+      estimatedDate: 'Next horizon',
+      items: [
+        { label: 'Collaborative multi-agent workflows', status: 'planned' },
+        { label: 'Cross-product auth and policy unification', status: 'planned' },
+        { label: 'Enterprise SSO and compliance controls', status: 'planned' },
+        { label: 'Organization-level quality trend analytics', status: 'planned' },
+        { label: 'Extension ecosystem for plugins and IDE integrations', status: 'planned' },
+      ],
+    },
+  ];
+}
