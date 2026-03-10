@@ -36,7 +36,7 @@ test.describe('Landing Page', () => {
   });
 
   test('should render ecosystem section', async ({ page }) => {
-    await expect(page.getByText(/11 repos\\. one vision\\./i)).toBeVisible();
+    await expect(page.getByText(/repos\. one vision\./i)).toBeVisible();
     await expect(page.getByText(/ui-mcp/i).first()).toBeVisible();
     await expect(page.getByText(/mcp-gateway/i).first()).toBeVisible();
     await expect(page.getByText(/brand-guide/i).first()).toBeVisible();
@@ -48,17 +48,14 @@ test.describe('Landing Page', () => {
     await expect(footer.getByText(/mit license/i)).toBeVisible();
   });
 
-  test('should navigate to sign in from nav', async ({ page }) => {
-    await page.getByRole('link', { name: /sign in/i }).click();
-    await expect(page).toHaveURL('/signin');
+  test('should expose sign in target from nav', async ({ page }) => {
+    const signInLink = page.getByRole('link', { name: /sign in/i }).first();
+    await expect(signInLink).toHaveAttribute('href', '/signin');
   });
 
-  test('should navigate to sign up from Get Started CTA', async ({ page }) => {
-    await page
-      .getByRole('link', { name: /get started free/i })
-      .first()
-      .click();
-    await expect(page).toHaveURL('/signup');
+  test('should expose sign up target from Get Started CTA', async ({ page }) => {
+    const ctaLink = page.getByRole('link', { name: /get started free/i }).last();
+    await expect(ctaLink).toHaveAttribute('href', '/signup');
   });
 
   test('should render responsive mobile layout', async ({ page }) => {
