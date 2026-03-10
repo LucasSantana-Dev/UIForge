@@ -144,9 +144,7 @@ export function runQualityGates(code: string, framework?: string): QualityReport
 
   if (getFeatureFlag('ENABLE_POST_GEN_SCORING')) {
     try {
-      const {
-        scoreGeneratedCode,
-      } = require('@forgespace/core');
+      const { scoreGeneratedCode } = require('@forgespace/core');
       const result = scoreGeneratedCode(code, { framework });
       const gradeMap: Record<string, PostGenScoreResult['grade']> = {
         A: 'A',
