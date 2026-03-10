@@ -146,7 +146,7 @@ export function runQualityGates(code: string, framework?: string): QualityReport
     try {
       const {
         scoreGeneratedCode,
-      } = require('@forgespace/core/dist/patterns/idp/scorecards/post-gen-scorer');
+      } = require('@forgespace/core');
       const result = scoreGeneratedCode(code, { framework });
       const gradeMap: Record<string, PostGenScoreResult['grade']> = {
         A: 'A',
