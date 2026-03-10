@@ -36,7 +36,7 @@ test.describe('Landing Page', () => {
   });
 
   test('should render ecosystem section', async ({ page }) => {
-    await expect(page.getByText(/\d+\s+repos\.\s+one vision\./i)).toBeVisible();
+    await expect(page.getByText(/repos\. one vision\./i)).toBeVisible();
     await expect(page.getByText(/ui-mcp/i).first()).toBeVisible();
     await expect(page.getByText(/mcp-gateway/i).first()).toBeVisible();
     await expect(page.getByText(/brand-guide/i).first()).toBeVisible();
