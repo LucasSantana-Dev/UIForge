@@ -101,18 +101,36 @@ function registerCatalogStep(description: string): GoldenPathStep {
   };
 }
 
-export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
-  defineOfficialGoldenPath({
-    name: 'forge-next-service',
-    display_name: 'Next.js Service',
-    description: 'Production-ready Next.js service with Supabase auth, Tailwind, and CI/CD.',
-    type: 'service',
-    lifecycle: 'ga',
-    framework: 'next.js',
-    language: 'typescript',
-    stack: 'nextjs',
-    tags: ['next.js', 'supabase', 'tailwind', 'ci-cd'],
-    parameters: [
+type TemplateIdentity = readonly [name: string, displayName: string, description: string];
+type TemplateRuntime = readonly [
+  type: OfficialGoldenPathSeed['type'],
+  lifecycle: OfficialGoldenPathSeed['lifecycle'],
+  framework: string,
+  language: string,
+  stack: OfficialGoldenPathSeed['stack'],
+];
+type TemplateSpec = readonly [
+  identity: TemplateIdentity,
+  runtime: TemplateRuntime,
+  tags: string[],
+  parameters: GoldenPathParam[],
+  steps: GoldenPathStep[],
+  catalogType: string,
+  icon: string,
+  includesMonitoring?: boolean,
+  includesDocker?: boolean,
+];
+
+const TEMPLATE_SPECS: TemplateSpec[] = [
+  [
+    [
+      'forge-next-service',
+      'Next.js Service',
+      'Production-ready Next.js service with Supabase auth, Tailwind, and CI/CD.',
+    ],
+    ['service', 'ga', 'next.js', 'typescript', 'nextjs'],
+    ['next.js', 'supabase', 'tailwind', 'ci-cd'],
+    [
       textParam('projectName', 'Project name (kebab-case)', true),
       textParam('description', 'Short description'),
       boolParam('includeAuth', 'Include Supabase auth setup', true),
@@ -124,108 +142,131 @@ export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
       ]),
       numberParam('port', 'Dev server port', 3000),
     ],
-    steps: [
+    [
       fileStep('scaffold', 'Scaffold project', 'Create Next.js project structure with App Router.'),
       fileStep('configure', 'Configure CI/CD', 'Add GitHub Actions workflows.'),
       registerCatalogStep('Create catalog entry for the new service.'),
     ],
-    catalog_type: 'service',
-    icon: 'globe',
-  }),
-  defineOfficialGoldenPath({
-    name: 'forge-mcp-server',
-    display_name: 'MCP Server',
-    description: 'MCP server template with tool definitions, testing, and npm publishing.',
-    type: 'service',
-    lifecycle: 'ga',
-    framework: 'node.js',
-    language: 'typescript',
-    stack: 'api-service',
-    tags: ['mcp', 'sdk', 'npm'],
-    parameters: [
+    'service',
+    'globe',
+  ],
+  [
+    [
+      'forge-mcp-server',
+      'MCP Server',
+      'MCP server template with tool definitions, testing, and npm publishing.',
+    ],
+    ['service', 'ga', 'node.js', 'typescript', 'api-service'],
+    ['mcp', 'sdk', 'npm'],
+    [
       textParam('serverName', 'Server name (kebab-case)', true),
       textParam('description', 'Server description'),
       textParam('tools', 'Comma-separated initial tool names'),
     ],
-    steps: [
+    [
       fileStep('scaffold', 'Scaffold MCP server', 'Create MCP server with SDK setup.'),
       fileStep('tools', 'Create tool stubs', 'Generate initial tool definitions.'),
       fileStep('test', 'Setup testing', 'Configure testing.'),
       registerCatalogStep('Create catalog entry.'),
     ],
-    catalog_type: 'service',
-    icon: 'server',
-  }),
-  defineOfficialGoldenPath({
-    name: 'forge-react-library',
-    display_name: 'React Component Library',
-    description: 'Shared React component library with Storybook, tests, and npm publishing.',
-    type: 'library',
-    lifecycle: 'ga',
-    framework: 'react',
-    language: 'typescript',
-    stack: 'library',
-    tags: ['react', 'storybook', 'npm', 'components'],
-    parameters: [
+    'service',
+    'server',
+  ],
+  [
+    [
+      'forge-react-library',
+      'React Component Library',
+      'Shared React component library with Storybook, tests, and npm publishing.',
+    ],
+    ['library', 'ga', 'react', 'typescript', 'library'],
+    ['react', 'storybook', 'npm', 'components'],
+    [
       textParam('packageName', 'Package name (@scope/name)', true),
       textParam('description', 'Library description'),
     ],
-    steps: [
+    [
       fileStep('scaffold', 'Scaffold library', 'Create component library structure.'),
       fileStep('storybook', 'Setup Storybook', 'Configure Storybook.'),
       registerCatalogStep('Create catalog entry.'),
     ],
-    catalog_type: 'library',
-    icon: 'book-open',
-  }),
-  defineOfficialGoldenPath({
-    name: 'forge-python-api',
-    display_name: 'Python API Service',
-    description: 'FastAPI service with Docker, pytest, and CI/CD.',
-    type: 'api',
-    lifecycle: 'beta',
-    framework: 'fastapi',
-    language: 'python',
-    stack: 'api-service',
-    tags: ['python', 'fastapi', 'docker', 'api'],
-    parameters: [
+    'library',
+    'book-open',
+  ],
+  [
+    ['forge-python-api', 'Python API Service', 'FastAPI service with Docker, pytest, and CI/CD.'],
+    ['api', 'beta', 'fastapi', 'python', 'api-service'],
+    ['python', 'fastapi', 'docker', 'api'],
+    [
       textParam('serviceName', 'Service name (kebab-case)', true),
       textParam('description', 'API description'),
       boolParam('includeDocker', 'Include Dockerfile and docker-compose', true),
       selectParam('pythonVersion', 'Python version', '3.12', ['3.11', '3.12', '3.13']),
       numberParam('port', 'API server port', 8000),
     ],
-    steps: [
+    [
       fileStep('scaffold', 'Scaffold API', 'Create FastAPI project with routers.'),
       fileStep('docker', 'Setup Docker', 'Add Dockerfile and compose config.'),
       registerCatalogStep('Create catalog entry.'),
     ],
-    includes_monitoring: false,
-    includes_docker: true,
-    catalog_type: 'api',
-    icon: 'server',
-  }),
-  defineOfficialGoldenPath({
-    name: 'forge-cloudflare-worker',
-    display_name: 'Cloudflare Worker',
-    description: 'Edge worker with KV storage, rate limiting, and wrangler deploy.',
-    type: 'worker',
-    lifecycle: 'beta',
-    framework: 'cloudflare',
-    language: 'typescript',
-    stack: 'worker',
-    tags: ['cloudflare', 'workers', 'edge', 'serverless'],
-    parameters: [
+    'api',
+    'server',
+    false,
+    true,
+  ],
+  [
+    [
+      'forge-cloudflare-worker',
+      'Cloudflare Worker',
+      'Edge worker with KV storage, rate limiting, and wrangler deploy.',
+    ],
+    ['worker', 'beta', 'cloudflare', 'typescript', 'worker'],
+    ['cloudflare', 'workers', 'edge', 'serverless'],
+    [
       textParam('workerName', 'Worker name (kebab-case)', true),
       boolParam('includeKV', 'Include KV namespace binding', false),
     ],
-    steps: [
+    [
       fileStep('scaffold', 'Scaffold worker', 'Create Cloudflare Worker project.'),
       fileStep('deploy', 'Configure deployment', 'Setup wrangler.toml and deploy scripts.'),
       registerCatalogStep('Create catalog entry.'),
     ],
-    includes_monitoring: false,
-    catalog_type: 'worker',
-    icon: 'code',
-  }),
+    'worker',
+    'code',
+    false,
+    false,
+  ],
 ];
+
+export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = TEMPLATE_SPECS.map(
+  ([
+    identity,
+    runtime,
+    tags,
+    parameters,
+    steps,
+    catalogType,
+    icon,
+    includesMonitoring,
+    includesDocker,
+  ]) => {
+    const [name, display_name, description] = identity;
+    const [type, lifecycle, framework, language, stack] = runtime;
+    return defineOfficialGoldenPath({
+      name,
+      display_name,
+      description,
+      type,
+      lifecycle,
+      framework,
+      language,
+      stack,
+      tags,
+      parameters,
+      steps,
+      includes_monitoring: includesMonitoring,
+      includes_docker: includesDocker,
+      catalog_type: catalogType,
+      icon,
+    });
+  }
+);
