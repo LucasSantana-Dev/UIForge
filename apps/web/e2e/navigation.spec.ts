@@ -2,6 +2,11 @@ import { test, expect } from '@playwright/test';
 import { setupAuthenticatedUser } from './helpers/auth';
 
 test.describe('Navigation and Routing', () => {
+  test.skip(
+    !process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.NEXT_PUBLIC_SUPABASE_URL,
+    'Requires Supabase admin envs for authenticated navigation tests'
+  );
+
   test.beforeEach(async ({ page }) => {
     await setupAuthenticatedUser(page);
   });

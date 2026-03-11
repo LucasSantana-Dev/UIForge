@@ -1,4 +1,6 @@
 import { createGeneration, updateGeneration } from '@/lib/repositories/generation.repo';
+import { createRequire } from 'node:module';
+import { dirname, join, resolve } from 'node:path';
 import { enrichPromptWithContext } from './context-enrichment';
 import { storeGenerationEmbedding } from './embeddings';
 import { runAllGates, type QualityReport, type PostGenScoreResult } from '@/lib/quality/gates';
@@ -13,6 +15,34 @@ const BORDER_RADIUS_MAP: Record<string, string> = {
   large: '12px',
   full: '9999px',
 };
+
+type ScoreGeneratedCodeFn = (
+  code: string,
+  options?: { framework?: string }
+) => {
+  score: number;
+  grade: string;
+  passed: boolean;
+  checks: Array<{ name: string; passed: boolean; message: string; weight: number }>;
+};
+
+export function loadPostGenScorer(): ScoreGeneratedCodeFn | null {
+  try {
+    const runtimeRequire = createRequire(join(process.cwd(), 'package.json'));
+    const coreEntry = runtimeRequire.resolve('@forgespace/core');
+    const coreRoot = resolve(dirname(coreEntry), '..', '..');
+    const scorerModulePath = join(coreRoot, 'dist/patterns/idp/scorecards/post-gen-scorer.js');
+    const scorerModule = runtimeRequire(scorerModulePath) as {
+      scoreGeneratedCode?: ScoreGeneratedCodeFn;
+    };
+    if (typeof scorerModule.scoreGeneratedCode !== 'function') {
+      return null;
+    }
+    return scorerModule.scoreGeneratedCode;
+  } catch {
+    return null;
+  }
+}
 
 export interface DesignContextParams {
   colorMode?: string;
@@ -144,7 +174,10 @@ export function runQualityGates(code: string, framework?: string): QualityReport
 
   if (getFeatureFlag('ENABLE_POST_GEN_SCORING')) {
     try {
-      const { scoreGeneratedCode } = require('@forgespace/core');
+      const scoreGeneratedCode = loadPostGenScorer();
+      if (!scoreGeneratedCode) {
+        return report;
+      }
       const result = scoreGeneratedCode(code, { framework });
       const gradeMap: Record<string, PostGenScoreResult['grade']> = {
         A: 'A',

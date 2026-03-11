@@ -29,6 +29,43 @@ export async function setupAuthenticatedUser(page: Page): Promise<{
     throw new Error(`Failed to create test user: ${createError?.message || 'unknown'}`);
   }
 
+  let profileFound = false;
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const { data } = await adminSupabase
+      .from('profiles')
+      .select('id')
+      .eq('id', createdUser.user.id)
+      .single();
+    if (data) {
+      profileFound = true;
+      break;
+    }
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+
+  const setupTimestamp = new Date().toISOString();
+  const profileSetup = {
+    onboarding_completed_at: setupTimestamp,
+    tour_completed_at: setupTimestamp,
+  };
+
+  if (!profileFound) {
+    const { error: insertError } = await adminSupabase
+      .from('profiles')
+      .insert({ id: createdUser.user.id, ...profileSetup });
+    if (insertError) {
+      throw new Error(`Failed to initialize profile flags: ${insertError.message}`);
+    }
+  } else {
+    const { error: updateError } = await adminSupabase
+      .from('profiles')
+      .update(profileSetup)
+      .eq('id', createdUser.user.id);
+    if (updateError) {
+      throw new Error(`Failed to set onboarding/tour flags: ${updateError.message}`);
+    }
+  }
+
   await page.goto('/signin');
   await page.getByLabel(/email/i).fill(testEmail);
   await page.getByLabel(/password/i).fill(testPassword);

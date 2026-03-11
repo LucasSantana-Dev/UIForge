@@ -77,9 +77,19 @@ Create `apps/web/.env.local`:
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-local-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-local-service-role-key
+GEMINI_API_KEY=your-gemini-key
+# Optional backup capacity for quota/rate-limit fallback
+ANTHROPIC_API_KEY=your-anthropic-key
 NEXT_PUBLIC_ENABLE_BYOK=true
 NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
 ```
+
+### Generation reliability behavior
+
+- Siza defaults to `siza -> google` routing for shared free-tier generation
+- On provider quota/rate-limit, the server falls back to Anthropic when `ANTHROPIC_API_KEY` is configured
+- Fallback never reuses the primary provider BYOK key for backup provider calls
+- When no backup capacity is configured, users get explicit capacity guidance with BYOK next steps
 
 ### Grant admin access locally
 
@@ -150,6 +160,15 @@ npm test                # Unit tests (Jest)
 npm run test:e2e        # E2E tests (Playwright)
 npm run type-check      # TypeScript
 ```
+
+### Generation E2E modes
+
+- Default CI-safe suite uses mocked `/api/generate` SSE for deterministic generation/preview assertions
+- Optional live-provider smoke test is gated behind `E2E_LIVE_PROVIDER=true`
+- Live smoke uses BYOK provider selection (`GEMINI_API_KEY` or `ANTHROPIC_API_KEY`)
+- If Gemini preflight returns quota/rate-limit (`HTTP 429`), smoke auto-switches to Anthropic when available
+- If Gemini is quota-limited and Anthropic key is unavailable, smoke skips with an explicit reason
+- Live smoke prerequisites: `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, and at least one provider key (`GEMINI_API_KEY` or `ANTHROPIC_API_KEY`)
 
 Project operation notes for AI agents and contributors are in
 [AGENTS.md](AGENTS.md).

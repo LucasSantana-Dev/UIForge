@@ -14,7 +14,7 @@ test.describe('Admin panel', () => {
 
       await page.goto('/admin');
       await expect(page.getByRole('heading', { name: 'Admin' })).toBeVisible();
-      await expect(page.getByText('Feature flags')).toBeVisible();
+      await expect(page.getByText('Feature flags', { exact: true }).first()).toBeVisible();
     } finally {
       await cleanupTestData(user.id);
     }

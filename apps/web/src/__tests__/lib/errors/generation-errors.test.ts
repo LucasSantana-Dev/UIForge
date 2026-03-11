@@ -1,6 +1,11 @@
 import { categorizeGenerationError } from '@/lib/errors/generation-errors';
 
 describe('categorizeGenerationError', () => {
+  it('categorizes provider capacity errors separately from subscription quota', () => {
+    const result = categorizeGenerationError('AI provider capacity reached. Retry later.');
+    expect(result.category).toBe('provider-capacity');
+  });
+
   it('categorizes rate limit errors', () => {
     const result = categorizeGenerationError('Rate limit exceeded. Try again shortly.');
     expect(result.category).toBe('rate-limit');
@@ -35,6 +40,13 @@ describe('categorizeGenerationError', () => {
   it('categorizes provider errors', () => {
     const result = categorizeGenerationError('API key is invalid or expired');
     expect(result.category).toBe('provider');
+  });
+
+  it('categorizes provider quota responses as capacity errors', () => {
+    const result = categorizeGenerationError(
+      'Google generation failed: You exceeded your current quota'
+    );
+    expect(result.category).toBe('provider-capacity');
   });
 
   it('categorizes service unavailable', () => {

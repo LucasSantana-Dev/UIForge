@@ -16,6 +16,7 @@ interface QuotaGuardProps {
 }
 
 const CATEGORY_ICONS = {
+  'provider-capacity': AlertTriangle,
   'rate-limit': Zap,
   quota: AlertTriangle,
   auth: ShieldAlert,

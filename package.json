@@ -56,7 +56,11 @@
     "wrangler": "^4.71.0"
   },
   "overrides": {
-    "dompurify": "^3.3.2"
+    "dompurify": "^3.3.2",
+    "tar": "^7.5.11",
+    "onnxruntime-node": {
+      "tar": "^7.5.11"
+    }
   },
   "engines": {
     "node": ">=22",

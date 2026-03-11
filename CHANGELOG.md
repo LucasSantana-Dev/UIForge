@@ -13,15 +13,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `teams.spec.ts` — 9 tests: list, create team, detail, slug preview, members, validation
   - `golden-paths.spec.ts` — 7 tests: list, search, filters, scaffold form toggle
   - `onboarding.spec.ts` — 7 tests: redirect, welcome step, feature cards, project creation, skip
+- **Live provider generation smoke spec** — `generation-live.spec.ts` gated by
+  `E2E_LIVE_PROVIDER=true` for real provider + preview integration validation
 - **Live ecosystem sync module (marketing)** — Server-only GitHub metadata fetch with 11-repo allowlist, latest release enrichment, resilient fallback snapshot, and 6-hour revalidation
 - **Marketing ecosystem tests** — Coverage for mapping, release fallback, and full fallback snapshot behavior
 
 ### Changed
 - **Contributor guidance** — Added `AGENTS.md` project operations guide and linked it from README development docs.
+- **Generation E2E model** — `generation.spec.ts` now uses deterministic mocked SSE
+  flows for stable CI assertions (preview render, refresh interaction, copy/download)
+- **Live smoke provider selection** — `generation-live.spec.ts` now preflights
+  Gemini BYOK capacity, auto-switches to Anthropic BYOK when available, and skips
+  with an explicit reason when live provider quota is unavailable
 - **Bundle optimization** — removed 4 dead dependencies (@monaco-editor/react, react-icons, react-email, next-themes), moved 9 misplaced root deps to proper workspaces, added serverExternalPackages for 5 server-only libs, lazy-load 3 below-fold landing sections, optimizePackageImports for lucide-react/motion/supabase
 - **Marketing data model refresh** — Home (`StatsBar`, `EcosystemSection`), About, and Roadmap now consume a live ecosystem snapshot instead of stale hardcoded repo/capability claims
 - **Marketing UI polish** — Improved label/card rhythm, metadata chips, focus-visible states, and contrast consistency across ecosystem and stats surfaces
 - **Docs refresh** — Updated README ecosystem narrative to 11 product repositories and documented `FORGE_SPACE_GITHUB_TOKEN` with `GITHUB_TOKEN` fallback
+- **Core follow-up tracking** — Opened issue to remove `@forgespace/core` import-time
+  CLI side effects: [Forge-Space/core#124](https://github.com/Forge-Space/core/issues/124)
+
+### Fixed
+- **Generation fallback reliability** — Quota/rate-limit provider failures now return
+  normalized capacity guidance when no backup key is configured, and fallback to
+  server-side Anthropic when available
+- **Fallback key isolation** — Backup provider calls no longer reuse primary-provider
+  BYOK keys
+- **Post-gen scorer import side effects** — Siza now loads the scorer directly from
+  side-effect-safe core subpath instead of importing `@forgespace/core` root
+- **E2E auth fixture setup** — Playwright fixtures now mark both onboarding and tour
+  completion, preventing overlay/interstitial interference in dashboard tests
 
 ---
 

@@ -1,4 +1,5 @@
 export type GenerationErrorCategory =
+  | 'provider-capacity'
   | 'rate-limit'
   | 'quota'
   | 'auth'
@@ -19,6 +20,18 @@ const ERROR_PATTERNS: Array<{
   info: GenerationErrorInfo;
 }> = [
   {
+    test: (msg) =>
+      /provider capacity|free-tier capacity|resource_exhausted|current quota|capacity reached/i.test(
+        msg
+      ),
+    info: {
+      category: 'provider-capacity',
+      title: 'AI capacity reached',
+      message: 'Siza shared provider capacity is currently exhausted.',
+      suggestion: 'Retry in a few minutes or add your own provider key in AI Keys.',
+    },
+  },
+  {
     test: (msg) => /rate limit/i.test(msg),
     info: {
       category: 'rate-limit',
@@ -28,7 +41,8 @@ const ERROR_PATTERNS: Array<{
     },
   },
   {
-    test: (msg) => /quota|limit reached|limit exceeded/i.test(msg),
+    test: (msg) =>
+      /generation quota exceeded|billing period|monthly limit reached|upgrade your plan/i.test(msg),
     info: {
       category: 'quota',
       title: 'Generation limit reached',

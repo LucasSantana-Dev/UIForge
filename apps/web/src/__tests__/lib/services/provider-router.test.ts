@@ -39,6 +39,7 @@ describe('routeGeneration', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    delete process.env.ANTHROPIC_API_KEY;
   });
 
   describe('MCP routing', () => {
@@ -140,7 +141,34 @@ describe('routeGeneration', () => {
       );
     });
 
-    it('propagates errors without fallback', async () => {
+    it('falls back to Anthropic on quota errors when server backup is available', async () => {
+      const { generateWithProvider } = require('@/lib/services/generation');
+      process.env.ANTHROPIC_API_KEY = 'server-anthropic-key';
+
+      generateWithProvider.mockImplementation(async function* (options: any) {
+        if (options.provider === 'google') {
+          yield { type: 'error', message: 'quota exceeded 429', timestamp: 1 };
+          return;
+        }
+        yield { type: 'start', timestamp: 2 };
+        yield { type: 'chunk', content: 'fallback-code', timestamp: 3 };
+        yield { type: 'complete', timestamp: 4 };
+      });
+
+      const events = await collectEvents(routeGeneration(baseOpts));
+
+      expect(events.some((e) => e.type === 'fallback')).toBe(true);
+      expect(events.some((e) => e.type === 'chunk' && e.content === 'fallback-code')).toBe(true);
+      expect(generateWithProvider).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          provider: 'anthropic',
+          apiKey: undefined,
+        })
+      );
+    });
+
+    it('returns normalized capacity guidance when no backup provider key is configured', async () => {
       const { generateWithProvider } = require('@/lib/services/generation');
 
       generateWithProvider.mockImplementation(async function* () {
@@ -151,6 +179,60 @@ describe('routeGeneration', () => {
 
       expect(events).toHaveLength(1);
       expect(events[0].type).toBe('error');
+      expect(events[0].message).toContain('capacity reached');
+    });
+
+    it('does not fallback for non-quota provider failures', async () => {
+      const { generateWithProvider } = require('@/lib/services/generation');
+      process.env.ANTHROPIC_API_KEY = 'server-anthropic-key';
+
+      generateWithProvider.mockImplementation(async function* () {
+        yield { type: 'error', message: 'provider key invalid', timestamp: 1 };
+      });
+
+      const events = await collectEvents(routeGeneration(baseOpts));
+
+      expect(events).toHaveLength(1);
+      expect(events[0].type).toBe('error');
+      expect(events[0].message).toContain('provider key invalid');
+      expect(generateWithProvider).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls back from Anthropic BYOK to server Anthropic key on quota errors', async () => {
+      const { generateWithProvider } = require('@/lib/services/generation');
+      process.env.ANTHROPIC_API_KEY = 'server-anthropic-key';
+
+      generateWithProvider.mockImplementation(async function* (options: any) {
+        if (options.provider === 'anthropic' && options.apiKey === 'user-byok-key') {
+          yield { type: 'error', message: 'quota exceeded 429', timestamp: 1 };
+          return;
+        }
+        if (options.provider === 'anthropic' && options.apiKey === undefined) {
+          yield { type: 'chunk', content: 'server-capacity-code', timestamp: 2 };
+          yield { type: 'complete', timestamp: 3 };
+        }
+      });
+
+      const events = await collectEvents(
+        routeGeneration({
+          ...baseOpts,
+          provider: 'anthropic',
+          model: 'claude-sonnet-4-20250514',
+          userApiKey: 'user-byok-key',
+        })
+      );
+
+      expect(events.some((e) => e.type === 'fallback')).toBe(true);
+      expect(events.some((e) => e.type === 'chunk' && e.content === 'server-capacity-code')).toBe(
+        true
+      );
+      expect(generateWithProvider).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          provider: 'anthropic',
+          apiKey: undefined,
+        })
+      );
     });
   });
 

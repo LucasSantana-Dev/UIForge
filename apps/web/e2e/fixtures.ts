@@ -8,7 +8,7 @@ type TestFixtures = {
 };
 
 export const test = base.extend<TestFixtures>({
-  testUser: async ({}, use) => {
+  testUser: async (_args, applyFixture) => {
     const uniqueId = crypto.randomUUID();
     const testPassword = crypto.randomBytes(16).toString('hex');
     const testUser = {
@@ -16,10 +16,10 @@ export const test = base.extend<TestFixtures>({
       password: testPassword,
       id: uniqueId,
     };
-    await use(testUser);
+    await applyFixture(testUser);
   },
 
-  authenticatedPage: async ({ page, testUser }, use: (page: Page) => Promise<void>) => {
+  authenticatedPage: async ({ page, testUser }, applyFixture: (page: Page) => Promise<void>) => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -43,7 +43,6 @@ export const test = base.extend<TestFixtures>({
 
     testUser.id = createdUser.user.id;
 
-    // Wait for profile row to exist (created by DB trigger), then mark onboarding complete
     let profileFound = false;
     for (let attempt = 0; attempt < 20; attempt++) {
       const { data } = await adminSupabase
@@ -57,32 +56,54 @@ export const test = base.extend<TestFixtures>({
       }
       await new Promise((r) => setTimeout(r, 500));
     }
+    const setupTimestamp = new Date().toISOString();
+    const profileSetup = {
+      onboarding_completed_at: setupTimestamp,
+      tour_completed_at: setupTimestamp,
+    };
+    let profileSetupError: string | null = null;
+
     if (!profileFound) {
-      // Profile trigger didn't fire — insert the profile manually
-      const { error: insertErr } = await adminSupabase.from('profiles').insert({
-        id: testUser.id,
-        onboarding_completed_at: new Date().toISOString(),
-      });
-      if (insertErr) console.warn('E2E fixture insert error:', insertErr.message);
+      const { error: insertErr } = await adminSupabase
+        .from('profiles')
+        .insert({ id: testUser.id, ...profileSetup });
+      if (insertErr) profileSetupError = insertErr.message;
     } else {
       const { error: updateErr } = await adminSupabase
         .from('profiles')
-        .update({ onboarding_completed_at: new Date().toISOString() })
+        .update(profileSetup)
         .eq('id', testUser.id);
-      if (updateErr) console.warn('E2E fixture update error:', updateErr.message);
+      if (updateErr) profileSetupError = updateErr.message;
     }
 
-    // Verify the update took effect
-    const { data: verifyProfile } = await adminSupabase
+    if (profileSetupError) {
+      try {
+        await adminSupabase.auth.admin.deleteUser(testUser.id);
+      } catch (cleanupError) {
+        void cleanupError;
+      }
+      base.skip(true, `Failed to set onboarding/tour fixture flags: ${profileSetupError}`);
+      return;
+    }
+
+    const { data: verifyProfile, error: verifyProfileError } = await adminSupabase
       .from('profiles')
-      .select('onboarding_completed_at')
+      .select('onboarding_completed_at, tour_completed_at')
       .eq('id', testUser.id)
       .single();
-    if (!verifyProfile?.onboarding_completed_at) {
-      console.warn(
-        'E2E fixture: onboarding_completed_at not set after update, profile:',
-        verifyProfile
-      );
+    if (
+      verifyProfileError ||
+      !verifyProfile?.onboarding_completed_at ||
+      !verifyProfile?.tour_completed_at
+    ) {
+      try {
+        await adminSupabase.auth.admin.deleteUser(testUser.id);
+      } catch (cleanupError) {
+        void cleanupError;
+      }
+      const reason = verifyProfileError?.message || 'onboarding/tour flags missing after update';
+      base.skip(true, `Failed to verify onboarding/tour fixture flags: ${reason}`);
+      return;
     }
 
     await page.goto('/signin');
@@ -95,12 +116,14 @@ export const test = base.extend<TestFixtures>({
     } catch {
       try {
         await adminSupabase.auth.admin.deleteUser(testUser.id);
-      } catch {}
+      } catch (cleanupError) {
+        void cleanupError;
+      }
       base.skip(true, 'Sign-in flow did not complete - skipping authenticated test');
       return;
     }
 
-    await use(page);
+    await applyFixture(page);
 
     try {
       await adminSupabase.auth.admin.deleteUser(testUser.id);
