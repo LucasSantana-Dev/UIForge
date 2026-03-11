@@ -3,13 +3,11 @@
 import { useRouter } from 'next/navigation';
 import { PricingCard } from '@/components/billing/PricingCard';
 import { PLANS } from '@/lib/stripe/plans';
-import { useSubscription } from '@/hooks/use-subscription';
 import { Code2 } from 'lucide-react';
 import Link from 'next/link';
 
 export function PricingPageClient() {
   const router = useRouter();
-  const { subscription } = useSubscription();
 
   const handleSelectPlan = async (priceId: string) => {
     try {
@@ -50,25 +48,17 @@ export function PricingPageClient() {
         </div>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          <PricingCard
-            plan={PLANS.free}
-            currentPlan={subscription?.plan}
-            onSelect={handleSelectPlan}
-          />
+          <PricingCard plan={PLANS.free} currentPlan={undefined} onSelect={handleSelectPlan} />
           <PricingCard
             plan={PLANS.pro}
-            currentPlan={subscription?.plan}
+            currentPlan={undefined}
             onSelect={handleSelectPlan}
             highlighted
           />
-          <PricingCard
-            plan={PLANS.team}
-            currentPlan={subscription?.plan}
-            onSelect={handleSelectPlan}
-          />
+          <PricingCard plan={PLANS.team} currentPlan={undefined} onSelect={handleSelectPlan} />
           <PricingCard
             plan={PLANS.enterprise}
-            currentPlan={subscription?.plan}
+            currentPlan={undefined}
             onSelect={handleSelectPlan}
           />
         </div>

@@ -7,11 +7,7 @@ import { ArrowRight, BookOpen } from 'lucide-react';
 import { AmbientVideoBackground } from '@/components/migration/ambient-video-background';
 import { EASE_SIZA, CONTAINER } from './constants';
 
-interface HeroSectionProps {
-  user: { id: string } | null;
-}
-
-export function HeroSection({ user }: HeroSectionProps) {
+export function HeroSection() {
   const prefersReducedMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
   const particles = useMemo(() => {
@@ -144,11 +140,11 @@ export function HeroSection({ user }: HeroSectionProps) {
             className="inline-flex"
           >
             <Link
-              href={user ? '/generate' : '/signin'}
+              href="/signup"
               className="group relative inline-flex items-center gap-2 bg-violet-600 text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-violet-500 shadow-[0_0_24px_rgba(139,92,246,0.3)] hover:shadow-[0_0_32px_rgba(139,92,246,0.45)] overflow-hidden"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              <span className="relative">{user ? 'Go to Dashboard' : 'Start Generating Free'}</span>
+              <span className="relative">Start Generating Free</span>
               <ArrowRight className="relative w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
           </motion.div>

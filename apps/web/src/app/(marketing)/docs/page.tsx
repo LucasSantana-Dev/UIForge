@@ -10,8 +10,11 @@ import {
   CreditCard,
 } from 'lucide-react';
 import { FadeIn } from '@/components/landing/FadeIn';
+import { getMarketingPageMetadata, getMarketingWebPageJsonLd } from '@/lib/marketing/seo';
 
 const DOCS_BASE = 'https://docs.forgespace.co/docs';
+
+export const metadata = getMarketingPageMetadata('docs');
 
 const mainCards = [
   {
@@ -86,8 +89,16 @@ const popularTopics = [
 ];
 
 export default function DocsPage() {
+  const webPageJsonLd = getMarketingWebPageJsonLd('docs');
+
   return (
     <div className="min-h-screen">
+      <script
+        id="ld-json-docs-webpage"
+        key="ld-json-docs-webpage"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+      />
       <section className="relative overflow-hidden pb-16 pt-20 px-6">
         <div className="pointer-events-none absolute inset-0 bg-primary/5 blur-[100px] opacity-50" />
         <div className="relative z-10 mx-auto max-w-[800px] text-center">

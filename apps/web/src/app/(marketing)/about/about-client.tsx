@@ -109,6 +109,7 @@ function formatDate(iso: string | null): string {
     month: 'short',
     day: '2-digit',
     year: 'numeric',
+    timeZone: 'UTC',
   }).format(new Date(iso));
 }
 

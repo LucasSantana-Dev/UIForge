@@ -1,7 +1,5 @@
 import type { Metadata } from 'next';
 import { DM_Sans, Plus_Jakarta_Sans, IBM_Plex_Mono } from 'next/font/google';
-import { QueryProvider } from '@/components/providers/query-provider';
-import { FeatureFlagProvider } from '@/lib/features/provider';
 import './globals.css';
 
 const dmSans = DM_Sans({
@@ -26,7 +24,10 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://siza.forgespace.co'),
-  title: 'Siza — Vibe Code the Right Way',
+  title: {
+    default: 'Siza — Vibe Code the Right Way',
+    template: '%s | Siza',
+  },
   description:
     'AI-powered full-stack generation with real architecture, security by default, and quality gates. Open source, MIT licensed.',
   keywords: [
@@ -69,9 +70,6 @@ export const metadata: Metadata = {
     description: 'Full-stack AI generation with architecture, security, and quality built in.',
     images: ['/og-image.png'],
   },
-  alternates: {
-    canonical: 'https://siza.forgespace.co',
-  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -80,17 +78,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`${dmSans.variable} ${plusJakartaSans.variable} ${ibmPlexMono.variable}`}
     >
-      <body className="font-sans">
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:bg-brand focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-white"
-        >
-          Skip to content
-        </a>
-        <QueryProvider>
-          <FeatureFlagProvider>{children}</FeatureFlagProvider>
-        </QueryProvider>
-      </body>
+      <body className="font-sans">{children}</body>
     </html>
   );
 }

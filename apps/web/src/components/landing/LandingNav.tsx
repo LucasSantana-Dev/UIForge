@@ -7,11 +7,7 @@ import { Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { CONTAINER } from './constants';
 
-interface LandingNavProps {
-  user: { id: string } | null;
-}
-
-export function LandingNav({ user }: LandingNavProps) {
+export function LandingNav() {
   const [isScrolled, setIsScrolled] = useState(
     () => typeof window !== 'undefined' && window.scrollY > 0
   );
@@ -36,10 +32,11 @@ export function LandingNav({ user }: LandingNavProps) {
   }, []);
 
   const navLinks = [
-    { label: 'Platform', href: '/generate' },
-    { label: 'Ecosystem', href: '#ecosystem' },
+    { label: 'About', href: '/about' },
+    { label: 'Roadmap', href: '/roadmap' },
+    { label: 'Pricing', href: '/pricing' },
     { label: 'Docs', href: '/docs' },
-    { label: 'Dashboard', href: '/generate' },
+    { label: 'Gallery', href: '/gallery' },
   ];
 
   return (
@@ -69,29 +66,18 @@ export function LandingNav({ user }: LandingNavProps) {
         </div>
 
         <div className="flex items-center gap-3">
-          {user ? (
-            <Link
-              href="/generate"
-              className="bg-violet-600 hover:bg-violet-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors shadow-[0_0_16px_rgba(139,92,246,0.25)]"
-            >
-              Dashboard
-            </Link>
-          ) : (
-            <>
-              <Link
-                href="/signin"
-                className="hidden sm:inline-block text-sm text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
-              >
-                Sign in
-              </Link>
-              <Link
-                href="/signup"
-                className="bg-violet-600 hover:bg-violet-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors shadow-[0_0_16px_rgba(139,92,246,0.25)]"
-              >
-                Get Started
-              </Link>
-            </>
-          )}
+          <Link
+            href="/signin"
+            className="hidden sm:inline-block text-sm text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
+          >
+            Sign in
+          </Link>
+          <Link
+            href="/signup"
+            className="bg-violet-600 hover:bg-violet-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors shadow-[0_0_16px_rgba(139,92,246,0.25)]"
+          >
+            Get Started
+          </Link>
 
           <Sheet>
             <SheetTrigger

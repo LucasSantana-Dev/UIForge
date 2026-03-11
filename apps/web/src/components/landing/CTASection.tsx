@@ -5,11 +5,7 @@ import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, Github } from 'lucide-react';
 import { FadeIn } from './FadeIn';
 
-interface CTASectionProps {
-  user: { id: string } | null;
-}
-
-export function CTASection({ user }: CTASectionProps) {
+export function CTASection() {
   const prefersReducedMotion = useReducedMotion();
 
   return (
@@ -43,10 +39,10 @@ export function CTASection({ user }: CTASectionProps) {
                 className="inline-flex"
               >
                 <Link
-                  href={user ? '/generate' : '/signup'}
+                  href="/signup"
                   className="bg-violet-600 hover:bg-violet-500 text-white rounded-lg px-8 py-3 text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors shadow-[0_0_24px_rgba(139,92,246,0.25)] hover:shadow-[0_0_32px_rgba(139,92,246,0.35)]"
                 >
-                  {user ? 'Go to Dashboard' : 'Get Started Free'}
+                  Get Started Free
                   <ArrowRight className="w-4 h-4" />
                 </Link>
               </motion.div>
@@ -61,6 +57,21 @@ export function CTASection({ user }: CTASectionProps) {
                 <Github className="w-4 h-4" />
                 View on GitHub
               </motion.a>
+            </div>
+
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-5 text-sm text-[#A1A1AA]">
+              <Link href="/pricing" className="hover:text-[#FAFAFA] transition-colors">
+                Pricing
+              </Link>
+              <Link href="/about" className="hover:text-[#FAFAFA] transition-colors">
+                About
+              </Link>
+              <Link href="/roadmap" className="hover:text-[#FAFAFA] transition-colors">
+                Roadmap
+              </Link>
+              <Link href="/docs" className="hover:text-[#FAFAFA] transition-colors">
+                Docs
+              </Link>
             </div>
 
             <p className="text-sm text-[#71717A] text-center mt-6">

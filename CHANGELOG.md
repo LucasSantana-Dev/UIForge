@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Marketing SEO contract** — Added centralized route metadata map for
+  `/`, `/about`, `/roadmap`, `/pricing`, `/docs`, `/gallery`,
+  `/legal/privacy`, and `/legal/terms` with canonical/Open Graph/Twitter fields
+- **Marketing robots/sitemap handlers** — Added `robots.ts` and `sitemap.ts`
+  with explicit marketing allowlist and non-marketing disallow rules
+- **SEO test coverage** — Added unit coverage for metadata/indexability/schema
+  and Playwright SEO assertions for title/canonical/meta/H1/robots/sitemap/noindex
 - **E2E test coverage expansion** — 4 new spec files (closes #399)
   - `catalog.spec.ts` — 10 tests: list, search, create entry, detail view, edit, graph, discover, tags
   - `teams.spec.ts` — 9 tests: list, create team, detail, slug preview, members, validation
@@ -19,6 +26,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Marketing ecosystem tests** — Coverage for mapping, release fallback, and full fallback snapshot behavior
 
 ### Changed
+- **Canonical behavior** — Removed root-level canonical override and switched to
+  self-canonical metadata per marketing/legal route
+- **Marketing rendering strategy** — Marketing routes are static/ISR-friendly;
+  removed server-auth dependency from homepage marketing nav rendering
+- **Indexability policy enforcement** — Added noindex boundaries for
+  dashboard/onboarding/auth/utility routes and redirect-only `/landing`
+- **Pricing page static fallback** — Removed marketing React Query dependency
+  from pricing page to keep marketing prerender deterministic
 - **Contributor guidance** — Added `AGENTS.md` project operations guide and linked it from README development docs.
 - **Generation E2E model** — `generation.spec.ts` now uses deterministic mocked SSE
   flows for stable CI assertions (preview render, refresh interaction, copy/download)

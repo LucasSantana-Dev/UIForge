@@ -1,16 +1,21 @@
 import type { Metadata } from 'next';
 import { GalleryClient } from './gallery-client';
+import { getMarketingPageMetadata, getMarketingWebPageJsonLd } from '@/lib/marketing/seo';
 
-export const metadata: Metadata = {
-  title: 'Gallery — Siza',
-  description:
-    'Explore AI-generated UI components. See what Siza can build — React, Vue, Svelte, and more.',
-  openGraph: {
-    title: 'Gallery — Siza',
-    description: 'Explore AI-generated UI components built with Siza.',
-  },
-};
+export const metadata: Metadata = getMarketingPageMetadata('gallery');
 
 export default function GalleryPage() {
-  return <GalleryClient />;
+  const webPageJsonLd = getMarketingWebPageJsonLd('gallery');
+
+  return (
+    <>
+      <script
+        id="ld-json-gallery-webpage"
+        key="ld-json-gallery-webpage"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(webPageJsonLd) }}
+      />
+      <GalleryClient />
+    </>
+  );
 }

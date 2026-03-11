@@ -195,6 +195,32 @@ FORGE_SPACE_GITHUB_TOKEN=ghp_...
 GITHUB_TOKEN=ghp_...
 ```
 
+## SEO and Indexability (Marketing)
+
+Siza uses an explicit SEO contract for marketing and legal pages.
+
+Indexable routes:
+
+- `/`
+- `/about`
+- `/roadmap`
+- `/pricing`
+- `/docs`
+- `/gallery`
+- `/legal/privacy`
+- `/legal/terms`
+
+Technical behavior:
+
+- Route-level metadata map with canonical, title, description, keywords, Open Graph, and Twitter fields
+- `robots.txt` and `sitemap.xml` are generated from the marketing route allowlist
+- `/landing` is excluded from indexing (redirect target only)
+- Non-marketing surfaces are noindex/disallowed (`/api/*`, dashboard/app/auth/onboarding/utility paths)
+- Marketing pages are static/ISR-friendly and do not depend on server auth state
+- Structured data:
+  - Homepage: `Organization` + `WebSite` + `SoftwareApplication`
+  - Marketing/legal pages: `WebPage` JSON-LD
+
 ## Pricing
 
 Free for individuals, paid for scale and convenience.
