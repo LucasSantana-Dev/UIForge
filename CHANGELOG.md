@@ -33,6 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Official skills parser sweep test** — Validates all `skills/*/SKILL.md` files parse cleanly
 
 ### Changed
+- **Project MCP defaults** — Added wrapper-first `playwright` server entry in
+  `.mcp.json` and documented global-registry recovery flow + restart step for
+  Codex runtime MCP reload
 - **Canonical behavior** — Removed root-level canonical override and switched to
   self-canonical metadata per marketing/legal route
 - **Marketing rendering strategy** — Marketing routes are static/ISR-friendly;

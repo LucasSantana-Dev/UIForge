@@ -174,14 +174,30 @@ npm run sync:skills     # Sync official skills from skills/*/SKILL.md
 
 ### Playwright MCP Wrapper (Codex Runtime)
 
-If Codex Playwright MCP calls fail with `Transport closed`, use the local wrapper
-that bridges Content-Length and newline JSON-RPC transport styles.
+Siza ships `.mcp.json` with a wrapper-first `playwright` MCP server:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "node",
+      "args": ["scripts/playwright-mcp-wrapper.mjs", "--headless"]
+    }
+  }
+}
+```
+
+If your global Codex MCP registry still points `playwright` to direct
+`npx @playwright/mcp` and calls fail with `Transport closed`, re-register with
+the local wrapper that bridges Content-Length and newline JSON-RPC transport styles.
 
 ```bash
 codex mcp remove playwright
 codex mcp add playwright -- \
   node /absolute/path/to/siza/scripts/playwright-mcp-wrapper.mjs --headless
 ```
+
+Then restart Codex to reload MCP server configuration.
 
 Local smoke check:
 
