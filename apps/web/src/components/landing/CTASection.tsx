@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { ArrowRight, Github } from 'lucide-react';
 
 export function CTASection() {
