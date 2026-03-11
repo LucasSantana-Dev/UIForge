@@ -169,6 +169,7 @@ npm run type-check      # TypeScript
 - If Gemini preflight returns quota/rate-limit (`HTTP 429`), smoke auto-switches to Anthropic when available
 - If Gemini is quota-limited and Anthropic key is unavailable, smoke skips with an explicit reason
 - Live smoke prerequisites: `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SUPABASE_URL`, and at least one provider key (`GEMINI_API_KEY` or `ANTHROPIC_API_KEY`)
+
 ## CI Security Hygiene
 
 - GitHub Actions and reusable workflow references in `.github/workflows/` are pinned to full commit SHAs.

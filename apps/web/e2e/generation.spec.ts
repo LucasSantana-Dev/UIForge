@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { createReactProject, fillGenerationForm } from './helpers/generation';
 
 type MockSseEvent = {
   type: 'start' | 'chunk' | 'complete' | 'error';
@@ -25,17 +26,7 @@ test.describe('Component Generation (mocked)', () => {
   let projectId: string;
 
   test.beforeEach(async ({ authenticatedPage: page }) => {
-    await page.goto('/projects/new');
-    await page.getByLabel(/project name/i).fill('Generation Test Project');
-    await page.getByLabel(/framework/i).selectOption('react');
-    await page.getByRole('button', { name: /create project/i }).click();
-
-    await page.waitForURL(/\/projects\/[a-f0-9-]+/);
-    const match = page.url().match(/\/projects\/([a-f0-9-]+)/);
-    if (!match) {
-      throw new Error(`Could not parse project id from URL: ${page.url()}`);
-    }
-    projectId = match[1];
+    projectId = await createReactProject(page, 'Generation Test Project');
   });
 
   test('shows generate workspace and panels', async ({ authenticatedPage: page }) => {
@@ -59,12 +50,7 @@ test.describe('Component Generation (mocked)', () => {
 
   test('validates prompt length client-side', async ({ authenticatedPage: page }) => {
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
-
-    await page.getByLabel(/component name/i).fill('ValidName');
-    await page
-      .getByLabel(/describe your component/i)
-      .first()
-      .fill('Short');
+    await fillGenerationForm(page, 'ValidName', 'Short');
     await page.locator('form button[type="submit"]').click();
 
     await expect(page.getByText(/at least 10 characters/i)).toBeVisible();
@@ -100,11 +86,11 @@ test.describe('Component Generation (mocked)', () => {
     });
 
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
-    await page.getByLabel(/component name/i).fill('SizaMockButton');
-    await page
-      .getByLabel(/describe your component/i)
-      .first()
-      .fill('Create a compact CTA button with primary style and loading state.');
+    await fillGenerationForm(
+      page,
+      'SizaMockButton',
+      'Create a compact CTA button with primary style and loading state.'
+    );
 
     await page.locator('form button[type="submit"]').click();
 
@@ -141,11 +127,11 @@ test.describe('Component Generation (mocked)', () => {
     });
 
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
-    await page.getByLabel(/component name/i).fill('DownloadMock');
-    await page
-      .getByLabel(/describe your component/i)
-      .first()
-      .fill('Build a tiny component for download verification.');
+    await fillGenerationForm(
+      page,
+      'DownloadMock',
+      'Build a tiny component for download verification.'
+    );
 
     await page.locator('form button[type="submit"]').click();
     await expect(page.getByRole('button', { name: /download code/i })).toBeVisible();
@@ -173,11 +159,11 @@ test.describe('Component Generation (mocked)', () => {
     });
 
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
-    await page.getByLabel(/component name/i).fill('ErrorMock');
-    await page
-      .getByLabel(/describe your component/i)
-      .first()
-      .fill('Trigger stream error rendering for capacity guidance.');
+    await fillGenerationForm(
+      page,
+      'ErrorMock',
+      'Trigger stream error rendering for capacity guidance.'
+    );
 
     await page.locator('form button[type="submit"]').click();
 
