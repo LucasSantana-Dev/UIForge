@@ -47,6 +47,9 @@ type GoldenPathDefaults = Pick<
 type OfficialGoldenPathInput = Omit<OfficialGoldenPathSeed, keyof GoldenPathDefaults> &
   Partial<GoldenPathDefaults>;
 
+type GoldenPathParam = OfficialGoldenPathSeed['parameters'][number];
+type GoldenPathStep = OfficialGoldenPathSeed['steps'][number];
+
 const DEFAULT_GOLDEN_PATH_VALUES: GoldenPathDefaults = {
   is_official: true,
   includes_ci: true,
@@ -57,17 +60,45 @@ const DEFAULT_GOLDEN_PATH_VALUES: GoldenPathDefaults = {
   catalog_lifecycle: 'production',
 };
 
-function registerCatalogStep(description: string): OfficialGoldenPathSeed['steps'][number] {
+function defineOfficialGoldenPath(input: OfficialGoldenPathInput): OfficialGoldenPathSeed {
+  return { ...DEFAULT_GOLDEN_PATH_VALUES, ...input };
+}
+
+function textParam(name: string, description: string, required = false): GoldenPathParam {
+  if (required) {
+    return { name, type: 'string', required: true, description };
+  }
+  return { name, type: 'string', description };
+}
+
+function boolParam(name: string, description: string, defaultValue: boolean): GoldenPathParam {
+  return { name, type: 'boolean', default: defaultValue, description };
+}
+
+function numberParam(name: string, description: string, defaultValue: number): GoldenPathParam {
+  return { name, type: 'number', default: defaultValue, description };
+}
+
+function selectParam(
+  name: string,
+  description: string,
+  defaultValue: string,
+  options: string[]
+): GoldenPathParam {
+  return { name, type: 'select', default: defaultValue, description, options };
+}
+
+function fileStep(id: string, name: string, description: string): GoldenPathStep {
+  return { id, name, action: 'create-files', description };
+}
+
+function registerCatalogStep(description: string): GoldenPathStep {
   return {
     id: 'register',
     name: 'Register in Catalog',
     action: 'register-catalog',
     description,
   };
-}
-
-function defineOfficialGoldenPath(input: OfficialGoldenPathInput): OfficialGoldenPathSeed {
-  return { ...DEFAULT_GOLDEN_PATH_VALUES, ...input };
 }
 
 export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
@@ -82,51 +113,20 @@ export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
     stack: 'nextjs',
     tags: ['next.js', 'supabase', 'tailwind', 'ci-cd'],
     parameters: [
-      {
-        name: 'projectName',
-        type: 'string',
-        required: true,
-        description: 'Project name (kebab-case)',
-      },
-      {
-        name: 'description',
-        type: 'string',
-        required: false,
-        description: 'Short description',
-      },
-      {
-        name: 'includeAuth',
-        type: 'boolean',
-        default: true,
-        description: 'Include Supabase auth setup',
-      },
-      {
-        name: 'cssFramework',
-        type: 'select',
-        default: 'tailwind',
-        description: 'CSS framework',
-        options: ['tailwind', 'vanilla-extract', 'css-modules', 'none'],
-      },
-      {
-        name: 'port',
-        type: 'number',
-        default: 3000,
-        description: 'Dev server port',
-      },
+      textParam('projectName', 'Project name (kebab-case)', true),
+      textParam('description', 'Short description'),
+      boolParam('includeAuth', 'Include Supabase auth setup', true),
+      selectParam('cssFramework', 'CSS framework', 'tailwind', [
+        'tailwind',
+        'vanilla-extract',
+        'css-modules',
+        'none',
+      ]),
+      numberParam('port', 'Dev server port', 3000),
     ],
     steps: [
-      {
-        id: 'scaffold',
-        name: 'Scaffold project',
-        action: 'create-files',
-        description: 'Create Next.js project structure with App Router.',
-      },
-      {
-        id: 'configure',
-        name: 'Configure CI/CD',
-        action: 'create-files',
-        description: 'Add GitHub Actions workflows.',
-      },
+      fileStep('scaffold', 'Scaffold project', 'Create Next.js project structure with App Router.'),
+      fileStep('configure', 'Configure CI/CD', 'Add GitHub Actions workflows.'),
       registerCatalogStep('Create catalog entry for the new service.'),
     ],
     catalog_type: 'service',
@@ -143,44 +143,14 @@ export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
     stack: 'api-service',
     tags: ['mcp', 'sdk', 'npm'],
     parameters: [
-      {
-        name: 'serverName',
-        type: 'string',
-        required: true,
-        description: 'Server name (kebab-case)',
-      },
-      {
-        name: 'description',
-        type: 'string',
-        required: false,
-        description: 'Server description',
-      },
-      {
-        name: 'tools',
-        type: 'string',
-        required: false,
-        description: 'Comma-separated initial tool names',
-      },
+      textParam('serverName', 'Server name (kebab-case)', true),
+      textParam('description', 'Server description'),
+      textParam('tools', 'Comma-separated initial tool names'),
     ],
     steps: [
-      {
-        id: 'scaffold',
-        name: 'Scaffold MCP server',
-        action: 'create-files',
-        description: 'Create MCP server with SDK setup.',
-      },
-      {
-        id: 'tools',
-        name: 'Create tool stubs',
-        action: 'create-files',
-        description: 'Generate initial tool definitions.',
-      },
-      {
-        id: 'test',
-        name: 'Setup testing',
-        action: 'create-files',
-        description: 'Configure testing.',
-      },
+      fileStep('scaffold', 'Scaffold MCP server', 'Create MCP server with SDK setup.'),
+      fileStep('tools', 'Create tool stubs', 'Generate initial tool definitions.'),
+      fileStep('test', 'Setup testing', 'Configure testing.'),
       registerCatalogStep('Create catalog entry.'),
     ],
     catalog_type: 'service',
@@ -197,32 +167,12 @@ export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
     stack: 'library',
     tags: ['react', 'storybook', 'npm', 'components'],
     parameters: [
-      {
-        name: 'packageName',
-        type: 'string',
-        required: true,
-        description: 'Package name (@scope/name)',
-      },
-      {
-        name: 'description',
-        type: 'string',
-        required: false,
-        description: 'Library description',
-      },
+      textParam('packageName', 'Package name (@scope/name)', true),
+      textParam('description', 'Library description'),
     ],
     steps: [
-      {
-        id: 'scaffold',
-        name: 'Scaffold library',
-        action: 'create-files',
-        description: 'Create component library structure.',
-      },
-      {
-        id: 'storybook',
-        name: 'Setup Storybook',
-        action: 'create-files',
-        description: 'Configure Storybook.',
-      },
+      fileStep('scaffold', 'Scaffold library', 'Create component library structure.'),
+      fileStep('storybook', 'Setup Storybook', 'Configure Storybook.'),
       registerCatalogStep('Create catalog entry.'),
     ],
     catalog_type: 'library',
@@ -239,51 +189,15 @@ export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
     stack: 'api-service',
     tags: ['python', 'fastapi', 'docker', 'api'],
     parameters: [
-      {
-        name: 'serviceName',
-        type: 'string',
-        required: true,
-        description: 'Service name (kebab-case)',
-      },
-      {
-        name: 'description',
-        type: 'string',
-        required: false,
-        description: 'API description',
-      },
-      {
-        name: 'includeDocker',
-        type: 'boolean',
-        default: true,
-        description: 'Include Dockerfile and docker-compose',
-      },
-      {
-        name: 'pythonVersion',
-        type: 'select',
-        default: '3.12',
-        description: 'Python version',
-        options: ['3.11', '3.12', '3.13'],
-      },
-      {
-        name: 'port',
-        type: 'number',
-        default: 8000,
-        description: 'API server port',
-      },
+      textParam('serviceName', 'Service name (kebab-case)', true),
+      textParam('description', 'API description'),
+      boolParam('includeDocker', 'Include Dockerfile and docker-compose', true),
+      selectParam('pythonVersion', 'Python version', '3.12', ['3.11', '3.12', '3.13']),
+      numberParam('port', 'API server port', 8000),
     ],
     steps: [
-      {
-        id: 'scaffold',
-        name: 'Scaffold API',
-        action: 'create-files',
-        description: 'Create FastAPI project with routers.',
-      },
-      {
-        id: 'docker',
-        name: 'Setup Docker',
-        action: 'create-files',
-        description: 'Add Dockerfile and compose config.',
-      },
+      fileStep('scaffold', 'Scaffold API', 'Create FastAPI project with routers.'),
+      fileStep('docker', 'Setup Docker', 'Add Dockerfile and compose config.'),
       registerCatalogStep('Create catalog entry.'),
     ],
     includes_monitoring: false,
@@ -302,32 +216,12 @@ export const OFFICIAL_GOLDEN_PATHS: OfficialGoldenPathSeed[] = [
     stack: 'worker',
     tags: ['cloudflare', 'workers', 'edge', 'serverless'],
     parameters: [
-      {
-        name: 'workerName',
-        type: 'string',
-        required: true,
-        description: 'Worker name (kebab-case)',
-      },
-      {
-        name: 'includeKV',
-        type: 'boolean',
-        default: false,
-        description: 'Include KV namespace binding',
-      },
+      textParam('workerName', 'Worker name (kebab-case)', true),
+      boolParam('includeKV', 'Include KV namespace binding', false),
     ],
     steps: [
-      {
-        id: 'scaffold',
-        name: 'Scaffold worker',
-        action: 'create-files',
-        description: 'Create Cloudflare Worker project.',
-      },
-      {
-        id: 'deploy',
-        name: 'Configure deployment',
-        action: 'create-files',
-        description: 'Setup wrangler.toml and deploy scripts.',
-      },
+      fileStep('scaffold', 'Scaffold worker', 'Create Cloudflare Worker project.'),
+      fileStep('deploy', 'Configure deployment', 'Setup wrangler.toml and deploy scripts.'),
       registerCatalogStep('Create catalog entry.'),
     ],
     includes_monitoring: false,
