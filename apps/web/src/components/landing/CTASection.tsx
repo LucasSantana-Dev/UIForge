@@ -43,7 +43,22 @@ export function CTASection() {
             </a>
           </div>
 
-          <p className="text-sm text-[#A1A1AA] text-center mt-6">
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-5 text-sm text-[#A1A1AA]">
+            <Link href="/pricing" className="hover:text-[#FAFAFA] transition-colors">
+              Pricing
+            </Link>
+            <Link href="/about" className="hover:text-[#FAFAFA] transition-colors">
+              About
+            </Link>
+            <Link href="/roadmap" className="hover:text-[#FAFAFA] transition-colors">
+              Roadmap
+            </Link>
+            <Link href="/docs" className="hover:text-[#FAFAFA] transition-colors">
+              Docs
+            </Link>
+          </div>
+
+          <p className="text-sm text-[#71717A] text-center mt-6">
             Open source. MIT License. No credit card required.
           </p>
         </div>

@@ -3,10 +3,11 @@ import { CONTAINER } from './constants';
 
 export function LandingNav() {
   const navLinks = [
-    { label: 'Platform', href: '#capabilities' },
-    { label: 'Ecosystem', href: '#ecosystem' },
+    { label: 'About', href: '/about' },
+    { label: 'Roadmap', href: '/roadmap' },
+    { label: 'Pricing', href: '/pricing' },
     { label: 'Docs', href: '/docs' },
-    { label: 'Dashboard', href: '#preview' },
+    { label: 'Gallery', href: '/gallery' },
   ];
 
   return (
