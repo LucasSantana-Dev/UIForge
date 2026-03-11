@@ -233,6 +233,9 @@ Required environment variables:
 - GitHub Actions and reusable workflow references in `.github/workflows/` are pinned to full commit SHAs.
 - Placeholder DNS/IP examples in UI/test fixtures avoid real private-network literals.
 - Regex-based content extraction paths use bounded or parser-based logic to reduce ReDoS risk.
+- Desktop dependency chain is audited explicitly in CI (`npm audit --workspace=apps/desktop --audit-level=high`).
+- CI also prints desktop `tar` resolution (`npm ls tar --workspace=apps/desktop`) to make transitive remediation visible in logs.
+- High severity dependency advisories are fixed in the active cycle; medium/low advisories are tracked in follow-up issues when non-breaking fixes are not available.
 Project operation notes for AI agents and contributors are in
 [AGENTS.md](AGENTS.md).
 

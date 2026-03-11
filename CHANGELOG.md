@@ -54,6 +54,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Marketing data model refresh** — Home (`StatsBar`, `EcosystemSection`), About, and Roadmap now consume a live ecosystem snapshot instead of stale hardcoded repo/capability claims
 - **Marketing UI polish** — Improved label/card rhythm, metadata chips, focus-visible states, and contrast consistency across ecosystem and stats surfaces
 - **Docs refresh** — Updated README ecosystem narrative to 11 product repositories and documented `FORGE_SPACE_GITHUB_TOKEN` with `GITHUB_TOKEN` fallback
+- **Desktop dependency security baseline** — Upgraded `apps/desktop` build chain to
+  `electron-builder@^26.8.1` and refreshed lockfile resolution so `tar` resolves to
+  `7.5.11` across desktop and generator transitive paths.
+- **Desktop CI security gate** — Added a dedicated CI job that prints desktop `tar`
+  resolution and fails on `npm audit --workspace=apps/desktop --audit-level=high`.
 - **Core follow-up tracking** — Opened issue to remove `@forgespace/core` import-time
   CLI side effects: [Forge-Space/core#124](https://github.com/Forge-Space/core/issues/124)
 - **Golden Paths API contract** — `GET /api/golden-paths` now returns `data + pagination` shape aligned with frontend hooks

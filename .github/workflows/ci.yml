@@ -59,6 +59,16 @@ jobs:
         run: npm outdated
         continue-on-error: true
 
+  desktop-security-guard:
+    name: Desktop Security Guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Forge-Space/.github/.github/actions/setup-node@6fbe56bc610ddf84b70f213c752b95196bcadd95
+      - name: Verify tar resolution in desktop dependency graph
+        run: npm ls tar --workspace=apps/desktop
+      - name: Enforce desktop high severity dependency audit gate
+        run: npm audit --workspace=apps/desktop --audit-level=high
+
   shell-lint:
     name: Shell Lint
     runs-on: ubuntu-latest
