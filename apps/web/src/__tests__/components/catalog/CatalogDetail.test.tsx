@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import CatalogDetail from '@/components/catalog/CatalogDetail';
 
 jest.mock('marked', () => ({
-  marked: { parse: (content) => '<div>' + content + '</div>' },
+  marked: { parse: (content: string) => '<div>' + content + '</div>' },
 }));
 
 jest.mock('@/hooks/use-relationships', () => ({

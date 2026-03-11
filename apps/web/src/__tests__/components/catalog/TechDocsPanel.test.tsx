@@ -3,7 +3,7 @@ import TechDocsPanel from '@/components/catalog/TechDocsPanel';
 
 jest.mock('marked', () => ({
   marked: {
-    parse: (content) => '<div>' + content + '</div>',
+    parse: (content: string) => '<div>' + content + '</div>',
     Renderer: jest.fn().mockImplementation(() => ({ heading: jest.fn() })),
   },
 }));
