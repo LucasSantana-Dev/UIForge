@@ -8,7 +8,7 @@ type TestFixtures = {
 };
 
 export const test = base.extend<TestFixtures>({
-  testUser: async (_context, applyFixture) => {
+  testUser: async ({ page: _page }, applyFixture) => {
     const uniqueId = crypto.randomUUID();
     const testPassword = crypto.randomBytes(16).toString('hex');
     const testUser = {

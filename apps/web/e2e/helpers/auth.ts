@@ -29,7 +29,7 @@ export async function setupAuthenticatedUser(page: Page): Promise<{
   let signInError: string | null = null;
   let signedIn = false;
 
-  for (let attempt = 0; attempt < 2 && !signedIn; attempt++) {
+  for (let attempt = 0; attempt < 2; attempt++) {
     await page.goto('/signin');
     await page.waitForLoadState('networkidle');
     await page.getByLabel(/email/i).fill(testEmail);
