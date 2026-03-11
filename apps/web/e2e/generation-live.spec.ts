@@ -1,4 +1,5 @@
 import { test, expect } from './fixtures';
+import { createReactProject, fillGenerationForm } from './helpers/generation';
 
 const liveProviderEnabled = process.env.E2E_LIVE_PROVIDER === 'true';
 const liveGeminiKey = process.env.GEMINI_API_KEY;
@@ -158,17 +159,7 @@ test.describe('Component Generation (live provider smoke)', () => {
   let projectId: string;
 
   test.beforeEach(async ({ authenticatedPage: page }) => {
-    await page.goto('/projects/new');
-    await page.getByLabel(/project name/i).fill('Generation Live Smoke Project');
-    await page.getByLabel(/framework/i).selectOption('react');
-    await page.getByRole('button', { name: /create project/i }).click();
-
-    await page.waitForURL(/\/projects\/[a-f0-9-]+/);
-    const match = page.url().match(/\/projects\/([a-f0-9-]+)/);
-    if (!match) {
-      throw new Error(`Could not parse project id from URL: ${page.url()}`);
-    }
-    projectId = match[1];
+    projectId = await createReactProject(page, 'Generation Live Smoke Project');
   });
 
   test('generates code and renders live preview', async ({ authenticatedPage: page }) => {
@@ -183,14 +174,11 @@ test.describe('Component Generation (live provider smoke)', () => {
     await ensureByokConfigured(page, providerConfig);
 
     await page.goto(`/generate?projectId=${projectId}&framework=react`);
-
-    await page.getByLabel(/component name/i).fill('LiveSmokeButton');
-    await page
-      .getByLabel(/describe your component/i)
-      .first()
-      .fill(
-        'Create a modern button with hover states and loading state for live smoke validation.'
-      );
+    await fillGenerationForm(
+      page,
+      'LiveSmokeButton',
+      'Create a modern button with hover states and loading state for live smoke validation.'
+    );
 
     const byokToggle = page.getByRole('button', { name: /advanced: use your own key/i });
     if (!(await byokToggle.isVisible())) {
