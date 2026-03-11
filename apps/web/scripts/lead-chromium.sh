@@ -47,7 +47,7 @@ release_next_dev_lock() {
 
   local lock_holders
   lock_holders="$(lsof -t "${lock_file}" 2>/dev/null | tr '\n' ' ' || true)"
-  if [ -n "${lock_holders// }" ]; then
+  if [ -n "${lock_holders// /}" ]; then
     echo "[WARN] Releasing Next dev lock from PID(s): ${lock_holders}"
     kill ${lock_holders} 2>/dev/null || true
     sleep 1
@@ -78,10 +78,11 @@ sync_supabase_status_env() {
   if [ -n "${service_role_key}" ]; then
     export SUPABASE_SERVICE_ROLE_KEY="${service_role_key}"
   fi
-  generated_service_role_key="$(cd "${WEB_DIR}" && \
-    NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-}" \
-    SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-placeholder}" \
-    NODE_NO_WARNINGS=1 node --input-type=module <<'NODE'
+  generated_service_role_key="$(
+    cd "${WEB_DIR}" &&
+      NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-}" \
+        SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-placeholder}" \
+        NODE_NO_WARNINGS=1 node --input-type=module <<'NODE'
 import { createAdminClient } from './e2e/helpers/admin-client.ts';
 process.stdout.write(createAdminClient().supabaseKey ?? '');
 NODE
@@ -121,7 +122,7 @@ DEFAULT_SPECS=(
 
 if [ -n "${LEAD_E2E_SPECS:-}" ]; then
   # Space-delimited spec list override for targeted lead-critical reruns.
-  read -r -a SELECTED_SPECS <<< "${LEAD_E2E_SPECS}"
+  read -r -a SELECTED_SPECS <<<"${LEAD_E2E_SPECS}"
 else
   SELECTED_SPECS=("${DEFAULT_SPECS[@]}")
 fi

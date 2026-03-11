@@ -52,10 +52,11 @@ sync_supabase_status_env() {
   if [ -n "${service_role_key}" ]; then
     export SUPABASE_SERVICE_ROLE_KEY="${service_role_key}"
   fi
-  generated_service_role_key="$(cd "${WEB_DIR}" && \
-    NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-}" \
-    SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-placeholder}" \
-    NODE_NO_WARNINGS=1 node --input-type=module <<'NODE'
+  generated_service_role_key="$(
+    cd "${WEB_DIR}" &&
+      NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-}" \
+        SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-placeholder}" \
+        NODE_NO_WARNINGS=1 node --input-type=module <<'NODE'
 import { createAdminClient } from './e2e/helpers/admin-client.ts';
 process.stdout.write(createAdminClient().supabaseKey ?? '');
 NODE
@@ -70,13 +71,13 @@ NODE
 
 ensure_local_supabase_url() {
   case "${NEXT_PUBLIC_SUPABASE_URL:-}" in
-    http://127.0.0.1:* | http://localhost:* | https://127.0.0.1:* | https://localhost:*)
-      return 0
-      ;;
-    *)
-      echo "[ERROR] NEXT_PUBLIC_SUPABASE_URL must target local Supabase for lead validation."
-      exit 1
-      ;;
+  http://127.0.0.1:* | http://localhost:* | https://127.0.0.1:* | https://localhost:*)
+    return 0
+    ;;
+  *)
+    echo "[ERROR] NEXT_PUBLIC_SUPABASE_URL must target local Supabase for lead validation."
+    exit 1
+    ;;
   esac
 }
 
@@ -95,12 +96,12 @@ check_required_env() {
 
 resolve_default_provider() {
   case "${DEFAULT_GENERATION_PROVIDER:-google}" in
-    google | openai | anthropic)
-      echo "${DEFAULT_GENERATION_PROVIDER:-google}"
-      ;;
-    *)
-      echo "google"
-      ;;
+  google | openai | anthropic)
+    echo "${DEFAULT_GENERATION_PROVIDER:-google}"
+    ;;
+  *)
+    echo "google"
+    ;;
   esac
 }
 
@@ -184,27 +185,27 @@ validate_server_provider_backend() {
   provider="$(resolve_default_provider)"
 
   case "${provider}" in
-    google)
-      if [ -z "${GEMINI_API_KEY:-}" ]; then
-        echo "[WARN] DEFAULT_GENERATION_PROVIDER=google requires GEMINI_API_KEY."
-        return 1
-      fi
-      validate_google_key
-      ;;
-    openai)
-      if [ -z "${OPENAI_API_KEY:-}" ]; then
-        echo "[WARN] DEFAULT_GENERATION_PROVIDER=openai requires OPENAI_API_KEY."
-        return 1
-      fi
-      validate_openai_key
-      ;;
-    anthropic)
-      if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
-        echo "[WARN] DEFAULT_GENERATION_PROVIDER=anthropic requires ANTHROPIC_API_KEY."
-        return 1
-      fi
-      validate_anthropic_key
-      ;;
+  google)
+    if [ -z "${GEMINI_API_KEY:-}" ]; then
+      echo "[WARN] DEFAULT_GENERATION_PROVIDER=google requires GEMINI_API_KEY."
+      return 1
+    fi
+    validate_google_key
+    ;;
+  openai)
+    if [ -z "${OPENAI_API_KEY:-}" ]; then
+      echo "[WARN] DEFAULT_GENERATION_PROVIDER=openai requires OPENAI_API_KEY."
+      return 1
+    fi
+    validate_openai_key
+    ;;
+  anthropic)
+    if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+      echo "[WARN] DEFAULT_GENERATION_PROVIDER=anthropic requires ANTHROPIC_API_KEY."
+      return 1
+    fi
+    validate_anthropic_key
+    ;;
   esac
 }
 
