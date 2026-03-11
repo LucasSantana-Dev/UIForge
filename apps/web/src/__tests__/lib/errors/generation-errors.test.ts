@@ -1,60 +1,33 @@
 import { categorizeGenerationError } from '@/lib/errors/generation-errors';
 
 describe('categorizeGenerationError', () => {
-  it('categorizes rate limit errors', () => {
+  const categoryCases: Array<{ message: string; category: string }> = [
+    { message: 'AI provider capacity reached. Retry later.', category: 'provider-capacity' },
+    {
+      message: 'Google generation failed: You exceeded your current quota',
+      category: 'provider-capacity',
+    },
+    { message: 'Rate limit exceeded. Try again shortly.', category: 'rate-limit' },
+    { message: 'Generation quota exceeded', category: 'quota' },
+    { message: 'Monthly limit reached for this plan', category: 'quota' },
+    { message: 'Authentication required. Please sign in.', category: 'auth' },
+    { message: 'Unauthorized access', category: 'auth' },
+    { message: 'Invalid request: description is required', category: 'validation' },
+    { message: 'API key is invalid or expired', category: 'provider' },
+    { message: 'Service unavailable (503)', category: 'provider' },
+    { message: 'Network error: Failed to fetch', category: 'network' },
+    { message: 'ECONNREFUSED', category: 'network' },
+    { message: 'Request timeout after 30s', category: 'network' },
+  ];
+
+  it.each(categoryCases)('categorizes "$message" as $category', ({ message, category }) => {
+    const result = categorizeGenerationError(message);
+    expect(result.category).toBe(category);
+  });
+
+  it('includes guidance for rate limit responses', () => {
     const result = categorizeGenerationError('Rate limit exceeded. Try again shortly.');
-    expect(result.category).toBe('rate-limit');
     expect(result.suggestion).toBeTruthy();
-  });
-
-  it('categorizes quota errors', () => {
-    const result = categorizeGenerationError('Generation quota exceeded');
-    expect(result.category).toBe('quota');
-  });
-
-  it('categorizes limit reached errors', () => {
-    const result = categorizeGenerationError('Monthly limit reached for this plan');
-    expect(result.category).toBe('quota');
-  });
-
-  it('categorizes authentication errors', () => {
-    const result = categorizeGenerationError('Authentication required. Please sign in.');
-    expect(result.category).toBe('auth');
-  });
-
-  it('categorizes unauthorized errors', () => {
-    const result = categorizeGenerationError('Unauthorized access');
-    expect(result.category).toBe('auth');
-  });
-
-  it('categorizes validation errors', () => {
-    const result = categorizeGenerationError('Invalid request: description is required');
-    expect(result.category).toBe('validation');
-  });
-
-  it('categorizes provider errors', () => {
-    const result = categorizeGenerationError('API key is invalid or expired');
-    expect(result.category).toBe('provider');
-  });
-
-  it('categorizes service unavailable', () => {
-    const result = categorizeGenerationError('Service unavailable (503)');
-    expect(result.category).toBe('provider');
-  });
-
-  it('categorizes network errors', () => {
-    const result = categorizeGenerationError('Network error: Failed to fetch');
-    expect(result.category).toBe('network');
-  });
-
-  it('categorizes connection refused', () => {
-    const result = categorizeGenerationError('ECONNREFUSED');
-    expect(result.category).toBe('network');
-  });
-
-  it('categorizes timeout errors', () => {
-    const result = categorizeGenerationError('Request timeout after 30s');
-    expect(result.category).toBe('network');
   });
 
   it('returns unknown for unrecognized errors', () => {

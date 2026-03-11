@@ -139,9 +139,25 @@ const QUOTA_ERROR_PATTERNS = [
   /too\s*many\s*requests/i,
 ];
 
+const CAPACITY_MESSAGE =
+  'AI provider capacity reached. Siza free-tier capacity is unavailable right now. ' +
+  'Add a BYOK key in AI Keys or retry in a few minutes.';
+
 function isQuotaError(message?: string): boolean {
   if (!message) return false;
   return QUOTA_ERROR_PATTERNS.some((p) => p.test(message));
+}
+
+function canFallbackToAnthropic(opts: RouteGenerationOptions): boolean {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return false;
+  }
+
+  if (opts.provider !== 'anthropic') {
+    return true;
+  }
+
+  return !!opts.userApiKey;
 }
 
 async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
@@ -170,9 +186,12 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
 
   if (!quotaError) return;
 
-  const serverKeyAvailable = opts.provider !== 'anthropic' && !!process.env.ANTHROPIC_API_KEY;
-  if (!serverKeyAvailable) {
-    yield quotaError;
+  if (!canFallbackToAnthropic(opts)) {
+    yield {
+      type: 'error',
+      message: CAPACITY_MESSAGE,
+      timestamp: Date.now(),
+    };
     return;
   }
 
@@ -184,7 +203,10 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
   yield {
     type: 'fallback',
     provider: 'anthropic',
-    message: `${opts.provider} quota exceeded, falling back to Anthropic`,
+    message:
+      opts.provider === 'anthropic'
+        ? 'Anthropic BYOK quota exceeded, retrying with server backup capacity'
+        : `${opts.provider} quota exceeded, falling back to Anthropic`,
     timestamp: Date.now(),
   };
 
@@ -196,7 +218,7 @@ async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<G
     componentLibrary: opts.componentLibrary,
     style: opts.style,
     typescript: opts.typescript,
-    apiKey: opts.userApiKey,
+    apiKey: undefined,
     contextAddition: opts.contextAddition,
     imageBase64: opts.imageBase64,
     imageMimeType: opts.imageMimeType,

@@ -22,9 +22,7 @@ test.describe('Marketing Pages', () => {
 
     test('should display phase cards', async ({ page }) => {
       await page.goto('/roadmap');
-      const phases = page.locator('[data-testid="phase-card"], .phase-card, article');
-      const count = await phases.count();
-      expect(count).toBeGreaterThanOrEqual(1);
+      await expect(page.getByRole('heading', { name: /phase\s+\d+/i }).first()).toBeVisible();
     });
   });
 

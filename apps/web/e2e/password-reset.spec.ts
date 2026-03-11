@@ -32,6 +32,8 @@ test.describe('Password Reset Flow', () => {
 
   test('should render reset password page', async ({ page }) => {
     await page.goto('/reset-password');
-    await expect(page.locator('text=Reset password').first()).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /set new password|invalid or expired link/i }).first()
+    ).toBeVisible();
   });
 });

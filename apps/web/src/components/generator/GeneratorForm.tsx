@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { SparklesIcon, WandIcon, ChevronDownIcon, SettingsIcon, CpuIcon } from 'lucide-react';
 import { useGeneration } from '@/hooks/use-generation';
-import { useApiKeyForProvider, useAIKeyStore, useAIKeys } from '@/stores/ai-keys';
+import { useAIKeyStore, useAIKeys } from '@/stores/ai-keys';
 import { decryptApiKey, type AIProvider } from '@/lib/encryption';
 import { PROVIDER_MODELS } from '@/lib/services/generation';
 import { isFeatureEnabled } from '@/lib/features/flags';
@@ -97,6 +97,7 @@ export default function GeneratorForm({
 }: GeneratorFormProps) {
   const generation = useGeneration(projectId);
   const encryptionKey = useAIKeyStore((s) => s.encryptionKey);
+  const loadApiKeys = useAIKeyStore((s) => s.loadApiKeys);
   const apiKeys = useAIKeys();
   const { usage } = useSubscription();
   const isQuotaExceeded =
@@ -116,7 +117,9 @@ export default function GeneratorForm({
   const [skillParams, setSkillParams] = useState<Record<string, Record<string, unknown>>>({});
 
   const realProvider: AIProvider = selectedProvider === 'siza' ? 'google' : selectedProvider;
-  const providerKey = useApiKeyForProvider(realProvider);
+  const providerKey =
+    apiKeys.find((key) => key.provider === realProvider && key.isDefault) ??
+    apiKeys.find((key) => key.provider === realProvider);
 
   const handleBYOKProviderChange = (provider: AIProvider) => {
     setSelectedProvider(provider);
@@ -177,6 +180,11 @@ export default function GeneratorForm({
   useEffect(() => {
     if (initialDescription) setValue('prompt', initialDescription);
   }, [initialDescription, setValue]);
+
+  useEffect(() => {
+    if (!encryptionKey) return;
+    void loadApiKeys();
+  }, [encryptionKey, loadApiKeys]);
 
   const needsApiKey = selectedProvider !== 'google' && selectedProvider !== 'siza' && !providerKey;
 
