@@ -128,7 +128,9 @@ export function CTASection() {
             </Link>
           </div>
 
-          <p className="text-sm text-[#71717A] text-center mt-6">No credit card required.</p>
+          <p className="text-sm text-[#71717A] text-center mt-6">
+            Open source. MIT License. No credit card required.
+          </p>
         </div>
       </div>
     </section>
