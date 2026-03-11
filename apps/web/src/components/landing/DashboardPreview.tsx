@@ -3,7 +3,7 @@ import { CONTAINER, SECTION_PADDING } from './constants';
 
 export function DashboardPreview() {
   return (
-    <section className={`${SECTION_PADDING} border-t border-[#27272A]`}>
+    <section id="preview" className={`${SECTION_PADDING} border-t border-[#27272A]`}>
       <div className={CONTAINER}>
         <div className="text-center">
           <div className="text-sm font-mono text-violet-400 tracking-wider uppercase mb-4">

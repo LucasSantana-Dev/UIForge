@@ -61,6 +61,9 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
   with server-rendered sections and CSS transitions
 - Lighthouse accessibility pass: raised subtle text contrast token and aligned
   footer/code-surface secondary text to contrast-safe values
+- Landing nav runtime pass: replaced client-side Sheet/scroll nav logic with
+  server-rendered disclosure navigation + in-page anchors, and disabled homepage
+  internal-link prefetch to avoid eager loading non-critical route bundles
 
 ## Quick Start
 

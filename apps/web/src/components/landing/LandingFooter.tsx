@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import Image from 'next/image';
 import { Github, Linkedin } from 'lucide-react';
 
@@ -14,7 +13,7 @@ export function LandingFooter() {
             </div>
             <p className="mt-2 text-sm text-subtle">The open full-stack AI workspace.</p>
             <div className="flex items-center gap-4 mt-4">
-              <Link
+              <a
                 href="https://github.com/Forge-Space"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -22,8 +21,8 @@ export function LandingFooter() {
                 className="text-subtle hover:text-foreground transition-colors"
               >
                 <Github className="w-4 h-4" />
-              </Link>
-              <Link
+              </a>
+              <a
                 href="https://www.linkedin.com/in/devlucassantana/"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -31,124 +30,124 @@ export function LandingFooter() {
                 className="text-subtle hover:text-foreground transition-colors"
               >
                 <Linkedin className="w-4 h-4" />
-              </Link>
+              </a>
             </div>
           </div>
 
           <div>
             <h3 className="mb-4 text-sm font-medium text-foreground">Product</h3>
-            <Link
+            <a
               href="/"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Platform
-            </Link>
-            <Link
+            </a>
+            <a
               href="/pricing"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Pricing
-            </Link>
-            <Link
+            </a>
+            <a
               href="/templates"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Templates
-            </Link>
-            <Link
+            </a>
+            <a
               href="/roadmap"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Roadmap
-            </Link>
+            </a>
           </div>
 
           <div>
             <h3 className="mb-4 text-sm font-medium text-foreground">Resources</h3>
-            <Link
+            <a
               href="/docs"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Documentation
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://github.com/Forge-Space"
               target="_blank"
               rel="noopener noreferrer"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               GitHub
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://github.com/Forge-Space/ui-mcp"
               target="_blank"
               rel="noopener noreferrer"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               MCP Tools
-            </Link>
-            <Link
+            </a>
+            <a
               href="/docs"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               API Reference
-            </Link>
+            </a>
           </div>
 
           <div>
             <h3 className="mb-4 text-sm font-medium text-foreground">Company</h3>
-            <Link
+            <a
               href="/about"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               About
-            </Link>
-            <Link
+            </a>
+            <a
               href="/roadmap"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Roadmap
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://github.com/orgs/Forge-Space/discussions"
               target="_blank"
               rel="noopener noreferrer"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Community
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://github.com/Forge-Space/siza/releases"
               target="_blank"
               rel="noopener noreferrer"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Changelog
-            </Link>
+            </a>
           </div>
 
           <div>
             <h3 className="mb-4 text-sm font-medium text-foreground">Legal</h3>
-            <Link
+            <a
               href="/legal/privacy"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Privacy
-            </Link>
-            <Link
+            </a>
+            <a
               href="/legal/terms"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               Terms
-            </Link>
-            <Link
+            </a>
+            <a
               href="https://github.com/Forge-Space/siza/blob/main/LICENSE"
               target="_blank"
               rel="noopener noreferrer"
               className="block py-1 text-sm text-subtle hover:text-foreground transition-colors"
             >
               License
-            </Link>
+            </a>
           </div>
         </div>
 

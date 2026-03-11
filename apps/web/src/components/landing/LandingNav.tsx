@@ -1,104 +1,76 @@
-'use client';
-
-import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
-import { Menu } from 'lucide-react';
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { CONTAINER } from './constants';
 
 export function LandingNav() {
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    let rafId = 0;
-    const handleScroll = () => {
-      if (!rafId) {
-        rafId = requestAnimationFrame(() => {
-          setIsScrolled(window.scrollY > 0);
-          rafId = 0;
-        });
-      }
-    };
-    window.addEventListener('scroll', handleScroll, {
-      passive: true,
-    });
-    handleScroll();
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      cancelAnimationFrame(rafId);
-    };
-  }, []);
-
   const navLinks = [
-    { label: 'Platform', href: '/generate' },
+    { label: 'Platform', href: '#capabilities' },
     { label: 'Ecosystem', href: '#ecosystem' },
     { label: 'Docs', href: '/docs' },
-    { label: 'Dashboard', href: '/generate' },
+    { label: 'Dashboard', href: '#preview' },
   ];
 
   return (
-    <nav
-      className={`sticky top-0 z-50 h-16 border-b transition-all duration-300 ${
-        isScrolled
-          ? 'backdrop-blur-xl bg-background/80 border-border shadow-[0_1px_3px_rgba(0,0,0,0.3)]'
-          : 'bg-transparent border-transparent'
-      }`}
-    >
+    <nav className="sticky top-0 z-50 h-16 border-b border-border bg-background/80 backdrop-blur-xl">
       <div className={`${CONTAINER} h-full flex items-center justify-between`}>
-        <Link href="/" className="flex items-center gap-2">
+        <a href="/" className="flex items-center gap-2">
           <Image src="/monogram.svg" alt="Siza" width={24} height={24} priority />
           <span className="font-display font-bold text-lg">siza</span>
-        </Link>
+        </a>
 
         <div className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
-            <Link
+            <a
               key={link.label}
               href={link.href}
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               {link.label}
-            </Link>
+            </a>
           ))}
         </div>
 
         <div className="flex items-center gap-3">
-          <Link
+          <a
             href="/signin"
             className="hidden sm:inline-block text-sm text-muted-foreground hover:text-foreground transition-colors px-4 py-2"
           >
             Sign in
-          </Link>
-          <Link
+          </a>
+          <a
             href="/signup"
             className="bg-violet-600 hover:bg-violet-500 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors shadow-[0_0_16px_rgba(139,92,246,0.25)]"
           >
             Get Started
-          </Link>
+          </a>
 
-          <Sheet>
-            <SheetTrigger
+          <details className="relative md:hidden">
+            <summary
               aria-label="Open menu"
-              className="md:hidden p-2 text-muted-foreground hover:text-foreground"
+              className="list-none p-2 text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden"
             >
-              <Menu size={20} />
-            </SheetTrigger>
-            <SheetContent className="bg-background border-border">
-              <SheetTitle className="font-display text-lg mb-6">Menu</SheetTitle>
-              <div className="flex flex-col gap-4">
+              <svg aria-hidden viewBox="0 0 20 20" fill="none" className="h-5 w-5">
+                <path
+                  d="M3 5h14M3 10h14M3 15h14"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </summary>
+            <div className="absolute right-0 top-full mt-2 w-56 rounded-lg border border-border bg-background p-3 shadow-card">
+              <div className="flex flex-col gap-1">
                 {navLinks.map((link) => (
-                  <Link
+                  <a
                     key={link.label}
                     href={link.href}
-                    className="text-muted-foreground hover:text-foreground transition-colors py-2"
+                    className="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-violet-500/8 hover:text-foreground"
                   >
                     {link.label}
-                  </Link>
+                  </a>
                 ))}
               </div>
-            </SheetContent>
-          </Sheet>
+            </div>
+          </details>
         </div>
       </div>
     </nav>

@@ -48,6 +48,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   dashboard/CTA/stats surfaces; non-interactive sections now render as server components
 - **Landing contrast tokens** — Updated subtle text token to higher-contrast value and
   applied contrast-safe text colors across marketing code snippets/footer metadata
+- **Landing navigation runtime trim** — Replaced client Sheet + scroll-state nav
+  behavior with server-rendered disclosure navigation and section-anchor links
+  to keep homepage interaction JS minimal
+- **Landing link prefetch policy** — Disabled automatic Next.js prefetch on
+  homepage internal marketing links to avoid eager downloading of non-critical
+  route bundles from `/`
 
 ### Fixed
 - **Generation fallback reliability** — Quota/rate-limit provider failures now return

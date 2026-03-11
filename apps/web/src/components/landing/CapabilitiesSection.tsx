@@ -60,7 +60,7 @@ const iconBgs: Record<string, string> = {
 
 export function CapabilitiesSection() {
   return (
-    <section className={SECTION_PADDING}>
+    <section id="capabilities" className={SECTION_PADDING}>
       <div className={CONTAINER}>
         <div className="text-center">
           <p className="text-sm font-mono text-violet-400 tracking-wider uppercase mb-4">

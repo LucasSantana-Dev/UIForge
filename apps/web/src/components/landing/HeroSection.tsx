@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { AmbientVideoBackground } from '@/components/migration/ambient-video-background';
 import { CONTAINER } from './constants';
@@ -92,23 +91,23 @@ export function HeroSection() {
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
           <div className="inline-flex transition-transform duration-200 hover:-translate-y-0.5">
-            <Link
+            <a
               href="/signup"
               className="group relative inline-flex items-center gap-2 bg-violet-600 text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-violet-500 shadow-[0_0_24px_rgba(139,92,246,0.3)] hover:shadow-[0_0_32px_rgba(139,92,246,0.45)] overflow-hidden"
             >
               <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
               <span className="relative">Start Generating Free</span>
               <ArrowRight className="relative w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-            </Link>
+            </a>
           </div>
           <div className="inline-flex transition-transform duration-200 hover:-translate-y-0.5">
-            <Link
+            <a
               href="/docs"
               className="inline-flex items-center gap-2 border border-border rounded-lg px-6 py-3 text-sm font-medium text-foreground hover:bg-violet-500/5 hover:border-violet-500/40 transition-all duration-200"
             >
               <BookOpen className="w-4 h-4" />
               Read the Docs
-            </Link>
+            </a>
           </div>
         </div>
 

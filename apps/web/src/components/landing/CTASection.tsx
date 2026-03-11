@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { ArrowRight, Github } from 'lucide-react';
 
 export function CTASection() {
@@ -26,13 +25,13 @@ export function CTASection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
+            <a
               href="/signup"
               className="bg-violet-600 hover:bg-violet-500 text-white rounded-lg px-8 py-3 text-sm font-medium inline-flex items-center justify-center gap-2 transition-colors shadow-[0_0_24px_rgba(139,92,246,0.25)] hover:shadow-[0_0_32px_rgba(139,92,246,0.35)]"
             >
               Get Started Free
               <ArrowRight className="w-4 h-4" />
-            </Link>
+            </a>
             <a
               href="https://github.com/Forge-Space"
               target="_blank"
