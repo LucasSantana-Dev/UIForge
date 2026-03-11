@@ -130,6 +130,15 @@ npm run admin:grant -- <email>
 
 This command runs `scripts/grant-admin-by-email.ts` and updates `public.profiles.role` to `admin`.
 
+For Codex Playwright MCP transport compatibility:
+
+```bash
+npm run mcp:playwright:wrapper -- --help
+```
+
+Use this command path when wiring the `playwright` MCP server in Codex:
+`node /absolute/path/to/siza/scripts/playwright-mcp-wrapper.mjs --headless`.
+
 ---
 
 **Note**: This change improves security while maintaining all deployment functionality. The new approach is safer and more auditable.

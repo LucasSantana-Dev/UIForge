@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Playwright MCP transport wrapper** — New `scripts/playwright-mcp-wrapper.mjs`
+  bridges Content-Length and newline JSON-RPC framing for Codex runtime
+  compatibility, with `npm run mcp:playwright:wrapper` helper script
 - **E2E test coverage expansion** — 4 new spec files (closes #399)
   - `catalog.spec.ts` — 10 tests: list, search, create entry, detail view, edit, graph, discover, tags
   - `teams.spec.ts` — 9 tests: list, create team, detail, slug preview, members, validation

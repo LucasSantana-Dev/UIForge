@@ -169,6 +169,23 @@ npm run sync:golden-paths # Sync official Golden Paths seeds
 npm run sync:skills     # Sync official skills from skills/*/SKILL.md
 ```
 
+### Playwright MCP Wrapper (Codex Runtime)
+
+If Codex Playwright MCP calls fail with `Transport closed`, use the local wrapper
+that bridges Content-Length and newline JSON-RPC transport styles.
+
+```bash
+codex mcp remove playwright
+codex mcp add playwright -- \
+  node /absolute/path/to/siza/scripts/playwright-mcp-wrapper.mjs --headless
+```
+
+Local smoke check:
+
+```bash
+npm run mcp:playwright:wrapper -- --help
+```
+
 ### Governance Asset Sync
 
 Siza keeps official governance assets (Golden Paths and Skills) syncable from repository sources.

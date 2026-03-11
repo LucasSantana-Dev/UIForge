@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "admin:grant": "node --experimental-strip-types scripts/grant-admin-by-email.ts",
+    "mcp:playwright:wrapper": "node scripts/playwright-mcp-wrapper.mjs",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint -- --fix",
