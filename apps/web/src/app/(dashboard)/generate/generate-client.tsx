@@ -280,9 +280,9 @@ export default function TemplateComponent() {
     }`;
 
   return (
-    <div className="h-full flex flex-col -m-4 sm:-m-6 lg:-m-8">
+    <div className="h-full flex flex-col rounded-xl border border-surface-3 bg-surface-0 overflow-hidden">
       {/* Workspace Header */}
-      <div className="flex items-center justify-between px-4 h-12 border-b border-surface-3 bg-surface-0 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 sm:px-5 h-12 border-b border-surface-3 bg-surface-0 flex-shrink-0">
         <div className="flex items-center gap-3">
           <button
             onClick={() => setConfigCollapsed(!configCollapsed)}
@@ -347,11 +347,11 @@ export default function TemplateComponent() {
       </div>
 
       {/* Workspace Body */}
-      <div className="flex-1 flex min-h-0">
+      <div className="flex-1 min-h-0 flex flex-col md:flex-row">
         {/* Left: Config Panel */}
         <div
-          className={`flex-shrink-0 border-r border-surface-3 bg-surface-0 overflow-y-auto transition-[width] duration-200 ease-siza ${
-            configCollapsed ? 'w-0 overflow-hidden' : 'w-full lg:w-[400px]'
+          className={`flex-shrink-0 border-b md:border-b-0 md:border-r border-surface-3 bg-surface-0 overflow-y-auto transition-[width] duration-200 ease-siza ${
+            configCollapsed ? 'w-0 overflow-hidden' : 'w-full md:w-[360px] lg:w-[400px]'
           }`}
         >
           <GeneratorForm
@@ -368,7 +368,7 @@ export default function TemplateComponent() {
         {/* Right: Output Panel */}
         <div className="flex-1 flex flex-col min-h-0 min-w-0">
           {/* Output Tab Bar */}
-          <div className="flex items-center justify-between border-b border-surface-3 bg-surface-0 flex-shrink-0 px-2">
+          <div className="flex items-center justify-between border-b border-surface-3 bg-surface-0 flex-shrink-0 px-3">
             <div className="flex items-center">
               <button onClick={() => setActiveTab('preview')} className={tabCls('preview')}>
                 <Eye className="w-3.5 h-3.5" />
@@ -444,7 +444,7 @@ export default function TemplateComponent() {
                   <Sparkles className="w-8 h-8 text-violet-400" />
                 </div>
                 <h3 className="text-lg font-semibold font-display text-text-primary mb-2">
-                  Ready to generate
+                  Ready to Generate
                 </h3>
                 <p className="text-sm text-text-secondary max-w-sm">
                   Describe your component in the config panel and hit Generate. Your code and
@@ -503,8 +503,8 @@ export default function TemplateComponent() {
 
 function GenerateLoadingSkeleton() {
   return (
-    <div className="h-full flex -m-4 sm:-m-6 lg:-m-8">
-      <div className="w-[400px] border-r border-surface-3 p-6 space-y-4">
+    <div className="h-full flex flex-col md:flex-row rounded-xl border border-surface-3 bg-surface-0 overflow-hidden">
+      <div className="md:w-[360px] lg:w-[400px] border-b md:border-b-0 md:border-r border-surface-3 p-6 space-y-4">
         <Skeleton className="h-5 w-32" />
         <Skeleton className="h-10 w-full" />
         <Skeleton className="h-24 w-full" />

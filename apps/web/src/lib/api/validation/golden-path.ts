@@ -9,6 +9,8 @@ export const goldenPathQuerySchema = z.object({
   type: z.enum(goldenPathTypes).optional(),
   lifecycle: z.enum(goldenPathLifecycles).optional(),
   framework: z.string().max(50).optional(),
+  stack: z.string().max(50).optional(),
+  language: z.string().max(50).optional(),
   tags: z.string().max(500).optional(),
   page: z.coerce.number().int().min(1).optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),

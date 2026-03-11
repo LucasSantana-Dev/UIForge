@@ -1,35 +1,21 @@
-'use client';
-
-import { useMemo, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'motion/react';
 import { ArrowRight, BookOpen } from 'lucide-react';
 import { AmbientVideoBackground } from '@/components/migration/ambient-video-background';
-import { EASE_SIZA, CONTAINER } from './constants';
+import { CONTAINER } from './constants';
+
+const PARTICLES = Array.from({ length: 14 }, (_, i) => ({
+  id: i,
+  top: `${((i * 17) % 100) + 0.5}%`,
+  left: `${((i * 23) % 100) + 0.5}%`,
+  size: i % 2 === 0 ? 2 : 3,
+  opacity: 0.16 + (i % 4) * 0.03,
+  duration: 16 + (i % 5) * 4,
+  delay: (i % 6) * 0.8,
+  driftX: (i % 2 === 0 ? 1 : -1) * 20,
+  driftY: (i % 3 === 0 ? 1 : -1) * 15,
+}));
 
 export function HeroSection() {
-  const prefersReducedMotion = useReducedMotion();
-  const [mounted, setMounted] = useState(false);
-  const particles = useMemo(() => {
-    const seed = (i: number) => {
-      const x = Math.sin(i * 12.9898 + 78.233) * 43758.5453;
-      return x - Math.floor(x);
-    };
-    return Array.from({ length: 14 }, (_, i) => ({
-      id: i,
-      top: `${seed(i * 7) * 100}%`,
-      left: `${seed(i * 13) * 100}%`,
-      size: seed(i * 19) > 0.5 ? 2 : 3,
-      opacity: 0.15 + seed(i * 23) * 0.15,
-      duration: 15 + seed(i * 29) * 15,
-      delay: seed(i * 31) * 10,
-    }));
-  }, []);
-
-  useEffect(() => {
-    queueMicrotask(() => setMounted(true));
-  }, []);
-
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
       <AmbientVideoBackground />
@@ -60,27 +46,24 @@ export function HeroSection() {
         }}
       />
 
-      {mounted &&
-        particles.map((p) => (
-          <div
-            key={p.id}
-            className="absolute rounded-full bg-violet-500"
-            style={
-              {
-                width: `${p.size}px`,
-                height: `${p.size}px`,
-                top: p.top,
-                left: p.left,
-                opacity: p.opacity,
-                animation: `particle-drift ${p.duration}s ease-in-out infinite`,
-                animationDelay: `${p.delay}s`,
-                '--drift-x': `${(p.id % 2 === 0 ? 1 : -1) * 20}px`,
-                '--drift-y': `${(p.id % 3 === 0 ? 1 : -1) * 15}px`,
-                '--particle-opacity': `${p.opacity}`,
-              } as React.CSSProperties
-            }
-          />
-        ))}
+      {PARTICLES.map((p) => (
+        <div
+          key={p.id}
+          className="absolute rounded-full bg-violet-500"
+          style={{
+            width: `${p.size}px`,
+            height: `${p.size}px`,
+            top: p.top,
+            left: p.left,
+            opacity: p.opacity,
+            animation: `particle-drift ${p.duration}s ease-in-out infinite`,
+            animationDelay: `${p.delay}s`,
+            ['--drift-x' as string]: `${p.driftX}px`,
+            ['--drift-y' as string]: `${p.driftY}px`,
+            ['--particle-opacity' as string]: `${p.opacity}`,
+          }}
+        />
+      ))}
 
       <div
         className="absolute w-[700px] h-[500px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
@@ -91,54 +74,24 @@ export function HeroSection() {
       />
 
       <div className={`${CONTAINER} relative z-10 text-center`}>
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: EASE_SIZA }}
-          className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-mono text-violet-300"
-        >
+        <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-mono text-violet-300">
           <div className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
           Now in Public Beta
-        </motion.div>
+        </div>
 
-        <motion.h1
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={
-            prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: EASE_SIZA, delay: 0.1 }
-          }
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mt-6"
-        >
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mt-6">
           Generate <span className="shimmer-text">production-grade</span>
           <br />
           UI code with AI
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={
-            prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: EASE_SIZA, delay: 0.2 }
-          }
-          className="text-lg text-muted-foreground max-w-2xl mx-auto mt-6"
-        >
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-6">
           Siza generates quality React, Next.js, and Vue components, not generic AI slop. Bring your
           own API key, choose your model, and ship faster.
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={
-            prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: EASE_SIZA, delay: 0.3 }
-          }
-          className="flex flex-col sm:flex-row gap-4 justify-center mt-10"
-        >
-          <motion.div
-            whileHover={prefersReducedMotion ? undefined : { y: -2 }}
-            whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
-            className="inline-flex"
-          >
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
+          <div className="inline-flex transition-transform duration-200 hover:-translate-y-0.5">
             <Link
               href="/signup"
               className="group relative inline-flex items-center gap-2 bg-violet-600 text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-violet-500 shadow-[0_0_24px_rgba(139,92,246,0.3)] hover:shadow-[0_0_32px_rgba(139,92,246,0.45)] overflow-hidden"
@@ -147,12 +100,8 @@ export function HeroSection() {
               <span className="relative">Start Generating Free</span>
               <ArrowRight className="relative w-4 h-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-          </motion.div>
-          <motion.div
-            whileHover={prefersReducedMotion ? undefined : { y: -2 }}
-            whileTap={prefersReducedMotion ? undefined : { scale: 0.98 }}
-            className="inline-flex"
-          >
+          </div>
+          <div className="inline-flex transition-transform duration-200 hover:-translate-y-0.5">
             <Link
               href="/docs"
               className="inline-flex items-center gap-2 border border-border rounded-lg px-6 py-3 text-sm font-medium text-foreground hover:bg-violet-500/5 hover:border-violet-500/40 transition-all duration-200"
@@ -160,18 +109,10 @@ export function HeroSection() {
               <BookOpen className="w-4 h-4" />
               Read the Docs
             </Link>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
 
-        <motion.div
-          initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={
-            prefersReducedMotion ? { duration: 0 } : { duration: 0.8, ease: EASE_SIZA, delay: 0.5 }
-          }
-          whileHover={prefersReducedMotion ? undefined : { y: -2 }}
-          className="max-w-4xl mx-auto rounded-xl border border-border bg-surface overflow-hidden mt-16 shadow-card hover:shadow-card-hover transition-all duration-300"
-        >
+        <div className="max-w-4xl mx-auto rounded-xl border border-border bg-surface overflow-hidden mt-16 shadow-card hover:shadow-card-hover transition-all duration-300">
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
             <div className="w-2.5 h-2.5 rounded-full bg-red-500 opacity-60" />
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 opacity-60" />
@@ -212,7 +153,7 @@ export function HeroSection() {
               />
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

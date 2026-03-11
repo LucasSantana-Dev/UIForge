@@ -1,10 +1,12 @@
-import nextDynamic from 'next/dynamic';
 import { LandingNav } from '@/components/landing/LandingNav';
 import { HeroSection } from '@/components/landing/HeroSection';
 import { StatsBar } from '@/components/landing/StatsBar';
 import { CodeShowcase } from '@/components/landing/CodeShowcase';
 import { DashboardPreview } from '@/components/landing/DashboardPreview';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { CapabilitiesSection } from '@/components/landing/CapabilitiesSection';
+import { EcosystemSection } from '@/components/landing/EcosystemSection';
+import { CTASection } from '@/components/landing/CTASection';
 import { getEcosystemSnapshot } from '@/lib/marketing/ecosystem-data';
 import {
   globalStructuredData,
@@ -12,19 +14,6 @@ import {
   getMarketingWebPageJsonLd,
   softwareApplicationJsonLd,
 } from '@/lib/marketing/seo';
-
-const CapabilitiesSection = nextDynamic(
-  () => import('@/components/landing/CapabilitiesSection').then((m) => m.CapabilitiesSection),
-  { ssr: true }
-);
-const EcosystemSection = nextDynamic(
-  () => import('@/components/landing/EcosystemSection').then((m) => m.EcosystemSection),
-  { ssr: true }
-);
-const CTASection = nextDynamic(
-  () => import('@/components/landing/CTASection').then((m) => m.CTASection),
-  { ssr: true }
-);
 
 export const metadata = getMarketingPageMetadata('home');
 

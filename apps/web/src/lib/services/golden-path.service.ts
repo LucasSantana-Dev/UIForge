@@ -25,6 +25,8 @@ export interface GoldenPathListQuery {
   type?: string;
   lifecycle?: string;
   framework?: string;
+  stack?: string;
+  language?: string;
   tags?: string;
   page?: number;
   limit?: number;
@@ -44,6 +46,8 @@ export async function listGoldenPathTemplates(query: GoldenPathListQuery = {}): 
     type: query.type,
     lifecycle: query.lifecycle,
     framework: query.framework,
+    stack: query.stack,
+    language: query.language,
     tags: query.tags ? query.tags.split(',').map((t) => t.trim()) : undefined,
     page: query.page || 1,
     limit: query.limit || 20,

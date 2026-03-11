@@ -59,9 +59,9 @@ test.describe('Billing Page (authenticated)', () => {
     await authenticatedPage.goto('/billing');
 
     await expect(authenticatedPage.getByRole('heading', { name: 'Billing' })).toBeVisible();
-    await expect(authenticatedPage.getByText('Current plan')).toBeVisible();
-    await expect(authenticatedPage.getByText('Usage this month')).toBeVisible();
-    await expect(authenticatedPage.getByText('Included features')).toBeVisible();
+    await expect(authenticatedPage.getByText('Current Plan')).toBeVisible();
+    await expect(authenticatedPage.getByText('Usage This Month')).toBeVisible();
+    await expect(authenticatedPage.getByText('Included Features')).toBeVisible();
   });
 
   test('should show free plan for new users', async ({ authenticatedPage }) => {

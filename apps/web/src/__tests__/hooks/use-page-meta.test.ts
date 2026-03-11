@@ -24,10 +24,10 @@ describe('usePageMeta', () => {
     expect(result.current.breadcrumbs[0].label).toBe('Home');
   });
 
-  it('returns Generator for /generate', () => {
+  it('returns Generate for /generate', () => {
     mockPathname.mockReturnValue('/generate');
     const { result } = renderHook(() => usePageMeta());
-    expect(result.current.title).toBe('Generator');
+    expect(result.current.title).toBe('Generate');
   });
 
   it('returns Settings for /settings', () => {

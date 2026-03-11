@@ -8,6 +8,10 @@ interface SubscriptionStatusProps {
 
 export function SubscriptionStatus({ plan, status, cancelAtPeriodEnd }: SubscriptionStatusProps) {
   const planLabel = plan.charAt(0).toUpperCase() + plan.slice(1);
+  const statusLabel = status
+    .split('_')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 
   const statusColor =
     status === 'active'
@@ -20,7 +24,7 @@ export function SubscriptionStatus({ plan, status, cancelAtPeriodEnd }: Subscrip
     <div className="flex items-center gap-2">
       <span className="text-sm font-medium">{planLabel}</span>
       <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusColor}`}>
-        {cancelAtPeriodEnd ? 'Canceling' : status}
+        {cancelAtPeriodEnd ? 'Canceling' : statusLabel}
       </span>
     </div>
   );

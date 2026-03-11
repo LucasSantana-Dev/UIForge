@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const result = await listGoldenPathTemplates(validated);
 
     const response = successResponse({
-      templates: result.data,
+      data: result.data,
       pagination: result.pagination,
     });
     setRateLimitHeaders(response, { allowed, remaining, resetAt }, 120);

@@ -128,6 +128,8 @@ describe('goldenPathQuerySchema', () => {
       type: 'service',
       lifecycle: 'ga',
       framework: 'next.js',
+      stack: 'nextjs',
+      language: 'typescript',
       page: '2',
       limit: '10',
     });

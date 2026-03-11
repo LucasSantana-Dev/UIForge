@@ -48,6 +48,8 @@ export interface GoldenPathListParams {
   type?: string;
   lifecycle?: string;
   framework?: string;
+  stack?: string;
+  language?: string;
   tags?: string[];
   page?: number;
   limit?: number;
@@ -78,7 +80,17 @@ export async function findGoldenPathByName(name: string): Promise<GoldenPathRow 
 export async function listGoldenPaths(
   params: GoldenPathListParams
 ): Promise<PaginatedResult<GoldenPathRow>> {
-  const { search, type, lifecycle, framework, tags, page = 1, limit = 20 } = params;
+  const {
+    search,
+    type,
+    lifecycle,
+    framework,
+    stack,
+    language,
+    tags,
+    page = 1,
+    limit = 20,
+  } = params;
   const { from, to } = paginationRange(page, limit);
   const supabase = await getClient();
 
@@ -90,6 +102,8 @@ export async function listGoldenPaths(
   if (type) query = query.eq('type', type);
   if (lifecycle) query = query.eq('lifecycle', lifecycle);
   if (framework) query = query.eq('framework', framework);
+  if (stack) query = query.eq('stack', stack);
+  if (language) query = query.eq('language', language);
   if (tags && tags.length > 0) query = query.overlaps('tags', tags);
 
   query = query.order('updated_at', { ascending: false }).range(from, to);

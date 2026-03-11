@@ -186,6 +186,12 @@ const STACK_META: Record<string, { icon: typeof ServerIcon; label: string }> = {
   monorepo: { icon: LayersIcon, label: 'Monorepo' },
 };
 
+function formatLanguage(language: string): string {
+  if (language.toLowerCase() === 'typescript') return 'TypeScript';
+  if (language.toLowerCase() === 'javascript') return 'JavaScript';
+  return language.charAt(0).toUpperCase() + language.slice(1);
+}
+
 function GoldenPathCard({ path }: { path: GoldenPathRow }) {
   const stackMeta = STACK_META[path.stack] || STACK_META.nextjs;
   const StackIcon = stackMeta.icon;
@@ -203,7 +209,7 @@ function GoldenPathCard({ path }: { path: GoldenPathRow }) {
           {path.display_name}
         </p>
         <p className="mt-0.5 truncate text-xs text-text-secondary">
-          {stackMeta.label} &middot; {path.language}
+          {stackMeta.label} &middot; {formatLanguage(path.language)}
         </p>
       </div>
       <div className="flex items-center gap-1.5">

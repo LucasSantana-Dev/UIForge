@@ -49,6 +49,12 @@ const LANGUAGE_COLORS: Record<string, string> = {
 const STACKS = ['nextjs', 'api-service', 'library', 'worker', 'monorepo'];
 const LANGUAGES = ['typescript', 'python', 'go'];
 
+function formatLanguage(language: string): string {
+  if (language.toLowerCase() === 'typescript') return 'TypeScript';
+  if (language.toLowerCase() === 'javascript') return 'JavaScript';
+  return language.charAt(0).toUpperCase() + language.slice(1);
+}
+
 interface IncludeBadgeProps {
   enabled: boolean;
   icon: typeof CheckCircleIcon;
@@ -199,7 +205,7 @@ export function GoldenPathsClient() {
             <option value="">All languages</option>
             {LANGUAGES.map((l) => (
               <option key={l} value={l}>
-                {l.charAt(0).toUpperCase() + l.slice(1)}
+                {formatLanguage(l)}
               </option>
             ))}
           </select>
@@ -260,7 +266,7 @@ export function GoldenPathsClient() {
                   <span
                     className={`inline-flex items-center rounded-md px-2 py-0.5 text-[10px] font-medium ${langColor}`}
                   >
-                    {path.language}
+                    {formatLanguage(path.language)}
                   </span>
                   <span className="inline-flex items-center rounded-md bg-surface-2 px-2 py-0.5 text-[10px] text-text-muted">
                     {stackMeta.label}

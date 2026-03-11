@@ -54,7 +54,7 @@ export function BillingClient() {
         <div className="rounded-lg border bg-card p-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold">Current plan</h2>
+              <h2 className="text-lg font-semibold">Current Plan</h2>
               <div className="mt-2">
                 <SubscriptionStatus
                   plan={plan}
@@ -93,7 +93,7 @@ export function BillingClient() {
         </div>
 
         <div className="rounded-lg border bg-card p-6">
-          <h2 className="text-lg font-semibold">Usage this month</h2>
+          <h2 className="text-lg font-semibold">Usage This Month</h2>
           <div className="mt-4 space-y-4">
             <UsageChart
               label="AI Generations"
@@ -109,7 +109,7 @@ export function BillingClient() {
         </div>
 
         <div className="rounded-lg border bg-card p-6">
-          <h2 className="text-lg font-semibold">Included features</h2>
+          <h2 className="text-lg font-semibold">Included Features</h2>
           <ul className="mt-3 space-y-1.5">
             {currentPlan.features.map((feature) => (
               <li key={feature} className="text-sm text-muted-foreground">

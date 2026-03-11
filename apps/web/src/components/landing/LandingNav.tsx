@@ -8,9 +8,7 @@ import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/s
 import { CONTAINER } from './constants';
 
 export function LandingNav() {
-  const [isScrolled, setIsScrolled] = useState(
-    () => typeof window !== 'undefined' && window.scrollY > 0
-  );
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     let rafId = 0;
@@ -25,6 +23,7 @@ export function LandingNav() {
     window.addEventListener('scroll', handleScroll, {
       passive: true,
     });
+    handleScroll();
     return () => {
       window.removeEventListener('scroll', handleScroll);
       cancelAnimationFrame(rafId);

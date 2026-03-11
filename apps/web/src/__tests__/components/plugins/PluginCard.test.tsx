@@ -60,7 +60,7 @@ describe('PluginCard', () => {
       <PluginCard plugin={mockPlugin} onInstall={mockOnInstall} onUninstall={mockOnUninstall} />
     );
 
-    const categoryBadge = screen.getByText('security');
+    const categoryBadge = screen.getByText('Security');
     expect(categoryBadge).toBeInTheDocument();
     expect(categoryBadge).toHaveClass('bg-red-500/10', 'text-red-400');
   });
@@ -316,7 +316,7 @@ describe('PluginCard', () => {
       />
     );
 
-    const categoryBadge = screen.getByText('unknown-category');
+    const categoryBadge = screen.getByText('Unknown Category');
     expect(categoryBadge).toBeInTheDocument();
     expect(categoryBadge).toHaveClass('bg-violet-500/10', 'text-violet-400');
   });

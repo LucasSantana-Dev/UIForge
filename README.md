@@ -42,6 +42,7 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 - **Multi-LLM** — Swap between Gemini, Claude, GPT without code changes
 - **Production Ready** — Monaco editor, live preview, Stripe billing, feature flags
 - **IDP Governance** — Software catalog, golden path templates, post-gen scorecard, dependency graph, API docs viewer, CI/CD visibility, governance plugins
+- **Theme Generator** — Deterministic preset + seed-color theme generation in Generate flow
 
 ## UI Migration Status (March 2026)
 
@@ -55,6 +56,11 @@ Every AI code tool generates beautiful frontends. Then you spend days wiring aut
 - Migrated mapped route visuals across landing/about/auth/dashboard surfaces while preserving behavior contracts (middleware, OAuth callback, query-param pages)
 - Redesigned gap routes (`reset-password`, legal pages, maintenance, billing success) into the current Siza visual language
 - Added role-aware dashboard navigation and a new Admin page for feature flag management
+- Landing page performance pass: removed force-dynamic homepage personalization,
+  switched to static public CTAs, and replaced Motion-heavy above-the-fold effects
+  with server-rendered sections and CSS transitions
+- Lighthouse accessibility pass: raised subtle text contrast token and aligned
+  footer/code-surface secondary text to contrast-safe values
 
 ## Quick Start
 
@@ -159,7 +165,40 @@ npm run lint            # ESLint
 npm test                # Unit tests (Jest)
 npm run test:e2e        # E2E tests (Playwright)
 npm run type-check      # TypeScript
+npm run sync:golden-paths # Sync official Golden Paths seeds
+npm run sync:skills     # Sync official skills from skills/*/SKILL.md
 ```
+
+### Playwright MCP Wrapper (Codex Runtime)
+
+If Codex Playwright MCP calls fail with `Transport closed`, use the local wrapper
+that bridges Content-Length and newline JSON-RPC transport styles.
+
+```bash
+codex mcp remove playwright
+codex mcp add playwright -- \
+  node /absolute/path/to/siza/scripts/playwright-mcp-wrapper.mjs --headless
+```
+
+Local smoke check:
+
+```bash
+npm run mcp:playwright:wrapper -- --help
+```
+
+### Governance Asset Sync
+
+Siza keeps official governance assets (Golden Paths and Skills) syncable from repository sources.
+
+```bash
+npm run sync:golden-paths
+npm run sync:skills
+```
+
+Required environment variables:
+
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_URL`
 
 ### Generation E2E modes
 

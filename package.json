@@ -11,6 +11,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "admin:grant": "node --experimental-strip-types scripts/grant-admin-by-email.ts",
+    "mcp:playwright:wrapper": "node scripts/playwright-mcp-wrapper.mjs",
     "build": "turbo run build",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint -- --fix",
@@ -20,6 +21,8 @@
     "type-check": "turbo run type-check",
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
+    "sync:golden-paths": "npm --workspace @siza/web run sync:golden-paths",
+    "sync:skills": "npm --workspace @siza/web run sync:skills",
     "deps:check": "ncu",
     "deps:update": "ncu -u && npm install",
     "deps:unused": "knip",

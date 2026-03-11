@@ -3,6 +3,7 @@
 import { PaletteIcon } from 'lucide-react';
 import { ColorPicker } from './ColorPicker';
 import { ThemeSelector } from './ThemeSelector';
+import { ThemeGenerator } from './ThemeGenerator';
 import { useThemeStore } from '@/stores/theme-store';
 
 export type ColorMode = 'dark' | 'light' | 'both';
@@ -117,6 +118,7 @@ export function DesignContext({ projectId, values, onChange }: DesignContextProp
       </div>
 
       <ThemeSelector projectId={projectId} currentValues={values} onSelectTheme={onChange} />
+      <ThemeGenerator projectId={projectId} values={values} onApply={onChange} />
 
       <BrandInfo projectId={projectId} />
 

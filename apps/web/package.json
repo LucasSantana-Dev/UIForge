@@ -16,6 +16,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
+    "sync:golden-paths": "node --experimental-strip-types ./scripts/sync-golden-paths.ts",
+    "sync:skills": "node --experimental-strip-types ./scripts/sync-skills.ts",
     "postinstall": "node scripts/patch-next.js",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",

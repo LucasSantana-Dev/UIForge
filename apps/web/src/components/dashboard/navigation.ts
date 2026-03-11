@@ -84,7 +84,7 @@ export function getDashboardNavigation(isAdmin: boolean): DashboardNavItem[] {
 export function getDashboardPages(isAdmin: boolean): DashboardNavItem[] {
   return [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboardIcon },
-    { name: 'Generator', href: '/generate', icon: PlusIcon },
+    { name: 'Generate', href: '/generate', icon: PlusIcon },
     ...getDashboardNavigation(isAdmin),
   ];
 }

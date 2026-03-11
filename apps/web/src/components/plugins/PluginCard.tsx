@@ -65,6 +65,11 @@ export function PluginCard({
   const Icon = plugin.icon ? ICON_MAP[plugin.icon] : Shield;
   const isInstalled = !!plugin.installation;
   const categoryStyle = CATEGORY_COLORS[plugin.category] ?? CATEGORY_COLORS.governance;
+  const categoryLabel = plugin.category
+    .split(/[-_]/g)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 
   return (
     <div className="group rounded-xl border border-border/50 bg-surface p-5 transition-all hover:-translate-y-0.5 hover:border-brand/30">
@@ -79,7 +84,7 @@ export function PluginCard({
               <span
                 className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${categoryStyle}`}
               >
-                {plugin.category}
+                {categoryLabel}
               </span>
               <span className="text-[10px] text-text-tertiary">v{plugin.version}</span>
             </div>
