@@ -79,6 +79,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   route bundles from `/`
 
 ### Fixed
+- **Deferred dependency alerts remediation (`#448`)** — Upgraded desktop test
+  toolchain to `vitest@4` (removing vulnerable `vite-node/esbuild` path) and
+  upgraded web Jest/JSDOM environment to v30 (removing vulnerable
+  `@tootallnate/once` transitive path).
 - **Generation fallback reliability** — Quota/rate-limit provider failures now return
   normalized capacity guidance when no backup key is configured, and fallback to
   server-side Anthropic when available
