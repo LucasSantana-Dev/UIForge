@@ -25,7 +25,9 @@ export function EcosystemSection({ snapshot }: EcosystemSectionProps) {
     <section id="ecosystem" className={`${SECTION_PADDING} border-t border-[#27272A]`}>
       <div className={CONTAINER}>
         <div className="text-center">
-          <p className="mb-4 text-sm font-mono uppercase tracking-wider text-violet-400">Ecosystem</p>
+          <p className="mb-4 text-sm font-mono uppercase tracking-wider text-violet-400">
+            Ecosystem
+          </p>
           <h2 className="mb-4 text-3xl font-bold tracking-tight text-[#FAFAFA] sm:text-4xl">
             {snapshot.repoCount} repos. One vision.
           </h2>

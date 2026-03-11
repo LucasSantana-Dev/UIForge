@@ -6,7 +6,9 @@ export function DashboardPreview() {
     <section className={`${SECTION_PADDING} border-t border-[#27272A]`}>
       <div className={CONTAINER}>
         <div className="text-center">
-          <div className="text-sm font-mono text-violet-400 tracking-wider uppercase mb-4">Preview</div>
+          <div className="text-sm font-mono text-violet-400 tracking-wider uppercase mb-4">
+            Preview
+          </div>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-4">
             Your AI workspace
           </h2>
@@ -25,7 +27,9 @@ export function DashboardPreview() {
               <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
               <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
             </div>
-            <div className="text-xs text-[#A1A1AA] font-mono mx-auto">siza.forgespace.co/generate</div>
+            <div className="text-xs text-[#A1A1AA] font-mono mx-auto">
+              siza.forgespace.co/generate
+            </div>
           </div>
 
           <div className="flex min-h-[400px] bg-[#121214]">

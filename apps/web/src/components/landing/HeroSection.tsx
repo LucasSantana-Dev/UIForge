@@ -73,7 +73,7 @@ export function HeroSection() {
         }}
       />
 
-      <div className={`${CONTAINER} relative z-10 text-center`}> 
+      <div className={`${CONTAINER} relative z-10 text-center`}>
         <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-mono text-violet-300">
           <div className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
           Now in Public Beta
@@ -86,8 +86,8 @@ export function HeroSection() {
         </h1>
 
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-6">
-          Siza generates quality React, Next.js, and Vue components, not generic AI slop. Bring
-          your own API key, choose your model, and ship faster.
+          Siza generates quality React, Next.js, and Vue components, not generic AI slop. Bring your
+          own API key, choose your model, and ship faster.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
@@ -117,7 +117,9 @@ export function HeroSection() {
             <div className="w-2.5 h-2.5 rounded-full bg-red-500 opacity-60" />
             <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 opacity-60" />
             <div className="w-2.5 h-2.5 rounded-full bg-green-500 opacity-60" />
-            <span className="ml-3 text-xs text-subtle font-mono">siza generate --component ProductCard</span>
+            <span className="ml-3 text-xs text-subtle font-mono">
+              siza generate --component ProductCard
+            </span>
           </div>
           <div className="p-5 font-mono text-[13px] leading-relaxed">
             <div>
@@ -130,10 +132,14 @@ export function HeroSection() {
             </div>
             <div>
               <span className="text-violet-400">return</span>{' '}
-              <span className="text-subtle">{'(<Card className="group hover:shadow-lg transition-all">)'}</span>
+              <span className="text-subtle">
+                {'(<Card className="group hover:shadow-lg transition-all">)'}
+              </span>
             </div>
             <div>
-              <span className="text-subtle">{'<Badge variant="secondary">{product.category}</Badge>'}</span>
+              <span className="text-subtle">
+                {'<Badge variant="secondary">{product.category}</Badge>'}
+              </span>
             </div>
             <div>
               <span className="text-subtle">{'<h3>{product.name}</h3>'}</span>
