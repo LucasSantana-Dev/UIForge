@@ -80,8 +80,8 @@ describe('routeGeneration', () => {
       const { generateWithProvider } = require('@/lib/services/generation');
       const { captureServerError } = require('@/lib/sentry/server');
 
-      // eslint-disable-next-line require-yield
       mcpStream.mockImplementation(async function* () {
+        yield* [];
         throw new Error('Gateway down');
       });
       generateWithProvider.mockImplementation(async function* () {
@@ -107,8 +107,8 @@ describe('routeGeneration', () => {
     it('returns policy error when MCP fallback is disabled', async () => {
       const { generateComponentStream: mcpStream } = require('@/lib/mcp/client');
 
-      // eslint-disable-next-line require-yield
       mcpStream.mockImplementation(async function* () {
+        yield* [];
         throw new Error('Gateway down');
       });
 

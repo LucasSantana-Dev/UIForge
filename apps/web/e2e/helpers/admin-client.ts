@@ -1,5 +1,5 @@
-import { execSync } from 'child_process';
-import crypto from 'crypto';
+import { execFileSync } from 'node:child_process';
+import crypto from 'node:crypto';
 import { createClient } from '@supabase/supabase-js';
 
 type JwtSigningJwk = {
@@ -14,6 +14,14 @@ type JwtSigningJwk = {
 
 let cachedKey: string | null = null;
 let cachedUrl = '';
+const FIXED_PATH = '/usr/local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin';
+
+function commandEnv(): NodeJS.ProcessEnv {
+  return {
+    ...process.env,
+    PATH: FIXED_PATH,
+  };
+}
 
 function requiredEnv(name: string): string {
   const value = process.env[name];
@@ -33,9 +41,14 @@ function isLocalSupabaseUrl(supabaseUrl: string): boolean {
 }
 
 function resolveAuthContainerName(): string {
-  const name = execSync("docker ps --format '{{.Names}}' | rg '^supabase_auth_' | head -n 1", {
+  const output = execFileSync('docker', ['ps', '--format', '{{.Names}}'], {
     encoding: 'utf8',
-  }).trim();
+    env: commandEnv(),
+  });
+  const name = output
+    .split('\n')
+    .map((line) => line.trim())
+    .find((line) => line.startsWith('supabase_auth_'));
 
   if (!name) {
     throw new Error('Supabase auth container not found');
@@ -45,12 +58,21 @@ function resolveAuthContainerName(): string {
 }
 
 function readJwtSigningKey(containerName: string): JwtSigningJwk {
-  const line = execSync(
-    `docker inspect -f '{{range .Config.Env}}{{println .}}{{end}}' ${containerName} | rg '^GOTRUE_JWT_KEYS='`,
+  const envOutput = execFileSync(
+    'docker',
+    ['inspect', '-f', '{{range .Config.Env}}{{println .}}{{end}}', containerName],
     {
       encoding: 'utf8',
+      env: commandEnv(),
     }
-  ).trim();
+  );
+  const line = envOutput
+    .split('\n')
+    .map((value) => value.trim())
+    .find((value) => value.startsWith('GOTRUE_JWT_KEYS='));
+  if (!line) {
+    throw new Error('GOTRUE_JWT_KEYS env not found in Supabase auth container');
+  }
 
   const rawValue = line.replace(/^GOTRUE_JWT_KEYS=/, '');
   const parsed = JSON.parse(rawValue) as JwtSigningJwk[];
