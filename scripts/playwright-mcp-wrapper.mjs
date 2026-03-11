@@ -1,8 +1,25 @@
 #!/usr/bin/env node
 
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 
-const child = spawn('npx', ['-y', '@playwright/mcp', ...process.argv.slice(2)], {
+const NPX_CANDIDATES = [
+  '/usr/bin/npx',
+  '/usr/local/bin/npx',
+  '/opt/homebrew/bin/npx',
+  '/bin/npx',
+];
+
+const resolveNpxPath = () => {
+  for (const candidate of NPX_CANDIDATES) {
+    if (existsSync(candidate)) {
+      return candidate;
+    }
+  }
+  throw new Error('Unable to locate npx in approved system paths.');
+};
+
+const child = spawn(resolveNpxPath(), ['-y', '@playwright/mcp', ...process.argv.slice(2)], {
   stdio: ['pipe', 'pipe', 'inherit'],
 });
 
