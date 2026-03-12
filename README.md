@@ -133,6 +133,12 @@ SIZA_AGENT_LOCAL_FALLBACK=false
 Admin UI (`/admin`) now includes a live Product Telemetry section backed by
 `GET /api/admin/metrics` (admin session required).
 
+Security Spoke telemetry is also available in Admin (`/admin`) with:
+
+- `GET /api/admin/security` (admin-only, supports `windowDays=7|30|90`)
+- live summary, risk/severity distribution, top rules, and recent high-risk generations
+- per-generation persistence from MCP stream quality events (`security_spoke`)
+
 Required runtime env:
 
 ```env

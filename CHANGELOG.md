@@ -15,6 +15,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Core-flow validation telemetry** — Added `GET /api/admin/validation` (admin-only),
   `POST /api/internal/validation/snapshot` (token-protected), daily snapshot storage
   (`core_flow_gate_snapshots`), and scheduled snapshot workflow for 50-user gate tracking
+- **Security Spoke admin telemetry** — Added `GET /api/admin/security` (admin-only,
+  `windowDays=7|30|90`) with summary metrics, top triggered rules, risk/severity
+  distributions, and recent high-risk generations
+- **Security report persistence** — Added `generation_security_reports` storage
+  (one report per generation) and MCP quality-event ingestion path to persist
+  `security_spoke` payloads with advisory fail-open behavior
 - **Live admin metrics endpoint** — Added `GET /api/admin/metrics` (admin-only)
   with `windowDays=7|30|90` support for product telemetry
 - **Marketing SEO contract** — Added centralized route metadata map for

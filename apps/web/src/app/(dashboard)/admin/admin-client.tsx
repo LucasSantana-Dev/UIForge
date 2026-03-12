@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import type { MetricsWindowDays } from '@/lib/analytics/metrics';
 
 interface FeatureFlag {
   id: string;
@@ -71,6 +72,45 @@ interface CoreFlowValidationResponse {
   };
 }
 
+interface SecurityTelemetryResponse {
+  timestamp: string;
+  windowDays: MetricsWindowDays;
+  summary: {
+    totalReports: number;
+    totalFindings: number;
+    reportsWithFindings: number;
+    highRiskGenerations: number;
+    scannerErrors: number;
+  };
+  severityDistribution: {
+    critical: number;
+    high: number;
+    medium: number;
+    low: number;
+    info: number;
+  };
+  riskDistribution: {
+    high: number;
+    medium: number;
+    low: number;
+  };
+  topRules: Array<{
+    ruleId: string;
+    count: number;
+    maxSeverity: string;
+    maxRiskLevel: string;
+  }>;
+  recentHighRiskGenerations: Array<{
+    generationId: string;
+    userId: string;
+    createdAt: string;
+    findingCount: number;
+    scannerExecution: 'success' | 'error';
+    highestRiskLevel: string;
+    highestSeverity: string | null;
+  }>;
+}
+
 const reasonCopy: Record<Exclude<CoreFlowGateReason, 'PASS'>, string> = {
   TARGET_NOT_REACHED: 'Current qualified users are still below the 50-user target.',
   INSUFFICIENT_HISTORY: 'Two full weeks of daily snapshots are required to evaluate stability.',
@@ -96,11 +136,18 @@ const categories = [
   'billing',
 ];
 
+const securityWindowOptions: MetricsWindowDays[] = [7, 30, 90];
+
 export function AdminClient() {
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [validation, setValidation] = useState<CoreFlowValidationResponse | null>(null);
   const [isValidationLoading, setIsValidationLoading] = useState(true);
+  const [securityTelemetry, setSecurityTelemetry] = useState<SecurityTelemetryResponse | null>(
+    null
+  );
+  const [isSecurityLoading, setIsSecurityLoading] = useState(true);
+  const [securityWindowDays, setSecurityWindowDays] = useState<MetricsWindowDays>(30);
   const [isCreating, setIsCreating] = useState(false);
   const [newFlagName, setNewFlagName] = useState('');
   const [newFlagDescription, setNewFlagDescription] = useState('');
@@ -170,10 +217,40 @@ export function AdminClient() {
     }
   }, [toast]);
 
+  const loadSecurityTelemetry = useCallback(
+    async (windowDays: MetricsWindowDays) => {
+      try {
+        setIsSecurityLoading(true);
+        const response = await fetch(`/api/admin/security?windowDays=${windowDays}`, {
+          cache: 'no-store',
+        });
+        const payload = (await response.json()) as SecurityTelemetryResponse & { error?: string };
+        if (!response.ok) {
+          throw new Error(payload.error || 'Failed to load security telemetry');
+        }
+        setSecurityTelemetry(payload);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Failed to load security telemetry';
+        toast({
+          variant: 'destructive',
+          title: 'Could not load security telemetry',
+          description: message,
+        });
+      } finally {
+        setIsSecurityLoading(false);
+      }
+    },
+    [toast]
+  );
+
   useEffect(() => {
-    void loadFlags();
-    void loadValidation();
+    Promise.all([loadFlags(), loadValidation()]).catch(() => undefined);
   }, [loadFlags, loadValidation]);
+
+  useEffect(() => {
+    loadSecurityTelemetry(securityWindowDays).catch(() => undefined);
+  }, [loadSecurityTelemetry, securityWindowDays]);
 
   const setBusy = (id: string, value: boolean) => {
     setBusyIds((prev) => {
@@ -290,6 +367,147 @@ export function AdminClient() {
       setIsCreating(false);
     }
   };
+
+  const securityTelemetryContent = (() => {
+    if (isSecurityLoading) {
+      return (
+        <div className="flex items-center justify-center py-8 text-text-secondary">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Loading security telemetry...
+        </div>
+      );
+    }
+
+    if (!securityTelemetry) {
+      return (
+        <p className="text-sm text-text-secondary">No security telemetry data is available.</p>
+      );
+    }
+
+    const summaryCards = [
+      { label: 'Reports', value: securityTelemetry.summary.totalReports },
+      { label: 'Total findings', value: securityTelemetry.summary.totalFindings },
+      { label: 'Reports with findings', value: securityTelemetry.summary.reportsWithFindings },
+      { label: 'High-risk generations', value: securityTelemetry.summary.highRiskGenerations },
+      { label: 'Scanner errors', value: securityTelemetry.summary.scannerErrors },
+    ];
+
+    return (
+      <>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {summaryCards.map((card) => (
+            <div key={card.label} className="rounded-md border border-surface-3 p-3">
+              <p className="text-xs text-text-muted-foreground">{card.label}</p>
+              <p className="text-lg font-semibold text-text-primary">{card.value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="rounded-md border border-surface-3 p-3">
+            <p className="mb-2 text-xs uppercase tracking-wide text-text-muted-foreground">
+              Severity distribution
+            </p>
+            <div className="space-y-1 text-sm text-text-secondary">
+              {Object.entries(securityTelemetry.severityDistribution).map(([severity, count]) => (
+                <div key={severity} className="flex items-center justify-between">
+                  <span>{severity}</span>
+                  <span className="font-medium text-text-primary">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-md border border-surface-3 p-3">
+            <p className="mb-2 text-xs uppercase tracking-wide text-text-muted-foreground">
+              Risk distribution
+            </p>
+            <div className="space-y-1 text-sm text-text-secondary">
+              {Object.entries(securityTelemetry.riskDistribution).map(([risk, count]) => (
+                <div key={risk} className="flex items-center justify-between">
+                  <span>{risk}</span>
+                  <span className="font-medium text-text-primary">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-xs uppercase tracking-wide text-text-muted-foreground">
+            Top triggered rules
+          </p>
+          {securityTelemetry.topRules.length === 0 ? (
+            <p className="text-sm text-text-secondary">No rules triggered in this window.</p>
+          ) : (
+            <div className="siza-scrollbar overflow-x-auto">
+              <table className="min-w-full divide-y divide-surface-3 text-sm">
+                <thead>
+                  <tr className="text-left text-text-muted-foreground">
+                    <th className="px-3 py-2 font-medium">Rule</th>
+                    <th className="px-3 py-2 font-medium">Count</th>
+                    <th className="px-3 py-2 font-medium">Max severity</th>
+                    <th className="px-3 py-2 font-medium">Max risk</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-surface-3">
+                  {securityTelemetry.topRules.map((rule) => (
+                    <tr key={rule.ruleId}>
+                      <td className="px-3 py-2 font-mono text-xs text-text-primary">
+                        {rule.ruleId}
+                      </td>
+                      <td className="px-3 py-2 text-text-primary">{rule.count}</td>
+                      <td className="px-3 py-2 text-text-secondary">{rule.maxSeverity}</td>
+                      <td className="px-3 py-2 text-text-secondary">{rule.maxRiskLevel}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-xs uppercase tracking-wide text-text-muted-foreground">
+            Recent high-risk generations
+          </p>
+          {securityTelemetry.recentHighRiskGenerations.length === 0 ? (
+            <p className="text-sm text-text-secondary">No high-risk generations in this window.</p>
+          ) : (
+            <div className="siza-scrollbar overflow-x-auto">
+              <table className="min-w-full divide-y divide-surface-3 text-sm">
+                <thead>
+                  <tr className="text-left text-text-muted-foreground">
+                    <th className="px-3 py-2 font-medium">Generation</th>
+                    <th className="px-3 py-2 font-medium">Created</th>
+                    <th className="px-3 py-2 font-medium">Findings</th>
+                    <th className="px-3 py-2 font-medium">Severity</th>
+                    <th className="px-3 py-2 font-medium">Scanner</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-surface-3">
+                  {securityTelemetry.recentHighRiskGenerations.map((item) => (
+                    <tr key={item.generationId}>
+                      <td className="px-3 py-2 font-mono text-xs text-text-primary">
+                        {item.generationId.slice(0, 8)}
+                      </td>
+                      <td className="px-3 py-2 text-text-secondary">
+                        {new Date(item.createdAt).toLocaleString()}
+                      </td>
+                      <td className="px-3 py-2 text-text-primary">{item.findingCount}</td>
+                      <td className="px-3 py-2 text-text-secondary">
+                        {item.highestSeverity ?? 'N/A'}
+                      </td>
+                      <td className="px-3 py-2 text-text-secondary">{item.scannerExecution}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  })();
 
   return (
     <div className="container mx-auto py-8 space-y-6">
@@ -440,6 +658,32 @@ export function AdminClient() {
         <CardContent>
           <AnalyticsDashboard />
         </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle>Security Spoke</CardTitle>
+              <CardDescription>
+                Live Security Spoke telemetry from MCP generation streams.
+              </CardDescription>
+            </div>
+            <div className="flex rounded-lg bg-surface-2 p-1">
+              {securityWindowOptions.map((window) => (
+                <Button
+                  key={window}
+                  variant={securityWindowDays === window ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setSecurityWindowDays(window)}
+                >
+                  {window}d
+                </Button>
+              ))}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-5">{securityTelemetryContent}</CardContent>
       </Card>
 
       <Card>

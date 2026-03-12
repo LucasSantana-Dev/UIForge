@@ -25,6 +25,10 @@ import {
   type ConversationContext,
 } from '@/lib/services/generation.service';
 import { routeGeneration } from '@/lib/services/provider-router';
+import {
+  extractSecuritySpokeReport,
+  persistSecuritySpokeReport,
+} from '@/lib/services/security-spoke.service';
 import { buildSkillContext, trackSkillUsage } from '@/lib/services/skill.service';
 
 export const dynamic = 'force-dynamic';
@@ -154,6 +158,7 @@ export async function POST(request: NextRequest) {
           let actualProvider = activeProvider;
           let routedProvider: string | undefined;
           let routingReason: string | undefined;
+          let securitySpokeCaptured = null;
           for await (const event of routeGeneration({
             mcpEnabled,
             allowDirectProviderFallback,
@@ -177,6 +182,12 @@ export async function POST(request: NextRequest) {
             if (event.type === 'routing') {
               routedProvider = (event as any).provider;
               routingReason = (event as any).reason;
+            }
+            if (event.type === 'quality') {
+              const parsedSecurityReport = extractSecuritySpokeReport(event.report);
+              if (parsedSecurityReport) {
+                securitySpokeCaptured = parsedSecurityReport;
+              }
             }
             if (event.type === 'fallback' && event.provider) {
               actualProvider = event.provider;
@@ -210,6 +221,17 @@ export async function POST(request: NextRequest) {
             void postGenerationTasks(generationId, input.description, user.id, input.userApiKey);
             if (skillsEnabled && input.skillIds?.length) {
               trackSkillUsage(generationId, input.skillIds, input.skillParams).catch(() => {});
+            }
+            if (securitySpokeCaptured) {
+              try {
+                await persistSecuritySpokeReport(generationId, user.id, securitySpokeCaptured);
+              } catch (securityPersistError) {
+                captureServerError(securityPersistError, {
+                  route: '/api/generate',
+                  userId: user.id,
+                  extra: { context: 'persistSecuritySpokeReport', generationId },
+                });
+              }
             }
           }
 

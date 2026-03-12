@@ -10,6 +10,8 @@ if (typeof globalThis.ReadableStream === 'undefined') {
 const mockCheckRateLimit = jest.fn();
 const mockVerifySession = jest.fn();
 const mockRouteGeneration = jest.fn();
+const mockExtractSecuritySpokeReport = jest.fn();
+const mockPersistSecuritySpokeReport = jest.fn();
 
 jest.mock('@/lib/api/rate-limit', () => ({
   checkRateLimit: (...args: any[]) => mockCheckRateLimit(...args),
@@ -23,6 +25,11 @@ jest.mock('@/lib/api/auth', () => ({
 
 jest.mock('@/lib/services/provider-router', () => ({
   routeGeneration: (...args: any[]) => mockRouteGeneration(...args),
+}));
+
+jest.mock('@/lib/services/security-spoke.service', () => ({
+  extractSecuritySpokeReport: (...args: any[]) => mockExtractSecuritySpokeReport(...args),
+  persistSecuritySpokeReport: (...args: any[]) => mockPersistSecuritySpokeReport(...args),
 }));
 
 jest.mock('@/lib/services/generation.service', () => ({
@@ -81,6 +88,8 @@ describe('POST /api/generate', () => {
     mockVerifySession.mockResolvedValue({
       user: { id: 'user-1' },
     });
+    mockExtractSecuritySpokeReport.mockReturnValue(null);
+    mockPersistSecuritySpokeReport.mockResolvedValue(undefined);
   });
 
   it('returns 429 when rate limited', async () => {
