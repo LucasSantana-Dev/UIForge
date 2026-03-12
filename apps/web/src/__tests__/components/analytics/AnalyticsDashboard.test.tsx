@@ -22,12 +22,12 @@ describe('AnalyticsDashboard', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    global.fetch = jest.fn().mockResolvedValue({
+    globalThis.fetch = jest.fn().mockResolvedValue({
       ok: true,
       json: async () => mockReport,
     }) as jest.Mock;
-    window.URL.createObjectURL = jest.fn(() => 'blob:metrics');
-    window.URL.revokeObjectURL = jest.fn();
+    globalThis.URL.createObjectURL = jest.fn(() => 'blob:metrics');
+    globalThis.URL.revokeObjectURL = jest.fn();
     clickSpy = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
   });
 
@@ -53,7 +53,7 @@ describe('AnalyticsDashboard', () => {
     render(<AnalyticsDashboard />);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/admin/metrics?windowDays=30', {
+      expect(globalThis.fetch).toHaveBeenCalledWith('/api/admin/metrics?windowDays=30', {
         cache: 'no-store',
       });
     });
@@ -61,7 +61,7 @@ describe('AnalyticsDashboard', () => {
     await user.click(screen.getByRole('button', { name: '7d' }));
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith('/api/admin/metrics?windowDays=7', {
+      expect(globalThis.fetch).toHaveBeenCalledWith('/api/admin/metrics?windowDays=7', {
         cache: 'no-store',
       });
     });
@@ -77,8 +77,8 @@ describe('AnalyticsDashboard', () => {
 
     await user.click(screen.getByRole('button', { name: 'Export CSV' }));
 
-    expect(window.URL.createObjectURL).toHaveBeenCalled();
-    expect(window.URL.revokeObjectURL).toHaveBeenCalled();
+    expect(globalThis.URL.createObjectURL).toHaveBeenCalled();
+    expect(globalThis.URL.revokeObjectURL).toHaveBeenCalled();
     expect(clickSpy).toHaveBeenCalled();
   });
 });

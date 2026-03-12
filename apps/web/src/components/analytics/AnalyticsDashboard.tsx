@@ -44,7 +44,7 @@ function useLiveMetrics() {
   }, []);
 
   useEffect(() => {
-    void load(timeRange);
+    load(timeRange);
   }, [load, timeRange]);
 
   return { timeRange, setTimeRange, data, isLoading, error, refresh: () => load(timeRange) };
@@ -121,7 +121,7 @@ export default function AnalyticsDashboard() {
               </Button>
             ))}
           </div>
-          <Button variant="outline" size="sm" onClick={() => void refresh()} disabled={isLoading}>
+          <Button variant="outline" size="sm" onClick={refresh} disabled={isLoading}>
             {isLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (

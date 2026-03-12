@@ -9,16 +9,13 @@ const mockCreateClient = createClient as jest.MockedFunction<typeof createClient
 const mockFrom = jest.fn();
 
 function makeThenable(result: unknown) {
-  const obj: Record<string, unknown> = {
-    ...Object(result),
-    then: (resolve: (v: unknown) => void) => {
-      resolve(result);
-      return Promise.resolve(result);
-    },
-    gte: jest.fn(() => obj),
-    eq: jest.fn(() => obj),
+  const query = Promise.resolve(result) as Promise<unknown> & {
+    gte: jest.Mock<Promise<unknown>, []>;
+    eq: jest.Mock<Promise<unknown>, []>;
   };
-  return obj;
+  query.gte = jest.fn(() => Promise.resolve(result));
+  query.eq = jest.fn(() => Promise.resolve(result));
+  return query;
 }
 
 function setupResponses(responses: Array<Record<string, unknown>>) {
