@@ -56,7 +56,7 @@ export default function RoadmapClientPage({ repoCount }: RoadmapClientPageProps)
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen overflow-x-hidden bg-background">
       <motion.div
         initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

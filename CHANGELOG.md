@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Production audit harness** — Added `test:e2e:prod`, `playwright.production.config.ts`,
+  `e2e/production-public-smoke.spec.ts`, and `scripts/e2e-production-audit.sh` for
+  Chromium production sweeps with artifacted reports and runtime API probe diagnostics
+- **Generation unauth contract tests** — Added route tests for unauthenticated
+  `GET /api/generations`, `GET /api/generations/history`, and `GET /api/generations/[id]`
+  to prevent 500 regressions on auth-required endpoints
 - **Lead-readiness E2E coverage** — Added `lead-readiness.spec.ts` for disposable signup-to-generation smoke and `marketplace.spec.ts` for templates/plugins/gallery marketplace funnel checks
 - **Lead prepublish automation** — Added `test:e2e:lead:preflight`, `test:e2e:lead:chromium`, and `ads:google:prepublish` scripts plus supporting shell runners
 - **Google Ads pilot assets** — Added campaign package for `siza_br_en_leadtest_v1` under `apps/web/marketing/google-ads/siza_br_en_leadtest_v1` (campaign config, keywords, negatives, RSA copy, day-1 ops)
@@ -70,6 +76,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `GET /api/admin/validation`
 
 ### Changed
+- **Generation API auth contract** — `verifySession` failures now return `401`
+  (instead of `500`) for `/api/generations`, `/api/generations/history`, and
+  `/api/generations/[id]`, while preserving existing `403`/`404`/`500` semantics
+- **Roadmap mobile overflow resilience** — Updated `PhaseCard` header layout to wrap
+  safely on narrow viewports and applied page-level `overflow-x-hidden` in roadmap client
+- **Lead-readiness billing smoke policy** — Checkout-session validation now accepts
+  `403 Billing is not enabled` when billing is disabled, and requires `200` with URL when enabled
+- **Production issues map quality** — `e2e-production-audit.sh` now records findings only
+  from real failures/probe mismatches, maps roadmap overflow failures to component fix targets,
+  and resolves Vercel env pulls correctly from git worktrees
 - **Signup and analytics flow** — Wrapped app layout with `AnalyticsProvider`; signup now emits GA4 lead events and includes `marketing_attribution` metadata on auth signup
 - **Template ownership querying** — Templates UI/API now uses explicit ownership filter (`all|official|mine`) with auth-checked `mine` behavior and route tests
 - **Admin validation API** — `GET /api/admin/validation` now accepts

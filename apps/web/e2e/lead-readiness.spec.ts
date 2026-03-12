@@ -244,6 +244,15 @@ test.describe('Lead Readiness', () => {
       },
       headers: { 'Content-Type': 'application/json' },
     });
-    expect(checkoutResponse.ok()).toBe(true);
+    if (checkoutResponse.status() === 403) {
+      const body = await checkoutResponse.json();
+      expect(body.error).toBe('Billing is not enabled');
+      return;
+    }
+
+    expect(checkoutResponse.status()).toBe(200);
+    const body = await checkoutResponse.json();
+    expect(typeof body.url).toBe('string');
+    expect(body.url.length).toBeGreaterThan(0);
   });
 });

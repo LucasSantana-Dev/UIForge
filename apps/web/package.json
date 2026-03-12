@@ -16,6 +16,7 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
+    "test:e2e:prod": "bash ./scripts/e2e-production-audit.sh",
     "test:e2e:lead:preflight": "bash ./scripts/lead-preflight.sh",
     "test:e2e:lead:chromium": "bash ./scripts/lead-chromium.sh",
     "ads:google:prepublish": "bash ./scripts/google-ads-prepublish.sh",
