@@ -173,6 +173,7 @@ GitHub automation:
 
 - Workflow: `.github/workflows/core-flow-validation-snapshot.yml`
 - Workflow: `.github/workflows/core-flow-validation-report.yml`
+- Report schedule: daily at `03:20 UTC` and weekly gate rollup at `03:25 UTC` (Mondays)
 - Repository variable: `SIZA_BASE_URL` (for example `https://siza.forgespace.co`)
 - Repository secret: `METRICS_SNAPSHOT_TOKEN`
 
