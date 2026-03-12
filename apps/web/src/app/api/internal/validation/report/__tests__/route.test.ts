@@ -13,8 +13,9 @@ const mockBuildInternalCoreFlowValidationReport =
     typeof buildInternalCoreFlowValidationReport
   >;
 
-function makeRequest(headers: Record<string, string> = {}) {
-  return new Request('http://localhost:3000/api/internal/validation/report', {
+function requestWithAuth(auth?: string) {
+  const headers = auth ? { authorization: auth } : {};
+  return new Request('http://localhost/api/internal/validation/report', {
     method: 'GET',
     headers,
   });
@@ -25,35 +26,45 @@ describe('GET /api/internal/validation/report', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env = {
-      ...originalEnv,
-      METRICS_SNAPSHOT_TOKEN: 'snapshot-token',
-    };
+    process.env = { ...originalEnv, METRICS_SNAPSHOT_TOKEN: 'snapshot-token' };
   });
 
   afterEach(() => {
     process.env = originalEnv;
   });
 
-  it('returns 503 when endpoint is not configured', async () => {
-    delete process.env.METRICS_SNAPSHOT_TOKEN;
-    const response = await GET(makeRequest());
-    expect(response.status).toBe(503);
-    expect(await response.json()).toEqual({
-      error: 'Validation report endpoint is not configured',
-    });
-  });
+  it.each([
+    {
+      name: 'returns 503 when endpoint is not configured',
+      env: undefined,
+      auth: undefined,
+      status: 503,
+      body: { error: 'Validation report endpoint is not configured' },
+    },
+    {
+      name: 'returns 401 for missing authorization header',
+      env: 'snapshot-token',
+      auth: undefined,
+      status: 401,
+      body: { error: 'Unauthorized' },
+    },
+    {
+      name: 'returns 403 for invalid bearer token',
+      env: 'snapshot-token',
+      auth: 'Bearer wrong-token',
+      status: 403,
+      body: { error: 'Forbidden' },
+    },
+  ])('$name', async ({ env, auth, status, body }) => {
+    if (env === undefined) {
+      delete process.env.METRICS_SNAPSHOT_TOKEN;
+    } else {
+      process.env.METRICS_SNAPSHOT_TOKEN = env;
+    }
 
-  it('returns 401 for missing authorization header', async () => {
-    const response = await GET(makeRequest());
-    expect(response.status).toBe(401);
-    expect(await response.json()).toEqual({ error: 'Unauthorized' });
-  });
-
-  it('returns 403 for invalid bearer token', async () => {
-    const response = await GET(makeRequest({ authorization: 'Bearer wrong-token' }));
-    expect(response.status).toBe(403);
-    expect(await response.json()).toEqual({ error: 'Forbidden' });
+    const response = await GET(requestWithAuth(auth));
+    expect(response.status).toBe(status);
+    expect(await response.json()).toEqual(body);
   });
 
   it('returns internal report for valid token', async () => {
@@ -78,7 +89,7 @@ describe('GET /api/internal/validation/report', () => {
       current: { qualifiedUsers: 32 },
     } as any);
 
-    const response = await GET(makeRequest({ authorization: 'Bearer snapshot-token' }));
+    const response = await GET(requestWithAuth('Bearer snapshot-token'));
     expect(response.status).toBe(200);
     const body = await response.json();
     expect(body.gate.passed).toBe(false);
@@ -92,7 +103,7 @@ describe('GET /api/internal/validation/report', () => {
     mockGetCoreFlowValidationReport.mockRejectedValue(
       new Error('Core flow validation service configuration missing')
     );
-    const response = await GET(makeRequest({ authorization: 'Bearer snapshot-token' }));
+    const response = await GET(requestWithAuth('Bearer snapshot-token'));
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({
       error: 'Validation report endpoint is not configured',
