@@ -292,6 +292,11 @@ npm run ads:google:prepublish
 - `test:e2e:lead:chromium` runs Chromium smoke for lead-critical flows
 - `ads:google:prepublish` runs preflight + marketplace smoke and prints manual GA4/Ads checks
 - Campaign assets for `siza_br_en_leadtest_v1` are in `apps/web/marketing/google-ads/siza_br_en_leadtest_v1`
+  - `campaign-config.json`
+  - `keywords.csv`
+  - `negative-keywords.csv`
+  - `rsa.json`
+  - `day1-ops.md`
 
 ### Playwright MCP Wrapper (Codex Runtime)
 
