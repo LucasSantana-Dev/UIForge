@@ -14,7 +14,7 @@ const mockBuildInternalCoreFlowValidationReport =
   >;
 
 function requestWithAuth(auth?: string) {
-  const headers = auth ? { authorization: auth } : {};
+  const headers: HeadersInit | undefined = auth ? { authorization: auth } : undefined;
   return new Request('http://localhost/api/internal/validation/report', {
     method: 'GET',
     headers,

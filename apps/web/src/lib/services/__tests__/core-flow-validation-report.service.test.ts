@@ -19,7 +19,7 @@ function makeSnapshot(snapshotDate: string, qualifiedUsers: number, captured = t
 }
 
 function makeReport(overrides: Partial<CoreFlowValidationReport> = {}): CoreFlowValidationReport {
-  return {
+  const baseReport: CoreFlowValidationReport = {
     generatedAt: '2026-03-12T03:00:00.000Z',
     current: {
       snapshotDate: '2026-03-12',
@@ -67,8 +67,46 @@ function makeReport(overrides: Partial<CoreFlowValidationReport> = {}): CoreFlow
         qualification: 40,
       },
       topDropoffReasons: [{ reason: 'NO_PROJECT', count: 4 }],
+      activation: {
+        counts: {
+          onboardedWithoutProject: 4,
+          projectWithoutCompletedGeneration: 2,
+          qualifiedUsers: 8,
+        },
+        nextBestAction: 'CREATE_PROJECT',
+        nextBestActionDistribution: {
+          CREATE_PROJECT: 4,
+          COMPLETE_GENERATION: 2,
+        },
+        primaryBottleneck: {
+          stage: 'ONBOARDED_TO_PROJECT',
+          count: 4,
+        },
+      },
     },
+    activation: {
+      counts: {
+        onboardedWithoutProject: 4,
+        projectWithoutCompletedGeneration: 2,
+        qualifiedUsers: 8,
+      },
+      nextBestAction: 'CREATE_PROJECT',
+      nextBestActionDistribution: {
+        CREATE_PROJECT: 4,
+        COMPLETE_GENERATION: 2,
+      },
+      primaryBottleneck: {
+        stage: 'ONBOARDED_TO_PROJECT',
+        count: 4,
+      },
+    },
+  };
+
+  return {
+    ...baseReport,
     ...overrides,
+    activationFunnel: overrides.activationFunnel ?? baseReport.activationFunnel,
+    activation: overrides.activation ?? baseReport.activation,
   };
 }
 
