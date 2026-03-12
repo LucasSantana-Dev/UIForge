@@ -113,6 +113,8 @@ SIZA_AGENT_LOCAL_FALLBACK=false
 - Signup now sends `marketing_attribution` in Supabase auth metadata
 - GA4 lead events emitted during signup:
   `lead_signup_started`, `lead_signup_success`, `lead_signup_oauth_start`, `lead_signup_error`
+- Unit coverage validates signup attribution metadata and lead event emission in
+  `SignUpPage` auth tests
 
 ### MCP-first routing policy
 

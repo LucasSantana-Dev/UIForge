@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Lead prepublish automation** — Added `test:e2e:lead:preflight`, `test:e2e:lead:chromium`, and `ads:google:prepublish` scripts plus supporting shell runners
 - **Google Ads pilot assets** — Added campaign package for `siza_br_en_leadtest_v1` under `apps/web/marketing/google-ads/siza_br_en_leadtest_v1` (campaign config, keywords, negatives, RSA copy, day-1 ops)
 - **Lead attribution module** — Added first-touch attribution capture/storage and unit coverage (`lead-attribution.test.ts`)
+- **Signup lead-conversion coverage** — Expanded `SignUpPage` unit tests to assert
+  `marketing_attribution` payload propagation and GA4 lead event emission paths
+  (`lead_signup_started`, `lead_signup_success`, `lead_signup_oauth_start`, `lead_signup_error`)
 - **Core-flow validation telemetry** — Added `GET /api/admin/validation` (admin-only),
   `POST /api/internal/validation/snapshot` (token-protected), daily snapshot storage
   (`core_flow_gate_snapshots`), and scheduled snapshot workflow for 50-user gate tracking
