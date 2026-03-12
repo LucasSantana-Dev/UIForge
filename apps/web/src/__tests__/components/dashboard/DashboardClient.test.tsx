@@ -627,6 +627,16 @@ describe('DashboardClient', () => {
       expect(screen.getByText('Core Flow Progress')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Create project' })).toBeInTheDocument();
       expect(screen.getByText('Complete your first generation')).toBeInTheDocument();
+      const createProjectLinks = screen.getAllByRole('link', { name: 'Create Project' });
+      expect(createProjectLinks.length).toBeGreaterThan(0);
+      expect(createProjectLinks[0]).toHaveAttribute(
+        'href',
+        '/projects/new?source=dashboard&entry=header_primary'
+      );
+      expect(createProjectLinks[1]).toHaveAttribute(
+        'href',
+        '/projects/new?source=dashboard&entry=empty_state_primary'
+      );
     });
 
     it('creates starter project from primary next-action CTA', async () => {
@@ -709,6 +719,11 @@ describe('DashboardClient', () => {
 
       const cta = screen.getByRole('link', { name: 'Generate component' });
       expect(cta).toHaveAttribute('href', '/generate?projectId=1');
+      const generateLink = screen.getByRole('link', { name: 'Generate' });
+      expect(generateLink).toHaveAttribute(
+        'href',
+        '/generate?projectId=1&source=dashboard&entry=header_primary'
+      );
     });
 
     it('hides checklist when user is qualified', () => {

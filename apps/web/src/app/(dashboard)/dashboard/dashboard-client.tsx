@@ -458,6 +458,18 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
     activationProgress.project && firstProjectId
       ? `/generate?projectId=${firstProjectId}`
       : '/generate';
+  const dashboardPrimaryHref =
+    activationProgress.project && firstProjectId
+      ? `/generate?projectId=${firstProjectId}&source=dashboard&entry=header_primary`
+      : '/projects/new?source=dashboard&entry=header_primary';
+  const dashboardPrimaryLabel = activationProgress.project ? 'Generate' : 'Create Project';
+  const emptyStatePrimaryHref =
+    activationProgress.project && firstProjectId
+      ? `/generate?projectId=${firstProjectId}&source=dashboard&entry=empty_state_primary`
+      : '/projects/new?source=dashboard&entry=empty_state_primary';
+  const emptyStatePrimaryLabel = activationProgress.project
+    ? 'Generate Component'
+    : 'Create Project';
 
   const handleCreateStarterProject = async () => {
     try {
@@ -525,9 +537,13 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
             asChild
             className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all"
           >
-            <Link href="/generate">
-              <SparklesIcon className="mr-2 h-4 w-4" />
-              Generate
+            <Link href={dashboardPrimaryHref}>
+              {activationProgress.project ? (
+                <SparklesIcon className="mr-2 h-4 w-4" />
+              ) : (
+                <PlusIcon className="mr-2 h-4 w-4" />
+              )}
+              {dashboardPrimaryLabel}
             </Link>
           </Button>
         </div>
@@ -637,9 +653,13 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
               </p>
               <div className="mt-4 flex items-center justify-center gap-3">
                 <Button asChild className="bg-violet-600 hover:bg-violet-500" size="sm">
-                  <Link href="/generate">
-                    <SparklesIcon className="mr-2 h-4 w-4" />
-                    Generate Component
+                  <Link href={emptyStatePrimaryHref}>
+                    {activationProgress.project ? (
+                      <SparklesIcon className="mr-2 h-4 w-4" />
+                    ) : (
+                      <PlusIcon className="mr-2 h-4 w-4" />
+                    )}
+                    {emptyStatePrimaryLabel}
                   </Link>
                 </Button>
                 <Button
@@ -648,9 +668,9 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
                   size="sm"
                   className="border-surface-3 text-text-secondary hover:text-text-primary"
                 >
-                  <Link href="/projects/new">
-                    <PlusIcon className="mr-2 h-4 w-4" />
-                    New Project
+                  <Link href="/generate">
+                    <SparklesIcon className="mr-2 h-4 w-4" />
+                    Generate Component
                   </Link>
                 </Button>
               </div>
