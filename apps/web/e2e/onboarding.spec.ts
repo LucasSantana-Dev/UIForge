@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
-import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { createAdminClient } from './helpers/admin-client';
 
 test.describe('Onboarding Wizard', () => {
   test.skip(!process.env.SUPABASE_SERVICE_ROLE_KEY, 'Requires SUPABASE_SERVICE_ROLE_KEY');
@@ -13,7 +13,7 @@ test.describe('Onboarding Wizard', () => {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!supabaseUrl || !serviceRoleKey) return;
 
-    const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
+    const adminSupabase = createAdminClient();
     try {
       await adminSupabase.from('components').delete().eq('user_id', userId);
       await adminSupabase.from('generations').delete().eq('user_id', userId);
@@ -25,9 +25,7 @@ test.describe('Onboarding Wizard', () => {
   });
 
   async function createFreshUser(page: Page) {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-    const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
+    const adminSupabase = createAdminClient();
 
     const uniqueId = crypto.randomUUID();
     const email = `test-onboard-${uniqueId}@example.com`;
@@ -66,7 +64,8 @@ test.describe('Onboarding Wizard', () => {
   test('should show step indicators', async ({ page }) => {
     await createFreshUser(page);
 
-    await expect(page.getByText(/welcome/i)).toBeVisible();
+    await expect(page.getByRole('heading', { name: /welcome to siza/i })).toBeVisible();
+    await expect(page.getByText('Project', { exact: true })).toBeVisible();
   });
 
   test('should advance to project step', async ({ page }) => {
@@ -76,7 +75,7 @@ test.describe('Onboarding Wizard', () => {
 
     await expect(page.getByRole('heading', { name: /create your first project/i })).toBeVisible();
     await expect(page.locator('#name')).toBeVisible();
-    await expect(page.locator('#framework')).toBeVisible();
+    await expect(page.getByRole('combobox').first()).toBeVisible();
   });
 
   test('should skip onboarding entirely', async ({ page }) => {
@@ -94,7 +93,6 @@ test.describe('Onboarding Wizard', () => {
 
     await page.locator('#name').clear();
     await page.locator('#name').fill('My Onboarding Project');
-    await page.locator('#framework').selectOption('react');
 
     await page.getByRole('button', { name: /create project/i }).click();
 

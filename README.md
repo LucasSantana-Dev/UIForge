@@ -297,6 +297,8 @@ npm run ads:google:prepublish
   - `negative-keywords.csv`
   - `rsa.json`
   - `day1-ops.md`
+- Auth/onboarding/stripe lead smoke now uses shared Supabase admin helpers and deterministic webhook payloads for CI stability
+- Catalog E2E creation now supports both direct detail redirects and list-first redirects by resolving created entry IDs via API lookup
 
 ### Playwright MCP Wrapper (Codex Runtime)
 

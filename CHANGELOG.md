@@ -89,6 +89,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   success, manual project-creation fallback on failure, and project-first
   quick-action generate routing for the same cohort
 - **Lead E2E determinism** — Playwright config now supports explicit lead smoke port/reuse controls and disables onboarding tour overlays by env for automation runs
+- **Lead/auth E2E hardening** — Auth/onboarding/stripe smoke specs now use shared
+  admin-client setup and deterministic webhook payloads to reduce flaky setup paths
+- **Catalog E2E redirect resilience** — Catalog creation specs now handle both
+  direct-detail and list-first redirect flows by resolving created entry IDs via API
 - **Project MCP defaults** — Added wrapper-first `playwright` server entry in
   `.mcp.json` and documented global-registry recovery flow + restart step for
   Codex runtime MCP reload
