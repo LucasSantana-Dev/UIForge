@@ -245,12 +245,11 @@ export function AdminClient() {
   );
 
   useEffect(() => {
-    void loadFlags();
-    void loadValidation();
+    Promise.all([loadFlags(), loadValidation()]).catch(() => undefined);
   }, [loadFlags, loadValidation]);
 
   useEffect(() => {
-    void loadSecurityTelemetry(securityWindowDays);
+    loadSecurityTelemetry(securityWindowDays).catch(() => undefined);
   }, [loadSecurityTelemetry, securityWindowDays]);
 
   const setBusy = (id: string, value: boolean) => {
@@ -368,6 +367,147 @@ export function AdminClient() {
       setIsCreating(false);
     }
   };
+
+  const securityTelemetryContent = (() => {
+    if (isSecurityLoading) {
+      return (
+        <div className="flex items-center justify-center py-8 text-text-secondary">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          Loading security telemetry...
+        </div>
+      );
+    }
+
+    if (!securityTelemetry) {
+      return (
+        <p className="text-sm text-text-secondary">No security telemetry data is available.</p>
+      );
+    }
+
+    const summaryCards = [
+      { label: 'Reports', value: securityTelemetry.summary.totalReports },
+      { label: 'Total findings', value: securityTelemetry.summary.totalFindings },
+      { label: 'Reports with findings', value: securityTelemetry.summary.reportsWithFindings },
+      { label: 'High-risk generations', value: securityTelemetry.summary.highRiskGenerations },
+      { label: 'Scanner errors', value: securityTelemetry.summary.scannerErrors },
+    ];
+
+    return (
+      <>
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+          {summaryCards.map((card) => (
+            <div key={card.label} className="rounded-md border border-surface-3 p-3">
+              <p className="text-xs text-text-muted-foreground">{card.label}</p>
+              <p className="text-lg font-semibold text-text-primary">{card.value}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2">
+          <div className="rounded-md border border-surface-3 p-3">
+            <p className="mb-2 text-xs uppercase tracking-wide text-text-muted-foreground">
+              Severity distribution
+            </p>
+            <div className="space-y-1 text-sm text-text-secondary">
+              {Object.entries(securityTelemetry.severityDistribution).map(([severity, count]) => (
+                <div key={severity} className="flex items-center justify-between">
+                  <span>{severity}</span>
+                  <span className="font-medium text-text-primary">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-md border border-surface-3 p-3">
+            <p className="mb-2 text-xs uppercase tracking-wide text-text-muted-foreground">
+              Risk distribution
+            </p>
+            <div className="space-y-1 text-sm text-text-secondary">
+              {Object.entries(securityTelemetry.riskDistribution).map(([risk, count]) => (
+                <div key={risk} className="flex items-center justify-between">
+                  <span>{risk}</span>
+                  <span className="font-medium text-text-primary">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-xs uppercase tracking-wide text-text-muted-foreground">
+            Top triggered rules
+          </p>
+          {securityTelemetry.topRules.length === 0 ? (
+            <p className="text-sm text-text-secondary">No rules triggered in this window.</p>
+          ) : (
+            <div className="siza-scrollbar overflow-x-auto">
+              <table className="min-w-full divide-y divide-surface-3 text-sm">
+                <thead>
+                  <tr className="text-left text-text-muted-foreground">
+                    <th className="px-3 py-2 font-medium">Rule</th>
+                    <th className="px-3 py-2 font-medium">Count</th>
+                    <th className="px-3 py-2 font-medium">Max severity</th>
+                    <th className="px-3 py-2 font-medium">Max risk</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-surface-3">
+                  {securityTelemetry.topRules.map((rule) => (
+                    <tr key={rule.ruleId}>
+                      <td className="px-3 py-2 font-mono text-xs text-text-primary">
+                        {rule.ruleId}
+                      </td>
+                      <td className="px-3 py-2 text-text-primary">{rule.count}</td>
+                      <td className="px-3 py-2 text-text-secondary">{rule.maxSeverity}</td>
+                      <td className="px-3 py-2 text-text-secondary">{rule.maxRiskLevel}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-xs uppercase tracking-wide text-text-muted-foreground">
+            Recent high-risk generations
+          </p>
+          {securityTelemetry.recentHighRiskGenerations.length === 0 ? (
+            <p className="text-sm text-text-secondary">No high-risk generations in this window.</p>
+          ) : (
+            <div className="siza-scrollbar overflow-x-auto">
+              <table className="min-w-full divide-y divide-surface-3 text-sm">
+                <thead>
+                  <tr className="text-left text-text-muted-foreground">
+                    <th className="px-3 py-2 font-medium">Generation</th>
+                    <th className="px-3 py-2 font-medium">Created</th>
+                    <th className="px-3 py-2 font-medium">Findings</th>
+                    <th className="px-3 py-2 font-medium">Severity</th>
+                    <th className="px-3 py-2 font-medium">Scanner</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-surface-3">
+                  {securityTelemetry.recentHighRiskGenerations.map((item) => (
+                    <tr key={item.generationId}>
+                      <td className="px-3 py-2 font-mono text-xs text-text-primary">
+                        {item.generationId.slice(0, 8)}
+                      </td>
+                      <td className="px-3 py-2 text-text-secondary">
+                        {new Date(item.createdAt).toLocaleString()}
+                      </td>
+                      <td className="px-3 py-2 text-text-primary">{item.findingCount}</td>
+                      <td className="px-3 py-2 text-text-secondary">
+                        {item.highestSeverity ?? 'N/A'}
+                      </td>
+                      <td className="px-3 py-2 text-text-secondary">{item.scannerExecution}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      </>
+    );
+  })();
 
   return (
     <div className="container mx-auto py-8 space-y-6">
@@ -543,160 +683,7 @@ export function AdminClient() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-5">
-          {isSecurityLoading ? (
-            <div className="flex items-center justify-center py-8 text-text-secondary">
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Loading security telemetry...
-            </div>
-          ) : !securityTelemetry ? (
-            <p className="text-sm text-text-secondary">No security telemetry data is available.</p>
-          ) : (
-            <>
-              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-                <div className="rounded-md border border-surface-3 p-3">
-                  <p className="text-xs text-text-muted-foreground">Reports</p>
-                  <p className="text-lg font-semibold text-text-primary">
-                    {securityTelemetry.summary.totalReports}
-                  </p>
-                </div>
-                <div className="rounded-md border border-surface-3 p-3">
-                  <p className="text-xs text-text-muted-foreground">Total findings</p>
-                  <p className="text-lg font-semibold text-text-primary">
-                    {securityTelemetry.summary.totalFindings}
-                  </p>
-                </div>
-                <div className="rounded-md border border-surface-3 p-3">
-                  <p className="text-xs text-text-muted-foreground">Reports with findings</p>
-                  <p className="text-lg font-semibold text-text-primary">
-                    {securityTelemetry.summary.reportsWithFindings}
-                  </p>
-                </div>
-                <div className="rounded-md border border-surface-3 p-3">
-                  <p className="text-xs text-text-muted-foreground">High-risk generations</p>
-                  <p className="text-lg font-semibold text-text-primary">
-                    {securityTelemetry.summary.highRiskGenerations}
-                  </p>
-                </div>
-                <div className="rounded-md border border-surface-3 p-3">
-                  <p className="text-xs text-text-muted-foreground">Scanner errors</p>
-                  <p className="text-lg font-semibold text-text-primary">
-                    {securityTelemetry.summary.scannerErrors}
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid gap-3 md:grid-cols-2">
-                <div className="rounded-md border border-surface-3 p-3">
-                  <p className="mb-2 text-xs uppercase tracking-wide text-text-muted-foreground">
-                    Severity distribution
-                  </p>
-                  <div className="space-y-1 text-sm text-text-secondary">
-                    {Object.entries(securityTelemetry.severityDistribution).map(
-                      ([severity, count]) => (
-                        <div key={severity} className="flex items-center justify-between">
-                          <span>{severity}</span>
-                          <span className="font-medium text-text-primary">{count}</span>
-                        </div>
-                      )
-                    )}
-                  </div>
-                </div>
-                <div className="rounded-md border border-surface-3 p-3">
-                  <p className="mb-2 text-xs uppercase tracking-wide text-text-muted-foreground">
-                    Risk distribution
-                  </p>
-                  <div className="space-y-1 text-sm text-text-secondary">
-                    {Object.entries(securityTelemetry.riskDistribution).map(([risk, count]) => (
-                      <div key={risk} className="flex items-center justify-between">
-                        <span>{risk}</span>
-                        <span className="font-medium text-text-primary">{count}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-xs uppercase tracking-wide text-text-muted-foreground">
-                  Top triggered rules
-                </p>
-                {securityTelemetry.topRules.length === 0 ? (
-                  <p className="text-sm text-text-secondary">No rules triggered in this window.</p>
-                ) : (
-                  <div className="siza-scrollbar overflow-x-auto">
-                    <table className="min-w-full divide-y divide-surface-3 text-sm">
-                      <thead>
-                        <tr className="text-left text-text-muted-foreground">
-                          <th className="px-3 py-2 font-medium">Rule</th>
-                          <th className="px-3 py-2 font-medium">Count</th>
-                          <th className="px-3 py-2 font-medium">Max severity</th>
-                          <th className="px-3 py-2 font-medium">Max risk</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-surface-3">
-                        {securityTelemetry.topRules.map((rule) => (
-                          <tr key={rule.ruleId}>
-                            <td className="px-3 py-2 font-mono text-xs text-text-primary">
-                              {rule.ruleId}
-                            </td>
-                            <td className="px-3 py-2 text-text-primary">{rule.count}</td>
-                            <td className="px-3 py-2 text-text-secondary">{rule.maxSeverity}</td>
-                            <td className="px-3 py-2 text-text-secondary">{rule.maxRiskLevel}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <p className="text-xs uppercase tracking-wide text-text-muted-foreground">
-                  Recent high-risk generations
-                </p>
-                {securityTelemetry.recentHighRiskGenerations.length === 0 ? (
-                  <p className="text-sm text-text-secondary">
-                    No high-risk generations in this window.
-                  </p>
-                ) : (
-                  <div className="siza-scrollbar overflow-x-auto">
-                    <table className="min-w-full divide-y divide-surface-3 text-sm">
-                      <thead>
-                        <tr className="text-left text-text-muted-foreground">
-                          <th className="px-3 py-2 font-medium">Generation</th>
-                          <th className="px-3 py-2 font-medium">Created</th>
-                          <th className="px-3 py-2 font-medium">Findings</th>
-                          <th className="px-3 py-2 font-medium">Severity</th>
-                          <th className="px-3 py-2 font-medium">Scanner</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-surface-3">
-                        {securityTelemetry.recentHighRiskGenerations.map((item) => (
-                          <tr key={item.generationId}>
-                            <td className="px-3 py-2 font-mono text-xs text-text-primary">
-                              {item.generationId.slice(0, 8)}
-                            </td>
-                            <td className="px-3 py-2 text-text-secondary">
-                              {new Date(item.createdAt).toLocaleString()}
-                            </td>
-                            <td className="px-3 py-2 text-text-primary">{item.findingCount}</td>
-                            <td className="px-3 py-2 text-text-secondary">
-                              {item.highestSeverity ?? 'N/A'}
-                            </td>
-                            <td className="px-3 py-2 text-text-secondary">
-                              {item.scannerExecution}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            </>
-          )}
-        </CardContent>
+        <CardContent className="space-y-5">{securityTelemetryContent}</CardContent>
       </Card>
 
       <Card>

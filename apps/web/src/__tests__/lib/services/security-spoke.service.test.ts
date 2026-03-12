@@ -40,7 +40,7 @@ const validPayload = {
         severity: 'high',
         category: 'injection',
         title: 'Injection Sink Pattern',
-        evidence: [{ kind: 'code', value: 'eval\\s*\\(', line: 12 }],
+        evidence: [{ kind: 'code', value: String.raw`eval\s*\(`, line: 12 }],
         recommendation: 'Use parameterized APIs.',
         risk_level: 'high',
       },
