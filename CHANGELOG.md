@@ -109,6 +109,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and disabled by default; failures now return explicit MCP-availability guidance
 
 ### Fixed
+- **Core-flow report workflow load failure** — Corrected report workflow schedule
+  cron expressions and cadence mapping to avoid zero-job parse failures on push
 - **Auth callback failure handling** — Sanitized callback `next` parameter and route failures to `/auth/auth-code-error` with explicit reason handling
 - **Marketplace resilience surfaces** — Improved templates/plugins/gallery handling for ownership filtering, empty-state messaging, and API failure/retry behavior used by marketplace smoke
 - **Onboarding completion idempotency** — Switched onboarding completion route to profile upsert-by-id to avoid missing-row failures

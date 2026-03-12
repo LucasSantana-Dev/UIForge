@@ -2,8 +2,8 @@ name: Core Flow Validation Report
 
 on:
   schedule:
-    - cron: '20 3 * * 2-7'
-    - cron: '20 3 * * 1'
+    - cron: '20 3 * * *'
+    - cron: '25 3 * * 1'
   workflow_dispatch:
 
 concurrency:
@@ -49,7 +49,7 @@ jobs:
 
           cadence="manual"
           if [ "$EVENT_NAME" = "schedule" ]; then
-            if [ "$EVENT_SCHEDULE" = "20 3 * * 1" ]; then
+            if [ "$EVENT_SCHEDULE" = "25 3 * * 1" ]; then
               cadence="weekly"
             else
               cadence="daily"
