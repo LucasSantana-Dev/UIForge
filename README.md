@@ -274,6 +274,7 @@ npm run build           # Build for production
 npm run lint            # ESLint
 npm test                # Unit tests (Jest)
 npm run test:e2e        # E2E tests (Playwright)
+npm run test:e2e:prod   # Production Chromium audit (artifacts + issues map)
 npm run type-check      # TypeScript
 npm run sync:golden-paths # Sync official Golden Paths seeds
 npm run sync:skills     # Sync official skills from skills/*/SKILL.md
@@ -286,11 +287,19 @@ cd apps/web
 npm run test:e2e:lead:preflight
 npm run test:e2e:lead:chromium
 npm run ads:google:prepublish
+npm run test:e2e:prod
 ```
 
 - `test:e2e:lead:preflight` validates generation backend readiness (MCP gateway, provider key, or local fallback)
 - `test:e2e:lead:chromium` runs Chromium smoke for lead-critical flows
 - `ads:google:prepublish` runs preflight + marketplace smoke and prints manual GA4/Ads checks
+- `test:e2e:prod` runs production audit packs (`public` + `auth` by default) and writes
+  artifacts to `apps/web/test-results/production/<run-id>` plus `issues-map.json`
+  from real failing tests and runtime API probes
+- Runtime probes in `test:e2e:prod` assert unauthenticated generation endpoints return `401`
+  (`/api/generations`, `/api/generations/history`, `/api/generations/[id]`)
+- Lead-readiness checkout smoke in production audit accepts `403 Billing is not enabled`
+  when billing is disabled and expects `200 + url` when billing is enabled
 - Campaign assets for `siza_br_en_leadtest_v1` are in `apps/web/marketing/google-ads/siza_br_en_leadtest_v1`
   - `campaign-config.json`
   - `keywords.csv`

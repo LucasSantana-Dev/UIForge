@@ -4,6 +4,7 @@ import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { captureServerError } from '@/lib/sentry/server';
+import { handleGenerationRouteError } from './error-handler';
 
 export async function GET(request: NextRequest) {
   try {
@@ -58,8 +59,7 @@ export async function GET(request: NextRequest) {
 
     return successResponse({ generations });
   } catch (error) {
-    captureServerError(error, { route: '/api/generations' });
-    return errorResponse('Internal server error', 500);
+    return handleGenerationRouteError(error, '/api/generations');
   }
 }
 
@@ -146,7 +146,6 @@ export async function POST(request: NextRequest) {
       '201'
     );
   } catch (error) {
-    captureServerError(error, { route: '/api/generations' });
-    return errorResponse('Internal server error', 500);
+    return handleGenerationRouteError(error, '/api/generations');
   }
 }

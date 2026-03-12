@@ -125,6 +125,7 @@ export function PhaseCard({
     <motion.div
       ref={ref}
       id={`phase-${phase.number}`}
+      data-testid="roadmap-phase-card"
       initial={prefersReducedMotion ? false : { opacity: 0, y: 30 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={
@@ -157,23 +158,29 @@ export function PhaseCard({
           onClick={onToggle}
           aria-expanded={expanded}
           aria-controls={`phase-${phase.number}-items`}
-          className="w-full text-left flex items-center gap-3 mb-1"
+          className="mb-1 w-full text-left"
         >
-          <span role="heading" aria-level={2} className="text-xl font-bold">
-            Phase {phase.number}
-          </span>
-          <span className="text-muted-foreground">&mdash;</span>
-          <span className="text-lg font-semibold">{phase.title}</span>
-          {isActive && (
-            <Badge className="bg-primary/20 text-primary border-0 text-xs">Current</Badge>
-          )}
-          <span className="text-xs text-muted-foreground ml-auto mr-2">{phase.estimatedDate}</span>
-          <motion.div
-            animate={{ rotate: expanded ? 180 : 0 }}
-            transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
-          >
-            <ChevronDown className="w-4 h-4 text-muted-foreground" />
-          </motion.div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <span role="heading" aria-level={2} className="text-xl font-bold">
+                Phase {phase.number}
+              </span>
+              <span className="text-muted-foreground">&mdash;</span>
+              <span className="text-lg font-semibold">{phase.title}</span>
+              {isActive && (
+                <Badge className="border-0 bg-primary/20 text-xs text-primary">Current</Badge>
+              )}
+            </div>
+            <div className="flex shrink-0 items-center gap-2 sm:ml-auto">
+              <span className="text-xs text-muted-foreground">{phase.estimatedDate}</span>
+              <motion.div
+                animate={{ rotate: expanded ? 180 : 0 }}
+                transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.2 }}
+              >
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </motion.div>
+            </div>
+          </div>
         </button>
         <p className="text-sm text-muted-foreground mb-3">{phase.subtitle}</p>
         <div className="flex items-center gap-3 mb-4">
