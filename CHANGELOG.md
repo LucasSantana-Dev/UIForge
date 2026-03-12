@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Core-flow validation telemetry** — Added `GET /api/admin/validation` (admin-only),
   `POST /api/internal/validation/snapshot` (token-protected), daily snapshot storage
   (`core_flow_gate_snapshots`), and scheduled snapshot workflow for 50-user gate tracking
+- **Live admin metrics endpoint** — Added `GET /api/admin/metrics` (admin-only)
+  with `windowDays=7|30|90` support for product telemetry
 - **Marketing SEO contract** — Added centralized route metadata map for
   `/`, `/about`, `/roadmap`, `/pricing`, `/docs`, `/gallery`,
   `/legal/privacy`, and `/legal/terms` with canonical/Open Graph/Twitter fields
@@ -40,6 +42,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Official skills parser sweep test** — Validates all `skills/*/SKILL.md` files parse cleanly
 - **Roadmap gate metrics contract** — `/api/metrics` now returns 50-user gate status,
   core-flow adoption metrics, revision rate, satisfaction rate, and MCP routing coverage
+- **Live analytics telemetry wiring** — Replaced mocked Analytics Dashboard data with
+  live `/api/admin/metrics` telemetry (core totals, generation success, revision rate,
+  satisfaction rate, MCP coverage) and CSV export from real values
 - **MCP fallback policy flag** — Added `ENABLE_MCP_DIRECT_PROVIDER_FALLBACK` (default: off)
   to control whether MCP failures may fallback to direct providers
 

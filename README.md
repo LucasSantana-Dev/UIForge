@@ -122,12 +122,22 @@ SIZA_AGENT_LOCAL_FALLBACK=false
 
 ### Validation and quality metrics
 
-`GET /api/metrics` now reports:
+`GET /api/metrics` reports live telemetry with strict bearer auth (`METRICS_API_KEY`):
 
-- 50-user gate readiness (`adoption.gate50`)
-- Core-flow adoption (onboarding/project/generation rates)
-- Generation quality indicators (success rate, satisfaction rate, revision rate)
-- MCP routing coverage (`routing.mcp`)
+- Users (`total`, `last7d`, `last30d`, `active`)
+- Generations (`total`, `last24h`, `last7d`, `successRate`)
+- Projects (`total`)
+- Quality (`revisionRate`, `satisfactionRate`, `mcpCoverage`) with optional
+  `windowDays=7|30|90` (default `30`)
+
+Admin UI (`/admin`) now includes a live Product Telemetry section backed by
+`GET /api/admin/metrics` (admin session required).
+
+Required runtime env:
+
+```env
+METRICS_API_KEY=replace-with-strong-random-token
+```
 
 ### Grant admin access locally
 

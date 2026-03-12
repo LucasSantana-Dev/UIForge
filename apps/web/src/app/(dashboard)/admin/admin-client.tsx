@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loader2, PlusCircle, ShieldCheck, Trash2 } from 'lucide-react';
 import { DashboardSection } from '@/components/migration/migration-primitives';
+import AnalyticsDashboard from '@/components/analytics/AnalyticsDashboard';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -426,6 +427,18 @@ export function AdminClient() {
               </div>
             </>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Product Telemetry</CardTitle>
+          <CardDescription>
+            Live quality and adoption metrics for generation performance and routing behavior.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <AnalyticsDashboard />
         </CardContent>
       </Card>
 

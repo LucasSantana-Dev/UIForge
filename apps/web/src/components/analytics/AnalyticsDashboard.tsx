@@ -1,298 +1,249 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Activity, BarChart3, Download, Loader2, RefreshCw, TrendingUp } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Users,
-  Eye,
-  MousePointer,
-  TrendingUp,
-  Download,
-  BarChart3,
-  PieChart,
-  Activity,
-} from 'lucide-react';
+import type { MetricsReport, MetricsWindowDays } from '@/lib/analytics/metrics';
 
-interface AnalyticsData {
-  pageViews: number;
-  uniqueVisitors: number;
-  bounceRate: number;
-  avgSessionDuration: number;
-  topPages: Array<{ path: string; views: number; percentage: number }>;
-  topTemplates: Array<{ name: string; uses: number; percentage: number }>;
-  dailyStats: Array<{ date: string; views: number; visitors: number }>;
-  userAgents: Array<{ browser: string; percentage: number }>;
-  devices: Array<{ device: string; percentage: number }>;
+const TIME_RANGES: MetricsWindowDays[] = [7, 30, 90];
+
+function formatPercent(value: number | null) {
+  if (value === null) return 'N/A';
+  return `${value}%`;
+}
+
+function formatValue(value: number) {
+  return value.toLocaleString();
+}
+
+function useLiveMetrics() {
+  const [timeRange, setTimeRange] = useState<MetricsWindowDays>(30);
+  const [data, setData] = useState<MetricsReport | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const load = useCallback(async (windowDays: MetricsWindowDays) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/admin/metrics?windowDays=${windowDays}`, {
+        cache: 'no-store',
+      });
+      const payload = (await response.json()) as MetricsReport & { error?: string };
+      if (!response.ok) {
+        throw new Error(payload.error || 'Failed to load metrics');
+      }
+      setData(payload);
+    } catch (fetchError) {
+      setError(fetchError instanceof Error ? fetchError.message : 'Failed to load metrics');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load(timeRange);
+  }, [load, timeRange]);
+
+  return { timeRange, setTimeRange, data, isLoading, error, refresh: () => load(timeRange) };
 }
 
 export default function AnalyticsDashboard() {
-  const [data] = useState<AnalyticsData>({
-    pageViews: 15420,
-    uniqueVisitors: 3280,
-    bounceRate: 32.5,
-    avgSessionDuration: 245,
-    topPages: [
-      { path: '/templates', views: 5420, percentage: 35.2 },
-      { path: '/generate', views: 3890, percentage: 25.2 },
-      { path: '/projects', views: 2890, percentage: 18.7 },
-      { path: '/', views: 2220, percentage: 14.4 },
-      { path: '/settings', views: 1000, percentage: 6.5 },
-    ],
-    topTemplates: [
-      { name: 'Navigation Bar', uses: 342, percentage: 28.5 },
-      { name: 'Hero Section', uses: 289, percentage: 24.1 },
-      { name: 'Contact Form', uses: 198, percentage: 16.5 },
-      { name: 'Pricing Card', uses: 156, percentage: 13.0 },
-      { name: 'Modal Dialog', uses: 215, percentage: 17.9 },
-    ],
-    dailyStats: [
-      { date: '2026-02-10', views: 2100, visitors: 450 },
-      { date: '2026-02-11', views: 2350, visitors: 480 },
-      { date: '2026-02-12', views: 2680, visitors: 520 },
-      { date: '2026-02-13', views: 2420, visitors: 490 },
-      { date: '2026-02-14', views: 2890, visitors: 580 },
-      { date: '2026-02-15', views: 2980, visitors: 760 },
-    ],
-    userAgents: [
-      { browser: 'Chrome', percentage: 65.2 },
-      { browser: 'Safari', percentage: 18.5 },
-      { browser: 'Firefox', percentage: 8.3 },
-      { browser: 'Edge', percentage: 5.8 },
-      { browser: 'Other', percentage: 2.2 },
-    ],
-    devices: [
-      { device: 'Desktop', percentage: 58.7 },
-      { device: 'Mobile', percentage: 35.2 },
-      { device: 'Tablet', percentage: 6.1 },
-    ],
-  });
+  const { timeRange, setTimeRange, data, isLoading, error, refresh } = useLiveMetrics();
 
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d'>('7d');
+  const exportData = useCallback(() => {
+    if (!data) return;
 
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-  };
-
-  const exportData = () => {
     const csvContent = [
       ['Metric', 'Value'],
-      ['Page Views', data.pageViews],
-      ['Unique Visitors', data.uniqueVisitors],
-      ['Bounce Rate', `${data.bounceRate}%`],
-      ['Avg Session Duration', formatDuration(data.avgSessionDuration)],
+      ['Users Total', data.users.total],
+      ['Users Active', data.users.active],
+      ['Users Last 7d', data.users.last7d],
+      ['Users Last 30d', data.users.last30d],
+      ['Generations Total', data.generations.total],
+      ['Generations Last 24h', data.generations.last24h],
+      ['Generations Last 7d', data.generations.last7d],
+      ['Generation Success Rate', `${data.generations.successRate}%`],
+      ['Projects Total', data.projects.total],
+      ['Quality Window (Days)', data.quality.windowDays],
+      ['Quality Total Generations', data.quality.totalGenerations],
+      ['Revision Rate', `${data.quality.revisionRate}%`],
+      [
+        'Satisfaction Rate',
+        data.quality.satisfactionRate === null ? 'N/A' : `${data.quality.satisfactionRate}%`,
+      ],
+      ['Satisfaction Votes', data.quality.satisfactionVotes],
+      ['MCP Coverage', `${data.quality.mcpCoverage}%`],
+      ['Captured At', data.timestamp],
     ];
 
     const csv = csvContent.map((row) => row.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `analytics-${timeRange}.csv`;
-    a.click();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `analytics-${timeRange}d.csv`;
+    link.click();
     window.URL.revokeObjectURL(url);
-  };
+  }, [data, timeRange]);
+
+  const qualityRows = useMemo(() => {
+    if (!data) return [];
+    return [
+      { label: 'Revision Rate', value: formatPercent(data.quality.revisionRate) },
+      { label: 'Satisfaction Rate', value: formatPercent(data.quality.satisfactionRate) },
+      { label: 'MCP Coverage', value: formatPercent(data.quality.mcpCoverage) },
+      { label: 'Satisfaction Votes', value: formatValue(data.quality.satisfactionVotes) },
+    ];
+  }, [data]);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-bold">Analytics Dashboard</h2>
-          <p className="text-sm text-muted-foreground">
-            Monitor your app&apos;s performance and user engagement
+          <h2 className="text-xl font-semibold text-text-primary">Live Analytics</h2>
+          <p className="text-sm text-text-secondary">
+            Product telemetry sourced from live generation, project, and feedback data.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex bg-surface-2 rounded-lg p-1">
-            {(['7d', '30d', '90d'] as const).map((range) => (
+          <div className="flex rounded-lg bg-surface-2 p-1">
+            {TIME_RANGES.map((range) => (
               <Button
                 key={range}
                 variant={timeRange === range ? 'default' : 'ghost'}
                 size="sm"
                 onClick={() => setTimeRange(range)}
               >
-                {range === '7d' ? '7 days' : range === '30d' ? '30 days' : '90 days'}
+                {range}d
               </Button>
             ))}
           </div>
-          <Button variant="outline" size="sm" onClick={exportData}>
-            <Download className="w-4 h-4 mr-2" />
-            Export
+          <Button variant="outline" size="sm" onClick={() => void refresh()} disabled={isLoading}>
+            {isLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <RefreshCw className="mr-2 h-4 w-4" />
+            )}
+            Refresh
+          </Button>
+          <Button variant="outline" size="sm" onClick={exportData} disabled={!data}>
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
           </Button>
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Page Views</p>
-              <p className="text-2xl font-bold">{data.pageViews.toLocaleString()}</p>
-              <div className="flex items-center mt-1">
-                <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
-                <span className="text-sm text-green-600">+12.5%</span>
-              </div>
-            </div>
-            <Eye className="w-8 h-8 text-brand" />
+      {error ? (
+        <Card className="border-error/40 bg-error/10 p-4 text-sm text-error">{error}</Card>
+      ) : null}
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <Card className="p-5">
+          <p className="text-xs text-text-muted-foreground">Users</p>
+          <p className="mt-2 text-2xl font-semibold text-text-primary">
+            {isLoading || !data ? '...' : formatValue(data.users.total)}
+          </p>
+          <p className="mt-1 text-xs text-text-secondary">
+            Active: {isLoading || !data ? '...' : formatValue(data.users.active)}
+          </p>
+        </Card>
+
+        <Card className="p-5">
+          <p className="text-xs text-text-muted-foreground">Generations</p>
+          <p className="mt-2 text-2xl font-semibold text-text-primary">
+            {isLoading || !data ? '...' : formatValue(data.generations.total)}
+          </p>
+          <p className="mt-1 text-xs text-text-secondary">
+            Last 7d: {isLoading || !data ? '...' : formatValue(data.generations.last7d)}
+          </p>
+        </Card>
+
+        <Card className="p-5">
+          <p className="text-xs text-text-muted-foreground">Generation Success</p>
+          <p className="mt-2 text-2xl font-semibold text-text-primary">
+            {isLoading || !data ? '...' : `${data.generations.successRate}%`}
+          </p>
+          <div className="mt-2 flex items-center gap-1 text-xs text-text-secondary">
+            <TrendingUp className="h-3.5 w-3.5" />
+            Success rate across all generations
           </div>
         </Card>
 
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Unique Visitors</p>
-              <p className="text-2xl font-bold">{data.uniqueVisitors.toLocaleString()}</p>
-              <div className="flex items-center mt-1">
-                <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
-                <span className="text-sm text-green-600">+8.3%</span>
-              </div>
-            </div>
-            <Users className="w-8 h-8 text-green-600" />
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Bounce Rate</p>
-              <p className="text-2xl font-bold">{data.bounceRate}%</p>
-              <div className="flex items-center mt-1">
-                <TrendingUp className="w-4 h-4 text-red-600 mr-1" />
-                <span className="text-sm text-red-600">+2.1%</span>
-              </div>
-            </div>
-            <MousePointer className="w-8 h-8 text-orange-600" />
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-muted-foreground">Avg Session</p>
-              <p className="text-2xl font-bold">{formatDuration(data.avgSessionDuration)}</p>
-              <div className="flex items-center mt-1">
-                <TrendingUp className="w-4 h-4 text-green-600 mr-1" />
-                <span className="text-sm text-green-600">+15s</span>
-              </div>
-            </div>
-            <Activity className="w-8 h-8 text-purple-600" />
-          </div>
+        <Card className="p-5">
+          <p className="text-xs text-text-muted-foreground">Projects</p>
+          <p className="mt-2 text-2xl font-semibold text-text-primary">
+            {isLoading || !data ? '...' : formatValue(data.projects.total)}
+          </p>
+          <p className="mt-1 text-xs text-text-secondary">Total projects created</p>
         </Card>
       </div>
 
-      {/* Charts and Details */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Pages */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Top Pages</h3>
-            <BarChart3 className="w-5 h-5 text-muted-foreground" />
+      <Card className="p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Activity className="h-4 w-4 text-brand" />
+            <h3 className="text-base font-semibold text-text-primary">Quality Telemetry</h3>
           </div>
-          <div className="space-y-3">
-            {data.topPages.map((page, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-muted-foreground w-12">
-                    #{index + 1}
-                  </span>
-                  <span className="text-sm">{page.path}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">
-                    {page.views.toLocaleString()}
-                  </span>
-                  <Badge variant="secondary" className="text-xs">
-                    {page.percentage}%
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+          {data ? (
+            <Badge variant="outline">
+              Window: {data.quality.windowDays}d ({formatValue(data.quality.totalGenerations)} gens)
+            </Badge>
+          ) : null}
+        </div>
 
-        {/* Top Templates */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Top Templates</h3>
-            <PieChart className="w-5 h-5 text-muted-foreground" />
-          </div>
-          <div className="space-y-3">
-            {data.topTemplates.map((template, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-muted-foreground w-12">
-                    #{index + 1}
-                  </span>
-                  <span className="text-sm">{template.name}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">{template.uses} uses</span>
-                  <Badge variant="secondary" className="text-xs">
-                    {template.percentage}%
-                  </Badge>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
+        <div className="space-y-2">
+          {qualityRows.map((row) => (
+            <div
+              key={row.label}
+              className={[
+                'flex items-center justify-between rounded-md border border-surface-3',
+                'px-3 py-2',
+              ].join(' ')}
+            >
+              <span className="text-sm text-text-secondary">{row.label}</span>
+              <span className="text-sm font-semibold text-text-primary">
+                {isLoading ? '...' : row.value}
+              </span>
+            </div>
+          ))}
+        </div>
+      </Card>
 
-        {/* User Agents */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Browsers</h3>
-            <BarChart3 className="w-5 h-5 text-muted-foreground" />
+      <Card className="p-5">
+        <div className="mb-4 flex items-center gap-2">
+          <BarChart3 className="h-4 w-4 text-brand" />
+          <h3 className="text-base font-semibold text-text-primary">Telemetry Snapshot</h3>
+        </div>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <div className="rounded-md border border-surface-3 p-3">
+            <p className="text-xs text-text-muted-foreground">Users Last 7d</p>
+            <p className="mt-1 text-lg font-semibold text-text-primary">
+              {isLoading || !data ? '...' : formatValue(data.users.last7d)}
+            </p>
           </div>
-          <div className="space-y-3">
-            {data.userAgents.map((browser, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <span className="text-sm">{browser.browser}</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 bg-surface-3 rounded-full h-2">
-                    <div
-                      className="bg-brand h-2 rounded-full"
-                      style={{ width: `${browser.percentage}%` }}
-                    />
-                  </div>
-                  <Badge variant="outline" className="text-xs w-12 justify-center">
-                    {browser.percentage}%
-                  </Badge>
-                </div>
-              </div>
-            ))}
+          <div className="rounded-md border border-surface-3 p-3">
+            <p className="text-xs text-text-muted-foreground">Users Last 30d</p>
+            <p className="mt-1 text-lg font-semibold text-text-primary">
+              {isLoading || !data ? '...' : formatValue(data.users.last30d)}
+            </p>
           </div>
-        </Card>
-
-        {/* Devices */}
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold">Devices</h3>
-            <PieChart className="w-5 h-5 text-muted-foreground" />
+          <div className="rounded-md border border-surface-3 p-3">
+            <p className="text-xs text-text-muted-foreground">Generations Last 24h</p>
+            <p className="mt-1 text-lg font-semibold text-text-primary">
+              {isLoading || !data ? '...' : formatValue(data.generations.last24h)}
+            </p>
           </div>
-          <div className="space-y-3">
-            {data.devices.map((device, index) => (
-              <div key={index} className="flex items-center justify-between">
-                <span className="text-sm">{device.device}</span>
-                <div className="flex items-center gap-2">
-                  <div className="w-24 bg-surface-3 rounded-full h-2">
-                    <div
-                      className="bg-green-600 h-2 rounded-full"
-                      style={{ width: `${device.percentage}%` }}
-                    />
-                  </div>
-                  <Badge variant="outline" className="text-xs w-12 justify-center">
-                    {device.percentage}%
-                  </Badge>
-                </div>
-              </div>
-            ))}
+          <div className="rounded-md border border-surface-3 p-3">
+            <p className="text-xs text-text-muted-foreground">Last Capture</p>
+            <p className="mt-1 text-sm font-semibold text-text-primary">
+              {isLoading || !data ? '...' : new Date(data.timestamp).toLocaleString()}
+            </p>
           </div>
-        </Card>
-      </div>
+        </div>
+      </Card>
     </div>
   );
 }
