@@ -1,4 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
+import type { MetricsWindowDays } from '@/lib/analytics/metrics';
+import {
+  getCoreFlowActivationFunnel,
+  type CoreFlowActivationFunnel,
+} from '@/lib/services/core-flow-activation.service';
 
 export const CORE_FLOW_QUALIFIED_TARGET = 50;
 export const CORE_FLOW_MAX_DROP_PCT = 10;
@@ -57,6 +62,7 @@ export interface CoreFlowValidationReport {
   snapshots: CoreFlowSnapshotPoint[];
   trend: CoreFlowWeeklyTrend;
   gate: CoreFlowGateStatus;
+  activationFunnel: CoreFlowActivationFunnel;
   capturedSnapshotDate?: string;
 }
 
@@ -315,6 +321,7 @@ function buildValidationReport(
   now: Date,
   current: CoreFlowCurrentMetrics,
   snapshots: CoreFlowSnapshotRow[],
+  activationFunnel: CoreFlowActivationFunnel,
   capturedSnapshotDate?: string
 ): CoreFlowValidationReport {
   const trend = evaluateCoreFlowWeeklyTrend(
@@ -331,19 +338,28 @@ function buildValidationReport(
     snapshots: buildSnapshotSeries(snapshots, now),
     trend,
     gate,
+    activationFunnel,
     ...(capturedSnapshotDate ? { capturedSnapshotDate } : {}),
   };
 }
 
-export async function getCoreFlowValidationReport(now = new Date()) {
+export async function getCoreFlowValidationReport(
+  now = new Date(),
+  windowDays: MetricsWindowDays = 30
+) {
   const current = await collectCurrentCoreFlowMetrics(now);
   const snapshots = await fetchRecentSnapshots(30);
-  return buildValidationReport(now, current, snapshots);
+  const activationFunnel = await getCoreFlowActivationFunnel(windowDays, now);
+  return buildValidationReport(now, current, snapshots, activationFunnel);
 }
 
-export async function captureCoreFlowValidationSnapshot(now = new Date()) {
+export async function captureCoreFlowValidationSnapshot(
+  now = new Date(),
+  windowDays: MetricsWindowDays = 30
+) {
   const current = await collectCurrentCoreFlowMetrics(now);
   const snapshot = await upsertDailySnapshot(current);
   const snapshots = await fetchRecentSnapshots(30);
-  return buildValidationReport(now, current, snapshots, snapshot.snapshotDate);
+  const activationFunnel = await getCoreFlowActivationFunnel(windowDays, now);
+  return buildValidationReport(now, current, snapshots, activationFunnel, snapshot.snapshotDate);
 }

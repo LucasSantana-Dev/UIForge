@@ -33,6 +33,8 @@ type CoreFlowGateReason =
   | 'WEEKLY_TARGET_NOT_REACHED'
   | 'WEEK_OVER_WEEK_DROP_TOO_HIGH';
 
+type CoreFlowDropoffReason = 'ONBOARDING_NOT_COMPLETED' | 'NO_PROJECT' | 'NO_COMPLETED_GENERATION';
+
 interface CoreFlowValidationSnapshot {
   snapshotDate: string;
   totalUsers: number;
@@ -69,6 +71,28 @@ interface CoreFlowValidationResponse {
     reasons: CoreFlowGateReason[];
     qualifiedTarget: number;
     maxDropPct: number;
+  };
+  activationFunnel: {
+    windowDays: MetricsWindowDays;
+    computedAt: string;
+    cohortStartDate: string;
+    counts: {
+      startedOnboarding: number;
+      completedOnboarding: number;
+      firstProject: number;
+      firstCompletedGeneration: number;
+      qualifiedUsers: number;
+    };
+    conversionRates: {
+      onboardingCompletion: number;
+      projectActivation: number;
+      generationActivation: number;
+      qualification: number;
+    };
+    topDropoffReasons: Array<{
+      reason: CoreFlowDropoffReason;
+      count: number;
+    }>;
   };
 }
 
@@ -118,6 +142,12 @@ const reasonCopy: Record<Exclude<CoreFlowGateReason, 'PASS'>, string> = {
   WEEK_OVER_WEEK_DROP_TOO_HIGH: 'Week-over-week qualified-user drop is above the 10% threshold.',
 };
 
+const dropoffReasonCopy: Record<CoreFlowDropoffReason, string> = {
+  ONBOARDING_NOT_COMPLETED: 'Onboarding not completed',
+  NO_PROJECT: 'No first project created',
+  NO_COMPLETED_GENERATION: 'No completed generation',
+};
+
 function formatDateLabel(dateKey: string) {
   const date = new Date(`${dateKey}T00:00:00.000Z`);
   return date.toLocaleDateString(undefined, { month: 'short', day: '2-digit' });
@@ -137,12 +167,14 @@ const categories = [
 ];
 
 const securityWindowOptions: MetricsWindowDays[] = [7, 30, 90];
+const validationWindowOptions: MetricsWindowDays[] = [7, 30, 90];
 
 export function AdminClient() {
   const [flags, setFlags] = useState<FeatureFlag[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [validation, setValidation] = useState<CoreFlowValidationResponse | null>(null);
   const [isValidationLoading, setIsValidationLoading] = useState(true);
+  const [validationWindowDays, setValidationWindowDays] = useState<MetricsWindowDays>(30);
   const [securityTelemetry, setSecurityTelemetry] = useState<SecurityTelemetryResponse | null>(
     null
   );
@@ -196,26 +228,32 @@ export function AdminClient() {
     }
   }, [toast]);
 
-  const loadValidation = useCallback(async () => {
-    try {
-      setIsValidationLoading(true);
-      const response = await fetch('/api/admin/validation', { cache: 'no-store' });
-      const payload = (await response.json()) as CoreFlowValidationResponse & { error?: string };
-      if (!response.ok) {
-        throw new Error(payload.error || 'Failed to fetch validation metrics');
+  const loadValidation = useCallback(
+    async (windowDays: MetricsWindowDays) => {
+      try {
+        setIsValidationLoading(true);
+        const response = await fetch(`/api/admin/validation?windowDays=${windowDays}`, {
+          cache: 'no-store',
+        });
+        const payload = (await response.json()) as CoreFlowValidationResponse & { error?: string };
+        if (!response.ok) {
+          throw new Error(payload.error || 'Failed to fetch validation metrics');
+        }
+        setValidation(payload);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : 'Failed to fetch validation metrics';
+        toast({
+          variant: 'destructive',
+          title: 'Could not load core-flow validation',
+          description: message,
+        });
+      } finally {
+        setIsValidationLoading(false);
       }
-      setValidation(payload);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to fetch validation metrics';
-      toast({
-        variant: 'destructive',
-        title: 'Could not load core-flow validation',
-        description: message,
-      });
-    } finally {
-      setIsValidationLoading(false);
-    }
-  }, [toast]);
+    },
+    [toast]
+  );
 
   const loadSecurityTelemetry = useCallback(
     async (windowDays: MetricsWindowDays) => {
@@ -245,8 +283,8 @@ export function AdminClient() {
   );
 
   useEffect(() => {
-    Promise.all([loadFlags(), loadValidation()]).catch(() => undefined);
-  }, [loadFlags, loadValidation]);
+    Promise.all([loadFlags(), loadValidation(validationWindowDays)]).catch(() => undefined);
+  }, [loadFlags, loadValidation, validationWindowDays]);
 
   useEffect(() => {
     loadSecurityTelemetry(securityWindowDays).catch(() => undefined);
@@ -519,10 +557,26 @@ export function AdminClient() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Core-Flow Validation</CardTitle>
-          <CardDescription>
-            Tracks the 50-user gate with live metrics and daily snapshot trends.
-          </CardDescription>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <CardTitle>Core-Flow Validation</CardTitle>
+              <CardDescription>
+                Tracks the 50-user gate with live metrics and daily snapshot trends.
+              </CardDescription>
+            </div>
+            <div className="flex rounded-lg bg-surface-2 p-1">
+              {validationWindowOptions.map((window) => (
+                <Button
+                  key={window}
+                  variant={validationWindowDays === window ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => setValidationWindowDays(window)}
+                >
+                  {window}d
+                </Button>
+              ))}
+            </div>
+          </div>
         </CardHeader>
         <CardContent className="space-y-5">
           {isValidationLoading ? (
@@ -609,6 +663,103 @@ export function AdminClient() {
                   <p className="text-lg font-semibold text-text-primary">
                     {validation.trend.weekOverWeekDropPct}% / {validation.trend.maxAllowedDropPct}%
                   </p>
+                </div>
+              </div>
+
+              <div className="space-y-3 rounded-md border border-surface-3 p-4">
+                <div>
+                  <p className="text-sm font-semibold text-text-primary">Activation Funnel</p>
+                  <p className="text-xs text-text-secondary">
+                    Cohort window {validation.activationFunnel.windowDays}d (since{' '}
+                    {validation.activationFunnel.cohortStartDate})
+                  </p>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">Started onboarding</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activationFunnel.counts.startedOnboarding}
+                    </p>
+                  </div>
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">Completed onboarding</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activationFunnel.counts.completedOnboarding}
+                    </p>
+                  </div>
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">First project</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activationFunnel.counts.firstProject}
+                    </p>
+                  </div>
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">First completed generation</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activationFunnel.counts.firstCompletedGeneration}
+                    </p>
+                  </div>
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">Qualified users</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activationFunnel.counts.qualifiedUsers}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">Onboarding completion</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activationFunnel.conversionRates.onboardingCompletion}%
+                    </p>
+                  </div>
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">Project activation</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activationFunnel.conversionRates.projectActivation}%
+                    </p>
+                  </div>
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">Generation activation</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activationFunnel.conversionRates.generationActivation}%
+                    </p>
+                  </div>
+                  <div className="rounded-md border border-surface-3 p-3">
+                    <p className="text-xs text-text-muted-foreground">Qualification</p>
+                    <p className="text-lg font-semibold text-text-primary">
+                      {validation.activationFunnel.conversionRates.qualification}%
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-xs uppercase tracking-wide text-text-muted-foreground">
+                    Top drop-off reasons
+                  </p>
+                  {validation.activationFunnel.topDropoffReasons.length === 0 ? (
+                    <p className="text-sm text-text-secondary">
+                      No drop-off reasons detected in this window.
+                    </p>
+                  ) : (
+                    <div className="space-y-1">
+                      {validation.activationFunnel.topDropoffReasons.map((reason) => (
+                        <div
+                          key={reason.reason}
+                          className="flex items-center justify-between rounded-md border border-surface-3 px-3 py-2"
+                        >
+                          <span className="text-sm text-text-secondary">
+                            {dropoffReasonCopy[reason.reason]}
+                          </span>
+                          <span className="text-sm font-semibold text-text-primary">
+                            {reason.count}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 

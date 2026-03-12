@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { verifyAdmin } from '@/lib/api/admin';
 import { getCoreFlowValidationReport } from '@/lib/services/core-flow-validation.service';
+import { parseWindowDays } from '@/lib/services/metrics.service';
 
 function toErrorResponse(error: unknown) {
   const message = error instanceof Error ? error.message : 'Failed to load validation metrics';
@@ -11,7 +12,7 @@ function toErrorResponse(error: unknown) {
   return NextResponse.json({ error: 'Failed to load validation metrics' }, { status: 500 });
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const supabase = await createClient();
     const user = await verifyAdmin(supabase);
@@ -19,7 +20,9 @@ export async function GET() {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const report = await getCoreFlowValidationReport();
+    const url = new URL(request.url);
+    const windowDays = parseWindowDays(url.searchParams.get('windowDays'));
+    const report = await getCoreFlowValidationReport(new Date(), windowDays);
     return NextResponse.json(report);
   } catch (error) {
     return toErrorResponse(error);

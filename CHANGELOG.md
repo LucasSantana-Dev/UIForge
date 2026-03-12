@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Core-flow validation telemetry** — Added `GET /api/admin/validation` (admin-only),
   `POST /api/internal/validation/snapshot` (token-protected), daily snapshot storage
   (`core_flow_gate_snapshots`), and scheduled snapshot workflow for 50-user gate tracking
+- **Core-flow activation funnel telemetry** — Added shared activation service with
+  per-user qualification progress and `windowDays=7|30|90` funnel aggregation
+  (onboarding -> first project -> first completed generation -> qualified)
 - **Core-flow validation reporting ops** — Added token-protected
   `GET /api/internal/validation/report` and scheduled report workflow
   (`core-flow-validation-report.yml`) that publishes Actions summary + JSON artifact
@@ -56,10 +59,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   satisfaction rate, MCP coverage) and CSV export from real values
 - **MCP fallback policy flag** — Added `ENABLE_MCP_DIRECT_PROVIDER_FALLBACK` (default: off)
   to control whether MCP failures may fallback to direct providers
+- **Core-flow activation UX** — Added onboarding nudges + deterministic onboarding telemetry
+  events and a dashboard Core Flow Progress checklist that persists until qualification
 
 ### Changed
 - **Signup and analytics flow** — Wrapped app layout with `AnalyticsProvider`; signup now emits GA4 lead events and includes `marketing_attribution` metadata on auth signup
 - **Template ownership querying** — Templates UI/API now uses explicit ownership filter (`all|official|mine`) with auth-checked `mine` behavior and route tests
+- **Admin validation API** — `GET /api/admin/validation` now accepts
+  `windowDays=7|30|90` and returns additive `activationFunnel` data for conversion/drop-off analysis
 - **Lead E2E determinism** — Playwright config now supports explicit lead smoke port/reuse controls and disables onboarding tour overlays by env for automation runs
 - **Project MCP defaults** — Added wrapper-first `playwright` server entry in
   `.mcp.json` and documented global-registry recovery flow + restart step for

@@ -4,17 +4,28 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CheckCircle, ArrowRight } from 'lucide-react';
 import { Button } from '@siza/ui';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 
 interface DoneStepProps {
   project: { id: string; name: string } | null;
+  onComplete?: () => void;
+  onCtaClick?: (cta: string) => void;
 }
 
-export function DoneStep({ project }: DoneStepProps) {
+export function DoneStep({ project, onComplete, onCtaClick }: DoneStepProps) {
   const router = useRouter();
   const [completing, setCompleting] = useState(false);
 
   const handleComplete = async () => {
     setCompleting(true);
+    onCtaClick?.('get_started');
+    onComplete?.();
+    trackEvent({
+      action: 'onboarding_cta_clicked',
+      category: 'Onboarding',
+      label: 'done',
+      params: { step: 'done', cta: 'get_started' },
+    });
     try {
       await fetch('/api/onboarding/complete', { method: 'POST' });
       router.push(project ? `/projects/${project.id}` : '/projects');
@@ -53,6 +64,13 @@ export function DoneStep({ project }: DoneStepProps) {
             <button
               key={href}
               onClick={async () => {
+                onCtaClick?.(href);
+                trackEvent({
+                  action: 'onboarding_cta_clicked',
+                  category: 'Onboarding',
+                  label: 'done',
+                  params: { step: 'done', cta: href },
+                });
                 await fetch('/api/onboarding/complete', { method: 'POST' });
                 router.push(href);
               }}

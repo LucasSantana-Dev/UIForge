@@ -160,8 +160,16 @@ This updates `public.profiles.role` to `admin` for that email.
 Siza now tracks roadmap gate progress in Admin (`/admin`) with:
 
 - live gate metrics (`GET /api/admin/validation`, admin-only)
+- activation funnel telemetry (`windowDays=7|30|90`) with onboarding/project/generation
+  conversion and top drop-off reasons
 - daily trend snapshots (`POST /api/internal/validation/snapshot`, bearer token protected)
 - internal gate status report (`GET /api/internal/validation/report`, bearer token protected)
+
+Activation UX is now surfaced directly in product:
+
+- Onboarding includes qualification nudges and deterministic telemetry events for
+  step views/completions/skips/CTA clicks
+- Dashboard shows a persistent Core Flow Progress checklist until the user is qualified
 
 Required runtime env:
 

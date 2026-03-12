@@ -20,6 +20,7 @@ import {
   ShieldCheckIcon,
   RocketIcon,
   CheckCircleIcon,
+  CircleIcon,
   ServerIcon,
   GlobeIcon,
   CodeIcon,
@@ -298,7 +299,83 @@ function GovernanceOverview() {
   );
 }
 
-export function DashboardClient() {
+interface CoreFlowUserProgress {
+  onboarding: boolean;
+  project: boolean;
+  completedGeneration: boolean;
+  qualified: boolean;
+  reasons: string[];
+}
+
+interface DashboardClientProps {
+  initialActivationProgress?: CoreFlowUserProgress | null;
+}
+
+function CoreFlowProgressChecklist({ progress }: { progress: CoreFlowUserProgress }) {
+  const items = [
+    {
+      id: 'onboarding',
+      label: 'Complete onboarding',
+      done: progress.onboarding,
+      href: '/onboarding',
+      cta: 'Finish onboarding',
+    },
+    {
+      id: 'project',
+      label: 'Create your first project',
+      done: progress.project,
+      href: '/projects/new',
+      cta: 'Create project',
+    },
+    {
+      id: 'generation',
+      label: 'Complete your first generation',
+      done: progress.completedGeneration,
+      href: '/generate',
+      cta: 'Generate component',
+    },
+  ];
+
+  return (
+    <div className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-semibold text-text-primary">Core Flow Progress</h2>
+          <p className="mt-1 text-xs text-text-secondary">
+            Complete all steps to qualify for gate validation.
+          </p>
+        </div>
+        <span className="rounded-full border border-violet-500/40 bg-violet-500/10 px-2 py-0.5 text-xs font-medium text-violet-200">
+          {items.filter((item) => item.done).length}/{items.length} complete
+        </span>
+      </div>
+      <div className="mt-4 space-y-2">
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="flex items-center justify-between rounded-lg border border-surface-3 bg-surface-1 px-3 py-2"
+          >
+            <div className="flex items-center gap-2">
+              {item.done ? (
+                <CheckCircleIcon className="h-4 w-4 text-emerald-400" />
+              ) : (
+                <CircleIcon className="h-4 w-4 text-text-muted" />
+              )}
+              <span className="text-sm text-text-primary">{item.label}</span>
+            </div>
+            {!item.done ? (
+              <Button asChild size="sm" variant="outline" className="text-xs">
+                <Link href={item.href}>{item.cta}</Link>
+              </Button>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function DashboardClient({ initialActivationProgress = null }: DashboardClientProps) {
   const { data: projects, isLoading: projectsLoading } = useProjects();
   const { usage, subscription, generationsTotal, isLoading: usageLoading } = useSubscription();
   const goldenPathsEnabled = isFeatureEnabled('ENABLE_GOLDEN_PATHS');
@@ -326,6 +403,24 @@ export function DashboardClient() {
   const topPaths = useMemo(() => {
     return goldenPathData?.data || [];
   }, [goldenPathData?.data]);
+  const fallbackActivationProgress = useMemo(() => {
+    const onboarding = true;
+    const project = (usage?.projects_count ?? 0) > 0;
+    const completedGeneration = generationsTotal > 0;
+    const reasons = [
+      ...(onboarding ? [] : ['ONBOARDING_NOT_COMPLETED']),
+      ...(project ? [] : ['NO_PROJECT']),
+      ...(completedGeneration ? [] : ['NO_COMPLETED_GENERATION']),
+    ];
+    return {
+      onboarding,
+      project,
+      completedGeneration,
+      qualified: reasons.length === 0,
+      reasons,
+    };
+  }, [generationsTotal, usage?.projects_count]);
+  const activationProgress = initialActivationProgress ?? fallbackActivationProgress;
 
   if (isLoading) {
     return (
@@ -388,6 +483,10 @@ export function DashboardClient() {
           </Button>
         </div>
       </div>
+
+      {!activationProgress.qualified ? (
+        <CoreFlowProgressChecklist progress={activationProgress} />
+      ) : null}
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

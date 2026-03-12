@@ -581,4 +581,78 @@ describe('DashboardClient', () => {
       expect(screen.getByText('Past generations')).toBeInTheDocument();
     });
   });
+
+  describe('Core Flow Progress', () => {
+    it('shows checklist when user is not qualified', () => {
+      mockUseProjects.mockReturnValue({
+        data: [],
+        isLoading: false,
+        error: null,
+      } as any);
+      mockUseSubscription.mockReturnValue({
+        subscription: { plan: 'free', status: 'active' },
+        usage: {
+          generations_count: 0,
+          generations_limit: 50,
+          projects_count: 0,
+          projects_limit: 2,
+          tokens_used: 0,
+        },
+        generationsTotal: 0,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      renderWithQueryClient(
+        <DashboardClient
+          initialActivationProgress={{
+            onboarding: true,
+            project: false,
+            completedGeneration: false,
+            qualified: false,
+            reasons: ['NO_PROJECT', 'NO_COMPLETED_GENERATION'],
+          }}
+        />
+      );
+
+      expect(screen.getByText('Core Flow Progress')).toBeInTheDocument();
+      expect(screen.getByText('Create project')).toBeInTheDocument();
+      expect(screen.getByText('Generate component')).toBeInTheDocument();
+    });
+
+    it('hides checklist when user is qualified', () => {
+      mockUseProjects.mockReturnValue({
+        data: [],
+        isLoading: false,
+        error: null,
+      } as any);
+      mockUseSubscription.mockReturnValue({
+        subscription: { plan: 'free', status: 'active' },
+        usage: {
+          generations_count: 1,
+          generations_limit: 50,
+          projects_count: 1,
+          projects_limit: 2,
+          tokens_used: 0,
+        },
+        generationsTotal: 1,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      renderWithQueryClient(
+        <DashboardClient
+          initialActivationProgress={{
+            onboarding: true,
+            project: true,
+            completedGeneration: true,
+            qualified: true,
+            reasons: [],
+          }}
+        />
+      );
+
+      expect(screen.queryByText('Core Flow Progress')).not.toBeInTheDocument();
+    });
+  });
 });

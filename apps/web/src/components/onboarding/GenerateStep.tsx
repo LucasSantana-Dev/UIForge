@@ -5,6 +5,7 @@ import { Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '@siza/ui';
 import { Card, CardContent } from '@siza/ui';
 import { useGeneration } from '@/hooks/use-generation';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 
 const SAMPLE_PROMPT =
   'A modern pricing card with three tiers (Free, Pro, Enterprise), purple gradient accents, dark theme, React + Tailwind CSS';
@@ -20,6 +21,12 @@ export function GenerateStep({ project, onNext, onSkip }: GenerateStepProps) {
   const [generated, setGenerated] = useState(false);
 
   const handleGenerate = async () => {
+    trackEvent({
+      action: 'onboarding_cta_clicked',
+      category: 'Onboarding',
+      label: 'generate',
+      params: { step: 'generate', cta: 'generate_sample' },
+    });
     const framework = (project?.framework as 'react' | 'vue' | 'angular' | 'svelte') ?? 'react';
 
     const result = await startGeneration({
@@ -56,7 +63,19 @@ export function GenerateStep({ project, onNext, onSkip }: GenerateStepProps) {
         </Card>
 
         <div className="flex justify-center">
-          <Button onClick={() => onNext({ generatedCode: code })}>Continue</Button>
+          <Button
+            onClick={() => {
+              trackEvent({
+                action: 'onboarding_cta_clicked',
+                category: 'Onboarding',
+                label: 'generate',
+                params: { step: 'generate', cta: 'continue' },
+              });
+              onNext({ generatedCode: code });
+            }}
+          >
+            Continue
+          </Button>
         </div>
       </div>
     );
@@ -97,13 +116,29 @@ export function GenerateStep({ project, onNext, onSkip }: GenerateStepProps) {
       {error && <p className="text-center text-sm text-red-400">{error}</p>}
 
       <div className="flex justify-center gap-3">
-        <Button variant="ghost" onClick={onSkip} className="text-white/40" disabled={isGenerating}>
+        <Button
+          variant="ghost"
+          onClick={() => {
+            trackEvent({
+              action: 'onboarding_cta_clicked',
+              category: 'Onboarding',
+              label: 'generate',
+              params: { step: 'generate', cta: 'skip' },
+            });
+            onSkip();
+          }}
+          className="text-white/40"
+          disabled={isGenerating}
+        >
           Skip
         </Button>
         <Button onClick={handleGenerate} disabled={isGenerating}>
           {isGenerating ? 'Generating...' : 'Generate'}
         </Button>
       </div>
+      <p className="text-center text-xs text-white/50">
+        Completing one generation is the final requirement for qualification.
+      </p>
     </div>
   );
 }

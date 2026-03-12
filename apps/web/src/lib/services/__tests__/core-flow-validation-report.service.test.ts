@@ -49,6 +49,25 @@ function makeReport(overrides: Partial<CoreFlowValidationReport> = {}): CoreFlow
       qualifiedTarget: 50,
       maxDropPct: 10,
     },
+    activationFunnel: {
+      windowDays: 30,
+      computedAt: '2026-03-12T03:00:00.000Z',
+      cohortStartDate: '2026-02-10',
+      counts: {
+        startedOnboarding: 20,
+        completedOnboarding: 16,
+        firstProject: 12,
+        firstCompletedGeneration: 10,
+        qualifiedUsers: 8,
+      },
+      conversionRates: {
+        onboardingCompletion: 80,
+        projectActivation: 75,
+        generationActivation: 83.33,
+        qualification: 40,
+      },
+      topDropoffReasons: [{ reason: 'NO_PROJECT', count: 4 }],
+    },
     ...overrides,
   };
 }
