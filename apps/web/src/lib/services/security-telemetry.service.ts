@@ -100,6 +100,106 @@ function toFindings(value: unknown): Array<Record<string, unknown>> {
   );
 }
 
+function readText(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
+function readCount(value: unknown): number {
+  const parsed = typeof value === 'number' ? value : Number(value ?? 0);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+interface ParsedSecurityRow {
+  generationId: string;
+  userId: string;
+  createdAt: string;
+  findingCount: number;
+  scannerExecution: 'success' | 'error';
+  highestRisk: SecurityRiskLevel | null;
+  highestSeverity: SecuritySeverity | null;
+  summaryBySeverity: Record<SecuritySeverity, number>;
+  summaryByRisk: Record<SecurityRiskLevel, number>;
+  findings: Array<Record<string, unknown>>;
+}
+
+function parseSecurityRow(row: Record<string, unknown>): ParsedSecurityRow {
+  const summaryBySeverity = readEnumCountMap(row.summary_by_severity, SEVERITY_ORDER);
+  const summaryByRisk = readEnumCountMap(row.summary_by_risk_level, RISK_ORDER);
+  const highestRisk =
+    normalizeRisk(row.highest_risk_level) ?? (summaryByRisk.high > 0 ? 'high' : null);
+  return {
+    generationId: readText(row.generation_id),
+    userId: readText(row.user_id),
+    createdAt: readText(row.created_at),
+    findingCount: readCount(row.summary_total_findings),
+    scannerExecution: row.scanner_execution === 'error' ? 'error' : 'success',
+    highestRisk,
+    highestSeverity: normalizeSeverity(row.highest_severity),
+    summaryBySeverity,
+    summaryByRisk,
+    findings: toFindings(row.findings),
+  };
+}
+
+function applyDistributionCounts(
+  summaryBySeverity: Record<SecuritySeverity, number>,
+  summaryByRisk: Record<SecurityRiskLevel, number>,
+  severityDistribution: Record<SecuritySeverity, number>,
+  riskDistribution: Record<SecurityRiskLevel, number>
+) {
+  for (const severity of SEVERITY_ORDER) {
+    severityDistribution[severity] += summaryBySeverity[severity];
+  }
+  for (const riskLevel of RISK_ORDER) {
+    riskDistribution[riskLevel] += summaryByRisk[riskLevel];
+  }
+}
+
+function applyTopRules(
+  findings: Array<Record<string, unknown>>,
+  topRuleMap: Map<string, SecurityTopRule>
+) {
+  for (const finding of findings) {
+    const ruleId = readText(finding.rule_id);
+    const severity = normalizeSeverity(finding.severity);
+    const riskLevel = normalizeRisk(finding.risk_level);
+    if (!ruleId || !severity || !riskLevel) {
+      continue;
+    }
+
+    const existing = topRuleMap.get(ruleId);
+    if (!existing) {
+      topRuleMap.set(ruleId, {
+        ruleId,
+        count: 1,
+        maxSeverity: severity,
+        maxRiskLevel: riskLevel,
+      });
+      continue;
+    }
+
+    existing.count += 1;
+    if (compareSeverity(severity, existing.maxSeverity)) {
+      existing.maxSeverity = severity;
+    }
+    if (compareRisk(riskLevel, existing.maxRiskLevel)) {
+      existing.maxRiskLevel = riskLevel;
+    }
+  }
+}
+
+function sortTopRules(topRuleMap: Map<string, SecurityTopRule>): SecurityTopRule[] {
+  return Array.from(topRuleMap.values())
+    .sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count;
+      if (a.maxSeverity !== b.maxSeverity) {
+        return SEVERITY_ORDER.indexOf(a.maxSeverity) - SEVERITY_ORDER.indexOf(b.maxSeverity);
+      }
+      return a.ruleId.localeCompare(b.ruleId);
+    })
+    .slice(0, 10);
+}
+
 export async function getSecurityTelemetryReport(
   windowDays: MetricsWindowDays = 30
 ): Promise<SecurityTelemetryReport> {
@@ -131,7 +231,12 @@ export async function getSecurityTelemetryReport(
   }
 
   const rows = Array.isArray(data)
-    ? (data as unknown[]).filter((row): row is Record<string, unknown> => isRecord(row))
+    ? data.reduce<Record<string, unknown>[]>((accumulator, row) => {
+        if (isRecord(row)) {
+          accumulator.push(row);
+        }
+        return accumulator;
+      }, [])
     : [];
   const severityDistribution = zeroSeverityMap();
   const riskDistribution = zeroRiskMap();
@@ -144,81 +249,41 @@ export async function getSecurityTelemetryReport(
   let highRiskGenerations = 0;
 
   for (const row of rows) {
-    const summaryBySeverity = readEnumCountMap(row.summary_by_severity, SEVERITY_ORDER);
-    const summaryByRisk = readEnumCountMap(row.summary_by_risk_level, RISK_ORDER);
-    const findingCount = Number(row.summary_total_findings ?? 0);
-    const scannerExecution = row.scanner_execution === 'error' ? 'error' : 'success';
-    const highestRisk =
-      normalizeRisk(row.highest_risk_level) ?? (summaryByRisk.high > 0 ? 'high' : null);
-    const highestSeverity = normalizeSeverity(row.highest_severity);
+    const parsed = parseSecurityRow(row);
 
-    totalFindings += findingCount;
-    if (findingCount > 0) {
+    totalFindings += parsed.findingCount;
+    if (parsed.findingCount > 0) {
       reportsWithFindings += 1;
     }
-    if (scannerExecution === 'error') {
+    if (parsed.scannerExecution === 'error') {
       scannerErrors += 1;
     }
-    if (highestRisk === 'high') {
+    if (parsed.highestRisk === 'high') {
       highRiskGenerations += 1;
     }
 
-    for (const severity of SEVERITY_ORDER) {
-      severityDistribution[severity] += summaryBySeverity[severity];
-    }
-    for (const riskLevel of RISK_ORDER) {
-      riskDistribution[riskLevel] += summaryByRisk[riskLevel];
-    }
+    applyDistributionCounts(
+      parsed.summaryBySeverity,
+      parsed.summaryByRisk,
+      severityDistribution,
+      riskDistribution
+    );
+    applyTopRules(parsed.findings, topRuleMap);
 
-    const findings = toFindings(row.findings);
-    for (const finding of findings) {
-      const ruleId = typeof finding.rule_id === 'string' ? finding.rule_id : '';
-      const severity = normalizeSeverity(finding.severity);
-      const riskLevel = normalizeRisk(finding.risk_level);
-      if (!ruleId || !severity || !riskLevel) {
-        continue;
-      }
-      const existing = topRuleMap.get(ruleId);
-      if (!existing) {
-        topRuleMap.set(ruleId, {
-          ruleId,
-          count: 1,
-          maxSeverity: severity,
-          maxRiskLevel: riskLevel,
-        });
-        continue;
-      }
-      existing.count += 1;
-      if (compareSeverity(severity, existing.maxSeverity)) {
-        existing.maxSeverity = severity;
-      }
-      if (compareRisk(riskLevel, existing.maxRiskLevel)) {
-        existing.maxRiskLevel = riskLevel;
-      }
-    }
-
-    if (highestRisk === 'high') {
+    if (parsed.highestRisk === 'high') {
       recentHighRiskGenerations.push({
-        generationId: String(row.generation_id ?? ''),
-        userId: String(row.user_id ?? ''),
-        createdAt: String(row.created_at ?? ''),
-        findingCount,
-        scannerExecution,
-        highestRiskLevel: highestRisk,
-        highestSeverity,
+        generationId: parsed.generationId,
+        userId: parsed.userId,
+        createdAt: parsed.createdAt,
+        findingCount: parsed.findingCount,
+        scannerExecution: parsed.scannerExecution,
+        highestRiskLevel: parsed.highestRisk,
+        highestSeverity: parsed.highestSeverity,
       });
     }
   }
 
-  const topRules = Array.from(topRuleMap.values())
-    .sort((a, b) => {
-      if (b.count !== a.count) return b.count - a.count;
-      if (a.maxSeverity !== b.maxSeverity) {
-        return SEVERITY_ORDER.indexOf(a.maxSeverity) - SEVERITY_ORDER.indexOf(b.maxSeverity);
-      }
-      return a.ruleId.localeCompare(b.ruleId);
-    })
-    .slice(0, 10);
+  const topRules = sortTopRules(topRuleMap);
 
   return {
     timestamp: now.toISOString(),
