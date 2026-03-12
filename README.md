@@ -179,11 +179,13 @@ Activation UX is now surfaced directly in product:
   and routes directly to a project-aware Generate flow
 - Dashboard shows a persistent Core Flow Progress checklist with a single primary
   next-action CTA until the user is qualified
-- Dashboard "Create project" next-action CTA now supports one-click starter project
-  creation and routes directly to Generate with `projectId`
-- Dashboard primary generation surfaces now route no-project users to project creation
-  first (header and empty-state CTAs) while keeping project-aware Generate links for
-  users who already have a project
+- Dashboard now includes a guided one-click starter-project prompt for the
+  onboarding-complete/no-project cohort with explicit confirm + "Not now" actions
+- Guided starter-project creation routes directly to project-aware Generate on success,
+  and falls back to manual project creation routing if creation fails
+- Dashboard primary generation surfaces now keep this cohort on project-first routing
+  (header, empty-state, and quick-action generate entry) while preserving
+  project-aware Generate links for users who already have a project
 
 Required runtime env:
 

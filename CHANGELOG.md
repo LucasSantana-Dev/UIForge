@@ -80,6 +80,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dashboard conversion-first CTA routing** — Header and empty-state primary
   actions now route no-project users to project creation first, while preserving
   project-aware Generate routes for users with an existing project
+- **Gate activation v5 guided conversion** — Added a dashboard guided
+  starter-project prompt for onboarding-complete/no-project users with explicit
+  confirm + "Not now" actions, project-aware Generate routing on starter-project
+  success, manual project-creation fallback on failure, and project-first
+  quick-action generate routing for the same cohort
 - **Lead E2E determinism** — Playwright config now supports explicit lead smoke port/reuse controls and disables onboarding tour overlays by env for automation runs
 - **Project MCP defaults** — Added wrapper-first `playwright` server entry in
   `.mcp.json` and documented global-registry recovery flow + restart step for

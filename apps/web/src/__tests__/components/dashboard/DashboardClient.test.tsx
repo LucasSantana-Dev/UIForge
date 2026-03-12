@@ -592,7 +592,7 @@ describe('DashboardClient', () => {
   });
 
   describe('Core Flow Progress', () => {
-    it('shows checklist when user is not qualified', () => {
+    it('shows guided prompt and checklist for onboarding-complete users without a project', () => {
       mockUseProjects.mockReturnValue({
         data: [],
         isLoading: false,
@@ -624,6 +624,9 @@ describe('DashboardClient', () => {
         />
       );
 
+      expect(screen.getByText('Start your first project')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Create Starter Project' })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'Not now' })).toBeInTheDocument();
       expect(screen.getByText('Core Flow Progress')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Create project' })).toBeInTheDocument();
       expect(screen.getByText('Complete your first generation')).toBeInTheDocument();
@@ -637,9 +640,17 @@ describe('DashboardClient', () => {
         'href',
         '/projects/new?source=dashboard&entry=empty_state_primary'
       );
+      const generateComponentLinks = screen.getAllByRole('link', { name: 'Generate Component' });
+      generateComponentLinks.forEach((link) => {
+        expect(link).toHaveAttribute('href');
+        expect(link.getAttribute('href')).toContain('/projects/new?source=dashboard');
+      });
+      expect(
+        screen.getByRole('link', { name: 'Generate Component AI-powered code generation' })
+      ).toHaveAttribute('href', '/projects/new?source=dashboard&entry=quick_action_generate');
     });
 
-    it('creates starter project from primary next-action CTA', async () => {
+    it('creates starter project from guided prompt confirm action', async () => {
       const user = userEvent.setup();
       mockUseProjects.mockReturnValue({
         data: [],
@@ -672,7 +683,7 @@ describe('DashboardClient', () => {
         />
       );
 
-      await user.click(screen.getByRole('button', { name: 'Create project' }));
+      await user.click(screen.getByRole('button', { name: 'Create Starter Project' }));
 
       await waitFor(() => {
         expect(mockCreateProject).toHaveBeenCalledWith({
@@ -680,7 +691,91 @@ describe('DashboardClient', () => {
           framework: 'react',
         });
         expect(mockPush).toHaveBeenCalledWith(
-          '/generate?projectId=starter-1&source=dashboard&step=project'
+          '/generate?projectId=starter-1&source=dashboard&entry=guided_starter_project&step=project'
+        );
+      });
+    });
+
+    it('hides guided starter prompt after Not now without creating a project', async () => {
+      const user = userEvent.setup();
+      mockUseProjects.mockReturnValue({
+        data: [],
+        isLoading: false,
+        error: null,
+      } as any);
+      mockUseSubscription.mockReturnValue({
+        subscription: { plan: 'free', status: 'active' },
+        usage: {
+          generations_count: 0,
+          generations_limit: 50,
+          projects_count: 0,
+          projects_limit: 2,
+          tokens_used: 0,
+        },
+        generationsTotal: 0,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      renderWithQueryClient(
+        <DashboardClient
+          initialActivationProgress={{
+            onboarding: true,
+            project: false,
+            completedGeneration: false,
+            qualified: false,
+            reasons: ['NO_PROJECT', 'NO_COMPLETED_GENERATION'],
+          }}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Not now' }));
+
+      expect(screen.queryByText('Start your first project')).not.toBeInTheDocument();
+      expect(mockCreateProject).not.toHaveBeenCalled();
+      expect(mockPush).not.toHaveBeenCalled();
+      expect(screen.getByText('Core Flow Progress')).toBeInTheDocument();
+    });
+
+    it('routes to manual project creation when starter project creation fails', async () => {
+      const user = userEvent.setup();
+      mockCreateProject.mockRejectedValueOnce(new Error('creation failed'));
+      mockUseProjects.mockReturnValue({
+        data: [],
+        isLoading: false,
+        error: null,
+      } as any);
+      mockUseSubscription.mockReturnValue({
+        subscription: { plan: 'free', status: 'active' },
+        usage: {
+          generations_count: 0,
+          generations_limit: 50,
+          projects_count: 0,
+          projects_limit: 2,
+          tokens_used: 0,
+        },
+        generationsTotal: 0,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      renderWithQueryClient(
+        <DashboardClient
+          initialActivationProgress={{
+            onboarding: true,
+            project: false,
+            completedGeneration: false,
+            qualified: false,
+            reasons: ['NO_PROJECT', 'NO_COMPLETED_GENERATION'],
+          }}
+        />
+      );
+
+      await user.click(screen.getByRole('button', { name: 'Create Starter Project' }));
+
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith(
+          '/projects/new?source=dashboard&entry=guided_starter_project&step=project'
         );
       });
     });
@@ -724,6 +819,10 @@ describe('DashboardClient', () => {
         'href',
         '/generate?projectId=1&source=dashboard&entry=header_primary'
       );
+      expect(screen.queryByText('Start your first project')).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Generate Component AI-powered code generation' })
+      ).toHaveAttribute('href', '/generate?projectId=1&source=dashboard&entry=quick_action_generate');
     });
 
     it('hides checklist when user is qualified', () => {

@@ -140,6 +140,7 @@ function QuickAction({
   return (
     <Link
       href={href}
+      aria-label={label}
       className="group flex items-center gap-3 rounded-lg border border-surface-3 bg-surface-1 p-4 transition-all duration-200 hover:border-violet-500/30 hover:shadow-[0_0_16px_rgba(124,58,237,0.06)]"
     >
       <div className="rounded-lg bg-violet-500/10 p-2 group-hover:bg-violet-500/20 transition-colors">
@@ -312,6 +313,42 @@ interface DashboardClientProps {
   initialActivationProgress?: CoreFlowUserProgress | null;
 }
 
+function GuidedStarterProjectPrompt({
+  isCreatingProject,
+  onConfirm,
+  onNotNow,
+}: {
+  isCreatingProject: boolean;
+  onConfirm: () => Promise<void>;
+  onNotNow: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-violet-500/40 bg-violet-500/10 p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-semibold text-text-primary">Start your first project</h2>
+          <p className="mt-1 text-xs text-text-secondary">
+            Create a starter project in one click, then generate your first component.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" className="text-xs" onClick={onNotNow}>
+            Not now
+          </Button>
+          <Button
+            size="sm"
+            className="bg-violet-600 hover:bg-violet-500 text-xs"
+            onClick={onConfirm}
+            disabled={isCreatingProject}
+          >
+            {isCreatingProject ? 'Creating...' : 'Create Starter Project'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CoreFlowProgressChecklist({
   progress,
   generationHref,
@@ -413,6 +450,7 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
   const goldenPathsEnabled = isFeatureEnabled('ENABLE_GOLDEN_PATHS');
   const { data: goldenPathData } = useGoldenPaths(goldenPathsEnabled ? { limit: 3 } : { limit: 0 });
   const [mountTime] = useState(() => Date.now());
+  const [isStarterPromptDismissed, setIsStarterPromptDismissed] = useState(false);
 
   const isLoading = projectsLoading || usageLoading;
 
@@ -454,6 +492,11 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
     };
   }, [generationsTotal, usage?.projects_count]);
   const activationProgress = initialActivationProgress ?? fallbackActivationProgress;
+  const starterProjectCohort =
+    activationProgress.onboarding &&
+    !activationProgress.project &&
+    !activationProgress.completedGeneration;
+  const showStarterProjectPrompt = starterProjectCohort && !isStarterPromptDismissed;
   const generationChecklistHref =
     activationProgress.project && firstProjectId
       ? `/generate?projectId=${firstProjectId}`
@@ -470,6 +513,14 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
   const emptyStatePrimaryLabel = activationProgress.project
     ? 'Generate Component'
     : 'Create Project';
+  const emptyStateSecondaryHref =
+    activationProgress.project && firstProjectId
+      ? `/generate?projectId=${firstProjectId}&source=dashboard&entry=empty_state_secondary`
+      : '/projects/new?source=dashboard&entry=empty_state_secondary';
+  const quickActionGenerateHref =
+    activationProgress.project && firstProjectId
+      ? `/generate?projectId=${firstProjectId}&source=dashboard&entry=quick_action_generate`
+      : '/projects/new?source=dashboard&entry=quick_action_generate';
 
   const handleCreateStarterProject = async () => {
     try {
@@ -477,9 +528,11 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
         name: 'My First Project',
         framework: 'react',
       });
-      router.push(`/generate?projectId=${project.id}&source=dashboard&step=project`);
+      router.push(
+        `/generate?projectId=${project.id}&source=dashboard&entry=guided_starter_project&step=project`
+      );
     } catch {
-      router.push('/projects/new?source=dashboard&step=project');
+      router.push('/projects/new?source=dashboard&entry=guided_starter_project&step=project');
     }
   };
 
@@ -549,11 +602,25 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
         </div>
       </div>
 
+      {showStarterProjectPrompt ? (
+        <GuidedStarterProjectPrompt
+          isCreatingProject={createProject.isPending}
+          onConfirm={handleCreateStarterProject}
+          onNotNow={() => setIsStarterPromptDismissed(true)}
+        />
+      ) : null}
+
       {!activationProgress.qualified ? (
         <CoreFlowProgressChecklist
           progress={activationProgress}
           generationHref={generationChecklistHref}
-          onCreateProject={activationProgress.project ? null : handleCreateStarterProject}
+          onCreateProject={
+            activationProgress.project
+              ? null
+              : async () => {
+                  setIsStarterPromptDismissed(false);
+                }
+          }
           isCreatingProject={createProject.isPending}
         />
       ) : null}
@@ -668,7 +735,7 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
                   size="sm"
                   className="border-surface-3 text-text-secondary hover:text-text-primary"
                 >
-                  <Link href="/generate">
+                  <Link href={emptyStateSecondaryHref}>
                     <SparklesIcon className="mr-2 h-4 w-4" />
                     Generate Component
                   </Link>
@@ -699,7 +766,7 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
             </h2>
             <div className="space-y-2">
               <QuickAction
-                href="/generate"
+                href={quickActionGenerateHref}
                 icon={SparklesIcon}
                 label="Generate Component"
                 description="AI-powered code generation"
