@@ -629,6 +629,50 @@ describe('DashboardClient', () => {
       expect(screen.getByText('Complete your first generation')).toBeInTheDocument();
     });
 
+    it('routes primary dashboard CTAs to project creation when user has no project', () => {
+      mockUseProjects.mockReturnValue({
+        data: [],
+        isLoading: false,
+        error: null,
+      } as any);
+      mockUseSubscription.mockReturnValue({
+        subscription: { plan: 'free', status: 'active' },
+        usage: {
+          generations_count: 0,
+          generations_limit: 50,
+          projects_count: 0,
+          projects_limit: 2,
+          tokens_used: 0,
+        },
+        generationsTotal: 0,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      renderWithQueryClient(
+        <DashboardClient
+          initialActivationProgress={{
+            onboarding: true,
+            project: false,
+            completedGeneration: false,
+            qualified: false,
+            reasons: ['NO_PROJECT', 'NO_COMPLETED_GENERATION'],
+          }}
+        />
+      );
+
+      const createProjectLinks = screen.getAllByRole('link', { name: 'Create Project' });
+      expect(createProjectLinks.length).toBeGreaterThan(0);
+      expect(createProjectLinks[0]).toHaveAttribute(
+        'href',
+        '/projects/new?source=dashboard&entry=header_primary'
+      );
+      expect(createProjectLinks[1]).toHaveAttribute(
+        'href',
+        '/projects/new?source=dashboard&entry=empty_state_primary'
+      );
+    });
+
     it('creates starter project from primary next-action CTA', async () => {
       const user = userEvent.setup();
       mockUseProjects.mockReturnValue({
@@ -709,6 +753,45 @@ describe('DashboardClient', () => {
 
       const cta = screen.getByRole('link', { name: 'Generate component' });
       expect(cta).toHaveAttribute('href', '/generate?projectId=1');
+    });
+
+    it('keeps primary dashboard CTA on generation flow for users with project', () => {
+      mockUseProjects.mockReturnValue({
+        data: mockProjects,
+        isLoading: false,
+        error: null,
+      } as any);
+      mockUseSubscription.mockReturnValue({
+        subscription: { plan: 'free', status: 'active' },
+        usage: {
+          generations_count: 0,
+          generations_limit: 50,
+          projects_count: 1,
+          projects_limit: 2,
+          tokens_used: 0,
+        },
+        generationsTotal: 0,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      renderWithQueryClient(
+        <DashboardClient
+          initialActivationProgress={{
+            onboarding: true,
+            project: true,
+            completedGeneration: false,
+            qualified: false,
+            reasons: ['NO_COMPLETED_GENERATION'],
+          }}
+        />
+      );
+
+      const generateLink = screen.getByRole('link', { name: 'Generate' });
+      expect(generateLink).toHaveAttribute(
+        'href',
+        '/generate?projectId=1&source=dashboard&entry=header_primary'
+      );
     });
 
     it('hides checklist when user is qualified', () => {

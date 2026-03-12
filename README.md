@@ -181,6 +181,9 @@ Activation UX is now surfaced directly in product:
   next-action CTA until the user is qualified
 - Dashboard "Create project" next-action CTA now supports one-click starter project
   creation and routes directly to Generate with `projectId`
+- Dashboard primary generation surfaces now route no-project users to project creation
+  first (header and empty-state CTAs) while keeping project-aware Generate links for
+  users who already have a project
 
 Required runtime env:
 
