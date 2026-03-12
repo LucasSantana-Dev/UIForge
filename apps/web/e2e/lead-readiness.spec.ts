@@ -117,6 +117,18 @@ async function completeOnboarding(page: Page): Promise<void> {
   await skipOnboardingIfStillVisible(page);
 }
 
+async function dismissTourIfVisible(page: Page): Promise<void> {
+  const dismissTourButton = page.getByRole('button', { name: /dismiss tour/i }).first();
+  if (!(await dismissTourButton.isVisible().catch(() => false))) {
+    return;
+  }
+
+  await dismissTourButton.click();
+  await expect(dismissTourButton)
+    .toBeHidden({ timeout: 5000 })
+    .catch(() => {});
+}
+
 async function createProjectFromPage(page: Page, projectName: string): Promise<void> {
   await page.waitForLoadState('domcontentloaded');
 
@@ -229,6 +241,7 @@ test.describe('Lead Readiness', () => {
     }
 
     await expect(page.getByText(/generation complete/i)).toBeVisible({ timeout: 10000 });
+    await dismissTourIfVisible(page);
     await page.getByRole('button', { name: /^code$/i }).click();
     await expect(page.getByRole('button', { name: /copy code/i })).toBeVisible();
 

@@ -86,6 +86,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Generation unauth test deduplication** — Replaced three near-identical
   unauthenticated generation GET route tests with one parameterized auth-contract
   suite covering list, history, and by-id endpoints
+- **Lead-readiness production smoke resilience** — `lead-readiness.spec.ts`
+  now dismisses the in-app tour overlay before code-tab interaction, preventing
+  pointer interception in production disposable-user audit runs
 - **Generation API auth contract** — `verifySession` failures now return `401`
   (instead of `500`) for `/api/generations`, `/api/generations/history`, and
   `/api/generations/[id]`, while preserving existing `403`/`404`/`500` semantics

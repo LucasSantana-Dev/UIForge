@@ -307,6 +307,8 @@ npm run test:e2e:prod
   - `rsa.json`
   - `day1-ops.md`
 - Auth/onboarding/stripe lead smoke now uses shared Supabase admin helpers and deterministic webhook payloads for CI stability
+- Lead-readiness production smoke now dismisses the guided tour overlay before
+  post-generation code-tab assertions to avoid pointer interception during disposable-user runs
 - Catalog E2E creation now supports both direct detail redirects and list-first redirects by resolving created entry IDs via API lookup
 
 ### Playwright MCP Wrapper (Codex Runtime)
