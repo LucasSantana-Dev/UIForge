@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Core-flow validation telemetry** — Added `GET /api/admin/validation` (admin-only),
   `POST /api/internal/validation/snapshot` (token-protected), daily snapshot storage
   (`core_flow_gate_snapshots`), and scheduled snapshot workflow for 50-user gate tracking
+- **Core-flow validation reporting ops** — Added token-protected
+  `GET /api/internal/validation/report` and scheduled report workflow
+  (`core-flow-validation-report.yml`) that publishes Actions summary + JSON artifact
 - **Security Spoke admin telemetry** — Added `GET /api/admin/security` (admin-only,
   `windowDays=7|30|90`) with summary metrics, top triggered rules, risk/severity
   distributions, and recent high-risk generations

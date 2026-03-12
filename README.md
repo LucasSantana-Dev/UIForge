@@ -161,6 +161,7 @@ Siza now tracks roadmap gate progress in Admin (`/admin`) with:
 
 - live gate metrics (`GET /api/admin/validation`, admin-only)
 - daily trend snapshots (`POST /api/internal/validation/snapshot`, bearer token protected)
+- internal gate status report (`GET /api/internal/validation/report`, bearer token protected)
 
 Required runtime env:
 
@@ -171,6 +172,7 @@ METRICS_SNAPSHOT_TOKEN=replace-with-strong-random-token
 GitHub automation:
 
 - Workflow: `.github/workflows/core-flow-validation-snapshot.yml`
+- Workflow: `.github/workflows/core-flow-validation-report.yml`
 - Repository variable: `SIZA_BASE_URL` (for example `https://siza.forgespace.co`)
 - Repository secret: `METRICS_SNAPSHOT_TOKEN`
 
@@ -178,6 +180,13 @@ Manual snapshot trigger:
 
 ```bash
 curl -X POST "$SIZA_BASE_URL/api/internal/validation/snapshot" \
+  -H "Authorization: Bearer $METRICS_SNAPSHOT_TOKEN"
+```
+
+Manual report trigger:
+
+```bash
+curl "$SIZA_BASE_URL/api/internal/validation/report" \
   -H "Authorization: Bearer $METRICS_SNAPSHOT_TOKEN"
 ```
 
