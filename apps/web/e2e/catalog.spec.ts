@@ -30,7 +30,9 @@ async function createCatalogEntry(
     const lookup = await page.request.get(`/api/catalog?search=${encodeURIComponent(input.name)}`);
     expect(lookup.ok()).toBe(true);
     const payload = await lookup.json();
-    const created = payload?.data?.entries?.find((entry: { name: string }) => entry.name === input.name);
+    const created = payload?.data?.entries?.find(
+      (entry: { name: string }) => entry.name === input.name
+    );
     expect(created?.id).toBeTruthy();
     await page.goto(`/catalog/${created.id}`);
   }
@@ -60,7 +62,9 @@ test.describe('Software Catalog', () => {
     await expect(page.getByPlaceholder(/search/i)).toBeVisible();
   });
 
-  test('should navigate to register new entry from header CTA', async ({ authenticatedPage: page }) => {
+  test('should navigate to register new entry from header CTA', async ({
+    authenticatedPage: page,
+  }) => {
     await page.goto('/catalog');
 
     await page.getByRole('button', { name: /^register$/i }).click();
