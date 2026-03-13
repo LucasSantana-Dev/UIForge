@@ -188,6 +188,15 @@ Activation UX is now surfaced directly in product:
 - Dashboard primary generation surfaces now keep this cohort on project-first routing
   (header, empty-state, and quick-action generate entry) while preserving
   project-aware Generate links for users who already have a project
+- Dashboard no-project conversion CTAs now run one-click starter-project creation
+  across header primary, empty-state primary, quick-action generate, and checklist
+  next-step actions, with deterministic `entry=<cta>&step=project` routing params
+- Onboarding no-project skip/done exits now route to dashboard conversion intent
+  (`/dashboard?...&intent=create_project`) instead of sending users directly to
+  manual project creation
+- Activation lifecycle telemetry is now emitted for starter conversion flows:
+  `activation_starter_project_confirmed`, `activation_starter_project_created`,
+  `activation_starter_project_fallback`, and `activation_route_to_generate`
 
 Required runtime env:
 

@@ -74,6 +74,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (`onboardedWithoutProject`, `projectWithoutCompletedGeneration`, `qualifiedUsers`)
   plus next-action prioritization (`CREATE_PROJECT`/`COMPLETE_GENERATION`) in
   `GET /api/admin/validation`
+- **Activation starter conversion telemetry** — Added deterministic activation lifecycle
+  events for starter-project flows: `activation_starter_project_confirmed`,
+  `activation_starter_project_created`, `activation_starter_project_fallback`,
+  and `activation_route_to_generate`
 
 ### Changed
 - **Production audit script lint compliance** — `apps/web/scripts/e2e-production-audit.sh`
@@ -117,6 +121,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   confirm + "Not now" actions, project-aware Generate routing on starter-project
   success, manual project-creation fallback on failure, and project-first
   quick-action generate routing for the same cohort
+- **P0-A in-app conversion lift** — Dashboard no-project primary CTAs now execute
+  one-click starter-project creation across header, empty-state primary,
+  quick-action generate, and checklist next-step actions, each tagged with
+  deterministic `entry=<cta>&step=project` attribution params
+- **Onboarding conversion exits** — No-project onboarding skip/done exits now route
+  through dashboard conversion intent (`/dashboard?...&intent=create_project`)
+  while preserving project-aware generation routing when project context exists
 - **Lead E2E determinism** — Playwright config now supports explicit lead smoke port/reuse controls and disables onboarding tour overlays by env for automation runs
 - **Lead/auth E2E hardening** — Auth/onboarding/stripe smoke specs now use shared
   admin-client setup and deterministic webhook payloads to reduce flaky setup paths
