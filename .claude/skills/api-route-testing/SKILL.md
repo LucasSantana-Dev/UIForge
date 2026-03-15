@@ -1,7 +1,7 @@
 ---
 name: api-route-testing
 description: Write unit tests for Next.js App Router API route handlers in Siza — mock patterns, auth, rate-limit, Supabase chaining
-version: 1.1.0
+version: 1.2.0
 tags: [testing, api, routes, jest, nextjs]
 ---
 
@@ -155,11 +155,34 @@ jest.mock('@/app/api/generations/error-handler', () => ({
 
 ## Response Body Shapes
 
-`errorResponse()` from `@/lib/api/response` returns `{ error: { message, status } }`:
+**Critical**: There are 3 different response helpers — each wraps data differently.
+
+| Helper | Body shape | Used for |
+|--------|-----------|----------|
+| `errorResponse(msg, status)` | `{ error: { message, status } }` | All errors |
+| `successResponse(data)` | `{ data: ...data }` — wraps in `{ data }` | Successful responses |
+| `jsonResponse(data)` | Raw `data` passed in — **no wrapper** | Direct JSON pass-through |
+| `NextResponse.json(data)` | Raw `data` — **no wrapper** | Direct in route |
+
 ```typescript
+// errorResponse
 expect(body.error.message).toMatch(/unauthorized/i);  // ✓
 expect(body.error).toMatch(/unauthorized/i);           // ✗ — body.error is an object
+
+// successResponse
+expect(body.data.templates).toHaveLength(2);  // ✓ — extra .data wrapper
+expect(body.templates).toHaveLength(2);       // ✗
+
+// jsonResponse (teams route uses this)
+expect(body.data).toHaveLength(2);   // ✓ — jsonResponse({ data: teams }) → body.data = teams
+expect(body.data.data).toHaveLength(2);  // ✗ — no double-wrapping
+
+// NextResponse.json directly (tour, scorecards)
+expect(body.completed).toBe(true);   // ✓
+expect(body.data.completed).toBe(true);  // ✗
 ```
+
+**Pattern**: Check the route source to see which helper it uses before asserting on body shape.
 
 `successResponse()` wraps in `{ data: ... }`:
 ```typescript
@@ -203,6 +226,8 @@ cd apps/web && npx jest --forceExit --silent
 
 ## Route Coverage Map (as of 2026-03-15)
 
+67 route files total. 14 actively tested in `__tests__/lib/api/` (default jest run).
+
 | Route | Test file | Tests |
 |-------|-----------|-------|
 | `GET /api/gallery` | `gallery-route.test.ts` ✓ | 5 |
@@ -214,7 +239,12 @@ cd apps/web && npx jest --forceExit --silent
 | `GET /api/suggestions` | `suggestions-route.test.ts` ✓ | 7 |
 | `GET /api/generations/history` | `generations-history-route.test.ts` ✓ | 5 |
 | `PATCH /api/generations/[id]/feature` | `generation-feature-route.test.ts` ✓ | 6 |
+| `GET /api/metrics` | `metrics-route.test.ts` ✓ | 6 |
+| `GET+POST /api/teams` | `teams-route.test.ts` ✓ | 8 |
+| `GET /api/plugins` | `plugins-route.test.ts` ✓ | 4 |
+| `GET+POST /api/golden-paths` | `golden-paths-route.test.ts` ✓ | 6 |
+| `GET+POST /api/templates` | `templates-route.test.ts` ✓ | 7 |
 | `GET /api/catalog` | `integration/catalog-route.test.ts` (excluded from default run) | — |
 | `GET /api/catalog/[id]` | `integration/catalog-id-route.test.ts` (excluded) | — |
 
-**Next targets:** `generate/analyze`, `generate/validate`, `teams/route`, `plugins/route`, `golden-paths/route`
+**Next targets:** `generate/analyze`, `generate/validate`, `generate/format`, `generations/[id]`, `components`, `projects`

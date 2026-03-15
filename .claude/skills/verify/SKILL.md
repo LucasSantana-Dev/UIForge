@@ -1,7 +1,7 @@
 ---
 name: verify
 description: Run Siza quality gates — lint, type-check, test, build — and report results
-version: 1.0.0
+version: 1.1.0
 tags: [quality, lint, test, build, ci, verification]
 ---
 
@@ -30,6 +30,7 @@ npm run lint
 - Auto-fix: `npm run lint -- --fix`
 - Known issue: `apps/docs` has pre-existing Fumadocs TS errors — skip with `--filter=!@siza/docs` if needed
 - ESLint 9 flat config at `apps/web/eslint.config.js`
+- CI uses `--max-warnings 0` — treat warnings as errors locally too
 
 ### Gate 2: Type Check
 ```bash
@@ -46,7 +47,8 @@ cd apps/web && npx jest --forceExit --passWithNoTests
 - **Run from `apps/web/`** — NOT repo root (babel parsing errors at root)
 - Always use `--forceExit` (Supabase client mocks leave async handles)
 - Coverage thresholds: branches 60%, functions 65%, lines 75%, statements 75%
-- Current: ~122 suites, ~1217 tests
+- Current: ~134 suites, ~1306+ tests (as of 2026-03-15)
+- API route tests live in `__tests__/lib/api/` (NOT `integration/` — excluded from default run)
 
 ### Gate 4: Build
 ```bash
@@ -61,8 +63,8 @@ npm run build
 npm run test:e2e
 ```
 - Requires running dev server or built app
-- 15 spec files, ~33+ scenarios
-- Typically run in CI only — use `npm run e2e:ui` for local debugging
+- 22 spec files covering auth, dashboard, billing, catalog, teams, golden paths, gallery, lead-readiness, marketplace, production smoke
+- Typically run in CI only — use `npm run test:e2e:ui` for local debugging
 
 ## Interpreting Results
 
@@ -81,11 +83,15 @@ Overall: GREEN / BLOCKED (N issues)
 | Issue | Fix |
 |-------|-----|
 | Unused import | Remove it or prefix with `_` |
+| Unused variable | Prefix with `_` or remove |
+| `body.error` is object not string | Use `body.error.message` — `errorResponse` nests in `{ error: { message, status } }` |
 | Type error in test mock | Check mock return shape matches interface |
+| `body.data.foo` undefined | Check if route uses `jsonResponse` (no wrapper) vs `successResponse` (wraps in `{ data: ... }`) |
 | Prettier formatting | `npx prettier --write <file>` |
 | Build fails on docs | Set `HUSKY=0` for non-code commits |
 | Tests hang | Add `--forceExit` flag |
 | Jest at root fails | Always run from `apps/web/` |
+| Stale eslint-disable directive | Remove comment when rule no longer triggers |
 
 ## Pre-commit Hook
 The repo has a Husky pre-commit hook that runs:
@@ -96,3 +102,5 @@ To bypass for docs/config commits: `HUSKY=0 git commit -m "docs: ..."`
 
 ## CI Alignment
 These gates mirror the CI workflow at `.github/workflows/ci.yml`. Running them locally catches issues before push.
+
+CI checks run: Lint, Type Check, Unit Tests, Build, Security Audit, Shell Lint, Desktop Security Guard, E2E Tests, CodeQL, Semgrep, Trivy, SonarCloud (advisory), TruffleHog, GitGuardian, ai-review.
