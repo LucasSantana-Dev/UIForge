@@ -1,7 +1,7 @@
 ---
 name: deploy-check
 description: Validate deployment readiness for Siza (Vercel + Cloudflare Workers)
-version: 2.0.0
+version: 2.1.0
 tags: [deploy, vercel, cloudflare, ci, validation]
 ---
 
@@ -102,7 +102,21 @@ grep -rn "export const runtime" apps/web/src/app/api/ 2>/dev/null
 - **PASS**: No matches (OpenNext handles runtime automatically)
 - **FAIL**: Found runtime exports (remove them for Workers, acceptable for Vercel)
 
-### 12. CI Workflow Status
+### 12. Route Coverage
+```bash
+npm run routes:check
+```
+- **PASS**: `✓ All N API routes have tests`
+- **FAIL**: Run `npm run routes:scaffold <path>` then write assertions
+
+### 13. Vercel Cron Config
+```bash
+cat vercel.json | python3 -c "import json,sys; d=json.load(sys.stdin); [print(c['path'], c['schedule']) for c in d.get('crons',[])]" 2>/dev/null || echo "No vercel.json or no crons"
+```
+- Verify each cron path has `CRON_SECRET` auth guard in route handler
+- Verify cron route has unit test covering 401 and happy path
+
+### 14. CI Workflow Status
 ```bash
 gh run list --repo Forge-Space/siza --workflow ci.yml --limit 3 --json status,conclusion,headBranch
 ```
@@ -115,11 +129,13 @@ Deploy Check Results (target: Vercel):
   [PASS/FAIL] Type check: clean
   [PASS/FAIL] Lint: clean
   [PASS/FAIL] Tests: N passed, M failed
+  [PASS/FAIL] Route coverage: N/N routes tested
   [PASS/FAIL] Build: .next/BUILD_ID exists
   [PASS/FAIL] GitHub secrets: X/17 set
   [PASS/FAIL] GitHub variables: X/3 set
   [PASS/FAIL] Middleware runtime: experimental-edge
   [PASS/FAIL] No API route runtime exports
+  [PASS/FAIL] Cron routes: auth guards verified
   [PASS/FAIL] CI status: green on current branch
 
 Overall: READY TO DEPLOY / BLOCKED (N issues)
