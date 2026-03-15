@@ -1,44 +1,60 @@
-# Siza Cloudflare Workers Deployment Gotchas
+# Siza Deployment Gotchas (v0.41.0)
 
-## Critical Rules
-1. **No `runtime = 'edge'` on API routes** — OpenNext handles routing automatically. Explicit `runtime` declarations cause 500 errors on deployed Workers. Only exception: `middleware.ts` uses `experimental-edge`.
-2. **WASM stub required for free tier** — `@vercel/og` ships resvg.wasm + yoga.wasm which exceed free tier. Stub them at deploy time with empty files.
-3. **No `_redirects` file** — Causes infinite redirect loop on Workers. Remove any Cloudflare Pages-style redirect files.
-4. **No `setInterval` in Workers** — V8 isolates don't support timers. Use lazy cleanup pattern (clean on each request cycle).
-5. **`CLOUDFLARE_DEPLOY_ENABLED` must be `true`** — GitHub variable safety gate on `deploy-web.yml`. Deploy silently skips if not set.
-6. **Bundle must stay under 3072 KiB gzip** — Free tier limit. Currently at 2880 KiB. Monitor with `wrangler deploy --dry-run`.
-7. **`middleware.ts` IS the one exception** — Uses `runtime = 'experimental-edge'` for auth checks, rate limiting, and request routing.
+## Primary Deploy: Vercel
+- **Trigger**: Push to `main` → `deploy-web.yml` → `vercel build --prod` → `vercel deploy --prebuilt --prod`
+- **Secrets required**: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
+- **Build output**: `apps/web/.next/`
+- **URL**: `siza.forgespace.co`
 
-## GitHub Secrets Required (12)
-- Infra: `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`, `CODECOV_TOKEN`
-- Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_BASE_URL`
+## Secondary Deploy: Cloudflare Workers (legacy)
+Only used if explicitly deploying to Workers:
+```bash
+cd apps/web && NODE_ENV=production npx opennextjs-cloudflare build
+npx wrangler deploy --keep-vars
+```
+
+## Critical Cloudflare Workers Rules
+1. **No `runtime = 'edge'` on API routes** — Only exception: `middleware.ts` uses `experimental-edge`
+2. **WASM stub required** — `@vercel/og` ships resvg.wasm + yoga.wasm exceeding free tier
+3. **No `_redirects` file** — Causes infinite redirect loop
+4. **Bundle must stay under 3072 KiB gzip** — Free tier limit
+5. **No `setInterval` in Workers** — Use lazy cleanup pattern
+
+## GitHub Secrets (17)
+- Vercel: `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`
+- Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+- App: `NEXT_PUBLIC_BASE_URL`, `CODECOV_TOKEN`
 - Stripe: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRO_PRICE_ID`, `STRIPE_TEAM_PRICE_ID`
-- Missing: `SUPABASE_SERVICE_ROLE_KEY` (for Stripe webhook handler)
+- Security: `NEXT_PUBLIC_SENTRY_DSN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_API_TOKEN`
 
 ## GitHub Variables (3)
-- `CLOUDFLARE_DEPLOY_ENABLED=true`
-- `NEXT_PUBLIC_ENABLE_STRIPE_BILLING=false`
-- `NEXT_PUBLIC_ENABLE_USAGE_LIMITS=false`
+- `NEXT_PUBLIC_ENABLE_STRIPE_BILLING=true`
+- `NEXT_PUBLIC_ENABLE_USAGE_LIMITS=true`
+- `NEXT_PUBLIC_ENABLE_ONBOARDING=true`
 
-## Release Automation (FIXED PR #277)
-- `release-automation.yml` now supports both merge and squash commit patterns
-- Added `create-release` job: auto-creates git tags + GitHub releases
-- Removed CHANGELOG overwrite job (we maintain CHANGELOG manually in release PRs)
-- Version-type comparison fixed: uses previous git tag instead of package.json
+## Release Automation
+- `release-automation.yml` — auto-creates git tags + GitHub releases on version bump PR merge
+- Trigger: version change in `apps/web/package.json` on merge to `main`
+- Also bumps root `package.json` (keep in sync)
+
+## Pre-deploy Checklist
+Use `/deploy-check` skill for full validation. Key checks:
+1. `npm run type-check` — no TS errors
+2. `npm run lint` — no lint errors
+3. `cd apps/web && npx jest --forceExit` — all tests pass
+4. `npm run build` — build succeeds
+
+## ESLint Gotchas
+- `eslint-disable-next-line` in JSX multi-line elements: use block `{/* eslint-disable rule */}` / `{/* eslint-enable rule */}` pairs
+- `__mocks__/` directory globally ignored in `apps/web/eslint.config.js`
+- ESLint 9 flat config at `apps/web/eslint.config.js` (takes precedence)
+
+## apps/docs Gotchas
+- **Pre-existing Fumadocs TS errors** — `.source/server` not generated until build time
+- For non-code commits: use `HUSKY=0 git commit` to skip pre-commit type-check
+- Build: must use `NODE_ENV=production next build` (shell `NODE_ENV=development` causes SSR null errors)
 
 ## npm Lockfile Gotcha
-- `npm install --legacy-peer-deps` PRUNES peer dependencies from `package-lock.json`
-- CI `npm ci` then fails: `Missing: monaco-editor@0.55.1 from lock file`
-- Fix: `git checkout origin/main -- package-lock.json && npm install` (WITHOUT --legacy-peer-deps)
-
-## JSX ESLint Comment Gotcha
-- `{/* eslint-disable-next-line */}` between JSX props is INVALID (Turbopack parse error)
-- `eslint-disable-next-line` doesn't work for multi-line JSX elements
-- Use block pattern: `{/* eslint-disable rule */}` before + `{/* eslint-enable rule */}` after
-
-## Deploy Commands
-```bash
-NODE_ENV=production npx opennextjs-cloudflare build   # Build for Workers
-npx wrangler deploy --keep-vars                        # Deploy (preserves env vars)
-curl https://siza-web.uiforge.workers.dev/api/health  # Verify deployment
-```
+- `npm install --legacy-peer-deps` PRUNES peer dependencies from lock file
+- CI `npm ci` then fails with `Missing: <package> from lock file`
+- Fix: `git checkout origin/main -- package-lock.json && npm install` (without --legacy-peer-deps)
