@@ -1,7 +1,7 @@
 ---
 name: api-route-testing
 description: Write unit tests for Next.js App Router API route handlers in Siza — mock patterns, auth, rate-limit, Supabase chaining
-version: 1.0.0
+version: 1.1.0
 tags: [testing, api, routes, jest, nextjs]
 ---
 
@@ -66,27 +66,35 @@ const mockEqId = jest.fn(() => ({ eq: mockEqUserId }));
 const mockSelect = jest.fn(() => ({ eq: mockEqId }));
 ```
 
-### Chain with order + limit (scorecard history pattern)
+### Chain with order + range (gallery/history pagination)
 ```typescript
-const mockLimit = jest.fn(() => ({ single: mockSingle }));
-const mockOrder = jest.fn(() => ({ limit: mockLimit }));
-const mockEq = jest.fn(() => ({ order: mockOrder }));
-const mockSelect = jest.fn(() => ({ eq: mockEq }));
+const mockRange = jest.fn().mockResolvedValue({ data: [], count: 0, error: null });
+const mockOrder2 = jest.fn(() => ({ range: mockRange }));
+const mockOrder = jest.fn(() => ({ order: mockOrder2, range: mockRange }));
+const mockEq = jest.fn(() => ({ order: mockOrder, eq: mockEqFramework }));
 ```
 
-### Mutation: upsert/update/insert
+### Chain with order + limit (scorecard/history)
+```typescript
+const mockLimit: jest.Mock = jest.fn(() => ({ single: mockSingle }));
+const mockOrder = jest.fn(() => ({ limit: mockLimit }));
+const mockEq = jest.fn(() => ({ order: mockOrder }));
+```
+
+### Mutation: upsert
 ```typescript
 const mockUpsert = jest.fn().mockResolvedValue({ error: null });
 const mockFrom = jest.fn(() => ({ upsert: mockUpsert }));
+```
 
-// update with eq:
+### Mutation: update + eq
+```typescript
 const mockEq = jest.fn().mockResolvedValue({ error: null });
 const mockUpdate = jest.fn(() => ({ eq: mockEq }));
 const mockFrom = jest.fn(() => ({ update: mockUpdate }));
 ```
 
 ### Multi-table parallel queries (Promise.all)
-Use `mockFrom.mockImplementation((table)=>...)` to dispatch per table:
 ```typescript
 mockFrom.mockImplementation((table: string) => {
   if (table === 'projects') return projectsChain;
@@ -96,23 +104,38 @@ mockFrom.mockImplementation((table: string) => {
 });
 ```
 
-### Public gallery-style (no auth, chained eq + order + range)
+### Table chain for parallel ilike/or queries (suggestions pattern)
 ```typescript
-const mockRange = jest.fn().mockResolvedValue({ data: [], count: 0, error: null });
-const mockOrder2 = jest.fn(() => ({ range: mockRange }));
-const mockOrder = jest.fn(() => ({ order: mockOrder2, range: mockRange }));
-const mockEq2 = jest.fn(() => ({ order: mockOrder, eq: mockEqFramework }));
-const mockEq1 = jest.fn(() => ({ eq: mockEq2 }));
-const mockSelect = jest.fn(() => ({ eq: mockEq1 }));
+function tableChain(data: unknown[]) {
+  const resolved = Promise.resolve({ data, error: null });
+  return {
+    select: jest.fn().mockReturnThis(),
+    eq: jest.fn().mockReturnThis(),
+    ilike: jest.fn().mockReturnThis(),
+    or: jest.fn().mockReturnThis(),
+    order: jest.fn().mockReturnThis(),
+    limit: jest.fn(() => resolved),
+  };
+}
 ```
 
-### auth.getUser() pattern (scorecards route — no verifySession)
+### auth.getUser() pattern (no verifySession)
 ```typescript
 const mockGetUser = jest.fn().mockResolvedValue({ data: { user: { id: 'u1' } }, error: null });
 jest.mock('@/lib/supabase/server', () => ({
   createClient: jest.fn(() =>
     Promise.resolve({ auth: { getUser: mockGetUser }, from: mockFrom })
   ),
+}));
+```
+
+### Routes with custom error handlers
+```typescript
+jest.mock('@/app/api/generations/error-handler', () => ({
+  handleGenerationRouteError: jest.fn((_err: unknown) => {
+    const Response = require('next/server').NextResponse;
+    return Response.json({ error: { message: 'error' } }, { status: 500 });
+  }),
 }));
 ```
 
@@ -126,24 +149,27 @@ jest.mock('@/lib/supabase/server', () => ({
 | Insufficient permissions | `res.status === 403` |
 | DB error | `res.status === 500` |
 | Rate limited | `res.status === 429` |
-| Edge case (empty/null data) | Correct fallback behavior |
+| Empty/null data | Correct fallback behavior |
+| Pagination offset | Correct `range(offset, offset+limit-1)` called |
+| Param clamping | Max/min limits enforced |
 
 ## Response Body Shapes
 
-`errorResponse()` from `@/lib/api/response` returns `{ error: { message, status } }` — NOT `{ error: "string" }`:
+`errorResponse()` from `@/lib/api/response` returns `{ error: { message, status } }`:
 ```typescript
-expect(body.error.message).toMatch(/unauthorized/i);  // correct
-expect(body.error).toMatch(/unauthorized/i);           // wrong — body.error is an object
+expect(body.error.message).toMatch(/unauthorized/i);  // ✓
+expect(body.error).toMatch(/unauthorized/i);           // ✗ — body.error is an object
 ```
 
 `successResponse()` wraps in `{ data: ... }`:
 ```typescript
-expect(body.data.completed).toBe(true);
+expect(body.data.completed).toBe(true);  // ✓
+expect(body.completed).toBe(true);       // ✗ — extra .data wrapper
 ```
 
-Routes using `NextResponse.json()` directly return the raw shape:
+Routes using `NextResponse.json()` directly return the raw shape (no wrapper):
 ```typescript
-expect(body.completed).toBe(true);
+expect(body.completed).toBe(true);  // ✓ for NextResponse.json({ completed: true })
 ```
 
 ## Auth Patterns
@@ -155,10 +181,10 @@ const mockVerifySession = verifySession as jest.MockedFunction<typeof verifySess
 // Success
 mockVerifySession.mockResolvedValue({ user: { id: 'u1', email: 't@t.com' } } as never);
 
-// UnauthorizedError (routes that use verifySession + catch block)
+// UnauthorizedError (routes with catch that check instanceof UnauthorizedError)
 mockVerifySession.mockRejectedValue(new UnauthorizedError('Unauthorized'));
 
-// Generic auth failure (routes that use try/catch without typed error)
+// Generic failure (routes with bare catch)
 mockVerifySession.mockRejectedValue(new Error('not authenticated'));
 ```
 
@@ -177,15 +203,18 @@ cd apps/web && npx jest --forceExit --silent
 
 ## Route Coverage Map (as of 2026-03-15)
 
-| Route | Test file |
-|-------|-----------|
-| `GET /api/gallery` | `gallery-route.test.ts` ✓ |
-| `GET /api/search` | `search-route.test.ts` ✓ |
-| `GET /api/usage/current` | `usage-current-route.test.ts` ✓ |
-| `POST /api/onboarding/complete` | `onboarding-complete-route.test.ts` ✓ |
-| `POST /api/tour/complete` | `tour-complete-route.test.ts` ✓ |
-| `GET /api/scorecards` | `scorecards-route.test.ts` ✓ |
-| `GET /api/catalog` | `integration/catalog-route.test.ts` (excluded from default run) |
-| `GET /api/catalog/[id]` | `integration/catalog-id-route.test.ts` (excluded) |
+| Route | Test file | Tests |
+|-------|-----------|-------|
+| `GET /api/gallery` | `gallery-route.test.ts` ✓ | 5 |
+| `GET /api/search` | `search-route.test.ts` ✓ | 6 |
+| `GET /api/usage/current` | `usage-current-route.test.ts` ✓ | 6 |
+| `POST /api/onboarding/complete` | `onboarding-complete-route.test.ts` ✓ | 3 |
+| `POST /api/tour/complete` | `tour-complete-route.test.ts` ✓ | 3 |
+| `GET /api/scorecards` | `scorecards-route.test.ts` ✓ | 7 |
+| `GET /api/suggestions` | `suggestions-route.test.ts` ✓ | 7 |
+| `GET /api/generations/history` | `generations-history-route.test.ts` ✓ | 5 |
+| `PATCH /api/generations/[id]/feature` | `generation-feature-route.test.ts` ✓ | 6 |
+| `GET /api/catalog` | `integration/catalog-route.test.ts` (excluded from default run) | — |
+| `GET /api/catalog/[id]` | `integration/catalog-id-route.test.ts` (excluded) | — |
 
-Next targets: `suggestions`, `generate/analyze`, `generate/validate`, `teams`, `plugins`.
+**Next targets:** `generate/analyze`, `generate/validate`, `teams/route`, `plugins/route`, `golden-paths/route`
