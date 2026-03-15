@@ -118,7 +118,7 @@ describe('GET /api/admin/security', () => {
     mockVerifyAdmin.mockResolvedValue(null);
 
     const res = await getSecurity(makeRequest('/api/admin/security'));
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(403);
   });
@@ -163,7 +163,7 @@ describe('GET /api/admin/validation', () => {
     mockVerifyAdmin.mockResolvedValue(null);
 
     const res = await getValidation(makeRequest('/api/admin/validation'));
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(403);
   });

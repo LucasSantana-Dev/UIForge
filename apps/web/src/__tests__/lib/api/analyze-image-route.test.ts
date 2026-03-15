@@ -68,14 +68,14 @@ describe('POST /api/analyze-image', () => {
 
   it('returns 400 when imageBase64 is missing', async () => {
     const res = await POST(makeRequest({ mimeType: 'image/png' }));
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(400);
   });
 
   it('returns 400 for invalid mimeType', async () => {
     const res = await POST(makeRequest({ ...VALID_BODY, mimeType: 'image/gif' }));
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(400);
   });
