@@ -1,7 +1,7 @@
 ---
 name: api-route-testing
 description: Write unit tests for Next.js App Router API route handlers in Siza — mock patterns, auth, rate-limit, Supabase chaining
-version: 1.2.0
+version: 1.3.0
 tags: [testing, api, routes, jest, nextjs]
 ---
 
@@ -195,6 +195,46 @@ Routes using `NextResponse.json()` directly return the raw shape (no wrapper):
 expect(body.completed).toBe(true);  // ✓ for NextResponse.json({ completed: true })
 ```
 
+## Barrel Mock vs Specific Module Mock
+
+**Critical**: Mocking `@/lib/api` (the barrel) is unreliable due to Jest hoisting order.
+
+```typescript
+// ✗ Unreliable — barrel mock may not intercept all imports correctly
+jest.mock('@/lib/api', () => ({ verifySession: jest.fn(), createProjectSchema: {...} }));
+
+// ✓ Reliable — mock specific sub-module directly
+jest.mock('@/lib/api/auth', () => ({ verifySession: jest.fn() }));
+jest.mock('@/lib/api/validation/projects', () => ({
+  createProjectSchema: { safeParse: jest.fn((v) => ...) },
+  updateProjectSchema: { safeParse: jest.fn((v) => ...) },
+}));
+```
+
+When a route imports from `@/lib/api` barrel: mock each sub-module that the barrel re-exports, not the barrel itself.
+
+## Dynamic Route Params
+
+Routes using `{ params }: { params: Promise<{ id: string }> }`:
+
+```typescript
+function makeParams(id = 'resource-1') {
+  return { params: Promise.resolve({ id }) };
+}
+
+// Call with:
+const res = await GET(makeRequest(), makeParams());
+const res = await PATCH(makeRequest('PATCH', body), makeParams('other-id'));
+```
+
+For `teams/[slug]`:
+```typescript
+type RouteContext = { params: Promise<{ slug: string }> };
+function makeContext(slug = 'acme') {
+  return { params: Promise.resolve({ slug }) };
+}
+```
+
 ## Auth Patterns
 
 ```typescript
@@ -226,7 +266,7 @@ cd apps/web && npx jest --forceExit --silent
 
 ## Route Coverage Map (as of 2026-03-15)
 
-67 route files total. 14 actively tested in `__tests__/lib/api/` (default jest run).
+67 route files total. **23 actively tested** in `__tests__/lib/api/` (default jest run). **1419 tests total**.
 
 | Route | Test file | Tests |
 |-------|-----------|-------|
@@ -244,7 +284,16 @@ cd apps/web && npx jest --forceExit --silent
 | `GET /api/plugins` | `plugins-route.test.ts` ✓ | 4 |
 | `GET+POST /api/golden-paths` | `golden-paths-route.test.ts` ✓ | 6 |
 | `GET+POST /api/templates` | `templates-route.test.ts` ✓ | 7 |
+| `POST /api/generate/analyze` | `generate-analyze-route.test.ts` ✓ | 7 |
+| `POST /api/generate/validate` | `generate-validate-route.test.ts` ✓ | 8 |
+| `GET+POST /api/projects` | `projects-route.test.ts` ✓ | 9 |
+| `GET+POST /api/components` | `components-route.test.ts` ✓ | 10 |
+| `GET+POST /api/generations` | `generations-route.test.ts` ✓ | 10 |
+| `GET+PATCH+DELETE /api/projects/[id]` | `projects-id-route.test.ts` ✓ | 12 |
+| `GET+PATCH+DELETE /api/generations/[id]` | `generations-id-route.test.ts` ✓ | 15 |
+| `GET+POST+PATCH+DELETE /api/teams/[slug]` | `teams-slug-route.test.ts` ✓ | 16 |
+| `GET+PATCH+DELETE /api/components/[id]` | `components-id-route.test.ts` ✓ | 8 |
 | `GET /api/catalog` | `integration/catalog-route.test.ts` (excluded from default run) | — |
 | `GET /api/catalog/[id]` | `integration/catalog-id-route.test.ts` (excluded) | — |
 
-**Next targets:** `generate/analyze`, `generate/validate`, `generate/format`, `generations/[id]`, `components`, `projects`
+**Next targets (44 remaining):** `generate` (350L complex SSE streaming), `wireframe` (338L), `golden-paths/scaffold` (172L), `catalog/ci` (165L), `catalog/[id]` (120L), `github/webhook` (116L), `plugins/[slug]` (107L)
