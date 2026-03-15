@@ -28,6 +28,7 @@ jest.mock('@/lib/auth/oauth', () => ({
 
 jest.mock('@/components/analytics/AnalyticsProvider', () => ({
   trackEvent: (...args: any[]) => mockTrackEvent(...args),
+  trackGoogleAdsConversion: jest.fn(),
 }));
 
 jest.mock('@/lib/analytics/lead-attribution', () => ({
