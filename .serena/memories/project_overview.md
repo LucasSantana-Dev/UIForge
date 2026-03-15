@@ -42,13 +42,15 @@ Three offset rectangles — base (widest), face (wide), horn (narrow, right-shif
 ## Brand Voice
 Precise, confident, technical, dry, architectural. Write for engineers. No emoji in product copy. No marketing speak.
 
-## Current State (2026-03-07)
-- **Version**: v0.39.0 (released 2026-03-07)
-- **Domain**: `siza.forgespace.co` (Cloudflare Workers)
-- **Branch**: main — 2 open PRs (#388 Skills spec, #391 Entity permissions)
-- **Tags**: v0.2.1 → ... → v0.33.0 → v0.39.0
-- **Tests**: 763+ webapp + 54 API passing, 64+ suites, 8 E2E spec files
-- **RBAC**: Team-based RBAC with entity permissions (see `rbac_entity_permissions` memory)
-- **IDP**: All 4 phases complete — Plugin System, TechDocs, Search Federation, Entity Relationships
+## Current State (2026-03-15)
+- **Version**: v0.41.0 (released 2026-03-08)
+- **Domain**: `siza.forgespace.co` (Vercel primary, Cloudflare Workers legacy)
+- **Branch**: main
+- **Tags**: v0.2.1 → ... → v0.41.0
+- **Tests**: 1217+ webapp passing, 122 suites, 15 E2E spec files
+- **RBAC**: Team-based RBAC with entity permissions
+- **IDP**: All phases complete — Plugin System, TechDocs, Search Federation, Entity Relationships
+- **Skills**: Anthropic Skills marketplace with import/export
+- **Quality**: Post-gen scoring (10 gates, weighted A-F grading)
 - **Desktop**: v0.2.0 released (Electron + Ollama local generation)
-- **Deploy**: Restored via @vercel/og stub (PR #298). Bundle 2975 KiB gzipped
+- **Deploy**: Vercel (primary via deploy-web.yml), Cloudflare Workers (legacy)
