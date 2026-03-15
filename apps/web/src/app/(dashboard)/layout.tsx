@@ -1,4 +1,5 @@
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 import type { User } from '@supabase/supabase-js';
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
@@ -8,6 +9,7 @@ import TopBar from '@/components/dashboard/TopBar';
 import { DashboardShell } from '@/components/dashboard/DashboardShell';
 import { TourProvider } from '@/components/tour/TourProvider';
 import { AppProviders } from '@/components/providers/app-providers';
+import { EmailVerifiedTracker } from '@/components/analytics/EmailVerifiedTracker';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
@@ -73,6 +75,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
             id="main-content"
             className="flex-1 overflow-y-auto bg-background p-4 sm:p-6 lg:p-8"
           >
+            <Suspense fallback={null}>
+              <EmailVerifiedTracker />
+            </Suspense>
             <TourProvider tourCompleted={tourCompleted}>
               <DashboardShell>{children}</DashboardShell>
             </TourProvider>

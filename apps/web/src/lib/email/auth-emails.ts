@@ -45,6 +45,21 @@ export async function sendPasswordResetEmail(to: string, token: string) {
   });
 }
 
+export async function sendReengagementEmail(to: string, firstName?: string) {
+  if (!getFeatureFlag('ENABLE_RESEND_EMAILS')) return;
+
+  const { Reengagement } = await import('@/emails/templates/Reengagement');
+
+  return sendEmail({
+    to,
+    subject: 'Your first AI component is one click away',
+    react: createElement(Reengagement, {
+      generateUrl: `${APP_URL}/generate`,
+      firstName,
+    }),
+  });
+}
+
 export async function sendEmailChangeEmail(to: string, newEmail: string, token: string) {
   if (!getFeatureFlag('ENABLE_RESEND_EMAILS')) return;
 
