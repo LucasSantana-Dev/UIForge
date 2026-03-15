@@ -1,6 +1,5 @@
 import { GET, DELETE } from '@/app/api/templates/[id]/route';
 import { NextRequest } from 'next/server';
-import { ForbiddenError } from '@/lib/api/errors';
 
 jest.mock('@/lib/api/auth', () => ({ verifySession: jest.fn() }));
 jest.mock('@/lib/api/rate-limit', () => ({
@@ -21,11 +20,9 @@ const mockGetEq = jest.fn(() => ({ single: mockGetSingle }));
 const mockGetSelect = jest.fn(() => ({ eq: mockGetEq }));
 
 const mockDeleteEq = jest.fn().mockResolvedValue({ error: null });
-const mockDeleteFrom = jest.fn(() => ({ eq: mockDeleteEq }));
 
 const mockFetchSingle = jest.fn();
 const mockFetchEq = jest.fn(() => ({ single: mockFetchSingle }));
-const mockFetchSelect = jest.fn(() => ({ eq: mockFetchEq }));
 
 const mockFrom = jest.fn();
 jest.mock('@/lib/supabase/server', () => ({

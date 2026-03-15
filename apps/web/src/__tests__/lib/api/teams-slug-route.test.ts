@@ -119,7 +119,7 @@ describe('POST /api/teams/[slug] — add member', () => {
       makeRequest('POST', 'none', { userId: 'u2', role: 'editor' }),
       makeContext('none')
     );
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(404);
   });

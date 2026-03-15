@@ -97,7 +97,7 @@ describe('GET /api/internal/validation/report', () => {
     mockGetReport.mockRejectedValue(new Error('configuration missing'));
 
     const res = await getReport(makeRequest('GET', TOKEN));
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(503);
   });
@@ -137,14 +137,14 @@ describe('POST /api/internal/validation/snapshot', () => {
 
   it('returns 401 when Authorization header is missing', async () => {
     const res = await postSnapshot(makeRequest('POST'));
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(401);
   });
 
   it('returns 403 when token is wrong', async () => {
     const res = await postSnapshot(makeRequest('POST', 'bad-token'));
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(403);
   });
@@ -153,7 +153,7 @@ describe('POST /api/internal/validation/snapshot', () => {
     mockCaptureSnapshot.mockRejectedValue(new Error('configuration missing'));
 
     const res = await postSnapshot(makeRequest('POST', TOKEN));
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(503);
   });

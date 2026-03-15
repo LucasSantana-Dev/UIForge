@@ -137,7 +137,7 @@ describe('GET /api/github/prs', () => {
     mockGetProjectPRs.mockRejectedValue(new Error('GitHub API error'));
 
     const res = await getPRs(makeRequest({ projectId: 'p1' }));
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(500);
   });

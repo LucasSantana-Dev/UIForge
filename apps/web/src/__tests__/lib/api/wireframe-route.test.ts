@@ -111,6 +111,7 @@ describe('POST /api/wireframe', () => {
   });
 
   it('returns 400 when description is missing', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { description: _, ...bodyWithout } = VALID_BODY;
     const res = await POST(makePostRequest(bodyWithout));
     const body = await res.json();

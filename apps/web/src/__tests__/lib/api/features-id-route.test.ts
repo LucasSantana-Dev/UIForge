@@ -60,7 +60,7 @@ describe('PATCH /api/features/[id]', () => {
     });
 
     const res = await PATCH(makeRequest({ description: 'New desc' }), makeParams());
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(200);
     expect(mockUpdate).toHaveBeenCalledWith(expect.objectContaining({ description: 'New desc' }));
@@ -105,7 +105,7 @@ describe('PATCH /api/features/[id]', () => {
     mockVerifyAdmin.mockRejectedValue(new Error('Unexpected'));
 
     const res = await PATCH(makeRequest({ enabled: false }), makeParams());
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(500);
   });
@@ -136,7 +136,7 @@ describe('DELETE /api/features/[id]', () => {
     mockVerifyAdmin.mockResolvedValue(null);
 
     const res = await DELETE(new Request('http://localhost/api/features/flag-1'), makeParams());
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(403);
   });

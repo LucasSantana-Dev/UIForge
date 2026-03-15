@@ -1,6 +1,5 @@
 import { POST } from '@/app/api/golden-paths/scaffold/route';
 import { NextRequest } from 'next/server';
-import { UnauthorizedError, ValidationError } from '@/lib/api/errors';
 
 jest.mock('@/lib/api/auth', () => ({ verifySession: jest.fn() }));
 jest.mock('@/lib/api/rate-limit', () => ({

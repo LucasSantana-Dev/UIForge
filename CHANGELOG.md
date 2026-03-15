@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Complete API route test coverage** — 100% of 67 route handlers now have unit tests
+  (1368 → 1662 tests, +294 across 27 new test files). Covers dynamic CRUD routes,
+  GitHub webhook/OAuth/install/push/link, Stripe billing sessions, internal bearer-token
+  validation, catalog CI/docs pipeline, image analysis, audit log, golden-path scaffold
+  with parameter resolution, skills import/export, and admin telemetry endpoints
+- **Jest mock patterns** — `api-route-testing` skill v1.6.0 captures: barrel-mock with
+  inline error classes, `jest.spyOn(NextResponse.redirect)` for redirect URL capture,
+  bearer-token auth, `AbortSignal.timeout` polyfill, `global.fetch` override via
+  `Object.defineProperty`, and zod uuid v4 fixture requirements
 - **API route test suite expansion** — 123 new unit tests across 17 previously untested
   route handlers: gallery, search, usage/current, onboarding/complete, tour/complete,
   scorecards, suggestions, generations/history, feature toggle, metrics, teams, plugins,

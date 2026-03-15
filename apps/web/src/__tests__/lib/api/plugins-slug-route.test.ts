@@ -94,7 +94,7 @@ describe('GET /api/plugins/[slug]', () => {
     mockGetPluginDetail.mockRejectedValue(new Error('DB error'));
 
     const res = await GET(makeRequest('GET', 'security-scan'), makeContext());
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(500);
   });
@@ -133,7 +133,7 @@ describe('POST /api/plugins/[slug] — install', () => {
     mockInstallPlugin.mockRejectedValue(new Error('Plugin security-scan not found'));
 
     const res = await POST(makeRequest('POST', 'security-scan', {}), makeContext());
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(404);
   });

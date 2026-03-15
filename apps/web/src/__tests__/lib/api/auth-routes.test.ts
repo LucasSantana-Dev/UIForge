@@ -1,6 +1,5 @@
 import { POST as postResendVerification } from '@/app/api/auth/resend-verification/route';
 import { POST as postWelcome } from '@/app/api/auth/welcome/route';
-import { NextRequest } from 'next/server';
 
 jest.mock('@/lib/api/auth', () => ({ verifySession: jest.fn() }));
 jest.mock('@/lib/email/auth-emails', () => ({ sendWelcomeEmail: jest.fn() }));

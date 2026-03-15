@@ -1,11 +1,6 @@
 import { GET, PATCH, DELETE } from '@/app/api/components/[id]/route';
 import { NextRequest } from 'next/server';
-import {
-  UnauthorizedError,
-  ForbiddenError,
-  NotFoundError,
-  ValidationError,
-} from '@/lib/api/errors';
+import { UnauthorizedError, ForbiddenError, NotFoundError } from '@/lib/api/errors';
 
 jest.mock('@/lib/api/auth', () => ({ verifySession: jest.fn() }));
 jest.mock('@/lib/api/rate-limit', () => ({
@@ -166,7 +161,7 @@ describe('PATCH /api/components/[id]', () => {
       makeRequest('PATCH', { component_name: 'UpdatedButton' }),
       makeContext()
     );
-    const body = await res.json();
+    void (await res.json());
 
     expect(res.status).toBe(200);
     expect(mockStoreComponentCode).not.toHaveBeenCalled();

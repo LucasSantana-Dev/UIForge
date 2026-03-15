@@ -1,6 +1,5 @@
 import { POST } from '@/app/api/stripe/create-checkout-session/route';
 import { NextRequest } from 'next/server';
-import { UnauthorizedError } from '@/lib/api/errors';
 
 jest.mock('@/lib/api/auth', () => ({ verifySession: jest.fn() }));
 jest.mock('@/lib/features/flags', () => ({ getFeatureFlag: jest.fn() }));
