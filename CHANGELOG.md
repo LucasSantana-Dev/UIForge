@@ -7,40 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.47.1] — 2026-03-15
+
 ### Added
-- **Complete API route test coverage** — 100% of 67 route handlers now have unit tests
-  (1368 → 1662 tests, +294 across 27 new test files). Covers dynamic CRUD routes,
-  GitHub webhook/OAuth/install/push/link, Stripe billing sessions, internal bearer-token
-  validation, catalog CI/docs pipeline, image analysis, audit log, golden-path scaffold
-  with parameter resolution, skills import/export, and admin telemetry endpoints
-- **Jest mock patterns** — `api-route-testing` skill v1.6.0 captures: barrel-mock with
-  inline error classes, `jest.spyOn(NextResponse.redirect)` for redirect URL capture,
-  bearer-token auth, `AbortSignal.timeout` polyfill, `global.fetch` override via
-  `Object.defineProperty`, and zod uuid v4 fixture requirements
-- **API route test suite expansion** — 123 new unit tests across 17 previously untested
-  route handlers: gallery, search, usage/current, onboarding/complete, tour/complete,
-  scorecards, suggestions, generations/history, feature toggle, metrics, teams, plugins,
-  golden-paths, templates, generate/analyze, generate/validate, projects, components,
-  generations — all in `apps/web/src/__tests__/lib/api/`
-- **Claude AI skills** — 5 new project-specific skills: `verify` (quality gate runner with
-  quick/full modes), `test-recovery` (failing test diagnosis with mock pattern library),
-  `coverage-boost` (coverage gap workflow with cast helper for Supabase storage mocks),
-  `api-route-testing` (route handler test patterns, response shape reference, 17-route
-  coverage map), `changelog` (this skill — release process and entry conventions)
-- **Improved Claude skills** — `deploy-check` v2.0 (Vercel as primary, 12 checks including
-  env vars, CI status, middleware runtime); `supabase-migration` v2.0 (team/RBAC RLS
-  templates, admin-only policies, GIN index patterns, feature flag integration)
+- **Route coverage enforcement** — `scripts/check-route-coverage.ts` + CI gate blocks merges when any `route.ts` lacks a test; `scripts/scaffold-route-test.ts` scaffolds test files from route source (detects methods, auth, rate-limit, dynamic params, redirects)
+- `npm run routes:check` and `npm run routes:scaffold <path>` convenience scripts
 
 ### Fixed
-- **Unit test reliability** — `generation.service.test.ts` postGenScore assertion now
-  correctly handles test environments without `@forgespace/core` (was asserting `toBeDefined()`
-  unconditionally, causing flaky failures)
+- **Security: 4 high CVEs in undici** — added `"overrides": { "undici": "^7.24.3" }` in root `package.json` to fix GHSA-f269, GHSA-2mjp, GHSA-vrm6, GHSA-v9p9, GHSA-4992, GHSA-phc3 (root cause: wrangler → miniflare → undici@7.18.2)
+- **CI security gate** — changed `npm audit --audit-level=moderate` to `--omit=dev` to exclude dev-only electron/yauzl false positives
 
 ### Changed
-- **Test coverage** — Overall coverage improved from 87.6% → 91.4% statements and
-  79.6% → 82.9% branches after targeted coverage work on `storage.ts`,
-  `usage/limits.ts`, and `features/provider.tsx`; 1218 → 1350+ tests passing
-- **Root package.json version** — Synced from 0.37.0 to 0.41.0 to match git tags
+- **Package.json version** — synced root + `apps/web` from 0.41.0 to 0.47.1 to match git tags
+
+## [0.47.0] — 2026-03-15
+
+> Covers changes from v0.42.0 through v0.47.0 (test expansion, funnel fixes, analytics, IDP telemetry).
+
+### Added
+- **P0 funnel fix** — removed project gate on `/generate`; users can generate in scratch mode without creating a project first; `ENABLE_MCP_DIRECT_PROVIDER_FALLBACK` enabled by default
+- **P1 funnel improvements** — pre-fill generate form with last session context; simplified dashboard for zero-project users showing direct Start Generating + Create Project CTAs; Google Ads conversion tracking; signin flow GA4 events
+- **Complete API route test coverage** — 100% of 68 route handlers now have unit tests (1368 → 1663 tests, +295 across 28 new test files)
+- **Route test automation** — `scripts/check-route-coverage.ts` (CI gate) + `scripts/scaffold-route-test.ts` (test scaffold generator)
+- **`api-route-testing` skill v1.6.0** — 6 documented mock patterns including barrel-mock error classes, NextResponse.redirect spy, bearer-token auth, AbortSignal polyfill, global.fetch override
+- **Claude AI skills** — 5 new project skills: `verify`, `test-recovery`, `coverage-boost`, `api-route-testing`, `changelog`
+- **Core-flow validation telemetry** — admin validation endpoint, internal snapshot/report endpoints, scheduled workflows
+- **Lead attribution + Google Ads pilot** — first-touch attribution, GA4 funnel events, campaign assets
+- **Production audit harness** — E2E production smoke, marketplace funnel spec
+
+### Fixed
+- **Security: 4 high CVEs in undici** — npm override to `^7.24.3` (wrangler → miniflare chain)
+- **Unit test reliability** — generation.service postGenScore assertion
+- **CI security gate** — `--omit=dev` excludes dev-only electron/yauzl
+
+### Changed
+- **Test coverage** — 87.6% → 91.4% statements, 79.6% → 82.9% branches
 
 - **Production audit harness** — Added `test:e2e:prod`, `playwright.production.config.ts`,
   `e2e/production-public-smoke.spec.ts`, and `scripts/e2e-production-audit.sh` for

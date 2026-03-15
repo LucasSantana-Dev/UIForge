@@ -1,7 +1,7 @@
 ---
 name: verify
 description: Run Siza quality gates — lint, type-check, test, build — and report results
-version: 1.1.0
+version: 1.2.0
 tags: [quality, lint, test, build, ci, verification]
 ---
 
@@ -16,9 +16,9 @@ npm run lint && npm run type-check
 ```
 
 ## Full Mode
-Run all gates including tests and build:
+Run all gates including tests, route coverage check, and build:
 ```bash
-npm run lint && npm run type-check && cd apps/web && npx jest --forceExit --passWithNoTests && cd ../.. && npm run build
+npm run lint && npm run type-check && npm run routes:check && cd apps/web && npx jest --forceExit --passWithNoTests && cd ../.. && npm run build
 ```
 
 ## Gate Sequence
@@ -47,8 +47,17 @@ cd apps/web && npx jest --forceExit --passWithNoTests
 - **Run from `apps/web/`** — NOT repo root (babel parsing errors at root)
 - Always use `--forceExit` (Supabase client mocks leave async handles)
 - Coverage thresholds: branches 60%, functions 65%, lines 75%, statements 75%
-- Current: ~134 suites, ~1306+ tests (as of 2026-03-15)
+- Current: 169 suites, 1659 tests (as of 2026-03-15, v0.47.1)
 - API route tests live in `__tests__/lib/api/` (NOT `integration/` — excluded from default run)
+- 100% route coverage: 68/68 routes tested — enforced in CI via `npm run routes:check`
+
+### Gate 3b: Route Coverage (new routes only)
+```bash
+npm run routes:check          # check all 68 routes covered
+npm run routes:scaffold <path> # scaffold test for new route
+```
+- Blocks CI when any `route.ts` lacks a test
+- Scaffold first, then fill in the TODO assertions
 
 ### Gate 4: Build
 ```bash
@@ -92,6 +101,8 @@ Overall: GREEN / BLOCKED (N issues)
 | Tests hang | Add `--forceExit` flag |
 | Jest at root fails | Always run from `apps/web/` |
 | Stale eslint-disable directive | Remove comment when rule no longer triggers |
+| New route needs test | Run `npm run routes:scaffold <path>` then fill in TODOs |
+| Route coverage CI fails | Check `npm run routes:check` locally, create test file |
 
 ## Pre-commit Hook
 The repo has a Husky pre-commit hook that runs:
