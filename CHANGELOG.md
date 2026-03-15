@@ -8,6 +8,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **API route test suite expansion** — 123 new unit tests across 17 previously untested
+  route handlers: gallery, search, usage/current, onboarding/complete, tour/complete,
+  scorecards, suggestions, generations/history, feature toggle, metrics, teams, plugins,
+  golden-paths, templates, generate/analyze, generate/validate, projects, components,
+  generations — all in `apps/web/src/__tests__/lib/api/`
+- **Claude AI skills** — 5 new project-specific skills: `verify` (quality gate runner with
+  quick/full modes), `test-recovery` (failing test diagnosis with mock pattern library),
+  `coverage-boost` (coverage gap workflow with cast helper for Supabase storage mocks),
+  `api-route-testing` (route handler test patterns, response shape reference, 17-route
+  coverage map), `changelog` (this skill — release process and entry conventions)
+- **Improved Claude skills** — `deploy-check` v2.0 (Vercel as primary, 12 checks including
+  env vars, CI status, middleware runtime); `supabase-migration` v2.0 (team/RBAC RLS
+  templates, admin-only policies, GIN index patterns, feature flag integration)
+
+### Fixed
+- **Unit test reliability** — `generation.service.test.ts` postGenScore assertion now
+  correctly handles test environments without `@forgespace/core` (was asserting `toBeDefined()`
+  unconditionally, causing flaky failures)
+
+### Changed
+- **Test coverage** — Overall coverage improved from 87.6% → 91.4% statements and
+  79.6% → 82.9% branches after targeted coverage work on `storage.ts`,
+  `usage/limits.ts`, and `features/provider.tsx`; 1218 → 1350+ tests passing
+- **Root package.json version** — Synced from 0.37.0 to 0.41.0 to match git tags
+
 - **Production audit harness** — Added `test:e2e:prod`, `playwright.production.config.ts`,
   `e2e/production-public-smoke.spec.ts`, and `scripts/e2e-production-audit.sh` for
   Chromium production sweeps with artifacted reports and runtime API probe diagnostics
