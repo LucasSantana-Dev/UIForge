@@ -1,33 +1,79 @@
 # Siza Testing State
 
-## Current Stats (as of v0.27.0, 2026-03-01)
-- 656+ tests passing, 53+ suites on main
-- Coverage thresholds: branches 60%, functions 65%, lines 75%, statements 75%
-- CI: ALL 13 JOBS GREEN (Lint, TypeCheck, Build, UnitTests, Security, ShellLint, E2E, CodeQL, etc.)
-- **Billing tests added (v0.27.0)**: 38 tests across PricingCard (16), SubscriptionStatus (9), UsageChart (9), UpgradePrompt (4)
+## Current Stats (v0.41.0, 2026-03-15)
+- **1218 tests passing**, 123 suites, 0 failures on main
+- Coverage: 87.57% statements, 79.58% branches, 89.89% functions, 88.83% lines
+- CI: ALL jobs green (Lint, TypeCheck, Build, UnitTests, Security, ShellLint, E2E, CodeQL, etc.)
+
+## Coverage Thresholds (jest.config)
+- Branches: 60% (actual: 79.58%)
+- Functions: 65% (actual: 89.89%)
+- Lines: 75% (actual: 88.83%)
+- Statements: 75% (actual: 87.57%)
+
+## Low-Coverage Files (as of 2026-03-15)
+- `lib/supabase/storage.ts` — 56.8% stmts (missing: getPublicUrl, createSignedUrl, listFiles, moveFile, copyFile, helper fns)
+- `lib/usage/limits.ts` — 55.2% stmts (missing: checkProjectQuota)
+- `lib/features/provider.tsx` — 53.3% stmts (missing: enabled centralized flags path, polling)
+
+## Test Structure
+```
+apps/web/src/__tests__/
+  components/      # 14 suites (auth, billing, catalog, dashboard, marketing, etc.)
+  hooks/           # Hook tests
+  integration/     # Integration tests
+  lib/             # 20 suites (api, features, quality gates, services, stripe, etc.)
+  services/        # Service tests
+  stores/          # Zustand store tests
+```
+
+## Running Tests
+```bash
+# Always from apps/web/, NEVER from repo root
+cd apps/web && npx jest --forceExit --passWithNoTests
+
+# Single file
+cd apps/web && npx jest <test-file> --forceExit --verbose
+
+# With coverage
+cd apps/web && npx jest --forceExit --coverage
+```
+
+## Critical Gotchas
+- **Run from `apps/web/`**, never repo root (babel parsing errors at root)
+- **Always `--forceExit`** — Supabase client mocks leave async handles open
+- **Auth test mocking**: Use `createClient().auth.signInWithPassword()` pattern, NOT direct `signIn()` imports
+- **React 19**: `renderHook` from `@testing-library/react` — no separate hooks package needed
+- **`__mocks__/` directory** is globally ignored in eslint.config.js
 
 ## API Route Test Patterns
 
-### Mock Pitfalls
-- `setRateLimitHeaders`: Projects routes do `return setRateLimitHeaders(response, ...)` — auto-mock returns undefined. Must use `mockImplementation((res) => res)`.
-- Components routes call `setRateLimitHeaders()` as void statement — auto-mock is safe.
-- `searchParams.get()` returns `null` for missing params, but Zod `.optional().default()` only handles `undefined`. Use `Object.fromEntries(searchParams.entries())`.
+### Multi-query routes (DELETE)
+Use separate chain objects per query — a single chain with `eqCallCount` breaks across queries:
+```typescript
+// Bad: single chain, counts bleed between queries
+// Good: mockFrom returns different objects per call
+let callCount = 0;
+mockFrom.mockImplementation(() => {
+  callCount++;
+  if (callCount === 1) return firstQueryChain;
+  return secondQueryChain;
+});
+```
 
 ### Supabase Mock Patterns
-- Single-query routes: `mockReturnThis()` chain works fine
-- Multi-query routes (DELETE): use `fromCallCount` with separate chain objects per query
-- When route does `from('A').select().eq().single()` then `from('B').select().eq().eq().single()`, a single chain with `eqCallCount` breaks because counts cross queries
+```typescript
+const mockSingle = jest.fn();
+const mockEq = jest.fn().mockReturnValue({ single: mockSingle });
+const mockSelect = jest.fn().mockReturnValue({ eq: mockEq });
+const mockFrom = jest.fn().mockReturnValue({ select: mockSelect });
+jest.mock('@/lib/supabase/server', () => ({
+  createClient: jest.fn(() => Promise.resolve({ from: mockFrom })),
+}));
+```
 
-### Mock Dependencies by Route
-- Components routes: `@/lib/supabase/server`, `@/lib/api/auth`, `@/lib/api/rate-limit`, `@/lib/sentry/server`, `@/lib/api/storage`
-- Projects routes: `@/lib/supabase/server`, `@/lib/api/auth`, `@/lib/api/rate-limit`, `@/lib/usage/limits`, `@/lib/usage/tracker`
-- Let pure modules work naturally: `@/lib/api/response`, `@/lib/api/errors`, `@/lib/api/validation/*`
-
-## Generate page keyboard shortcuts (Issue #266)
-- `use-generate-page-shortcuts.test.tsx`: 8 tests for Cmd+Enter (submit), Cmd+S (save), Cmd+K (focus prompt), Escape (close modals), useShortcutLabel. Fire both metaKey and ctrlKey in tests so they pass on Mac and non-Mac (hook uses metaKey on Mac, ctrlKey otherwise).
-
-## PR #91: Unskip 4 API Route Test Suites
-- Branch: feat/unskip-api-route-tests
-- Status: MERGED (2026-02-25)
-- +57 tests (322→379), +5 suites (25→30)
-- Fixed projects/route.ts null query param bug
+## E2E Tests (Playwright)
+- 15 spec files covering critical flows
+- Location: `apps/web/e2e/`
+- Run: `npm run test:e2e`
+- Auth flows, dashboard, billing, catalog, teams, golden paths, onboarding, gallery

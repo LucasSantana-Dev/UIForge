@@ -73,6 +73,72 @@ describe('FeatureFlagProvider', () => {
   });
 });
 
+describe('FeatureFlagProvider — centralized flags enabled', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
+    mockGetFeatureFlag.mockReturnValue(true);
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('fetches flags on mount when centralized flags enabled', async () => {
+    const resolved = { ...DEFAULT_FEATURE_FLAGS, ENABLE_GALLERY: true } as Record<
+      import('@/lib/features/types').FeatureFlagName,
+      boolean
+    >;
+    mockFetchFlags.mockResolvedValue(resolved);
+
+    render(
+      <FeatureFlagProvider userId="user-1">
+        <TestConsumer />
+      </FeatureFlagProvider>
+    );
+
+    // Wait for async fetchFlags to resolve
+    await screen.findByTestId('flags');
+    expect(mockFetchFlags).toHaveBeenCalledWith('user-1');
+  });
+
+  it('polls flags every 30s and clears cache', async () => {
+    const { clearFlagCache } = require('@/lib/features/client');
+    mockFetchFlags.mockResolvedValue(DEFAULT_FEATURE_FLAGS);
+
+    render(
+      <FeatureFlagProvider>
+        <TestConsumer />
+      </FeatureFlagProvider>
+    );
+
+    await screen.findByTestId('flags');
+    expect(mockFetchFlags).toHaveBeenCalledTimes(1);
+
+    jest.advanceTimersByTime(30_000);
+    await screen.findByTestId('flags');
+
+    expect(clearFlagCache).toHaveBeenCalled();
+    expect(mockFetchFlags).toHaveBeenCalledTimes(2);
+  });
+
+  it('clears polling interval on unmount', async () => {
+    mockFetchFlags.mockResolvedValue(DEFAULT_FEATURE_FLAGS);
+    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+    const { unmount } = render(
+      <FeatureFlagProvider>
+        <TestConsumer />
+      </FeatureFlagProvider>
+    );
+
+    await screen.findByTestId('flags');
+    unmount();
+    expect(clearIntervalSpy).toHaveBeenCalled();
+    clearIntervalSpy.mockRestore();
+  });
+});
+
 describe('useFeatureFlagContext', () => {
   it('returns default context outside provider', () => {
     function Bare() {
@@ -82,5 +148,20 @@ describe('useFeatureFlagContext', () => {
 
     render(<Bare />);
     expect(JSON.parse(screen.getByTestId('flags').textContent!)).toEqual(DEFAULT_FEATURE_FLAGS);
+  });
+
+  it('exposes refresh function from context', () => {
+    function RefreshConsumer() {
+      const { refresh } = useFeatureFlagContext();
+      return <span data-testid="refresh-type">{typeof refresh}</span>;
+    }
+
+    render(
+      <FeatureFlagProvider>
+        <RefreshConsumer />
+      </FeatureFlagProvider>
+    );
+
+    expect(screen.getByTestId('refresh-type')).toHaveTextContent('function');
   });
 });
