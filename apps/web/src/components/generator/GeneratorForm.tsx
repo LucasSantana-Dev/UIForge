@@ -142,7 +142,11 @@ export default function GeneratorForm({
   const autocompleteEnabled = isFeatureEnabled('ENABLE_PROMPT_AUTOCOMPLETE');
   const [designContext, setDesignContext] = useState<DesignContextValues>(DESIGN_DEFAULTS);
   const activeTheme = useThemeStore((s) => s.getActiveTheme)(projectId ?? '');
-  const [promptValue, setPromptValue] = useState(initialDescription || '');
+  const scratchDefault =
+    !projectId && !initialDescription
+      ? 'A modern pricing card component with a plan name, price, feature list, and a call-to-action button. Use a clean design with subtle shadows and rounded corners.'
+      : '';
+  const [promptValue, setPromptValue] = useState(initialDescription || scratchDefault);
   const [image, setImage] = useState<ImageState | null>(null);
   const designAnalysisEnabled = isFeatureEnabled('ENABLE_DESIGN_ANALYSIS');
 
@@ -161,6 +165,9 @@ export default function GeneratorForm({
     }
   };
 
+  const scratchModeDefaults = !projectId && !initialDescription;
+  const defaultComponentName = scratchModeDefaults ? 'pricing-card' : '';
+
   const {
     register,
     handleSubmit,
@@ -169,8 +176,8 @@ export default function GeneratorForm({
   } = useForm<GeneratorFormData>({
     resolver: zodResolver(generatorSchema),
     defaultValues: {
-      componentName: '',
-      prompt: initialDescription || '',
+      componentName: defaultComponentName,
+      prompt: initialDescription || scratchDefault,
       componentLibrary: framework === 'react' ? 'shadcn' : 'tailwind',
       style: 'modern',
       typescript: true,

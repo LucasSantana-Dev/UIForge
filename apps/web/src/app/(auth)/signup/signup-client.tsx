@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import Image from 'next/image';
 import { OAuthButton } from '@/components/auth/oauth-button';
-import { trackEvent } from '@/components/analytics/AnalyticsProvider';
+import { trackEvent, trackGoogleAdsConversion } from '@/components/analytics/AnalyticsProvider';
 import { signInWithGoogle, signInWithGitHub } from '@/lib/auth/oauth';
 import { getStoredLeadAttribution } from '@/lib/analytics/lead-attribution';
 import { AuthCardShell } from '@/components/migration/migration-primitives';
@@ -58,6 +58,7 @@ export function SignUpClient() {
         category: 'Lead',
         label: `email:${leadSource}`,
       });
+      trackGoogleAdsConversion('signup');
       setSuccess(true);
       setLoading(false);
     }

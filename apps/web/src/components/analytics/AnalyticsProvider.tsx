@@ -20,6 +20,7 @@ declare global {
 }
 
 const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GA_TRACKING_ID;
+const GOOGLE_ADS_ID = 'AW-959867732';
 
 export default function AnalyticsProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -43,6 +44,7 @@ export default function AnalyticsProvider({ children }: { children: React.ReactN
         page_location: window.location.href,
         debug_mode: ${process.env.NODE_ENV === 'development'}
       });
+      gtag('config', '${GOOGLE_ADS_ID}');
     `;
     document.head.appendChild(script2);
 
@@ -123,4 +125,12 @@ export const trackError = (error: string, context: string) => {
     category: 'Errors',
     label: `${context}: ${error}`,
   });
+};
+
+export const trackGoogleAdsConversion = (conversionLabel: string) => {
+  if (typeof window.gtag === 'function') {
+    window.gtag('event', 'conversion', {
+      send_to: `${GOOGLE_ADS_ID}/${conversionLabel}`,
+    });
+  }
 };

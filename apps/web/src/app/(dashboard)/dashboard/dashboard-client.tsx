@@ -606,6 +606,79 @@ export function DashboardClient({ initialActivationProgress = null }: DashboardC
     );
   }
 
+  const hasZeroProjects = !projects || projects.length === 0;
+
+  if (hasZeroProjects && activationProgress.onboarding) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-10">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center">
+            <SparklesIcon className="h-8 w-8 text-violet-400" />
+          </div>
+          <h1 className="text-4xl font-bold font-display tracking-tight text-text-primary">
+            Welcome to Forge Space
+          </h1>
+          <p className="text-lg text-text-secondary max-w-md mx-auto">
+            Generate your first UI component with AI
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <Button
+            asChild
+            size="lg"
+            className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_24px_rgba(124,58,237,0.2)] hover:shadow-[0_0_32px_rgba(124,58,237,0.3)] transition-all text-base px-8 py-3"
+          >
+            <Link href="/generate">
+              <SparklesIcon className="mr-2 h-5 w-5" />
+              Start Generating
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            className="border-surface-3 text-text-secondary hover:text-text-primary text-base px-8 py-3"
+          >
+            <Link href="/projects/new">
+              <PlusIcon className="mr-2 h-5 w-5" />
+              Create a Project
+            </Link>
+          </Button>
+        </div>
+
+        <div className="w-full max-w-2xl">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-muted text-center mb-6">
+            How it works
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="rounded-xl border border-surface-3 bg-surface-1 p-5 text-center">
+              <div className="mx-auto w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center mb-3">
+                <span className="text-sm font-bold text-violet-400">1</span>
+              </div>
+              <p className="text-sm font-medium text-text-primary">Describe</p>
+              <p className="mt-1 text-xs text-text-secondary">Tell Siza what component you need</p>
+            </div>
+            <div className="rounded-xl border border-surface-3 bg-surface-1 p-5 text-center">
+              <div className="mx-auto w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3">
+                <span className="text-sm font-bold text-emerald-400">2</span>
+              </div>
+              <p className="text-sm font-medium text-text-primary">Generate</p>
+              <p className="mt-1 text-xs text-text-secondary">AI creates production-ready code</p>
+            </div>
+            <div className="rounded-xl border border-surface-3 bg-surface-1 p-5 text-center">
+              <div className="mx-auto w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3">
+                <span className="text-sm font-bold text-amber-400">3</span>
+              </div>
+              <p className="text-sm font-medium text-text-primary">Ship</p>
+              <p className="mt-1 text-xs text-text-secondary">Copy, export, or push to your repo</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const generationsUsed = usage?.generations_count ?? 0;
   const generationsLimit = usage?.generations_limit ?? 50;
   const projectsUsed = usage?.projects_count ?? 0;

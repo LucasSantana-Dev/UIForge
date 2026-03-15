@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Image from 'next/image';
 import { OAuthButton } from '@/components/auth/oauth-button';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 import { signInWithGoogle, signInWithGitHub } from '@/lib/auth/oauth';
 import { AuthCardShell } from '@/components/migration/migration-primitives';
 
@@ -22,6 +23,12 @@ export function SignInClient() {
     setLoading(true);
     setError(null);
 
+    trackEvent({
+      action: 'signin_started',
+      category: 'Auth',
+      label: 'email',
+    });
+
     const supabase = createClient();
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -30,9 +37,19 @@ export function SignInClient() {
     });
 
     if (error) {
+      trackEvent({
+        action: 'signin_error',
+        category: 'Auth',
+        label: 'email',
+      });
       setError(error.message);
       setLoading(false);
     } else {
+      trackEvent({
+        action: 'signin_success',
+        category: 'Auth',
+        label: 'email',
+      });
       router.push('/projects');
       router.refresh();
     }
@@ -42,9 +59,20 @@ export function SignInClient() {
     setOAuthLoading('google');
     setError(null);
 
+    trackEvent({
+      action: 'signin_oauth_start',
+      category: 'Auth',
+      label: 'google',
+    });
+
     const { error } = await signInWithGoogle();
 
     if (error) {
+      trackEvent({
+        action: 'signin_error',
+        category: 'Auth',
+        label: 'oauth_google',
+      });
       setError(error.message);
       setOAuthLoading(null);
     }
@@ -54,9 +82,20 @@ export function SignInClient() {
     setOAuthLoading('github');
     setError(null);
 
+    trackEvent({
+      action: 'signin_oauth_start',
+      category: 'Auth',
+      label: 'github',
+    });
+
     const { error } = await signInWithGitHub();
 
     if (error) {
+      trackEvent({
+        action: 'signin_error',
+        category: 'Auth',
+        label: 'oauth_github',
+      });
       setError(error.message);
       setOAuthLoading(null);
     }
