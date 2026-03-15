@@ -1,7 +1,7 @@
 ---
 name: api-route-testing
 description: Write unit tests for Next.js App Router API route handlers in Siza — mock patterns, auth, rate-limit, Supabase chaining
-version: 1.3.0
+version: 1.4.0
 tags: [testing, api, routes, jest, nextjs]
 ---
 
@@ -266,7 +266,7 @@ cd apps/web && npx jest --forceExit --silent
 
 ## Route Coverage Map (as of 2026-03-15)
 
-67 route files total. **23 actively tested** in `__tests__/lib/api/` (default jest run). **1419 tests total**.
+67 route files total. **31 actively tested** in `__tests__/lib/api/` (default jest run). **1437 tests total**.
 
 | Route | Test file | Tests |
 |-------|-----------|-------|
@@ -291,9 +291,17 @@ cd apps/web && npx jest --forceExit --silent
 | `GET+POST /api/generations` | `generations-route.test.ts` ✓ | 10 |
 | `GET+PATCH+DELETE /api/projects/[id]` | `projects-id-route.test.ts` ✓ | 12 |
 | `GET+PATCH+DELETE /api/generations/[id]` | `generations-id-route.test.ts` ✓ | 15 |
-| `GET+POST+PATCH+DELETE /api/teams/[slug]` | `teams-slug-route.test.ts` ✓ | 16 |
+| `GET+POST+PATCH+DELETE /api/teams/[slug]` | `teams-slug-route.test.ts` ✓ | 18 |
 | `GET+PATCH+DELETE /api/components/[id]` | `components-id-route.test.ts` ✓ | 8 |
+| `GET /api/skills` | `skills-route.test.ts` ✓ | 8 |
+| `POST /api/skills/import` | `skills-import-route.test.ts` ✓ | 5 |
+| `GET /api/skills/export/[slug]` | `skills-export-route.test.ts` ✓ | 4 |
+| `GET+POST /api/wireframe` | `wireframe-route.test.ts` ✓ | 14 |
+| `POST /api/stripe/create-checkout-session` | `stripe-checkout-route.test.ts` ✓ | 5 |
+| `POST /api/stripe/create-portal-session` | `stripe-portal-route.test.ts` ✓ | 5 |
+| `POST /api/auth/resend-verification` | `auth-routes.test.ts` ✓ | 5 |
+| `POST /api/auth/welcome` | `auth-routes.test.ts` ✓ | 3 |
 | `GET /api/catalog` | `integration/catalog-route.test.ts` (excluded from default run) | — |
 | `GET /api/catalog/[id]` | `integration/catalog-id-route.test.ts` (excluded) | — |
 
-**Next targets (44 remaining):** `generate` (350L complex SSE streaming), `wireframe` (338L), `golden-paths/scaffold` (172L), `catalog/ci` (165L), `catalog/[id]` (120L), `github/webhook` (116L), `plugins/[slug]` (107L)
+**Next targets (36 remaining):** `generate` (350L complex SSE streaming), `golden-paths/scaffold` (172L), `catalog/ci`, `catalog/discover`, `catalog/stats`, `github/webhook`, `github/repos`, `analyze-image`, `audit`, `admin/*`
