@@ -23,62 +23,87 @@ const GROUP_ORDER: RepoGroup[] = ['Design & Brand', 'Governance & Quality', 'Gen
 
 const GROUP_META: Record<
   RepoGroup,
-  { label: string; color: string; dot: string; connector: string }
+  { label: string; sublabel: string; accent: string; border: string; bg: string; badge: string }
 > = {
   'Design & Brand': {
-    label: 'Design & Brand',
-    color: 'border-rose-500/30 bg-rose-500/5',
-    dot: 'bg-rose-400',
-    connector: 'text-rose-400',
+    label: 'Layer 1',
+    sublabel: 'Design & Brand',
+    accent: 'text-rose-400',
+    border: 'border-rose-500/25',
+    bg: 'bg-rose-500/5',
+    badge: 'bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20',
   },
   'Governance & Quality': {
-    label: 'Governance & Quality',
-    color: 'border-amber-500/30 bg-amber-500/5',
-    dot: 'bg-amber-400',
-    connector: 'text-amber-400',
+    label: 'Layer 2',
+    sublabel: 'Governance & Quality',
+    accent: 'text-amber-400',
+    border: 'border-amber-500/25',
+    bg: 'bg-amber-500/5',
+    badge: 'bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20',
   },
   'Generation Engine': {
-    label: 'Generation Engine',
-    color: 'border-violet-500/30 bg-violet-500/5',
-    dot: 'bg-violet-400',
-    connector: 'text-violet-400',
+    label: 'Layer 3',
+    sublabel: 'Generation Engine',
+    accent: 'text-violet-400',
+    border: 'border-violet-500/25',
+    bg: 'bg-violet-500/5',
+    badge: 'bg-violet-500/10 text-violet-400 ring-1 ring-violet-500/20',
   },
 };
 
-function RepoChip({ repo }: { repo: EcosystemRepo }) {
+function RepoNode({
+  repo,
+  accent,
+  border,
+}: {
+  repo: EcosystemRepo;
+  accent: string;
+  border: string;
+}) {
   return (
     <a
       href={repo.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex flex-col gap-1.5 rounded-lg border border-[#27272A] bg-[#18181B] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-500/30 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#121214]"
+      className={`group flex flex-col gap-1.5 rounded-lg border ${border} bg-[#18181B] px-3.5 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-violet-500/40 hover:shadow-[0_4px_16px_rgba(139,92,246,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#121214]`}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="text-sm font-semibold text-[#FAFAFA] transition-colors group-hover:text-violet-300">
+        <span
+          className={`text-[13px] font-semibold text-[#FAFAFA] transition-colors group-hover:${accent.replace('text-', 'text-')}`}
+        >
           {repo.name}
         </span>
         {repo.latestReleaseTag && (
-          <span className="shrink-0 rounded bg-[#27272A] px-1.5 py-0.5 font-mono text-[10px] text-[#A1A1AA]">
+          <span className="shrink-0 rounded bg-[#27272A] px-1.5 py-0.5 font-mono text-[10px] text-[#71717A]">
             {repo.latestReleaseTag}
           </span>
         )}
       </div>
-      <p className="text-xs leading-relaxed text-[#71717A]">{repo.description}</p>
-      {repo.highlights[0] && (
-        <p className="text-[10px] font-mono text-[#52525B]">• {repo.highlights[0]}</p>
-      )}
+      <p className="text-[11px] leading-relaxed text-[#71717A]">{repo.description}</p>
     </a>
   );
 }
 
-function FlowArrow() {
+function LayerConnector({ fromAccent }: { fromAccent: string }) {
   return (
-    <div className="hidden items-center justify-center lg:flex" aria-hidden>
-      <div className="flex flex-col items-center gap-1">
-        <div className="h-8 w-px bg-gradient-to-b from-[#27272A] to-violet-500/40" />
-        <svg className="h-4 w-4 text-violet-400" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M8 12L2 6h12L8 12z" />
-        </svg>
+    <div className="relative hidden lg:flex items-center justify-center py-1" aria-hidden>
+      <div className="absolute inset-x-0 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-0.5">
+          {/* Dashed line */}
+          <div className="flex flex-col items-center gap-[3px]">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <span key={i} className="h-1 w-px rounded-full bg-[#3F3F46]" />
+            ))}
+          </div>
+          {/* Arrow head */}
+          <svg
+            className={`h-3.5 w-3.5 ${fromAccent} opacity-70`}
+            viewBox="0 0 16 16"
+            fill="currentColor"
+          >
+            <path d="M8 12L2 5h12L8 12z" />
+          </svg>
+        </div>
       </div>
     </div>
   );
@@ -96,6 +121,7 @@ export function EcosystemSection({ snapshot }: EcosystemSectionProps) {
   return (
     <section id="ecosystem" className={`${SECTION_PADDING} border-t border-[#27272A]`}>
       <div className={CONTAINER}>
+        {/* Header */}
         <div className="text-center">
           <p className="mb-4 text-sm font-mono uppercase tracking-wider text-violet-400">
             Ecosystem
@@ -112,35 +138,64 @@ export function EcosystemSection({ snapshot }: EcosystemSectionProps) {
           </p>
         </div>
 
-        <div className="mt-14 flex flex-col gap-3 lg:gap-0">
-          {GROUP_ORDER.map((group, idx) => {
-            const meta = GROUP_META[group];
-            const repos = byGroup[group];
-            return (
-              <div key={group}>
-                <div
-                  className={`rounded-xl border p-6 ${meta.color}`}
-                  role="region"
-                  aria-label={meta.label}
-                >
-                  <div className="mb-4 flex items-center gap-3">
-                    <span className={`h-2.5 w-2.5 rounded-full ${meta.dot}`} />
-                    <span className="text-xs font-mono uppercase tracking-wider text-[#A1A1AA]">
-                      {meta.label}
-                    </span>
+        {/* Pipeline diagram */}
+        <div className="relative mt-14">
+          {/* Vertical spine — desktop only, sits behind layers */}
+          <div
+            className="pointer-events-none absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 lg:block"
+            aria-hidden
+          >
+            <div className="h-full w-full bg-gradient-to-b from-rose-500/20 via-amber-500/20 to-violet-500/20" />
+          </div>
+
+          <div className="flex flex-col gap-2 lg:gap-0">
+            {GROUP_ORDER.map((group, idx) => {
+              const meta = GROUP_META[group];
+              const repos = byGroup[group];
+              return (
+                <div key={group}>
+                  {/* Layer row */}
+                  <div
+                    className={`rounded-2xl border ${meta.border} ${meta.bg} p-5`}
+                    role="region"
+                    aria-label={meta.sublabel}
+                  >
+                    {/* Layer header */}
+                    <div className="mb-4 flex items-center gap-3">
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-mono uppercase tracking-widest ${meta.badge}`}
+                      >
+                        {meta.label}
+                      </span>
+                      <span
+                        className={`text-xs font-semibold uppercase tracking-wider ${meta.accent}`}
+                      >
+                        {meta.sublabel}
+                      </span>
+                    </div>
+
+                    {/* Repo nodes — flex row, wrap on mobile */}
+                    <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                      {repos.map((repo) => (
+                        <RepoNode
+                          key={repo.name}
+                          repo={repo}
+                          accent={meta.accent}
+                          border={meta.border}
+                        />
+                      ))}
+                    </div>
                   </div>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {repos.map((repo) => (
-                      <RepoChip key={repo.name} repo={repo} />
-                    ))}
-                  </div>
+
+                  {/* Connector between layers */}
+                  {idx < GROUP_ORDER.length - 1 && <LayerConnector fromAccent={meta.accent} />}
                 </div>
-                {idx < GROUP_ORDER.length - 1 && <FlowArrow />}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
+        {/* Footer stats */}
         <div className="mt-10 flex flex-wrap items-center justify-center gap-6 text-xs font-mono text-[#52525B]">
           <span>{snapshot.releasedRepoCount} packages released</span>
           <span className="text-[#27272A]">·</span>

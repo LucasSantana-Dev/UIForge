@@ -34,7 +34,7 @@ test.describe('Landing Page', () => {
 
   test('should render code showcase section', async ({ page }) => {
     await expect(page.getByText(/your next project/i)).toBeVisible();
-    await expect(page.getByText(/project structure/i)).toBeVisible();
+    await expect(page.getByText(/properly structured/i)).toBeVisible();
   });
 
   test('should render ecosystem section', async ({ page }) => {
