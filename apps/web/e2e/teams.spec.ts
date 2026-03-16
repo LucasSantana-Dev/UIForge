@@ -21,6 +21,7 @@ test.describe('Teams Management', () => {
 
   test('should display teams page', async ({ authenticatedPage: page }) => {
     await page.goto('/teams');
+    await page.waitForLoadState('networkidle');
 
     await expect(page.getByRole('heading', { name: 'Teams' })).toBeVisible();
     await expect(page.getByText(/manage teams and permissions/i)).toBeVisible();
@@ -28,12 +29,14 @@ test.describe('Teams Management', () => {
 
   test('should show empty state when no teams exist', async ({ authenticatedPage: page }) => {
     await page.goto('/teams');
+    await page.waitForLoadState('networkidle');
 
     await expect(page.getByText(/no teams yet/i)).toBeVisible();
   });
 
   test('should toggle create team form', async ({ authenticatedPage: page }) => {
     await page.goto('/teams');
+    await page.waitForLoadState('networkidle');
 
     await page.getByRole('button', { name: /new team/i }).click();
 
@@ -48,6 +51,7 @@ test.describe('Teams Management', () => {
   test('should create a team', async ({ authenticatedPage: page }) => {
     const name = `Test Team ${runId}`;
     await page.goto('/teams');
+    await page.waitForLoadState('networkidle');
 
     await page.getByRole('button', { name: /new team/i }).click();
     await page.locator('#team-name').fill(name);
@@ -62,31 +66,40 @@ test.describe('Teams Management', () => {
   test('should view team detail with members', async ({ authenticatedPage: page }) => {
     const name = `Detail Team ${runId}`;
     await page.goto('/teams');
+    await page.waitForLoadState('networkidle');
+
     await page.getByRole('button', { name: /new team/i }).click();
     await page.locator('#team-name').fill(name);
     await page.getByRole('button', { name: /^create$/i }).click();
 
     await expect(page).toHaveURL(new RegExp(`/teams/detail-team-${runId}`));
+    await page.waitForLoadState('networkidle');
     await expect(page.getByText(/members/i)).toBeVisible();
   });
 
   test('should show auto-generated slug', async ({ authenticatedPage: page }) => {
     await page.goto('/teams');
+    await page.waitForLoadState('networkidle');
 
     await page.getByRole('button', { name: /new team/i }).click();
     await page.locator('#team-name').fill(`My Great Team ${runId}`);
 
-    await expect(page.getByText(`my-great-team-${runId}`)).toBeVisible();
+    // Wait for the slug to be computed and rendered
+    const slugLocator = page.getByText(`my-great-team-${runId}`);
+    await expect(slugLocator).toBeVisible({ timeout: 5000 });
   });
 
   test('should navigate back from team detail', async ({ authenticatedPage: page }) => {
     const name = `Nav Team ${runId}`;
     await page.goto('/teams');
+    await page.waitForLoadState('networkidle');
+
     await page.getByRole('button', { name: /new team/i }).click();
     await page.locator('#team-name').fill(name);
     await page.getByRole('button', { name: /^create$/i }).click();
 
     await expect(page).toHaveURL(new RegExp(`/teams/nav-team-${runId}`));
+    await page.waitForLoadState('networkidle');
 
     await page.getByRole('link', { name: /teams/i }).first().click();
     await expect(page).toHaveURL('/teams');
@@ -95,22 +108,29 @@ test.describe('Teams Management', () => {
   test('should show owner as first member', async ({ authenticatedPage: page }) => {
     const name = `Owner Team ${runId}`;
     await page.goto('/teams');
+    await page.waitForLoadState('networkidle');
+
     await page.getByRole('button', { name: /new team/i }).click();
     await page.locator('#team-name').fill(name);
     await page.getByRole('button', { name: /^create$/i }).click();
 
     await expect(page).toHaveURL(new RegExp(`/teams/owner-team-${runId}`));
+    await page.waitForLoadState('networkidle');
     await expect(page.getByText(/owner/i)).toBeVisible();
   });
 
   test('should validate required team name', async ({ authenticatedPage: page }) => {
     await page.goto('/teams');
+    await page.waitForLoadState('networkidle');
 
     await page.getByRole('button', { name: /new team/i }).click();
 
     await page.getByRole('button', { name: /^create$/i }).click();
 
+    // Form stays open with the name field still visible (validation prevents submission)
     const nameInput = page.locator('#team-name');
     await expect(nameInput).toBeVisible();
+    // Ensure we are still on the teams page (form not submitted)
+    await expect(page).toHaveURL('/teams');
   });
 });
