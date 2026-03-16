@@ -33,7 +33,7 @@
     "eslint-config-next": "^16.1.6",
     "eslint-config-prettier": "6.15.0",
     "express": "^5.2.1",
-    "openai": "^4.80.0",
+    "openai": "^6.29.0",
     "ws": "^8.18.0",
     "zod": "^4.3.6"
   },
