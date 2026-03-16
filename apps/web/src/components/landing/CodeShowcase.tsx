@@ -4,49 +4,61 @@ import { useState } from 'react';
 import { Check, Copy } from 'lucide-react';
 import { CONTAINER, SECTION_PADDING } from './constants';
 
-const CODE_TEXT = `my-saas/
-├── src/
-│   ├── app/             # Next.js App Router
-│   ├── services/        # Business logic layer
-│   ├── repositories/    # Data access layer
-│   ├── middleware/       # Auth, rate-limit, logging
-│   └── lib/
-│       ├── security/    # BYOK, input validation
-│       └── quality/     # Anti-generic, a11y
-├── tests/               # 80%+ coverage target
-├── supabase/            # Migrations, RLS policies
-└── .github/             # CI/CD, security scan`;
+interface TreeLine {
+  prefix: string;
+  name: string;
+  comment?: string;
+  highlight?: string;
+}
 
-const dir = 'color:#60A5FA';
-const comment = 'color:#A1A1AA';
-const tree = 'color:#A1A1AA';
-const root = 'color:#a78bfa';
+const TREE_LINES: TreeLine[] = [
+  { prefix: '', name: 'my-saas/', highlight: 'violet' },
+  { prefix: '├── ', name: 'src/', highlight: 'blue' },
+  { prefix: '│   ├── ', name: 'app/', comment: '# Next.js App Router', highlight: 'blue' },
+  { prefix: '│   ├── ', name: 'services/', comment: '# Business logic layer', highlight: 'blue' },
+  { prefix: '│   ├── ', name: 'repositories/', comment: '# Data access layer', highlight: 'blue' },
+  {
+    prefix: '│   ├── ',
+    name: 'middleware/',
+    comment: '# Auth, rate-limit, logging',
+    highlight: 'blue',
+  },
+  { prefix: '│   └── ', name: 'lib/', highlight: 'blue' },
+  {
+    prefix: '│       ├── ',
+    name: 'security/',
+    comment: '# BYOK, input validation',
+    highlight: 'emerald',
+  },
+  {
+    prefix: '│       └── ',
+    name: 'quality/',
+    comment: '# Anti-generic, a11y',
+    highlight: 'emerald',
+  },
+  { prefix: '├── ', name: 'tests/', comment: '# 80%+ coverage target', highlight: 'amber' },
+  { prefix: '├── ', name: 'supabase/', comment: '# Migrations, RLS policies', highlight: 'blue' },
+  { prefix: '└── ', name: '.github/', comment: '# CI/CD, security scan', highlight: 'blue' },
+];
 
-const CODE_HTML = [
-  `<span style="${root}">my-saas/</span>`,
-  '\n',
-  `<span style="${tree}">├── </span><span style="${dir}">src/</span>`,
-  '\n',
-  `<span style="${tree}">│   ├── </span><span style="${dir}">app/</span><span style="${comment}">             # Next.js App Router</span>`,
-  '\n',
-  `<span style="${tree}">│   ├── </span><span style="${dir}">services/</span><span style="${comment}">        # Business logic layer</span>`,
-  '\n',
-  `<span style="${tree}">│   ├── </span><span style="${dir}">repositories/</span><span style="${comment}">    # Data access layer</span>`,
-  '\n',
-  `<span style="${tree}">│   ├── </span><span style="${dir}">middleware/</span><span style="${comment}">       # Auth, rate-limit, logging</span>`,
-  '\n',
-  `<span style="${tree}">│   └── </span><span style="${dir}">lib/</span>`,
-  '\n',
-  `<span style="${tree}">│       ├── </span><span style="${dir}">security/</span><span style="${comment}">    # BYOK, input validation</span>`,
-  '\n',
-  `<span style="${tree}">│       └── </span><span style="${dir}">quality/</span><span style="${comment}">     # Anti-generic, a11y</span>`,
-  '\n',
-  `<span style="${tree}">├── </span><span style="${dir}">tests/</span><span style="${comment}">               # 80%+ coverage target</span>`,
-  '\n',
-  `<span style="${tree}">├── </span><span style="${dir}">supabase/</span><span style="${comment}">            # Migrations, RLS policies</span>`,
-  '\n',
-  `<span style="${tree}">└── </span><span style="${dir}">.github/</span><span style="${comment}">             # CI/CD, security scan</span>`,
-].join('');
+const CODE_TEXT = TREE_LINES.map((l) =>
+  [l.prefix + l.name, l.comment].filter(Boolean).join('   ')
+).join('\n');
+
+const highlightClasses: Record<string, string> = {
+  violet: 'bg-violet-500/10 text-violet-300',
+  blue: 'bg-blue-500/10 text-blue-300',
+  emerald: 'bg-emerald-500/10 text-emerald-300',
+  amber: 'bg-amber-500/10 text-amber-300',
+};
+
+const defaultDirClass = 'text-[#60A5FA]';
+const highlightDirClass: Record<string, string> = {
+  violet: 'text-violet-300',
+  blue: 'text-blue-300',
+  emerald: 'text-emerald-300',
+  amber: 'text-amber-300',
+};
 
 const FEATURES = [
   'Architecture patterns baked in — service layers, repositories, middleware',
@@ -57,6 +69,7 @@ const FEATURES = [
 
 export function CodeShowcase() {
   const [copied, setCopied] = useState(false);
+  const [hoveredLine, setHoveredLine] = useState<number | null>(null);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(CODE_TEXT);
@@ -96,13 +109,39 @@ export function CodeShowcase() {
             </button>
           </div>
           <div className="p-5 overflow-x-auto">
-            <pre>
-              <code
-                className="font-mono text-[13px] leading-[1.65]"
-                dangerouslySetInnerHTML={{
-                  __html: CODE_HTML,
-                }}
-              />
+            <pre className="font-mono text-[13px] leading-[1.65] select-none">
+              {TREE_LINES.map((line, i) => {
+                const isRoot = i === 0;
+                const isHovered = hoveredLine === i;
+                const hl = line.highlight ?? 'blue';
+                const rowBg = isHovered ? highlightClasses[hl] : '';
+                const dirColor = isHovered
+                  ? (highlightDirClass[hl] ?? defaultDirClass)
+                  : defaultDirClass;
+                const rootColor = isHovered ? 'text-violet-300' : 'text-[#a78bfa]';
+
+                return (
+                  <span
+                    key={i}
+                    role="presentation"
+                    className={`flex items-baseline rounded px-1 -mx-1 cursor-default transition-colors duration-100 ${rowBg}`}
+                    onMouseEnter={() => setHoveredLine(i)}
+                    onMouseLeave={() => setHoveredLine(null)}
+                  >
+                    {!isRoot && (
+                      <span className="text-[#A1A1AA] whitespace-pre">{line.prefix}</span>
+                    )}
+                    <span className={isRoot ? rootColor : dirColor}>{line.name}</span>
+                    {line.comment && (
+                      <span className="text-[#52525B] ml-1 whitespace-pre">
+                        {'   '}
+                        {line.comment}
+                      </span>
+                    )}
+                    {'\n'}
+                  </span>
+                );
+              })}
             </pre>
           </div>
         </div>

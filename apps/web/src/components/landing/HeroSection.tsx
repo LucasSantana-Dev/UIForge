@@ -1,158 +1,206 @@
+'use client';
+
 import { ArrowRight, BookOpen } from 'lucide-react';
-import { AmbientVideoBackground } from '@/components/migration/ambient-video-background';
+import { useEffect, useRef, useState } from 'react';
 import { CONTAINER } from './constants';
 
-const PARTICLES = Array.from({ length: 14 }, (_, i) => ({
-  id: i,
-  top: `${((i * 17) % 100) + 0.5}%`,
-  left: `${((i * 23) % 100) + 0.5}%`,
-  size: i % 2 === 0 ? 2 : 3,
-  opacity: 0.16 + (i % 4) * 0.03,
-  duration: 16 + (i % 5) * 4,
-  delay: (i % 6) * 0.8,
-  driftX: (i % 2 === 0 ? 1 : -1) * 20,
-  driftY: (i % 3 === 0 ? 1 : -1) * 15,
-}));
+const DEMO_STEPS = [
+  {
+    label: 'prompt',
+    lines: ['$ siza generate --component ProductCard', '  > Analyzing context...'],
+  },
+  {
+    label: 'generating',
+    lines: [
+      '  > Generating component...',
+      '',
+      'import { Badge } from "@/components/ui/badge";',
+      'import { Card, CardContent } from "@/components/ui/card";',
+      '',
+      'export function ProductCard({ product }: Props) {',
+      '  return (',
+      '    <Card className="group hover:shadow-lg transition-all">',
+      '      <CardContent className="p-4">',
+      '        <Badge variant="secondary">{product.category}</Badge>',
+      '        <h3 className="mt-2 font-semibold">{product.name}</h3>',
+      '        <p className="text-sm text-muted-foreground">{product.price}</p>',
+      '      </CardContent>',
+      '    </Card>',
+      '  );',
+      '}',
+    ],
+  },
+  {
+    label: 'done',
+    lines: [
+      '',
+      '  ✓ Component generated (847ms)',
+      '  ✓ TypeScript types inferred',
+      '  ✓ Tests scaffolded',
+    ],
+  },
+];
+
+function AnimatedCodeDemo() {
+  const [stepIdx, setStepIdx] = useState(0);
+  const [lineIdx, setLineIdx] = useState(0);
+  const [charIdx, setCharIdx] = useState(0);
+  const [displayed, setDisplayed] = useState<string[]>([]);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const step = DEMO_STEPS[stepIdx];
+    if (!step) return;
+
+    const currentLine = step.lines[lineIdx] ?? '';
+    const isLastLine = lineIdx >= step.lines.length - 1;
+    const isLastStep = stepIdx >= DEMO_STEPS.length - 1;
+
+    if (charIdx < currentLine.length) {
+      timeoutRef.current = setTimeout(() => {
+        setCharIdx((c) => c + 1);
+      }, 18);
+    } else {
+      // line complete
+      const newDisplayed = [...displayed, currentLine];
+      timeoutRef.current = setTimeout(
+        () => {
+          setDisplayed(newDisplayed);
+          if (isLastLine) {
+            if (isLastStep) {
+              // reset after pause
+              timeoutRef.current = setTimeout(() => {
+                setStepIdx(0);
+                setLineIdx(0);
+                setCharIdx(0);
+                setDisplayed([]);
+              }, 3200);
+            } else {
+              setStepIdx((s) => s + 1);
+              setLineIdx(0);
+              setCharIdx(0);
+            }
+          } else {
+            setLineIdx((l) => l + 1);
+            setCharIdx(0);
+          }
+        },
+        isLastLine && isLastStep ? 0 : 60
+      );
+    }
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stepIdx, lineIdx, charIdx]);
+
+  const step = DEMO_STEPS[stepIdx];
+  const currentLine = step?.lines[lineIdx] ?? '';
+  const partialLine = currentLine.slice(0, charIdx);
+
+  return (
+    <div className="max-w-3xl mx-auto rounded-xl border border-[#27272A] bg-[#18181B] overflow-hidden mt-16 shadow-[0_8px_48px_rgba(0,0,0,0.5)]">
+      <div className="flex items-center gap-2 px-4 py-3 border-b border-[#27272A]">
+        <div className="flex gap-1.5">
+          <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
+          <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
+          <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
+        </div>
+        <span className="ml-2 text-xs text-[#71717A] font-mono">Terminal</span>
+      </div>
+      <div className="p-5 font-mono text-[13px] leading-relaxed min-h-[220px]">
+        {displayed.map((line, i) => (
+          <div
+            key={i}
+            className={
+              line.startsWith('  ✓')
+                ? 'text-emerald-400'
+                : line.startsWith('  >')
+                  ? 'text-violet-400'
+                  : line.startsWith('$')
+                    ? 'text-[#FAFAFA]'
+                    : 'text-[#A1A1AA]'
+            }
+          >
+            {line || '\u00A0'}
+          </div>
+        ))}
+        {partialLine !== undefined && (
+          <div
+            className={
+              partialLine.startsWith('  ✓')
+                ? 'text-emerald-400'
+                : partialLine.startsWith('  >')
+                  ? 'text-violet-400'
+                  : partialLine.startsWith('$')
+                    ? 'text-[#FAFAFA]'
+                    : 'text-[#A1A1AA]'
+            }
+          >
+            {partialLine}
+            <span className="inline-block w-[2px] h-[14px] bg-violet-400 align-middle ml-[1px] animate-[cursor-blink_1s_step-end_infinite]" />
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export function HeroSection() {
   return (
     <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      <AmbientVideoBackground />
+      {/* Sharp 1px dot grid — no blur */}
       <div
-        className="absolute w-[1000px] h-[1000px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        className="absolute inset-0 opacity-[0.18]"
         style={{
-          background:
-            'conic-gradient(from 0deg, rgba(139,92,246,0.20), rgba(6,182,212,0.10), rgba(99,102,241,0.16), rgba(139,92,246,0.20))',
-          filter: 'blur(90px)',
-          animation: 'mesh-rotate 60s linear infinite',
+          backgroundImage: 'radial-gradient(circle, rgba(139,92,246,0.8) 1px, transparent 1px)',
+          backgroundSize: '32px 32px',
         }}
       />
-
+      {/* Single static radial glow, no animation */}
       <div
-        className="absolute w-[600px] h-[600px] left-[20%] top-[30%] -translate-x-1/2 -translate-y-1/2"
+        className="absolute w-[600px] h-[400px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse, rgba(6,182,212,0.12), transparent 70%)',
-          filter: 'blur(60px)',
-          animation: 'mesh-rotate 90s linear infinite reverse',
-        }}
-      />
-
-      <div
-        className="absolute inset-0 opacity-[0.35]"
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(139,92,246,0.18) 1px, transparent 1px)',
-          backgroundSize: '40px 40px',
-        }}
-      />
-
-      {PARTICLES.map((p) => (
-        <div
-          key={p.id}
-          className="absolute rounded-full bg-violet-500"
-          style={{
-            width: `${p.size}px`,
-            height: `${p.size}px`,
-            top: p.top,
-            left: p.left,
-            opacity: p.opacity,
-            animation: `particle-drift ${p.duration}s ease-in-out infinite`,
-            animationDelay: `${p.delay}s`,
-            ['--drift-x' as string]: `${p.driftX}px`,
-            ['--drift-y' as string]: `${p.driftY}px`,
-            ['--particle-opacity' as string]: `${p.opacity}`,
-          }}
-        />
-      ))}
-
-      <div
-        className="absolute w-[700px] h-[500px] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{
-          background: 'radial-gradient(ellipse, rgba(139,92,246,0.25), transparent 65%)',
-          animation: 'pulse-glow 4s ease-in-out infinite',
+          background: 'radial-gradient(ellipse, rgba(139,92,246,0.12), transparent 70%)',
         }}
       />
 
       <div className={`${CONTAINER} relative z-10 text-center`}>
         <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs font-mono text-violet-300">
           <div className="w-2 h-2 rounded-full bg-violet-400 animate-pulse" />
-          Now in Public Beta
+          1,200+ developers generating
         </div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[1.1] mt-6">
-          Generate <span className="shimmer-text">production-grade</span>
+        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-[-0.02em] leading-[1.05] mt-6">
+          Generate production-grade
           <br />
-          UI code with AI
+          <span className="text-violet-400">UI code</span> with AI
         </h1>
 
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-6">
-          Siza generates quality React, Next.js, and Vue components, not generic AI slop. Bring your
-          own API key, choose your model, and ship faster.
+        <p className="text-lg text-[#A1A1AA] max-w-2xl mx-auto mt-6">
+          Siza generates quality React, Next.js, and Vue components&nbsp;— not generic AI slop.
+          Bring your own API key, choose your model, and ship faster.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-          <div className="inline-flex transition-transform duration-200 hover:-translate-y-0.5">
-            <a
-              href="/signup"
-              className="group relative inline-flex items-center gap-2 bg-violet-600 text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-violet-500 shadow-[0_0_24px_rgba(139,92,246,0.3)] hover:shadow-[0_0_32px_rgba(139,92,246,0.45)] overflow-hidden"
-            >
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-              <span className="relative">Start Generating Free</span>
-              <ArrowRight className="relative w-4 h-4 transition-transform group-hover:translate-x-0.5" />
-            </a>
-          </div>
-          <div className="inline-flex transition-transform duration-200 hover:-translate-y-0.5">
-            <a
-              href="/docs"
-              className="inline-flex items-center gap-2 border border-border rounded-lg px-6 py-3 text-sm font-medium text-foreground hover:bg-violet-500/5 hover:border-violet-500/40 transition-all duration-200"
-            >
-              <BookOpen className="w-4 h-4" />
-              Read the Docs
-            </a>
-          </div>
+          <a
+            href="/signup"
+            className="inline-flex items-center gap-2 bg-violet-600 text-white rounded-lg px-6 py-3 text-sm font-medium transition-all duration-200 hover:bg-violet-500 hover:-translate-y-0.5"
+          >
+            Start Generating Free
+            <ArrowRight className="w-4 h-4" />
+          </a>
+          <a
+            href="/docs"
+            className="inline-flex items-center gap-2 border border-[#27272A] rounded-lg px-6 py-3 text-sm font-medium text-[#FAFAFA] hover:bg-violet-500/5 hover:border-violet-500/40 hover:-translate-y-0.5 transition-all duration-200"
+          >
+            <BookOpen className="w-4 h-4" />
+            Read the Docs
+          </a>
         </div>
 
-        <div className="max-w-4xl mx-auto rounded-xl border border-border bg-surface overflow-hidden mt-16 shadow-card hover:shadow-card-hover transition-all duration-300">
-          <div className="flex items-center gap-2 px-4 py-3 border-b border-border">
-            <div className="w-2.5 h-2.5 rounded-full bg-red-500 opacity-60" />
-            <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 opacity-60" />
-            <div className="w-2.5 h-2.5 rounded-full bg-green-500 opacity-60" />
-            <span className="ml-3 text-xs text-subtle font-mono">
-              siza generate --component ProductCard
-            </span>
-          </div>
-          <div className="p-5 font-mono text-[13px] leading-relaxed">
-            <div>
-              <span className="text-subtle">{'// Generated by Siza AI — Claude 3.5 Sonnet'}</span>
-            </div>
-            <div>
-              <span className="text-violet-400">export function</span>{' '}
-              <span className="text-info">ProductCard</span>{' '}
-              <span className="text-subtle">{'({ product }: Props) {'}</span>
-            </div>
-            <div>
-              <span className="text-violet-400">return</span>{' '}
-              <span className="text-subtle">
-                {'(<Card className="group hover:shadow-lg transition-all">)'}
-              </span>
-            </div>
-            <div>
-              <span className="text-subtle">
-                {'<Badge variant="secondary">{product.category}</Badge>'}
-              </span>
-            </div>
-            <div>
-              <span className="text-subtle">{'<h3>{product.name}</h3>'}</span>
-            </div>
-            <div>
-              <span
-                className="inline-block w-2 h-4 bg-violet-500"
-                style={{
-                  animation: 'cursor-blink 1s step-end infinite',
-                }}
-              />
-            </div>
-          </div>
-        </div>
+        <AnimatedCodeDemo />
       </div>
     </section>
   );
