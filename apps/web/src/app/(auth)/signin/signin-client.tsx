@@ -8,7 +8,7 @@ import Image from 'next/image';
 import { OAuthButton } from '@/components/auth/oauth-button';
 import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 import { signInWithGoogle, signInWithGitHub } from '@/lib/auth/oauth';
-import { AuthCardShell } from '@/components/migration/migration-primitives';
+import { AuthSplitShell } from '@/components/migration/migration-primitives';
 
 export function SignInClient() {
   const [email, setEmail] = useState('');
@@ -102,7 +102,7 @@ export function SignInClient() {
   };
 
   return (
-    <AuthCardShell>
+    <AuthSplitShell>
       <div className="w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2">
@@ -204,6 +204,6 @@ export function SignInClient() {
           </p>
         </div>
       </div>
-    </AuthCardShell>
+    </AuthSplitShell>
   );
 }
