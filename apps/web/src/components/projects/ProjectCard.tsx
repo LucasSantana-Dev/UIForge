@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import type { Database } from '@/lib/supabase/database.types';
 import { formatDistanceToNow } from 'date-fns';
+import { ArrowRightIcon } from 'lucide-react';
 import ProjectActions from './ProjectActions';
 
 type Project = Database['public']['Tables']['projects']['Row'];
@@ -13,11 +14,6 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project, compact = false }: ProjectCardProps) {
-  const freshnessSeed = project.id
-    .split('')
-    .reduce((acc, char, index) => acc + char.charCodeAt(0) * (index + 1), 0);
-  const freshness = 25 + (freshnessSeed % 71);
-
   return (
     <div
       className={`group overflow-hidden rounded-xl border border-border bg-surface shadow-card transition-all duration-200 ease-siza hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-card-hover ${
@@ -76,8 +72,14 @@ export default function ProjectCard({ project, compact = false }: ProjectCardPro
             </span>
           </div>
         </div>
-        <div className="mt-4 h-1 w-full bg-border">
-          <div className="h-full bg-primary transition-all" style={{ width: `${freshness}%` }} />
+        <div className="mt-4 flex items-center justify-end">
+          <Link
+            href={`/projects/${project.id}`}
+            className="inline-flex items-center gap-1 text-xs font-medium text-primary/70 transition-colors hover:text-primary"
+          >
+            Open project
+            <ArrowRightIcon className="h-3 w-3" />
+          </Link>
         </div>
       </div>
     </div>
