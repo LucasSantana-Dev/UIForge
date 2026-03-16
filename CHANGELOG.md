@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **ecosystem-data unit tests** — 3 tests covering GitHub API → snapshot mapping, fallback on release fetch failure, and full fallback on repo list failure
 - **Dashboard shell unit tests** — 46 tests across 7 suites covering Sidebar, TopBar, UserMenu, MobileNav, PRStatus, GitHubPanel, and ProjectSettings; verified selector-pattern UIStore mocks, Supabase auth sign-out, and GitHub API loading/error states
 - **Wireframe component unit tests** — 18 tests across FigmaExportDialog (8) and WireframePreview (10) covering export flow, error/success states, zoom controls, element selection, and metadata footer
+- **Billing component unit tests** — 38 tests across PricingCard (15), SubscriptionStatus (10), UpgradePrompt (4), and UsageChart (9) covering plan display, pricing tiers, status badges, progress bars, and CTA flows
+- **Catalog unit tests** — TryItPanel (10 tests) covering parameter inputs, enum selects, request body textarea, response display, network error handling, and clipboard copy
+- **Roadmap unit tests** — PhaseCard (13 tests) covering phase number/title/badge rendering, expand/collapse, progress bar, item filtering by status and scope, and GitHub links
+- **ThemeSelector unit tests** — 14 tests covering active theme display, dropdown toggle, theme selection, save flow (input validation + createTheme), import flow (error on invalid JSON), export to clipboard, duplicate, and built-in delete guard
 
 ## [0.48.0] — 2026-03-15
 

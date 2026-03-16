@@ -1,8 +1,17 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { UpgradePrompt } from '@/components/billing/UpgradePrompt';
 
 jest.mock('next/link', () => {
-  function MockLink({ children, href, ...props }: { children: React.ReactNode; href: string }) {
+  function MockLink({
+    children,
+    href,
+    ...props
+  }: {
+    children: React.ReactNode;
+    href: string;
+    [key: string]: unknown;
+  }) {
     return (
       <a href={href} {...props}>
         {children}
