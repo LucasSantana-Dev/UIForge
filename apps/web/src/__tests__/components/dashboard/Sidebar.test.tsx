@@ -54,19 +54,8 @@ jest.mock('lucide-react', () => ({
 }));
 
 jest.mock('@/components/ui/button', () => ({
-  Button: ({
-    children,
-    onClick,
-    asChild: _asChild,
-    ...props
-  }: {
-    children: React.ReactNode;
-    onClick?: () => void;
-    asChild?: boolean;
-  }) => (
-    <button onClick={onClick} {...props}>
-      {children}
-    </button>
+  Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => (
+    <button onClick={onClick}>{children}</button>
   ),
 }));
 
