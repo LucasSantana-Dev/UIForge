@@ -1,6 +1,17 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { ThemeGenerator } from '@/components/generator/ThemeGenerator';
-import { DESIGN_DEFAULTS } from '@/components/generator/DesignContext';
+
+const DESIGN_DEFAULTS = {
+  colorMode: 'dark' as const,
+  primaryColor: '#8B5CF6',
+  secondaryColor: '#3B82F6',
+  accentColor: '#22C55E',
+  animation: 'subtle' as const,
+  spacing: 'default' as const,
+  borderRadius: 'medium' as const,
+  typography: 'system' as const,
+};
 
 const mockCreateTheme = jest.fn(() => 'theme-123');
 const mockSetActiveTheme = jest.fn();

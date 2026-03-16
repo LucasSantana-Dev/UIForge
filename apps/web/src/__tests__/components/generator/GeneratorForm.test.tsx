@@ -207,19 +207,19 @@ describe('GeneratorForm', () => {
 
   it('renders component library select inside Advanced section when opened', () => {
     render(<GeneratorForm {...defaultProps} />);
-    fireEvent.click(screen.getByText('Advanced'));
+    fireEvent.click(screen.getByRole('button', { name: /advanced/i }));
     expect(screen.getByLabelText('Component Library')).toBeInTheDocument();
   });
 
   it('renders design style select inside Advanced section when opened', () => {
     render(<GeneratorForm {...defaultProps} />);
-    fireEvent.click(screen.getByText('Advanced'));
+    fireEvent.click(screen.getByRole('button', { name: /advanced/i }));
     expect(screen.getByLabelText('Design Style')).toBeInTheDocument();
   });
 
   it('renders TypeScript checkbox inside Advanced section when opened', () => {
     render(<GeneratorForm {...defaultProps} />);
-    fireEvent.click(screen.getByText('Advanced'));
+    fireEvent.click(screen.getByRole('button', { name: /advanced/i }));
     expect(screen.getByLabelText('Use TypeScript')).toBeInTheDocument();
   });
 });

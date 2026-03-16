@@ -14,7 +14,7 @@ import LivePreview from '@/components/generator/LivePreview';
 describe('LivePreview (re-export stub)', () => {
   it('renders without crashing', () => {
     render(<LivePreview code="" framework="react" />);
-    expect(screen.getByTestId('live-preview-stub')).toBeDefined();
+    expect(screen.getByTestId('live-preview-stub')).toBeInTheDocument();
   });
 
   it('passes framework prop through to the underlying component', () => {
@@ -26,6 +26,6 @@ describe('LivePreview (re-export stub)', () => {
   it('renders code content when code prop is provided', () => {
     const sampleCode = 'export default function Btn() {}';
     render(<LivePreview code={sampleCode} framework="react" />);
-    expect(screen.getByText(`Preview: ${sampleCode}`)).toBeDefined();
+    expect(screen.getByText(`Preview: ${sampleCode}`)).toBeInTheDocument();
   });
 });

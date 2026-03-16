@@ -1,3 +1,4 @@
+import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DesignContext, DESIGN_DEFAULTS } from '@/components/generator/DesignContext';
 
@@ -94,7 +95,9 @@ describe('DesignContext', () => {
 
   it('renders Border Radius select', () => {
     render(<DesignContext {...defaultProps} />);
-    expect(screen.getByLabelText('Border Radius')).toBeInTheDocument();
+    const borderRadiusSelect = screen.getByLabelText('Border Radius');
+    expect(borderRadiusSelect).toBeInTheDocument();
+    expect(borderRadiusSelect).toHaveValue(DESIGN_DEFAULTS.borderRadius);
   });
 
   it('renders Typography select with correct default', () => {

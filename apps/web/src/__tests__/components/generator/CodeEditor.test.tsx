@@ -25,13 +25,13 @@ import CodeEditor from '@/components/generator/CodeEditor';
 describe('CodeEditor (re-export stub)', () => {
   it('renders without crashing', () => {
     render(<CodeEditor code="" onChange={jest.fn()} />);
-    expect(screen.getByTestId('code-editor-stub')).toBeDefined();
+    expect(screen.getByTestId('code-editor-stub')).toBeInTheDocument();
   });
 
   it('displays code content passed via prop', () => {
     const sampleCode = 'export default function App() { return <div/>; }';
     render(<CodeEditor code={sampleCode} onChange={jest.fn()} />);
-    expect(screen.getByText(sampleCode)).toBeDefined();
+    expect(screen.getByText(sampleCode)).toBeInTheDocument();
   });
 
   it('calls onChange when the editor triggers a change', () => {
