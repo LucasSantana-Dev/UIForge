@@ -126,7 +126,7 @@ export function EcosystemSection({ snapshot }: EcosystemSectionProps) {
           <p className="mb-4 text-sm font-mono uppercase tracking-wider text-violet-400">
             Ecosystem
           </p>
-          <h2 className="mb-4 text-3xl font-bold tracking-tight text-[#FAFAFA] sm:text-4xl">
+          <h2 className="mb-4 text-3xl font-extrabold tracking-[-0.02em] text-[#FAFAFA] sm:text-4xl">
             {snapshot.repoCount} repos. One vision.
           </h2>
           <p className="mx-auto max-w-2xl text-lg text-[#A1A1AA]">

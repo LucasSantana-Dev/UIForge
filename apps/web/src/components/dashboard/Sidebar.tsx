@@ -66,10 +66,13 @@ export default function Sidebar({ isAdmin }: SidebarProps) {
               </Tooltip>
 
               {navigationItems.map((item) => {
-                const isActive = pathname.startsWith(item.href);
+                const isActive =
+                  item.href === '/dashboard'
+                    ? pathname === item.href
+                    : pathname.startsWith(item.href);
                 const activeCls = isActive
-                  ? 'bg-brand/15 text-brand-light hover:bg-brand/20 before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-brand'
-                  : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary';
+                  ? `bg-brand/15 text-brand-light hover:bg-brand/20 transition-colors duration-150${collapsed ? '' : ' before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-brand'}`
+                  : 'text-text-secondary hover:bg-surface-2 hover:text-text-primary transition-colors duration-150';
 
                 return (
                   <Tooltip key={item.name}>
@@ -82,7 +85,7 @@ export default function Sidebar({ isAdmin }: SidebarProps) {
                       >
                         <Link href={item.href}>
                           <item.icon
-                            className={`h-[18px] w-[18px] flex-shrink-0 transition-colors ${isActive ? 'text-brand-light' : ''}`}
+                            className={`h-[18px] w-[18px] flex-shrink-0 transition-colors ${isActive ? 'text-brand-light scale-110' : ''}`}
                           />
                           <span
                             className={`whitespace-nowrap overflow-hidden transition-opacity duration-200 ${collapsed ? 'hidden' : 'opacity-100 ml-2.5'}`}

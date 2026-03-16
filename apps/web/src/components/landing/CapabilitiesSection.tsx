@@ -73,7 +73,7 @@ export function CapabilitiesSection() {
                 >
                   <Icon className={`w-5 h-5 ${iconColor}`} />
                 </div>
-                <h3 className="text-base font-semibold text-[#FAFAFA] mb-2">{cap.title}</h3>
+                <h3 className="text-lg font-semibold text-[#FAFAFA] mb-2">{cap.title}</h3>
                 <p className="text-sm text-[#A1A1AA] leading-relaxed">{cap.description}</p>
               </div>
             );
