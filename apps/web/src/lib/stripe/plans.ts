@@ -5,6 +5,7 @@ export interface PlanDefinition {
   name: string;
   description: string;
   priceMonthly: number;
+  priceAnnual?: number;
   stripePriceId: string | null;
   features: string[];
   limits: {
@@ -42,6 +43,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     name: 'Pro',
     description: 'For professional developers',
     priceMonthly: 19,
+    priceAnnual: 190,
     stripePriceId: process.env.STRIPE_PRO_PRICE_ID ?? null,
     features: [
       '500 AI generations per month',
@@ -63,6 +65,7 @@ export const PLANS: Record<PlanId, PlanDefinition> = {
     name: 'Team',
     description: 'For small teams and agencies',
     priceMonthly: 49,
+    priceAnnual: 490,
     stripePriceId: process.env.STRIPE_TEAM_PRICE_ID ?? null,
     features: [
       '2,500 AI generations per month',
