@@ -173,7 +173,7 @@ export function HeroSection() {
         </div>
 
         <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-[-0.02em] leading-[1.05] mt-6">
-          Generate production&#8209;grade
+          Generate production-grade
           <br />
           <span className="text-violet-400">UI code</span> with AI
         </h1>
