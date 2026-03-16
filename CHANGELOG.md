@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **AnalyticsDashboard unit tests** — 3 tests covering loading state, live metrics rendering, and time range switching
 - **StatsBar unit tests** — 9 tests covering formatDownloads thresholds (<1k, 1k-9k as 1.5k, ≥10k as 10k), npm vs product-repo label switching, and static stat items
 - **ecosystem-data unit tests** — 3 tests covering GitHub API → snapshot mapping, fallback on release fetch failure, and full fallback on repo list failure
+- **Dashboard shell unit tests** — 46 tests across 7 suites covering Sidebar, TopBar, UserMenu, MobileNav, PRStatus, GitHubPanel, and ProjectSettings; verified selector-pattern UIStore mocks, Supabase auth sign-out, and GitHub API loading/error states
+- **Wireframe component unit tests** — 18 tests across FigmaExportDialog (8) and WireframePreview (10) covering export flow, error/success states, zoom controls, element selection, and metadata footer
 
 ## [0.48.0] — 2026-03-15
 

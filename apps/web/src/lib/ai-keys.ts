@@ -100,8 +100,7 @@ class AIKeyManagerImpl implements AIKeyManager {
     if (!encryptedKey) return null;
     try {
       return { ...encryptedKey, isDefault: true };
-    } catch (error) {
-      console.error(`Failed to decrypt default key for ${provider}:`, error);
+    } catch {
       return null;
     }
   }
