@@ -7,18 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.49.0] — 2026-03-16
+
 ### Added
-- **Generator component unit tests** — 74 tests across 9 suites covering GeneratorForm, ThemeGenerator, DesignContext, LivePreview, and CodeEditor; fixed DesignContext color-mode radio button assertions
-- **Onboarding step unit tests** — 22 tests across WelcomeStep, ProjectStep, and GenerateStep covering render, skip/next callbacks, form validation, mutation pending/error states, and generation progress flow
-- **AnalyticsDashboard unit tests** — 3 tests covering loading state, live metrics rendering, and time range switching
-- **StatsBar unit tests** — 9 tests covering formatDownloads thresholds (<1k, 1k-9k as 1.5k, ≥10k as 10k), npm vs product-repo label switching, and static stat items
-- **ecosystem-data unit tests** — 3 tests covering GitHub API → snapshot mapping, fallback on release fetch failure, and full fallback on repo list failure
-- **Dashboard shell unit tests** — 46 tests across 7 suites covering Sidebar, TopBar, UserMenu, MobileNav, PRStatus, GitHubPanel, and ProjectSettings; verified selector-pattern UIStore mocks, Supabase auth sign-out, and GitHub API loading/error states
-- **Wireframe component unit tests** — 18 tests across FigmaExportDialog (8) and WireframePreview (10) covering export flow, error/success states, zoom controls, element selection, and metadata footer
-- **Billing component unit tests** — 38 tests across PricingCard (15), SubscriptionStatus (10), UpgradePrompt (4), and UsageChart (9) covering plan display, pricing tiers, status badges, progress bars, and CTA flows
-- **Catalog unit tests** — TryItPanel (10 tests) covering parameter inputs, enum selects, request body textarea, response display, network error handling, and clipboard copy
-- **Roadmap unit tests** — PhaseCard (13 tests) covering phase number/title/badge rendering, expand/collapse, progress bar, item filtering by status and scope, and GitHub links
-- **ThemeSelector unit tests** — 14 tests covering active theme display, dropdown toggle, theme selection, save flow (input validation + createTheme), import flow (error on invalid JSON), export to clipboard, duplicate, and built-in delete guard
+- **Landing page redesign** — animated demo, unified violet palette, social proof section, and improved hero copy (#530)
+- **Interactive CodeShowcase** — hover-to-highlight file tree nodes with live diff view (#532, #534)
+- **EcosystemSection pipeline diagram** — layered flow diagram replacing card grid with connected architecture visual (#534)
+- **Auth split-panel layout** — sign-in/up pages now show feature bullets and trust signals in a left panel (#533)
+- **Pricing annual/monthly toggle** — gradient header, annual discount display, and tier differentiation (#547)
+- **Generator empty state** — styled placeholder in code/preview panels before first generation (#546)
+- **ProjectCard open link** — replaces meaningless progress bar with direct Open project link (#545)
+- **Typography hierarchy** — normalized H2/H3 sizing across EcosystemSection and CapabilitiesSection; sidebar active indicator polish (#549)
+- **Generator component unit tests** — 74 tests across 9 suites covering GeneratorForm, ThemeGenerator, DesignContext, LivePreview, and CodeEditor
+- **Dashboard shell unit tests** — 46 tests across 7 suites covering Sidebar, TopBar, UserMenu, MobileNav, PRStatus, GitHubPanel, and ProjectSettings
+- **Billing component unit tests** — 38 tests across PricingCard (15), SubscriptionStatus (10), UpgradePrompt (4), and UsageChart (9)
+- **Roadmap and tour unit tests** — PhaseCard, PhaseNavigator, StatusFilter, TourCard, RoadmapHero (50+ tests)
+- **Catalog, onboarding, analytics unit tests** — TryItPanel, WelcomeStep, ProjectStep, GenerateStep, AnalyticsDashboard, StatsBar, ecosystem-data (90+ tests)
+- **Wireframe component unit tests** — FigmaExportDialog (8) and WireframePreview (10)
+- **ThemeSelector unit tests** — 14 tests covering selection, save, import/export, duplicate, and built-in delete guard
+- **SonarCloud CPD exclusions** — test files excluded from duplication checks (#528)
+
+### Fixed
+- **Sidebar active indicator** — exact-match on `/dashboard` prevents all child routes from appearing active; collapsed sidebar now hides left border correctly
+- **Teams E2E flakiness** — unique `runId` suffix prevents parallel test collisions; `afterEach` cleanup removes created teams
+
+### Changed
+- **Dependencies** — major bumps: openai 4→6, express 4→5, vite 6→8, @vitejs/plugin-react 4→6, @types/node 22→25, @typescript-eslint 7→8, supertest, marked 15→17, and 14-package minor/patch group (#535–#544)
 
 ## [0.48.0] — 2026-03-15
 
