@@ -6,10 +6,10 @@ export function DashboardPreview() {
     <section id="preview" className={`${SECTION_PADDING} border-t border-[#27272A]`}>
       <div className={CONTAINER}>
         <div className="text-center">
-          <div className="text-sm font-mono text-violet-400 tracking-wider uppercase mb-4">
+          <div className="text-sm font-mono text-violet-400 tracking-[0.15em] uppercase mb-4">
             Preview
           </div>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#FAFAFA] mb-4">
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.02em] text-[#FAFAFA] mb-4">
             Your AI workspace
           </h2>
           <p className="text-lg text-[#A1A1AA] max-w-2xl mx-auto mb-14">
@@ -69,24 +69,66 @@ export function DashboardPreview() {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {/* Button card — real interactive buttons */}
                 <div className="rounded-lg border border-[#27272A] bg-[#18181B] p-4">
-                  <div className="text-sm font-medium text-[#FAFAFA] mb-3">Button</div>
-                  <div className="flex gap-2">
-                    <div className="h-7 w-16 rounded bg-violet-600" />
-                    <div className="h-7 w-16 rounded border border-[#27272A]" />
+                  <div className="text-xs font-mono text-[#71717A] mb-3">Button</div>
+                  <div className="flex flex-wrap gap-2">
+                    <button className="inline-flex items-center rounded-md bg-violet-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-500 transition-colors">
+                      Primary
+                    </button>
+                    <button className="inline-flex items-center rounded-md border border-[#27272A] px-3 py-1.5 text-xs font-medium text-[#A1A1AA] hover:border-violet-500/40 hover:text-[#FAFAFA] transition-colors">
+                      Outline
+                    </button>
+                    <button className="inline-flex items-center rounded-md bg-[#27272A] px-3 py-1.5 text-xs font-medium text-[#A1A1AA] hover:bg-[#3F3F46] transition-colors">
+                      Ghost
+                    </button>
                   </div>
                 </div>
+
+                {/* Badge card — real text badges */}
                 <div className="rounded-lg border border-[#27272A] bg-[#18181B] p-4">
-                  <div className="text-sm font-medium text-[#FAFAFA] mb-3">Badge</div>
-                  <div className="flex gap-2">
-                    <div className="h-5 w-12 rounded-full bg-violet-500/20 border border-violet-500/30" />
-                    <div className="h-5 w-12 rounded-full bg-emerald-500/20 border border-emerald-500/30" />
-                    <div className="h-5 w-12 rounded-full bg-amber-500/20 border border-amber-500/30" />
+                  <div className="text-xs font-mono text-[#71717A] mb-3">Badge</div>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="inline-flex items-center rounded-full bg-violet-500/15 border border-violet-500/25 px-2.5 py-0.5 text-[11px] font-medium text-violet-300">
+                      New
+                    </span>
+                    <span className="inline-flex items-center rounded-full bg-emerald-500/15 border border-emerald-500/25 px-2.5 py-0.5 text-[11px] font-medium text-emerald-300">
+                      Stable
+                    </span>
+                    <span className="inline-flex items-center rounded-full bg-amber-500/15 border border-amber-500/25 px-2.5 py-0.5 text-[11px] font-medium text-amber-300">
+                      Beta
+                    </span>
+                    <span className="inline-flex items-center rounded-full bg-zinc-500/15 border border-zinc-500/25 px-2.5 py-0.5 text-[11px] font-medium text-zinc-400">
+                      Deprecated
+                    </span>
                   </div>
                 </div>
+
+                {/* Input card — real styled input */}
                 <div className="rounded-lg border border-[#27272A] bg-[#18181B] p-4">
-                  <div className="text-sm font-medium text-[#FAFAFA] mb-3">Input</div>
-                  <div className="h-9 rounded border border-[#27272A] bg-[#121214]" />
+                  <div className="text-xs font-mono text-[#71717A] mb-3">Input</div>
+                  <div className="space-y-2">
+                    <input
+                      readOnly
+                      value=""
+                      placeholder="Search components..."
+                      className="w-full h-8 rounded-md border border-[#27272A] bg-[#121214] px-3 text-xs text-[#A1A1AA] placeholder:text-[#52525B] focus:outline-none focus:border-violet-500/50 transition-colors"
+                    />
+                    <div className="flex gap-1.5">
+                      <input
+                        readOnly
+                        value=""
+                        placeholder="Label"
+                        className="flex-1 h-7 rounded border border-[#27272A] bg-[#121214] px-2 text-[11px] text-[#A1A1AA] placeholder:text-[#52525B]"
+                      />
+                      <input
+                        readOnly
+                        value=""
+                        placeholder="Value"
+                        className="flex-1 h-7 rounded border border-[#27272A] bg-[#121214] px-2 text-[11px] text-[#A1A1AA] placeholder:text-[#52525B]"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
