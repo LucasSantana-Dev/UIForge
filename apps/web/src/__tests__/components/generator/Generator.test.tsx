@@ -111,9 +111,9 @@ describe('ComponentGenerator Component', () => {
   it('should render sub-components', () => {
     render(<ComponentGenerator projectId="test-project" />);
     expect(screen.getByTestId('generator-form')).toBeInTheDocument();
-    expect(screen.getByTestId('code-editor')).toBeInTheDocument();
-    expect(screen.getByTestId('live-preview')).toBeInTheDocument();
     expect(screen.getByText('History')).toBeInTheDocument();
+    expect(screen.getByText('No code yet')).toBeInTheDocument();
+    expect(screen.getByText('No preview yet')).toBeInTheDocument();
   });
 
   it('should pass projectId to GeneratorForm', () => {
@@ -121,7 +121,11 @@ describe('ComponentGenerator Component', () => {
     expect(screen.getByTestId('generator-form')).toHaveAttribute('data-pid', 'test-project');
   });
 
-  it('should pass framework to LivePreview', () => {
+  it('should pass framework to LivePreview when code is present', () => {
+    mockUseGeneration.mockReturnValue({
+      ...mockGeneration,
+      code: 'export default function Button() { return <button>Click</button>; }',
+    });
     render(<ComponentGenerator projectId="test-project" />);
     expect(screen.getByTestId('live-preview')).toHaveAttribute('data-framework', 'react');
   });
