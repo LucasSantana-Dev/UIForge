@@ -1,12 +1,13 @@
 import { createElement } from 'react';
 import { sendEmail } from './service';
-import { Welcome } from '@/emails/templates/Welcome';
 import { getFeatureFlag } from '@/lib/features/flags';
 
 const APP_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
 
 export async function sendWelcomeEmail(to: string) {
   if (!getFeatureFlag('ENABLE_RESEND_EMAILS')) return;
+
+  const { Welcome } = await import('@/emails/templates/Welcome');
 
   return sendEmail({
     to,
