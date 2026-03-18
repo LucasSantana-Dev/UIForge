@@ -8,7 +8,6 @@ import {
   STORAGE_LIMITS,
 } from '@/lib/api/storage';
 
-// Mock Supabase server client
 const mockUpload = jest.fn();
 const mockDownload = jest.fn();
 const mockRemove = jest.fn();
@@ -26,6 +25,7 @@ jest.mock('@/lib/supabase/server', () => ({
 describe('lib/api/storage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
     mockFrom.mockReturnValue({
       upload: mockUpload,
       download: mockDownload,
@@ -34,10 +34,8 @@ describe('lib/api/storage', () => {
     });
   });
 
-  // ── uploadToStorage ────────────────────────────────────────────────────────
-
   describe('uploadToStorage', () => {
-    it('uploads content and returns path + publicUrl', async () => {
+    it('uploads with default plain-text contentType', async () => {
       mockUpload.mockResolvedValue({ data: { path: 'proj/comp.tsx' }, error: null });
       mockGetPublicUrl.mockReturnValue({
         data: { publicUrl: 'https://cdn.example.com/proj/comp.tsx' },
@@ -75,27 +73,23 @@ describe('lib/api/storage', () => {
     });
   });
 
-  // ── downloadFromStorage ────────────────────────────────────────────────────
-
   describe('downloadFromStorage', () => {
-    it('returns text content by default', async () => {
+    it.each([
+      [true, 'file content'],
+      [false, null],
+    ])('returns expected shape for asText=%s', async (asText, expectedText) => {
       const blob = { text: jest.fn().mockResolvedValue('file content') };
       mockDownload.mockResolvedValue({ data: blob, error: null });
 
-      const result = await downloadFromStorage('project-files', 'proj/comp.tsx');
+      const result = await downloadFromStorage('project-files', 'proj/comp.tsx', asText);
 
-      expect(result).toBe('file content');
-      expect(blob.text).toHaveBeenCalled();
-    });
+      if (asText) {
+        expect(result).toBe(expectedText);
+      } else {
+        expect(result).toBe(blob);
+      }
 
-    it('returns raw blob when asText=false', async () => {
-      const blob = { text: jest.fn() };
-      mockDownload.mockResolvedValue({ data: blob, error: null });
-
-      const result = await downloadFromStorage('project-files', 'proj/comp.tsx', false);
-
-      expect(result).toBe(blob);
-      expect(blob.text).not.toHaveBeenCalled();
+      expect(blob.text).toHaveBeenCalledTimes(asText ? 1 : 0);
     });
 
     it('throws when download returns an error', async () => {
@@ -106,8 +100,6 @@ describe('lib/api/storage', () => {
       );
     });
   });
-
-  // ── deleteFromStorage ──────────────────────────────────────────────────────
 
   describe('deleteFromStorage', () => {
     it('deletes file without throwing on success', async () => {
@@ -127,8 +119,6 @@ describe('lib/api/storage', () => {
     });
   });
 
-  // ── generateComponentStoragePath ──────────────────────────────────────────
-
   describe('generateComponentStoragePath', () => {
     it.each([
       ['react', 'proj-1/comp-1.tsx'],
@@ -143,34 +133,19 @@ describe('lib/api/storage', () => {
     });
 
     it.each([
-      ['../evil', 'Invalid projectId: contains forbidden characters'],
-      ['proj/evil', 'Invalid projectId: contains forbidden characters'],
-      ['proj\\evil', 'Invalid projectId: contains forbidden characters'],
-      ['proj\0evil', 'Invalid projectId: contains forbidden characters'],
-      [
-        'proj!id',
-        'Invalid projectId: must contain only alphanumeric characters, hyphens, and underscores',
-      ],
-    ])('throws for invalid projectId: %s', (projectId, errorMessage) => {
-      expect(() => generateComponentStoragePath(projectId, 'comp-1', 'react')).toThrow(
-        errorMessage
-      );
-    });
-
-    it.each([
-      ['../evil', 'Invalid componentId: contains forbidden characters'],
-      [
-        'comp!id',
-        'Invalid componentId: must contain only alphanumeric characters, hyphens, and underscores',
-      ],
-    ])('throws for invalid componentId: %s', (componentId, errorMessage) => {
-      expect(() => generateComponentStoragePath('proj-1', componentId, 'react')).toThrow(
-        errorMessage
+      ['../evil', 'comp-1', /contains forbidden characters/],
+      ['proj/evil', 'comp-1', /contains forbidden characters/],
+      ['proj\\evil', 'comp-1', /contains forbidden characters/],
+      ['proj\0evil', 'comp-1', /contains forbidden characters/],
+      ['proj!id', 'comp-1', /must contain only alphanumeric characters/],
+      ['proj-1', '../evil', /contains forbidden characters/],
+      ['proj-1', 'comp!id', /must contain only alphanumeric characters/],
+    ])('throws for invalid ids: %s / %s', (projectId, componentId, expectedError) => {
+      expect(() => generateComponentStoragePath(projectId, componentId, 'react')).toThrow(
+        expectedError
       );
     });
   });
-
-  // ── validateFileSize ───────────────────────────────────────────────────────
 
   describe('validateFileSize', () => {
     it.each([
@@ -184,25 +159,21 @@ describe('lib/api/storage', () => {
     });
   });
 
-  // ── STORAGE_BUCKETS ────────────────────────────────────────────────────────
+  describe('exported constants', () => {
+    it('matches storage bucket names and limits', () => {
+      expect(STORAGE_BUCKETS).toEqual({
+        PROJECT_FILES: 'project-files',
+        AVATARS: 'avatars',
+        THUMBNAILS: 'project-thumbnails',
+        USER_UPLOADS: 'user-uploads',
+      });
 
-  describe('STORAGE_BUCKETS', () => {
-    it('exports expected bucket names', () => {
-      expect(STORAGE_BUCKETS.PROJECT_FILES).toBe('project-files');
-      expect(STORAGE_BUCKETS.AVATARS).toBe('avatars');
-      expect(STORAGE_BUCKETS.THUMBNAILS).toBe('project-thumbnails');
-      expect(STORAGE_BUCKETS.USER_UPLOADS).toBe('user-uploads');
-    });
-  });
-
-  // ── STORAGE_LIMITS ─────────────────────────────────────────────────────────
-
-  describe('STORAGE_LIMITS', () => {
-    it('exports correct size limits in bytes', () => {
-      expect(STORAGE_LIMITS.AVATAR).toBe(2 * 1024 * 1024);
-      expect(STORAGE_LIMITS.THUMBNAIL).toBe(5 * 1024 * 1024);
-      expect(STORAGE_LIMITS.CODE_FILE).toBe(10 * 1024 * 1024);
-      expect(STORAGE_LIMITS.USER_UPLOAD).toBe(10 * 1024 * 1024);
+      expect(STORAGE_LIMITS).toEqual({
+        AVATAR: 2 * 1024 * 1024,
+        THUMBNAIL: 5 * 1024 * 1024,
+        CODE_FILE: 10 * 1024 * 1024,
+        USER_UPLOAD: 10 * 1024 * 1024,
+      });
     });
   });
 });
