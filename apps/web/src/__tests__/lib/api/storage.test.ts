@@ -130,75 +130,42 @@ describe('lib/api/storage', () => {
   // ── generateComponentStoragePath ──────────────────────────────────────────
 
   describe('generateComponentStoragePath', () => {
-    it('generates correct path for react framework', () => {
-      expect(generateComponentStoragePath('proj-1', 'comp-1', 'react')).toBe('proj-1/comp-1.tsx');
+    it.each([
+      ['react', 'proj-1/comp-1.tsx'],
+      ['nextjs', 'proj-1/comp-1.tsx'],
+      ['vue', 'proj-1/comp-1.vue'],
+      ['angular', 'proj-1/comp-1.ts'],
+      ['svelte', 'proj-1/comp-1.svelte'],
+      ['html', 'proj-1/comp-1.html'],
+      ['unknown', 'proj-1/comp-1.txt'],
+    ])('generates correct path for %s framework', (framework, expectedPath) => {
+      expect(generateComponentStoragePath('proj-1', 'comp-1', framework)).toBe(expectedPath);
     });
 
-    it('generates correct path for nextjs framework', () => {
-      expect(generateComponentStoragePath('proj-1', 'comp-1', 'nextjs')).toBe('proj-1/comp-1.tsx');
-    });
-
-    it('generates correct path for vue framework', () => {
-      expect(generateComponentStoragePath('proj-1', 'comp-1', 'vue')).toBe('proj-1/comp-1.vue');
-    });
-
-    it('generates correct path for angular framework', () => {
-      expect(generateComponentStoragePath('proj-1', 'comp-1', 'angular')).toBe('proj-1/comp-1.ts');
-    });
-
-    it('generates correct path for svelte framework', () => {
-      expect(generateComponentStoragePath('proj-1', 'comp-1', 'svelte')).toBe(
-        'proj-1/comp-1.svelte'
+    it.each([
+      ['../evil', 'Invalid projectId: contains forbidden characters'],
+      ['proj/evil', 'Invalid projectId: contains forbidden characters'],
+      ['proj\\evil', 'Invalid projectId: contains forbidden characters'],
+      ['proj\0evil', 'Invalid projectId: contains forbidden characters'],
+      [
+        'proj!id',
+        'Invalid projectId: must contain only alphanumeric characters, hyphens, and underscores',
+      ],
+    ])('throws for invalid projectId: %s', (projectId, errorMessage) => {
+      expect(() => generateComponentStoragePath(projectId, 'comp-1', 'react')).toThrow(
+        errorMessage
       );
     });
 
-    it('generates correct path for html framework', () => {
-      expect(generateComponentStoragePath('proj-1', 'comp-1', 'html')).toBe('proj-1/comp-1.html');
-    });
-
-    it('falls back to .txt for unknown frameworks', () => {
-      expect(generateComponentStoragePath('proj-1', 'comp-1', 'unknown')).toBe('proj-1/comp-1.txt');
-    });
-
-    it('throws on projectId with path traversal (..)', () => {
-      expect(() => generateComponentStoragePath('../evil', 'comp-1', 'react')).toThrow(
-        'Invalid projectId: contains forbidden characters'
-      );
-    });
-
-    it('throws on projectId with forward slash', () => {
-      expect(() => generateComponentStoragePath('proj/evil', 'comp-1', 'react')).toThrow(
-        'Invalid projectId: contains forbidden characters'
-      );
-    });
-
-    it('throws on projectId with backslash', () => {
-      expect(() => generateComponentStoragePath('proj\\evil', 'comp-1', 'react')).toThrow(
-        'Invalid projectId: contains forbidden characters'
-      );
-    });
-
-    it('throws on projectId with null byte', () => {
-      expect(() => generateComponentStoragePath('proj\0evil', 'comp-1', 'react')).toThrow(
-        'Invalid projectId: contains forbidden characters'
-      );
-    });
-
-    it('throws on projectId with special chars', () => {
-      expect(() => generateComponentStoragePath('proj!id', 'comp-1', 'react')).toThrow(
-        'Invalid projectId: must contain only alphanumeric characters, hyphens, and underscores'
-      );
-    });
-
-    it('throws on componentId with path traversal (..)', () => {
-      expect(() => generateComponentStoragePath('proj-1', '../evil', 'react')).toThrow(
-        'Invalid componentId: contains forbidden characters'
-      );
-    });
-
-    it('throws on componentId with special chars', () => {
-      expect(() => generateComponentStoragePath('proj-1', 'comp!id', 'react')).toThrow(
-        'Invalid componentId: must contain only alphanumeric characters, hyphens, and underscores'
+    it.each([
+      ['../evil', 'Invalid componentId: contains forbidden characters'],
+      [
+        'comp!id',
+        'Invalid componentId: must contain only alphanumeric characters, hyphens, and underscores',
+      ],
+    ])('throws for invalid componentId: %s', (componentId, errorMessage) => {
+      expect(() => generateComponentStoragePath('proj-1', componentId, 'react')).toThrow(
+        errorMessage
       );
     });
   });
@@ -206,24 +173,14 @@ describe('lib/api/storage', () => {
   // ── validateFileSize ───────────────────────────────────────────────────────
 
   describe('validateFileSize', () => {
-    it('returns true when content is within limit (string)', () => {
-      expect(validateFileSize('hello', 100)).toBe(true);
-    });
-
-    it('returns false when string content exceeds limit', () => {
-      expect(validateFileSize('a'.repeat(101), 100)).toBe(false);
-    });
-
-    it('returns true when Buffer content is within limit', () => {
-      expect(validateFileSize(Buffer.alloc(50), 100)).toBe(true);
-    });
-
-    it('returns false when Buffer content exceeds limit', () => {
-      expect(validateFileSize(Buffer.alloc(101), 100)).toBe(false);
-    });
-
-    it('returns true exactly at the limit boundary', () => {
-      expect(validateFileSize('a'.repeat(100), 100)).toBe(true);
+    it.each([
+      ['hello', 100, true],
+      ['a'.repeat(101), 100, false],
+      [Buffer.alloc(50), 100, true],
+      [Buffer.alloc(101), 100, false],
+      ['a'.repeat(100), 100, true],
+    ])('returns %s for size check case', (content, maxSize, expectedResult) => {
+      expect(validateFileSize(content, maxSize)).toBe(expectedResult);
     });
   });
 
