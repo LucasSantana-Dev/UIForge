@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.49.1] — 2026-03-19
+
+### Fixed
+- **Release provenance continuity** — cut a corrective follow-up release on `main` so release lineage and tags move forward without retagging `v0.49.0`.
+
+### Changed
+- **Version alignment** — synced root and `apps/web` package versions to `0.49.1`.
+
 ## [0.49.0] — 2026-03-16
 
 ### Added
