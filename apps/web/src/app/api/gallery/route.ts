@@ -33,8 +33,7 @@ export async function GET(req: NextRequest) {
   }
 
   const total = count ?? 0;
-
-  return NextResponse.json({
+  const payload = {
     generations: data ?? [],
     pagination: {
       page,
@@ -42,5 +41,20 @@ export async function GET(req: NextRequest) {
       total,
       totalPages: Math.ceil(total / limit),
     },
-  });
+  } as {
+    generations: typeof data;
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+    message?: string;
+  };
+
+  if (total === 0) {
+    payload.message = 'No featured generations available yet.';
+  }
+
+  return NextResponse.json(payload);
 }

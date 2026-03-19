@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Search,
   ChevronLeftIcon,
@@ -127,14 +127,17 @@ export function TemplatesClient() {
   const [previewOpen, setPreviewOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [pendingTemplate, setPendingTemplate] = useState<Template | null>(null);
+  const latestFetchId = useRef(0);
 
   const debouncedSearch = useDebounce(searchTerm, 300);
 
   const fetchTemplates = useCallback(async () => {
+    const fetchId = ++latestFetchId.current;
     setLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams({ limit: '100' });
+      params.set('ownership', ownershipFilter);
       if (selectedCategory !== 'All') {
         params.set('category', selectedCategory.toLowerCase());
       }
@@ -150,13 +153,19 @@ export function TemplatesClient() {
       if (!res.ok) throw new Error('Failed to load templates');
       const json = await res.json();
       const dbTemplates: DBTemplate[] = json.data?.templates || [];
-      setTemplates(dbTemplates.map(mapDBTemplate));
+      if (fetchId === latestFetchId.current) {
+        setTemplates(dbTemplates.map(mapDBTemplate));
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load templates');
+      if (fetchId === latestFetchId.current) {
+        setError(err instanceof Error ? err.message : 'Failed to load templates');
+      }
     } finally {
-      setLoading(false);
+      if (fetchId === latestFetchId.current) {
+        setLoading(false);
+      }
     }
-  }, [selectedCategory, selectedFramework, debouncedSearch, sortBy]);
+  }, [selectedCategory, selectedFramework, debouncedSearch, sortBy, ownershipFilter]);
 
   useEffect(() => {
     fetchTemplates();
@@ -166,17 +175,8 @@ export function TemplatesClient() {
     setCurrentPage(1);
   }, [debouncedSearch, selectedCategory, selectedFramework, ownershipFilter, sortBy]);
 
-  const filteredTemplates = useMemo(() => {
-    if (ownershipFilter === 'all') return templates;
-    return templates.filter((t) => {
-      if (ownershipFilter === 'official') return t.isOfficial;
-      if (ownershipFilter === 'mine') return !t.isOfficial;
-      return true;
-    });
-  }, [templates, ownershipFilter]);
-
-  const totalPages = Math.ceil(filteredTemplates.length / itemsPerPage);
-  const paginatedTemplates = filteredTemplates.slice(
+  const totalPages = Math.ceil(templates.length / itemsPerPage);
+  const paginatedTemplates = templates.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
@@ -343,7 +343,7 @@ export function TemplatesClient() {
           <>
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm text-text-secondary">
-                {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''} found
+                {templates.length} template{templates.length !== 1 ? 's' : ''} found
               </p>
             </div>
 
@@ -358,7 +358,7 @@ export function TemplatesClient() {
               ))}
             </div>
 
-            {filteredTemplates.length === 0 && (
+            {templates.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20 text-center">
                 <Search className="w-12 h-12 text-text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold text-text-primary mb-2">No templates found</h3>

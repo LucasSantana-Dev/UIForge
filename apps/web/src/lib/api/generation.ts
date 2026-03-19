@@ -118,8 +118,8 @@ export async function* streamGeneration(
           try {
             const data = JSON.parse(line.slice(6));
             yield data;
-          } catch (error) {
-            console.error('Failed to parse SSE data:', error);
+          } catch {
+            // skip malformed SSE data
           }
         }
       }
@@ -301,8 +301,8 @@ export async function* streamWireframe(options: WireframeOptions): AsyncGenerato
           try {
             const data = JSON.parse(line.slice(6));
             yield data;
-          } catch (error) {
-            console.error('Failed to parse SSE data:', error);
+          } catch {
+            // skip malformed SSE data
           }
         }
       }

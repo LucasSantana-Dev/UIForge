@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { verifySession } from '@/lib/api/auth';
+import { verifySession, getSession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, createdResponse, errorResponse } from '@/lib/api/response';
 import { UnauthorizedError, ValidationError } from '@/lib/api/errors';
@@ -19,9 +19,21 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const queryParams = Object.fromEntries(searchParams.entries());
     const validated = templateQuerySchema.parse(queryParams);
+    const session = await getSession();
 
     const supabase = await createClient();
     let query = supabase.from('templates').select('*');
+
+    if (validated.ownership === 'mine') {
+      if (!session?.user?.id) {
+        throw new UnauthorizedError('Authentication required for ownership=mine');
+      }
+      query = query.eq('created_by', session.user.id);
+    } else if (validated.ownership === 'official') {
+      query = query.eq('is_official', true);
+    } else {
+      query = query.eq('is_official', true);
+    }
 
     if (validated.category) {
       query = query.eq('category', validated.category);
@@ -49,7 +61,7 @@ export async function GET(request: NextRequest) {
     setRateLimitHeaders(response, { allowed, remaining, resetAt }, 120);
     return response;
   } catch (error) {
-    if (error instanceof ValidationError) {
+    if (error instanceof ValidationError || error instanceof UnauthorizedError) {
       return errorResponse(error.message, error.statusCode);
     }
     captureServerError(error, { route: '/api/templates' });

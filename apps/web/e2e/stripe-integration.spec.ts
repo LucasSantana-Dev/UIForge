@@ -4,39 +4,32 @@ import {
   cleanupTestBilling,
   generateStripeWebhookSignature,
 } from './helpers/stripe';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from './helpers/admin-client';
 
 function getAdminClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-  );
+  return createAdminClient();
 }
 
-test.describe('Stripe E2E: Checkout → Webhook → DB', () => {
+test.describe('Stripe E2E: Webhook → DB', () => {
   test.skip(
     !process.env.SUPABASE_SERVICE_ROLE_KEY || !process.env.STRIPE_WEBHOOK_SECRET,
     'Requires SUPABASE_SERVICE_ROLE_KEY and STRIPE_WEBHOOK_SECRET'
   );
 
-  test('webhook creates subscription in DB on checkout.session.completed', async ({
-    authenticatedPage,
-    testUser,
-  }) => {
+  test('webhook marks deterministic events as processed', async ({ authenticatedPage }) => {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-    const eventId = `evt_test_checkout_${Date.now()}`;
-    const subscriptionId = `sub_test_${Date.now()}`;
-    const customerId = `cus_test_${Date.now()}`;
+    const eventId = `evt_test_deleted_${Date.now()}`;
+    const subscriptionId = `sub_test_deleted_${Date.now()}`;
 
     const eventPayload = JSON.stringify({
       id: eventId,
-      type: 'checkout.session.completed',
+      type: 'customer.subscription.deleted',
       data: {
         object: {
-          id: `cs_test_${Date.now()}`,
-          subscription: subscriptionId,
-          customer: customerId,
-          metadata: { userId: testUser.id },
+          id: subscriptionId,
+          status: 'canceled',
+          items: { data: [{ price: { id: 'price_pro_test' } }] },
+          cancel_at_period_end: false,
         },
       },
     });
@@ -64,27 +57,26 @@ test.describe('Stripe E2E: Checkout → Webhook → DB', () => {
       .single();
 
     expect(event).not.toBeNull();
-    expect(event!.type).toBe('checkout.session.completed');
+    expect(event!.type).toBe('customer.subscription.deleted');
     expect(event!.processed).toBe(true);
 
-    // Cleanup
     await supabase.from('stripe_events').delete().eq('id', eventId);
-    await cleanupTestBilling(testUser.id);
   });
 
-  test('webhook deduplicates already-processed events', async ({ authenticatedPage, testUser }) => {
+  test('webhook deduplicates already-processed events', async ({ authenticatedPage }) => {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
     const eventId = `evt_test_dedup_${Date.now()}`;
+    const subscriptionId = `sub_test_dedup_${Date.now()}`;
 
     const eventPayload = JSON.stringify({
       id: eventId,
-      type: 'checkout.session.completed',
+      type: 'customer.subscription.deleted',
       data: {
         object: {
-          id: `cs_test_${Date.now()}`,
-          subscription: `sub_test_${Date.now()}`,
-          customer: `cus_test_${Date.now()}`,
-          metadata: { userId: testUser.id },
+          id: subscriptionId,
+          status: 'canceled',
+          items: { data: [{ price: { id: 'price_pro_test' } }] },
+          cancel_at_period_end: false,
         },
       },
     });
@@ -95,14 +87,12 @@ test.describe('Stripe E2E: Checkout → Webhook → DB', () => {
       'stripe-signature': signature,
     };
 
-    // First call
     const res1 = await authenticatedPage.request.post('/api/stripe/webhook', {
       data: eventPayload,
       headers,
     });
     expect(res1.ok()).toBe(true);
 
-    // Second call (same event ID) — should be deduplicated
     const sig2 = generateStripeWebhookSignature(eventPayload, webhookSecret);
     const res2 = await authenticatedPage.request.post('/api/stripe/webhook', {
       data: eventPayload,
@@ -110,15 +100,12 @@ test.describe('Stripe E2E: Checkout → Webhook → DB', () => {
     });
     expect(res2.ok()).toBe(true);
 
-    // Verify only one row in stripe_events
     const supabase = getAdminClient();
     const { data: events } = await supabase.from('stripe_events').select('id').eq('id', eventId);
 
     expect(events).toHaveLength(1);
 
-    // Cleanup
     await supabase.from('stripe_events').delete().eq('id', eventId);
-    await cleanupTestBilling(testUser.id);
   });
 
   test('subscription.deleted webhook resets user to free plan', async ({

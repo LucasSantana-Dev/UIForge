@@ -95,6 +95,7 @@ describe('createTemplateSchema', () => {
 describe('templateQuerySchema', () => {
   it('applies defaults for empty query', () => {
     const result = templateQuerySchema.parse({});
+    expect(result.ownership).toBe('all');
     expect(result.sort).toBe('created_at');
     expect(result.limit).toBe(50);
     expect(result.offset).toBe(0);
@@ -105,12 +106,14 @@ describe('templateQuerySchema', () => {
       category: 'dashboard',
       framework: 'vue',
       search: 'login',
+      ownership: 'mine',
       sort: 'name',
       limit: 25,
       offset: 10,
     });
     expect(result.category).toBe('dashboard');
     expect(result.framework).toBe('vue');
+    expect(result.ownership).toBe('mine');
     expect(result.limit).toBe(25);
   });
 
@@ -132,6 +135,11 @@ describe('templateQuerySchema', () => {
 
   it('rejects invalid sort field', () => {
     const result = templateQuerySchema.safeParse({ sort: 'invalid' });
+    expect(result.success).toBe(false);
+  });
+
+  it('rejects invalid ownership filter', () => {
+    const result = templateQuerySchema.safeParse({ ownership: 'team' });
     expect(result.success).toBe(false);
   });
 });

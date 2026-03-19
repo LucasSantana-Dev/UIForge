@@ -33,6 +33,7 @@ export const templateQuerySchema = z.object({
   category: templateCategoryEnum.optional(),
   framework: frameworkEnum.optional(),
   search: z.string().optional(),
+  ownership: z.enum(['all', 'official', 'mine']).default('all'),
   sort: z.enum(['created_at', 'name']).default('created_at'),
   limit: z.coerce.number().int().min(1).max(100).default(50),
   offset: z.coerce.number().int().min(0).default(0),

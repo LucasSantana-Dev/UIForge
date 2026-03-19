@@ -9,6 +9,7 @@ import { Input } from '@siza/ui';
 import { Label } from '@siza/ui';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@siza/ui';
 import { useCreateProject } from '@/hooks/use-projects';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 
 const schema = z.object({
   name: z.string().min(1, 'Project name is required').max(100),
@@ -49,6 +50,12 @@ export function ProjectStep({ onNext, onSkip }: ProjectStepProps) {
 
   const onSubmit = async (data: FormData) => {
     setError(null);
+    trackEvent({
+      action: 'onboarding_cta_clicked',
+      category: 'Onboarding',
+      label: 'project',
+      params: { step: 'project', cta: 'create_project' },
+    });
     try {
       const project = await createProject.mutateAsync({
         name: data.name,
@@ -106,13 +113,29 @@ export function ProjectStep({ onNext, onSkip }: ProjectStepProps) {
         {error && <p className="text-sm text-red-400">{error}</p>}
 
         <div className="flex justify-center gap-3">
-          <Button type="button" variant="ghost" onClick={onSkip} className="text-white/40">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => {
+              trackEvent({
+                action: 'onboarding_cta_clicked',
+                category: 'Onboarding',
+                label: 'project',
+                params: { step: 'project', cta: 'skip' },
+              });
+              onSkip();
+            }}
+            className="text-white/40"
+          >
             Skip
           </Button>
           <Button type="submit" disabled={createProject.isPending}>
             {createProject.isPending ? 'Creating...' : 'Create project'}
           </Button>
         </div>
+        <p className="text-center text-xs text-white/50">
+          This step is required to move toward core-flow qualification.
+        </p>
       </form>
     </div>
   );

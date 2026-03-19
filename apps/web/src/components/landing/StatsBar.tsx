@@ -15,12 +15,28 @@ function StatItem({ value, label }: { value: string; label: string }) {
   );
 }
 
+function formatDownloads(count: number): string {
+  if (count < 1000) {
+    return String(count);
+  }
+  if (count < 10000) {
+    return `${(count / 1000).toFixed(1)}k`;
+  }
+  return `${Math.floor(count / 1000)}k`;
+}
+
 export function StatsBar({ snapshot }: StatsBarProps) {
   const stats = [
-    { value: String(snapshot.repoCount), label: 'Product Repos' },
-    { value: String(snapshot.releasedRepoCount), label: 'Repos With Releases' },
-    { value: String(snapshot.stats.updatedLast30d), label: 'Updated in 30 Days' },
-    { value: String(snapshot.stats.updatedLast7d), label: 'Updated in 7 Days' },
+    {
+      value:
+        snapshot.npmDownloads.total > 0
+          ? formatDownloads(snapshot.npmDownloads.total)
+          : String(snapshot.repoCount),
+      label: snapshot.npmDownloads.total > 0 ? 'npm Downloads / Month' : 'Product Repos',
+    },
+    { value: String(snapshot.repoCount), label: 'Open Source Repos' },
+    { value: String(snapshot.releasedRepoCount), label: 'Published Releases' },
+    { value: 'MIT', label: 'Open Source License' },
   ];
 
   return (

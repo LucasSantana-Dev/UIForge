@@ -86,19 +86,38 @@ Create `apps/web/.env.local`:
 NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-local-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-local-service-role-key
+NEXT_PUBLIC_GA_TRACKING_ID=G-XXXXXXXXXX
 GEMINI_API_KEY=your-gemini-key
 # Optional backup capacity for quota/rate-limit fallback
 ANTHROPIC_API_KEY=your-anthropic-key
+DEFAULT_GENERATION_PROVIDER=google
 NEXT_PUBLIC_ENABLE_BYOK=true
 NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
+NEXT_PUBLIC_E2E_DISABLE_TOUR=false
+SIZA_AGENT_LOCAL_FALLBACK=false
 ```
 
 ### Generation reliability behavior
 
 - Siza defaults to `siza -> google` routing for shared free-tier generation
 - On provider quota/rate-limit, the server falls back to Anthropic when `ANTHROPIC_API_KEY` is configured
+- If enabled (`SIZA_AGENT_LOCAL_FALLBACK=true`), provider failures without chunks can fallback to local `@forgespace/siza-gen`
 - Fallback never reuses the primary provider BYOK key for backup provider calls
 - When no backup capacity is configured, users get explicit capacity guidance with BYOK next steps
+
+### Lead attribution and signup events
+
+- First-touch attribution is captured from URL params and stored in browser local storage:
+  `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content`, `gclid`, `gbraid`,
+  `wbraid`, `landing_path`, `first_seen_at`
+- Signup now sends `marketing_attribution` in Supabase auth metadata
+- GA4 lead events emitted during signup:
+  `lead_signup_started`, `lead_signup_success`, `lead_signup_oauth_start`, `lead_signup_error`
+- Unit coverage validates signup attribution metadata and lead event emission in
+  `SignUpPage` auth tests
+- Public auth routes now expose a page-level `h1` inside a proper `main` landmark, and
+  the gallery empty state always offers onward actions (`/templates` plus `/signup` or
+  `/generate` depending on session state)
 
 ### MCP-first routing policy
 
@@ -108,12 +127,28 @@ NEXT_PUBLIC_ENABLE_GEMINI_FALLBACK=true
 
 ### Validation and quality metrics
 
-`GET /api/metrics` now reports:
+`GET /api/metrics` reports live telemetry with strict bearer auth (`METRICS_API_KEY`):
 
-- 50-user gate readiness (`adoption.gate50`)
-- Core-flow adoption (onboarding/project/generation rates)
-- Generation quality indicators (success rate, satisfaction rate, revision rate)
-- MCP routing coverage (`routing.mcp`)
+- Users (`total`, `last7d`, `last30d`, `active`)
+- Generations (`total`, `last24h`, `last7d`, `successRate`)
+- Projects (`total`)
+- Quality (`revisionRate`, `satisfactionRate`, `mcpCoverage`) with optional
+  `windowDays=7|30|90` (default `30`)
+
+Admin UI (`/admin`) now includes a live Product Telemetry section backed by
+`GET /api/admin/metrics` (admin session required).
+
+Security Spoke telemetry is also available in Admin (`/admin`) with:
+
+- `GET /api/admin/security` (admin-only, supports `windowDays=7|30|90`)
+- live summary, risk/severity distribution, top rules, and recent high-risk generations
+- per-generation persistence from MCP stream quality events (`security_spoke`)
+
+Required runtime env:
+
+```env
+METRICS_API_KEY=replace-with-strong-random-token
+```
 
 ### Grant admin access locally
 
@@ -124,6 +159,75 @@ npm run admin:grant -- lucas.diassantana@gmail.com
 ```
 
 This updates `public.profiles.role` to `admin` for that email.
+
+### Core-flow validation snapshots
+
+Siza now tracks roadmap gate progress in Admin (`/admin`) with:
+
+- live gate metrics (`GET /api/admin/validation`, admin-only)
+- activation funnel telemetry (`windowDays=7|30|90`) with onboarding/project/generation
+  conversion and top drop-off reasons
+- additive activation bottleneck block in `GET /api/admin/validation` with:
+  - `onboardedWithoutProject`
+  - `projectWithoutCompletedGeneration`
+  - deterministic `nextBestAction` (`CREATE_PROJECT` or `COMPLETE_GENERATION`)
+- daily trend snapshots (`POST /api/internal/validation/snapshot`, bearer token protected)
+- internal gate status report (`GET /api/internal/validation/report`, bearer token protected)
+
+Activation UX is now surfaced directly in product:
+
+- Onboarding includes qualification nudges and deterministic telemetry events for
+  step views/completions/skips/CTA clicks
+- Onboarding skip/complete routes now push users toward the next qualifying action
+  (project creation or project-aware generation route)
+- Onboarding done-step primary CTA now supports one-click starter project creation
+  and routes directly to a project-aware Generate flow
+- Dashboard shows a persistent Core Flow Progress checklist with a single primary
+  next-action CTA until the user is qualified
+- Dashboard now includes a guided one-click starter-project prompt for the
+  onboarding-complete/no-project cohort with explicit confirm + "Not now" actions
+- Guided starter-project creation routes directly to project-aware Generate on success,
+  and falls back to manual project creation routing if creation fails
+- Dashboard primary generation surfaces now keep this cohort on project-first routing
+  (header, empty-state, and quick-action generate entry) while preserving
+  project-aware Generate links for users who already have a project
+- Dashboard no-project conversion CTAs now run one-click starter-project creation
+  across header primary, empty-state primary, quick-action generate, and checklist
+  next-step actions, with deterministic `entry=<cta>&step=project` routing params
+- Onboarding no-project skip/done exits now route to dashboard conversion intent
+  (`/dashboard?...&intent=create_project`) instead of sending users directly to
+  manual project creation
+- Activation lifecycle telemetry is now emitted for starter conversion flows:
+  `activation_starter_project_confirmed`, `activation_starter_project_created`,
+  `activation_starter_project_fallback`, and `activation_route_to_generate`
+
+Required runtime env:
+
+```env
+METRICS_SNAPSHOT_TOKEN=replace-with-strong-random-token
+```
+
+GitHub automation:
+
+- Workflow: `.github/workflows/core-flow-validation-snapshot.yml`
+- Workflow: `.github/workflows/core-flow-validation-report.yml`
+- Report schedule: daily at `03:20 UTC` and weekly gate rollup at `03:25 UTC` (Mondays)
+- Repository variable: `SIZA_BASE_URL` (for example `https://siza.forgespace.co`)
+- Repository secret: `METRICS_SNAPSHOT_TOKEN`
+
+Manual snapshot trigger:
+
+```bash
+curl -X POST "$SIZA_BASE_URL/api/internal/validation/snapshot" \
+  -H "Authorization: Bearer $METRICS_SNAPSHOT_TOKEN"
+```
+
+Manual report trigger:
+
+```bash
+curl "$SIZA_BASE_URL/api/internal/validation/report" \
+  -H "Authorization: Bearer $METRICS_SNAPSHOT_TOKEN"
+```
 
 ## Architecture
 
@@ -182,10 +286,42 @@ npm run build           # Build for production
 npm run lint            # ESLint
 npm test                # Unit tests (Jest)
 npm run test:e2e        # E2E tests (Playwright)
+npm run test:e2e:prod   # Production Chromium audit (artifacts + issues map)
 npm run type-check      # TypeScript
 npm run sync:golden-paths # Sync official Golden Paths seeds
 npm run sync:skills     # Sync official skills from skills/*/SKILL.md
 ```
+
+### Lead-readiness and ads prepublish checks
+
+```bash
+cd apps/web
+npm run test:e2e:lead:preflight
+npm run test:e2e:lead:chromium
+npm run ads:google:prepublish
+npm run test:e2e:prod
+```
+
+- `test:e2e:lead:preflight` validates generation backend readiness (MCP gateway, provider key, or local fallback)
+- `test:e2e:lead:chromium` runs Chromium smoke for lead-critical flows
+- `ads:google:prepublish` runs preflight + marketplace smoke and prints manual GA4/Ads checks
+- `test:e2e:prod` runs production audit packs (`public` + `auth` by default) and writes
+  artifacts to `apps/web/test-results/production/<run-id>` plus `issues-map.json`
+  from real failing tests and runtime API probes
+- Runtime probes in `test:e2e:prod` assert unauthenticated generation endpoints return `401`
+  (`/api/generations`, `/api/generations/history`, `/api/generations/[id]`)
+- Lead-readiness checkout smoke in production audit accepts `403 Billing is not enabled`
+  when billing is disabled and expects `200 + url` when billing is enabled
+- Campaign assets for `siza_br_en_leadtest_v1` are in `apps/web/marketing/google-ads/siza_br_en_leadtest_v1`
+  - `campaign-config.json`
+  - `keywords.csv`
+  - `negative-keywords.csv`
+  - `rsa.json`
+  - `day1-ops.md`
+- Auth/onboarding/stripe lead smoke now uses shared Supabase admin helpers and deterministic webhook payloads for CI stability
+- Lead-readiness production smoke now dismisses the guided tour overlay before
+  post-generation code-tab assertions to avoid pointer interception during disposable-user runs
+- Catalog E2E creation now supports both direct detail redirects and list-first redirects by resolving created entry IDs via API lookup
 
 ### Playwright MCP Wrapper (Codex Runtime)
 

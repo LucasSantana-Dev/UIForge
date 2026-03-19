@@ -1,0 +1,14 @@
+scope,negative_keyword,match_type
+campaign,job,broad
+campaign,jobs,broad
+campaign,salary,broad
+campaign,course,broad
+campaign,tutorial,broad
+campaign,bootcamp,broad
+campaign,free images,phrase
+campaign,logo,broad
+campaign,apk,broad
+campaign,crack,broad
+campaign,minecraft,broad
+campaign,chatbot prompt,phrase
+campaign,pdf,broad

@@ -102,8 +102,8 @@ export function FigmaExportDialog({ wireframe, onClose }: FigmaExportDialogProps
 
     try {
       await navigator.clipboard.writeText(JSON.stringify(exportResult.data, null, 2));
-    } catch (err) {
-      console.error('Failed to copy to clipboard:', err);
+    } catch {
+      // clipboard write failed silently
     }
   };
 

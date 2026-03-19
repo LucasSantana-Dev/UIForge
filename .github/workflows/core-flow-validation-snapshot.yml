@@ -1,0 +1,46 @@
+name: Core Flow Validation Snapshot
+
+on:
+  schedule:
+    - cron: '15 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: core-flow-validation-snapshot-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  snapshot:
+    name: Capture Daily Snapshot
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Capture snapshot from web app
+        env:
+          BASE_URL: ${{ vars.SIZA_BASE_URL }}
+          SNAPSHOT_TOKEN: ${{ secrets.METRICS_SNAPSHOT_TOKEN }}
+        run: |
+          if [ -z "$BASE_URL" ]; then
+            echo "SIZA_BASE_URL repository variable is required."
+            exit 1
+          fi
+
+          if [ -z "$SNAPSHOT_TOKEN" ]; then
+            echo "METRICS_SNAPSHOT_TOKEN secret is required."
+            exit 1
+          fi
+
+          status_code=$(curl -sS -o response.json -w "%{http_code}" \
+            -X POST "${BASE_URL}/api/internal/validation/snapshot" \
+            -H "Authorization: Bearer ${SNAPSHOT_TOKEN}" \
+            -H "Content-Type: application/json")
+
+          cat response.json
+
+          if [ "$status_code" -lt 200 ] || [ "$status_code" -ge 300 ]; then
+            echo "Snapshot request failed with status ${status_code}."
+            exit 1
+          fi
+
+          echo "Snapshot capture succeeded with status ${status_code}."

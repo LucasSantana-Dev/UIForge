@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import * as api from '@/lib/api';
 import * as rateLimit from '@/lib/api/rate-limit';
 
@@ -38,11 +38,11 @@ beforeEach(() => {
     resetAt: Date.now() + 60000,
   });
   mockVerifySession.mockResolvedValue({ user: { id: 'user-1' } } as any);
-  mockSuccessResponse.mockImplementation(
-    (data) => new Response(JSON.stringify({ success: true, data }), { status: 200 })
+  mockSuccessResponse.mockImplementation((data) =>
+    NextResponse.json({ success: true, data }, { status: 200 })
   );
-  mockErrorResponse.mockImplementation(
-    (msg, code) => new Response(JSON.stringify({ error: msg }), { status: code || 500 })
+  mockErrorResponse.mockImplementation((msg, code) =>
+    NextResponse.json({ error: msg }, { status: code || 500 })
   );
 });
 

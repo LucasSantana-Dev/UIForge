@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { DashboardClient } from '@/app/(dashboard)/dashboard/dashboard-client';
-import { useProjects } from '@/hooks/use-projects';
+import { useProjects, useCreateProject } from '@/hooks/use-projects';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useAIKeys } from '@/stores/ai-keys';
 import { useCatalog } from '@/hooks/use-catalog';
@@ -12,9 +12,13 @@ jest.mock('@/hooks/use-subscription');
 jest.mock('@/stores/ai-keys');
 jest.mock('@/hooks/use-catalog');
 jest.mock('@/hooks/use-golden-paths');
+jest.mock('@/components/analytics/AnalyticsProvider', () => ({
+  trackEvent: jest.fn(),
+}));
+const mockPush = jest.fn();
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: mockPush,
     replace: jest.fn(),
     back: jest.fn(),
     forward: jest.fn(),
@@ -54,10 +58,12 @@ jest.mock('@/components/ui/button', () => ({
 }));
 
 const mockUseProjects = useProjects as jest.MockedFunction<typeof useProjects>;
+const mockUseCreateProject = useCreateProject as jest.MockedFunction<typeof useCreateProject>;
 const mockUseSubscription = useSubscription as jest.MockedFunction<typeof useSubscription>;
 const mockUseAIKeys = useAIKeys as jest.MockedFunction<typeof useAIKeys>;
 const mockUseCatalog = useCatalog as jest.MockedFunction<typeof useCatalog>;
 const mockUseGoldenPaths = useGoldenPaths as jest.MockedFunction<typeof useGoldenPaths>;
+const mockCreateProject = jest.fn();
 
 const createMockQueryClient = () =>
   new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -87,6 +93,11 @@ describe('DashboardClient', () => {
   beforeEach(() => {
     queryClient = createMockQueryClient();
     jest.clearAllMocks();
+    mockUseCreateProject.mockReturnValue({
+      mutateAsync: mockCreateProject,
+      isPending: false,
+    } as any);
+    mockCreateProject.mockResolvedValue({ id: 'starter-1', name: 'My First Project' });
     mockUseAIKeys.mockReturnValue([]);
     mockUseCatalog.mockReturnValue({
       data: {
@@ -106,6 +117,41 @@ describe('DashboardClient', () => {
 
   const renderWithQueryClient = (component: React.ReactElement) =>
     render(<QueryClientProvider client={queryClient}>{component}</QueryClientProvider>);
+  const noProjectActivationProgress = {
+    onboarding: true,
+    project: false,
+    completedGeneration: false,
+    qualified: false,
+    reasons: ['NO_PROJECT', 'NO_COMPLETED_GENERATION'],
+  };
+
+  const mockFreeNoProjectState = () => {
+    mockUseProjects.mockReturnValue({
+      data: [],
+      isLoading: false,
+      error: null,
+    } as any);
+    mockUseSubscription.mockReturnValue({
+      subscription: { plan: 'free', status: 'active' },
+      usage: {
+        generations_count: 0,
+        generations_limit: 50,
+        projects_count: 0,
+        projects_limit: 2,
+        tokens_used: 0,
+      },
+      generationsTotal: 0,
+      isLoading: false,
+      error: null,
+    } as any);
+  };
+
+  const renderNoProjectDashboard = () => {
+    mockFreeNoProjectState();
+    return renderWithQueryClient(
+      <DashboardClient initialActivationProgress={noProjectActivationProgress} />
+    );
+  };
 
   describe('Loading State', () => {
     it('shows skeleton loading when projects are loading', () => {
@@ -150,7 +196,7 @@ describe('DashboardClient', () => {
   describe('Page Heading', () => {
     it('renders dashboard heading', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -178,7 +224,7 @@ describe('DashboardClient', () => {
   describe('Plan Badge', () => {
     it('shows Free badge for free plan', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -203,7 +249,7 @@ describe('DashboardClient', () => {
 
     it('shows Pro badge for pro plan', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -228,7 +274,7 @@ describe('DashboardClient', () => {
 
     it('shows Team badge for enterprise plan', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -281,7 +327,7 @@ describe('DashboardClient', () => {
 
     it('shows generation count stat card', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -308,7 +354,7 @@ describe('DashboardClient', () => {
 
     it('shows unlimited for pro plan generations', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -337,7 +383,7 @@ describe('DashboardClient', () => {
   describe('Usage Bar', () => {
     it('shows green usage bar when usage is low', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -368,7 +414,7 @@ describe('DashboardClient', () => {
 
     it('handles null usage gracefully', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -390,7 +436,7 @@ describe('DashboardClient', () => {
   describe('Upgrade CTA', () => {
     it('shows upgrade to pro CTA when plan is free', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -418,7 +464,7 @@ describe('DashboardClient', () => {
 
     it('does not show upgrade CTA when plan is pro', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -443,7 +489,7 @@ describe('DashboardClient', () => {
 
     it('shows upgrade quick action for free plan', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -469,7 +515,7 @@ describe('DashboardClient', () => {
 
     it('does not show upgrade quick action for pro plan', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -544,17 +590,15 @@ describe('DashboardClient', () => {
 
       renderWithQueryClient(<DashboardClient />);
 
-      expect(screen.getByText('Ready to build something?')).toBeInTheDocument();
-      expect(
-        screen.getByText('Describe what you need and Siza generates production-ready code.')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Welcome to Forge Space')).toBeInTheDocument();
+      expect(screen.getByText('Generate your first UI component with AI')).toBeInTheDocument();
     });
   });
 
   describe('Quick Actions', () => {
     it('shows all quick action links', () => {
       mockUseProjects.mockReturnValue({
-        data: [],
+        data: mockProjects,
         isLoading: false,
         error: null,
       } as any);
@@ -563,7 +607,74 @@ describe('DashboardClient', () => {
         usage: {
           generations_count: 0,
           generations_limit: 50,
-          projects_count: 0,
+          projects_count: 2,
+          projects_limit: 2,
+          tokens_used: 0,
+        },
+        generationsTotal: 0,
+        isLoading: false,
+        error: null,
+      } as any);
+      renderWithQueryClient(<DashboardClient />);
+
+      expect(screen.getByText('Quick Actions')).toBeInTheDocument();
+      expect(screen.getByText('AI-powered code generation')).toBeInTheDocument();
+      expect(screen.getByText('Start a new workspace')).toBeInTheDocument();
+      expect(screen.getByText('Track health and compliance')).toBeInTheDocument();
+      expect(screen.getByText('Past generations')).toBeInTheDocument();
+    });
+  });
+
+  describe('Simplified Welcome View (zero projects)', () => {
+    it('shows simplified welcome view with Start Generating and Create a Project CTAs', () => {
+      renderNoProjectDashboard();
+
+      expect(screen.getByText('Welcome to Forge Space')).toBeInTheDocument();
+      expect(screen.getByText('Generate your first UI component with AI')).toBeInTheDocument();
+      expect(screen.getByText('Start Generating')).toBeInTheDocument();
+      expect(screen.getByText('Create a Project')).toBeInTheDocument();
+      expect(screen.getByText('How it works')).toBeInTheDocument();
+      expect(screen.getByText('Describe')).toBeInTheDocument();
+      expect(screen.getByText('Generate')).toBeInTheDocument();
+      expect(screen.getByText('Ship')).toBeInTheDocument();
+    });
+
+    it('links Start Generating to /generate', () => {
+      renderNoProjectDashboard();
+
+      const startLink = screen.getByText('Start Generating').closest('a');
+      expect(startLink).toHaveAttribute('href', '/generate');
+    });
+
+    it('links Create a Project to /projects/new', () => {
+      renderNoProjectDashboard();
+
+      const createLink = screen.getByText('Create a Project').closest('a');
+      expect(createLink).toHaveAttribute('href', '/projects/new');
+    });
+
+    it('does not show the full governance dashboard elements', () => {
+      renderNoProjectDashboard();
+
+      expect(screen.queryByText('Core Flow Progress')).not.toBeInTheDocument();
+      expect(screen.queryByText('Quick Actions')).not.toBeInTheDocument();
+      expect(screen.queryByText('Platform Governance')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('Core Flow Progress (with projects)', () => {
+    it('uses project-aware generate link for generation next step', () => {
+      mockUseProjects.mockReturnValue({
+        data: mockProjects,
+        isLoading: false,
+        error: null,
+      } as any);
+      mockUseSubscription.mockReturnValue({
+        subscription: { plan: 'free', status: 'active' },
+        usage: {
+          generations_count: 0,
+          generations_limit: 50,
+          projects_count: 1,
           projects_limit: 2,
           tokens_used: 0,
         },
@@ -572,13 +683,67 @@ describe('DashboardClient', () => {
         error: null,
       } as any);
 
-      renderWithQueryClient(<DashboardClient />);
+      renderWithQueryClient(
+        <DashboardClient
+          initialActivationProgress={{
+            onboarding: true,
+            project: true,
+            completedGeneration: false,
+            qualified: false,
+            reasons: ['NO_COMPLETED_GENERATION'],
+          }}
+        />
+      );
 
-      expect(screen.getByText('Quick Actions')).toBeInTheDocument();
-      expect(screen.getByText('AI-powered code generation')).toBeInTheDocument();
-      expect(screen.getByText('Start a new workspace')).toBeInTheDocument();
-      expect(screen.getByText('Track health and compliance')).toBeInTheDocument();
-      expect(screen.getByText('Past generations')).toBeInTheDocument();
+      const cta = screen.getByRole('link', { name: 'Generate component' });
+      expect(cta).toHaveAttribute('href', '/generate?projectId=1');
+      const generateLink = screen.getByRole('link', { name: 'Generate' });
+      expect(generateLink).toHaveAttribute(
+        'href',
+        '/generate?projectId=1&source=dashboard&entry=header_primary'
+      );
+      expect(screen.queryByText('Start your first project')).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Generate Component AI-powered code generation' })
+      ).toHaveAttribute(
+        'href',
+        '/generate?projectId=1&source=dashboard&entry=quick_action_generate'
+      );
+    });
+
+    it('hides checklist when user is qualified', () => {
+      mockUseProjects.mockReturnValue({
+        data: mockProjects,
+        isLoading: false,
+        error: null,
+      } as any);
+      mockUseSubscription.mockReturnValue({
+        subscription: { plan: 'free', status: 'active' },
+        usage: {
+          generations_count: 1,
+          generations_limit: 50,
+          projects_count: 1,
+          projects_limit: 2,
+          tokens_used: 0,
+        },
+        generationsTotal: 1,
+        isLoading: false,
+        error: null,
+      } as any);
+
+      renderWithQueryClient(
+        <DashboardClient
+          initialActivationProgress={{
+            onboarding: true,
+            project: true,
+            completedGeneration: true,
+            qualified: true,
+            reasons: [],
+          }}
+        />
+      );
+
+      expect(screen.queryByText('Core Flow Progress')).not.toBeInTheDocument();
     });
   });
 });

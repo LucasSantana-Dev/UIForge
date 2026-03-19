@@ -31,6 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: Forge-Space/.github/.github/actions/setup-node@6fbe56bc610ddf84b70f213c752b95196bcadd95
+      - name: Check API route coverage
+        run: npx tsx scripts/check-route-coverage.ts --ci
       - run: npm run test -- --filter=!@siza/desktop -- --coverage
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de
@@ -52,9 +54,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: Forge-Space/.github/.github/actions/setup-node@6fbe56bc610ddf84b70f213c752b95196bcadd95
-      - name: Run security audit
-        run: npm audit --audit-level=moderate
-        continue-on-error: true
+      - name: Run security audit (production deps only)
+        run: npm audit --audit-level=moderate --omit=dev
       - name: Check outdated dependencies
         run: npm outdated
         continue-on-error: true
@@ -73,7 +74,7 @@ jobs:
     name: Shell Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
       - name: Install shfmt
         run: sudo apt-get install -y shfmt

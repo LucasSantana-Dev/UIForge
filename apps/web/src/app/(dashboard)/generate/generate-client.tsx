@@ -7,7 +7,6 @@ import CodeEditor from '@/components/generator/CodeEditor';
 import LivePreview from '@/components/generator/LivePreview';
 import RefinementInput from '@/components/generator/RefinementInput';
 import GenerationHistory from '@/components/generator/GenerationHistory';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@siza/ui';
@@ -25,6 +24,7 @@ import {
   Sparkles,
   PanelLeftClose,
   PanelLeftOpen,
+  Info,
 } from 'lucide-react';
 import FeedbackPanel from '@/components/generator/FeedbackPanel';
 import { QualityBadge } from '@/components/generator/QualityBadge';
@@ -34,7 +34,7 @@ import { isFeatureEnabled } from '@/lib/features/flags';
 import { useGeneration } from '@/hooks/use-generation';
 import { useGeneratePageShortcuts } from '@/hooks/use-generate-page-shortcuts';
 import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog';
-import { FolderPlus } from 'lucide-react';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 
 type OutputTab = 'preview' | 'code';
 
@@ -237,40 +237,13 @@ export default function TemplateComponent() {
     router.push('/generate?' + params.toString());
   };
 
-  if (!projectId) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <Card className="p-8 max-w-md text-center border-surface-3">
-          <div className="mx-auto w-14 h-14 rounded-xl bg-violet-500/10 flex items-center justify-center mb-4">
-            <FolderPlus className="w-7 h-7 text-violet-400" />
-          </div>
-          <h2 className="text-lg font-semibold font-display text-text-primary mb-2">
-            No Project Selected
-          </h2>
-          <p className="text-sm text-text-secondary mb-6">
-            Create a project to start generating components.
-          </p>
-          <div className="flex gap-3 justify-center">
-            <Button
-              onClick={() => setCreateDialogOpen(true)}
-              className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)]"
-            >
-              Create Project
-            </Button>
-            <Button variant="outline" onClick={() => router.push('/projects')}>
-              Browse Projects
-            </Button>
-          </div>
-          <CreateProjectDialog
-            open={createDialogOpen}
-            onOpenChange={setCreateDialogOpen}
-            onSuccess={handleProjectCreated}
-            defaultFramework={framework}
-          />
-        </Card>
-      </div>
-    );
-  }
+  useEffect(() => {
+    trackEvent({
+      action: 'generate_page_viewed',
+      category: 'Navigation',
+      label: projectId ? 'with_project' : 'no_project',
+    });
+  }, [projectId]);
 
   const tabCls = (tab: OutputTab) =>
     `flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
@@ -281,6 +254,21 @@ export default function TemplateComponent() {
 
   return (
     <div className="h-full flex flex-col rounded-xl border border-surface-3 bg-surface-0 overflow-hidden">
+      {/* Scratch Mode Banner */}
+      {!projectId && (
+        <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 border-b border-amber-500/20 text-xs text-amber-200">
+          <Info className="w-3.5 h-3.5 flex-shrink-0" />
+          <span>Generating in scratch mode.</span>
+          <button
+            onClick={() => setCreateDialogOpen(true)}
+            className="underline hover:text-amber-100 transition-colors"
+          >
+            Create a project
+          </button>
+          <span>to save your work.</span>
+        </div>
+      )}
+
       {/* Workspace Header */}
       <div className="flex items-center justify-between px-4 sm:px-5 h-12 border-b border-surface-3 bg-surface-0 flex-shrink-0">
         <div className="flex items-center gap-3">
@@ -335,11 +323,17 @@ export default function TemplateComponent() {
                 <SheetTitle>Generation History</SheetTitle>
               </SheetHeader>
               <div className="overflow-y-auto h-[calc(100%-60px)]">
-                <GenerationHistory
-                  projectId={projectId}
-                  onSelectGeneration={handleSelectFromHistory}
-                  onForkGeneration={handleForkFromHistory}
-                />
+                {projectId ? (
+                  <GenerationHistory
+                    projectId={projectId}
+                    onSelectGeneration={handleSelectFromHistory}
+                    onForkGeneration={handleForkFromHistory}
+                  />
+                ) : (
+                  <div className="p-6 text-center text-sm text-text-secondary">
+                    Create a project to view generation history.
+                  </div>
+                )}
               </div>
             </SheetContent>
           </Sheet>
@@ -496,6 +490,13 @@ export default function TemplateComponent() {
         onOpenChange={setSaveDialogOpen}
         code={generatedCode}
         framework={framework}
+      />
+
+      <CreateProjectDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={handleProjectCreated}
+        defaultFramework={framework}
       />
     </div>
   );

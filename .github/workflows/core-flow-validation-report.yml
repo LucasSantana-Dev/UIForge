@@ -1,0 +1,101 @@
+name: Core Flow Validation Report
+
+on:
+  schedule:
+    - cron: '20 3 * * *'
+    - cron: '25 3 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: core-flow-validation-report-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  report:
+    name: Publish Gate Report
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Fetch validation report from web app
+        id: fetch
+        env:
+          BASE_URL: ${{ vars.SIZA_BASE_URL }}
+          SNAPSHOT_TOKEN: ${{ secrets.METRICS_SNAPSHOT_TOKEN }}
+          EVENT_NAME: ${{ github.event_name }}
+          EVENT_SCHEDULE: ${{ github.event.schedule }}
+        run: |
+          if [ -z "$BASE_URL" ]; then
+            echo "SIZA_BASE_URL repository variable is required."
+            exit 1
+          fi
+
+          if [ -z "$SNAPSHOT_TOKEN" ]; then
+            echo "METRICS_SNAPSHOT_TOKEN secret is required."
+            exit 1
+          fi
+
+          status_code=$(curl -sS -o response.json -w "%{http_code}" \
+            "${BASE_URL}/api/internal/validation/report" \
+            -H "Authorization: Bearer ${SNAPSHOT_TOKEN}" \
+            -H "Content-Type: application/json")
+
+          cat response.json
+
+          if [ "$status_code" -lt 200 ] || [ "$status_code" -ge 300 ]; then
+            echo "Validation report request failed with status ${status_code}."
+            exit 1
+          fi
+
+          cadence="manual"
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            if [ "$EVENT_SCHEDULE" = "25 3 * * 1" ]; then
+              cadence="weekly"
+            else
+              cadence="daily"
+            fi
+          fi
+
+          mv response.json validation-report.json
+          echo "cadence=$cadence" >> "$GITHUB_OUTPUT"
+
+      - name: Write actions summary
+        env:
+          CADENCE: ${{ steps.fetch.outputs.cadence }}
+        run: |
+          node <<'NODE'
+          const fs = require('node:fs');
+
+          const report = JSON.parse(fs.readFileSync('validation-report.json', 'utf8'));
+          const trend = Array.isArray(report.trend14d) ? report.trend14d : [];
+          const capturedDays = trend.filter((day) => day && day.captured).length;
+          const reasons = Array.isArray(report.reasons) ? report.reasons.join(', ') : 'UNKNOWN';
+          const gateStatus = report.gate?.passed ? 'PASSED' : 'NOT PASSED';
+          const freshness = report.freshness?.status ?? 'missing';
+          const staleness =
+            report.freshness?.stalenessDays === null || report.freshness?.stalenessDays === undefined
+              ? 'n/a'
+              : String(report.freshness.stalenessDays);
+          const summary = [
+            '## Core-Flow Validation Gate Report',
+            '',
+            `- Cadence: **${process.env.CADENCE || 'manual'}**`,
+            `- Gate Status: **${gateStatus}**`,
+            `- Reasons: ${reasons}`,
+            `- Qualified Users: ${report.current?.qualifiedUsers ?? 0} / ${report.gate?.qualifiedTarget ?? 50}`,
+            `- Latest Snapshot: ${report.latestSnapshotDate ?? 'none'}`,
+            `- Freshness: ${freshness} (staleness days: ${staleness})`,
+            `- 14-day Captured Points: ${capturedDays} / ${trend.length || 14}`,
+            `- Week-over-Week Avg: ${report.weekOverWeek?.previousWeekAvg ?? 0} -> ${report.weekOverWeek?.currentWeekAvg ?? 0}`,
+            `- Week-over-Week Drop: ${report.weekOverWeek?.dropPct ?? 0}% (max ${report.weekOverWeek?.maxAllowedDropPct ?? 10}%)`,
+          ].join('\n');
+
+          fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${summary}\n`);
+          NODE
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: core-flow-validation-report-${{ steps.fetch.outputs.cadence }}-${{ github.run_id }}
+          path: validation-report.json
+          retention-days: 30

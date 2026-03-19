@@ -9,6 +9,8 @@ import SignUpPage from '@/app/(auth)/signup/page';
 const mockSignUp = jest.fn();
 const mockSignInWithGoogle = jest.fn();
 const mockSignInWithGitHub = jest.fn();
+const mockTrackEvent = jest.fn();
+const mockGetStoredLeadAttribution = jest.fn();
 
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn(), replace: jest.fn() }),
@@ -22,6 +24,15 @@ jest.mock('@/lib/supabase/client', () => ({
 jest.mock('@/lib/auth/oauth', () => ({
   signInWithGoogle: (...args: any[]) => mockSignInWithGoogle(...args),
   signInWithGitHub: (...args: any[]) => mockSignInWithGitHub(...args),
+}));
+
+jest.mock('@/components/analytics/AnalyticsProvider', () => ({
+  trackEvent: (...args: any[]) => mockTrackEvent(...args),
+  trackGoogleAdsConversion: jest.fn(),
+}));
+
+jest.mock('@/lib/analytics/lead-attribution', () => ({
+  getStoredLeadAttribution: (...args: any[]) => mockGetStoredLeadAttribution(...args),
 }));
 
 jest.mock('@/components/auth/oauth-button', () => ({
@@ -38,10 +49,26 @@ describe('SignUpPage', () => {
     mockSignUp.mockResolvedValue({ error: null });
     mockSignInWithGoogle.mockResolvedValue({ error: null });
     mockSignInWithGitHub.mockResolvedValue({ error: null });
+    mockGetStoredLeadAttribution.mockReturnValue({
+      utm_source: 'google',
+      utm_medium: 'cpc',
+      utm_campaign: 'siza_br_en_leadtest_v1',
+      utm_term: 'full stack ai code generator',
+      utm_content: null,
+      gclid: 'gclid-123',
+      gbraid: null,
+      wbraid: null,
+      landing_path: '/',
+      first_seen_at: '2026-03-10T00:00:00.000Z',
+    });
   });
 
   it('should render sign up form', () => {
     render(<SignUpPage />);
+    expect(screen.getByRole('main')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 1, name: /create your account/i })
+    ).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
@@ -66,7 +93,19 @@ describe('SignUpPage', () => {
     await user.click(screen.getByRole('button', { name: /create account/i }));
     await waitFor(() => {
       expect(mockSignUp).toHaveBeenCalledWith(
-        expect.objectContaining({ email: 'new@example.com', password: 'password123' })
+        expect.objectContaining({
+          email: 'new@example.com',
+          password: expect.any(String),
+          options: expect.objectContaining({
+            data: expect.objectContaining({
+              marketing_attribution: expect.objectContaining({
+                utm_source: 'google',
+                utm_medium: 'cpc',
+                utm_campaign: 'siza_br_en_leadtest_v1',
+              }),
+            }),
+          }),
+        })
       );
     });
   });
@@ -78,8 +117,22 @@ describe('SignUpPage', () => {
     await user.type(screen.getByLabelText(/password/i), 'password123');
     await user.click(screen.getByRole('button', { name: /create account/i }));
     await waitFor(() => {
-      expect(screen.getByText(/check your email/i)).toBeInTheDocument();
+      expect(
+        screen.getByRole('heading', { level: 1, name: /check your email/i })
+      ).toBeInTheDocument();
     });
+    expect(mockTrackEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'lead_signup_started',
+        category: 'Lead',
+      })
+    );
+    expect(mockTrackEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'lead_signup_success',
+        category: 'Lead',
+      })
+    );
   });
 
   it('should show error on sign up failure', async () => {
@@ -92,6 +145,12 @@ describe('SignUpPage', () => {
     await waitFor(() => {
       expect(screen.getByText(/user already registered/i)).toBeInTheDocument();
     });
+    expect(mockTrackEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'lead_signup_error',
+        category: 'Lead',
+      })
+    );
   });
 
   it('should show loading state during submission', async () => {
@@ -124,5 +183,17 @@ describe('SignUpPage', () => {
     await waitFor(() => {
       expect(screen.getByText(/github auth failed/i)).toBeInTheDocument();
     });
+    expect(mockTrackEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'lead_signup_oauth_start',
+        category: 'Lead',
+      })
+    );
+    expect(mockTrackEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        action: 'lead_signup_error',
+        category: 'Lead',
+      })
+    );
   });
 });

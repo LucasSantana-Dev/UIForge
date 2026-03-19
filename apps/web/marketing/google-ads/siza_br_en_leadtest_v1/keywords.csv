@@ -1,0 +1,13 @@
+campaign_name,ad_group_name,keyword,match_type,max_cpc_usd
+siza_br_en_leadtest_v1,high_intent,"ai app builder for developers",phrase,0.80
+siza_br_en_leadtest_v1,high_intent,"ai app builder for developers",exact,0.80
+siza_br_en_leadtest_v1,high_intent,"full stack ai code generator",phrase,0.80
+siza_br_en_leadtest_v1,high_intent,"full stack ai code generator",exact,0.80
+siza_br_en_leadtest_v1,high_intent,"open source ai code generator",phrase,0.80
+siza_br_en_leadtest_v1,high_intent,"open source ai code generator",exact,0.80
+siza_br_en_leadtest_v1,high_intent,"self hosted ai coding assistant",phrase,0.80
+siza_br_en_leadtest_v1,high_intent,"self hosted ai coding assistant",exact,0.80
+siza_br_en_leadtest_v1,high_intent,"ai developer platform",phrase,0.80
+siza_br_en_leadtest_v1,high_intent,"ai developer platform",exact,0.80
+siza_br_en_leadtest_v1,high_intent,"mcp tools for developers",phrase,0.80
+siza_br_en_leadtest_v1,high_intent,"mcp tools for developers",exact,0.80

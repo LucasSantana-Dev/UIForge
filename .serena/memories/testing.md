@@ -1,33 +1,35 @@
 # Siza Testing State
 
-## Current Stats (as of v0.27.0, 2026-03-01)
-- 656+ tests passing, 53+ suites on main
-- Coverage thresholds: branches 60%, functions 65%, lines 75%, statements 75%
-- CI: ALL 13 JOBS GREEN (Lint, TypeCheck, Build, UnitTests, Security, ShellLint, E2E, CodeQL, etc.)
-- **Billing tests added (v0.27.0)**: 38 tests across PricingCard (16), SubscriptionStatus (9), UsageChart (9), UpgradePrompt (4)
+## Current Stats (2026-03-15, v0.47.1+)
+- **1671 tests** — 170 suites, all passing
+- **100% API route coverage: 69/69 routes** (incl. campaigns/reengagement)
+- Coverage: ~91% stmts, ~83% branches, ~94% fns, ~93% lines
+- Skills: `api-route-testing` v1.6.0, `cron-routes` v1.0.0
 
-## API Route Test Patterns
+## Automation
+- `npm run routes:check` — verify 100% route coverage (CI gate)
+- `npm run routes:scaffold <path>` — scaffold test from route source
+- New cron route? → `npm run routes:scaffold` + fill auth guard test cases
 
-### Mock Pitfalls
-- `setRateLimitHeaders`: Projects routes do `return setRateLimitHeaders(response, ...)` — auto-mock returns undefined. Must use `mockImplementation((res) => res)`.
-- Components routes call `setRateLimitHeaders()` as void statement — auto-mock is safe.
-- `searchParams.get()` returns `null` for missing params, but Zod `.optional().default()` only handles `undefined`. Use `Object.fromEntries(searchParams.entries())`.
+## Test Running
+```bash
+cd apps/web && npx jest --forceExit --passWithNoTests  # full (1671 tests)
+cd apps/web && npx jest --forceExit src/__tests__/lib/api/  # route tests only
+npm run routes:check  # verify all routes have tests
+```
 
-### Supabase Mock Patterns
-- Single-query routes: `mockReturnThis()` chain works fine
-- Multi-query routes (DELETE): use `fromCallCount` with separate chain objects per query
-- When route does `from('A').select().eq().single()` then `from('B').select().eq().eq().single()`, a single chain with `eqCallCount` breaks because counts cross queries
+## Critical Gotchas
+- **Run from `apps/web/`** never repo root
+- **Always `--forceExit`** — Supabase mocks leave async handles
+- **Barrel mock unreliable**: mock `@/lib/api/auth`, `@/lib/api/validation/X` directly, NOT `@/lib/api`
+- **errorResponse()**: `{ error: { message, status } }` — NOT `{ error: "string" }`
+- **successResponse()**: `{ data: ... }` wraps payload; **jsonResponse()**: raw, no wrapper
+- **Dynamic route params**: `{ params: Promise.resolve({ id }) }`
+- **NextResponse.redirect**: use `jest.spyOn` + stub (not origRedirect) to avoid absolute-URL error
+- **global.fetch**: `Object.defineProperty` in `beforeEach` (jsdom resets it)
+- **AbortSignal.timeout**: polyfill: `(AbortSignal as any).timeout = () => new AbortController().signal`
+- **Cron routes**: use `@supabase/supabase-js` direct (not `@/lib/supabase/server`), mock it directly
 
-### Mock Dependencies by Route
-- Components routes: `@/lib/supabase/server`, `@/lib/api/auth`, `@/lib/api/rate-limit`, `@/lib/sentry/server`, `@/lib/api/storage`
-- Projects routes: `@/lib/supabase/server`, `@/lib/api/auth`, `@/lib/api/rate-limit`, `@/lib/usage/limits`, `@/lib/usage/tracker`
-- Let pure modules work naturally: `@/lib/api/response`, `@/lib/api/errors`, `@/lib/api/validation/*`
-
-## Generate page keyboard shortcuts (Issue #266)
-- `use-generate-page-shortcuts.test.tsx`: 8 tests for Cmd+Enter (submit), Cmd+S (save), Cmd+K (focus prompt), Escape (close modals), useShortcutLabel. Fire both metaKey and ctrlKey in tests so they pass on Mac and non-Mac (hook uses metaKey on Mac, ctrlKey otherwise).
-
-## PR #91: Unskip 4 API Route Test Suites
-- Branch: feat/unskip-api-route-tests
-- Status: MERGED (2026-02-25)
-- +57 tests (322→379), +5 suites (25→30)
-- Fixed projects/route.ts null query param bug
+## Active PRs with tests
+- #510: feat/reengagement-campaign (+9 cron route tests, +12 email tests)
+- #511: chore/deps-bump-march-15 (ecosystem updates, 1671 tests pass)

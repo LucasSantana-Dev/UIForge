@@ -1,12 +1,13 @@
 import { createElement } from 'react';
 import { sendEmail } from './service';
-import { Welcome } from '@/emails/templates/Welcome';
 import { getFeatureFlag } from '@/lib/features/flags';
 
 const APP_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
 
 export async function sendWelcomeEmail(to: string) {
   if (!getFeatureFlag('ENABLE_RESEND_EMAILS')) return;
+
+  const { Welcome } = await import('@/emails/templates/Welcome');
 
   return sendEmail({
     to,
@@ -41,6 +42,21 @@ export async function sendPasswordResetEmail(to: string, token: string) {
     subject: 'Reset your password - Siza',
     react: createElement(PasswordReset, {
       resetUrl: `${APP_URL}/reset-password?token=${token}`,
+    }),
+  });
+}
+
+export async function sendReengagementEmail(to: string, firstName?: string) {
+  if (!getFeatureFlag('ENABLE_RESEND_EMAILS')) return;
+
+  const { Reengagement } = await import('@/emails/templates/Reengagement');
+
+  return sendEmail({
+    to,
+    subject: 'Your first AI component is one click away',
+    react: createElement(Reengagement, {
+      generateUrl: `${APP_URL}/generate`,
+      firstName,
     }),
   });
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useProjects } from '@/hooks/use-projects';
+import { useProjects, useCreateProject } from '@/hooks/use-projects';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useCatalog } from '@/hooks/use-catalog';
 import { useGoldenPaths } from '@/hooks/use-golden-paths';
@@ -20,15 +20,18 @@ import {
   ShieldCheckIcon,
   RocketIcon,
   CheckCircleIcon,
+  CircleIcon,
   ServerIcon,
   GlobeIcon,
   CodeIcon,
   LayersIcon,
 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { GoldenPathRow } from '@/lib/repositories/golden-path.repo';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 
 interface StatCardProps {
   label: string;
@@ -124,20 +127,42 @@ function RecentProjectCard({
 
 function QuickAction({
   href,
+  onClick,
   icon: Icon,
   label,
   description,
   accent,
 }: {
   href: string;
+  onClick?: () => Promise<void> | void;
   icon: React.ElementType;
   label: string;
   description: string;
   accent?: string;
 }) {
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={label}
+        className="group flex w-full items-center gap-3 rounded-lg border border-surface-3 bg-surface-1 p-4 text-left transition-all duration-200 hover:border-violet-500/30 hover:shadow-[0_0_16px_rgba(124,58,237,0.06)]"
+      >
+        <div className="rounded-lg bg-violet-500/10 p-2 group-hover:bg-violet-500/20 transition-colors">
+          <Icon className={`h-4 w-4 ${accent || 'text-violet-400'}`} />
+        </div>
+        <div>
+          <p className="text-sm font-medium text-text-primary">{label}</p>
+          <p className="text-xs text-text-secondary">{description}</p>
+        </div>
+      </button>
+    );
+  }
+
   return (
     <Link
       href={href}
+      aria-label={label}
       className="group flex items-center gap-3 rounded-lg border border-surface-3 bg-surface-1 p-4 transition-all duration-200 hover:border-violet-500/30 hover:shadow-[0_0_16px_rgba(124,58,237,0.06)]"
     >
       <div className="rounded-lg bg-violet-500/10 p-2 group-hover:bg-violet-500/20 transition-colors">
@@ -298,14 +323,162 @@ function GovernanceOverview() {
   );
 }
 
-export function DashboardClient() {
+interface CoreFlowUserProgress {
+  onboarding: boolean;
+  project: boolean;
+  completedGeneration: boolean;
+  qualified: boolean;
+  reasons: string[];
+}
+
+interface DashboardClientProps {
+  initialActivationProgress?: CoreFlowUserProgress | null;
+}
+
+function GuidedStarterProjectPrompt({
+  isCreatingProject,
+  onConfirm,
+  onNotNow,
+}: {
+  isCreatingProject: boolean;
+  onConfirm: () => Promise<void>;
+  onNotNow: () => void;
+}) {
+  return (
+    <div className="rounded-xl border border-violet-500/40 bg-violet-500/10 p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-semibold text-text-primary">Start your first project</h2>
+          <p className="mt-1 text-xs text-text-secondary">
+            Create a starter project in one click, then generate your first component.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" className="text-xs" onClick={onNotNow}>
+            Not now
+          </Button>
+          <Button
+            size="sm"
+            className="bg-violet-600 hover:bg-violet-500 text-xs"
+            onClick={onConfirm}
+            disabled={isCreatingProject}
+          >
+            {isCreatingProject ? 'Creating...' : 'Create Starter Project'}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CoreFlowProgressChecklist({
+  progress,
+  generationHref,
+  onCreateProject,
+  isCreatingProject,
+}: {
+  progress: CoreFlowUserProgress;
+  generationHref: string;
+  onCreateProject: (() => Promise<void>) | null;
+  isCreatingProject: boolean;
+}) {
+  const items = [
+    {
+      id: 'onboarding',
+      label: 'Complete onboarding',
+      done: progress.onboarding,
+      href: '/onboarding',
+      cta: 'Finish onboarding',
+    },
+    {
+      id: 'project',
+      label: 'Create your first project',
+      done: progress.project,
+      href: '/projects/new',
+      cta: 'Create project',
+    },
+    {
+      id: 'generation',
+      label: 'Complete your first generation',
+      done: progress.completedGeneration,
+      href: generationHref,
+      cta: 'Generate component',
+    },
+  ];
+  const nextAction = items.find((item) => !item.done) ?? null;
+
+  return (
+    <div className="rounded-xl border border-violet-500/30 bg-violet-500/5 p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="text-sm font-semibold text-text-primary">Core Flow Progress</h2>
+          <p className="mt-1 text-xs text-text-secondary">
+            Complete all steps to qualify for gate validation.
+          </p>
+        </div>
+        <span className="rounded-full border border-violet-500/40 bg-violet-500/10 px-2 py-0.5 text-xs font-medium text-violet-200">
+          {items.filter((item) => item.done).length}/{items.length} complete
+        </span>
+      </div>
+      {nextAction ? (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-violet-500/40 bg-violet-500/10 px-3 py-2">
+          <div>
+            <p className="text-xs uppercase tracking-wide text-violet-200">Next step</p>
+            <p className="text-sm text-text-primary">{nextAction.label}</p>
+          </div>
+          {nextAction.id === 'project' && onCreateProject ? (
+            <Button
+              size="sm"
+              className="bg-violet-600 hover:bg-violet-500 text-xs"
+              onClick={onCreateProject}
+              disabled={isCreatingProject}
+            >
+              {isCreatingProject ? 'Creating...' : nextAction.cta}
+            </Button>
+          ) : (
+            <Button asChild size="sm" className="bg-violet-600 hover:bg-violet-500 text-xs">
+              <Link href={nextAction.href}>{nextAction.cta}</Link>
+            </Button>
+          )}
+        </div>
+      ) : null}
+      <div className="mt-4 space-y-2">
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="flex items-center justify-between rounded-lg border border-surface-3 bg-surface-1 px-3 py-2"
+          >
+            <div className="flex items-center gap-2">
+              {item.done ? (
+                <CheckCircleIcon className="h-4 w-4 text-emerald-400" />
+              ) : (
+                <CircleIcon className="h-4 w-4 text-text-muted" />
+              )}
+              <span className="text-sm text-text-primary">{item.label}</span>
+            </div>
+            {!item.done ? <span className="text-xs text-text-secondary">{item.cta}</span> : null}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function DashboardClient({ initialActivationProgress = null }: DashboardClientProps) {
+  const router = useRouter();
   const { data: projects, isLoading: projectsLoading } = useProjects();
+  const createProject = useCreateProject();
   const { usage, subscription, generationsTotal, isLoading: usageLoading } = useSubscription();
   const goldenPathsEnabled = isFeatureEnabled('ENABLE_GOLDEN_PATHS');
   const { data: goldenPathData } = useGoldenPaths(goldenPathsEnabled ? { limit: 3 } : { limit: 0 });
   const [mountTime] = useState(() => Date.now());
+  const [isStarterPromptDismissed, setIsStarterPromptDismissed] = useState(false);
 
   const isLoading = projectsLoading || usageLoading;
+
+  useEffect(() => {
+    trackEvent({ action: 'dashboard_viewed', category: 'Navigation' });
+  }, []);
 
   const stats = useMemo(() => {
     if (!projects) return null;
@@ -326,6 +499,96 @@ export function DashboardClient() {
   const topPaths = useMemo(() => {
     return goldenPathData?.data || [];
   }, [goldenPathData?.data]);
+  const firstProjectId = useMemo(() => projects?.[0]?.id ?? null, [projects]);
+  const fallbackActivationProgress = useMemo(() => {
+    const onboarding = true;
+    const project = (usage?.projects_count ?? 0) > 0;
+    const completedGeneration = generationsTotal > 0;
+    const reasons = [
+      ...(onboarding ? [] : ['ONBOARDING_NOT_COMPLETED']),
+      ...(project ? [] : ['NO_PROJECT']),
+      ...(completedGeneration ? [] : ['NO_COMPLETED_GENERATION']),
+    ];
+    return {
+      onboarding,
+      project,
+      completedGeneration,
+      qualified: reasons.length === 0,
+      reasons,
+    };
+  }, [generationsTotal, usage?.projects_count]);
+  const activationProgress = initialActivationProgress ?? fallbackActivationProgress;
+  const starterProjectCohort =
+    activationProgress.onboarding &&
+    !activationProgress.project &&
+    !activationProgress.completedGeneration;
+  const showStarterProjectPrompt = starterProjectCohort && !isStarterPromptDismissed;
+  const generationChecklistHref =
+    activationProgress.project && firstProjectId
+      ? `/generate?projectId=${firstProjectId}`
+      : '/generate';
+  const dashboardPrimaryHref =
+    activationProgress.project && firstProjectId
+      ? `/generate?projectId=${firstProjectId}&source=dashboard&entry=header_primary`
+      : '/projects/new?source=dashboard&entry=header_primary';
+  const dashboardPrimaryLabel = activationProgress.project ? 'Generate' : 'Create Project';
+  const emptyStatePrimaryHref =
+    activationProgress.project && firstProjectId
+      ? `/generate?projectId=${firstProjectId}&source=dashboard&entry=empty_state_primary`
+      : '/projects/new?source=dashboard&entry=empty_state_primary';
+  const emptyStatePrimaryLabel = activationProgress.project
+    ? 'Generate Component'
+    : 'Create Project';
+  const emptyStateSecondaryHref =
+    activationProgress.project && firstProjectId
+      ? `/generate?projectId=${firstProjectId}&source=dashboard&entry=empty_state_secondary`
+      : '/projects/new?source=dashboard&entry=empty_state_secondary';
+  const quickActionGenerateHref =
+    activationProgress.project && firstProjectId
+      ? `/generate?projectId=${firstProjectId}&source=dashboard&entry=quick_action_generate`
+      : '/projects/new?source=dashboard&entry=quick_action_generate';
+
+  const trackStarterProjectEvent = (
+    action: string,
+    entry: string,
+    params: Record<string, string | boolean | null> = {}
+  ) => {
+    trackEvent({
+      action,
+      category: 'Activation',
+      label: entry,
+      params: {
+        source: 'dashboard',
+        entry,
+        step: 'project',
+        hasProjectBefore: activationProgress.project,
+        ...params,
+      },
+    });
+  };
+
+  const handleCreateStarterProject = async (entry: string) => {
+    setIsStarterPromptDismissed(false);
+    trackStarterProjectEvent('activation_starter_project_confirmed', entry, { fallback: false });
+    try {
+      const project = await createProject.mutateAsync({
+        name: 'My First Project',
+        framework: 'react',
+      });
+      trackStarterProjectEvent('activation_starter_project_created', entry, {
+        projectId: project.id,
+        fallback: false,
+      });
+      trackStarterProjectEvent('activation_route_to_generate', entry, {
+        projectId: project.id,
+        fallback: false,
+      });
+      router.push(`/generate?projectId=${project.id}&source=dashboard&entry=${entry}&step=project`);
+    } catch {
+      trackStarterProjectEvent('activation_starter_project_fallback', entry, { fallback: true });
+      router.push(`/projects/new?source=dashboard&entry=${entry}&step=project`);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -338,6 +601,79 @@ export function DashboardClient() {
           {Array.from({ length: 4 }).map((_, i) => (
             <StatCardSkeleton key={i} />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  const hasZeroProjects = !projects || projects.length === 0;
+
+  if (hasZeroProjects && activationProgress.onboarding) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-10">
+        <div className="text-center space-y-4">
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-violet-500/10 flex items-center justify-center">
+            <SparklesIcon className="h-8 w-8 text-violet-400" />
+          </div>
+          <h1 className="text-4xl font-bold font-display tracking-tight text-text-primary">
+            Welcome to Forge Space
+          </h1>
+          <p className="text-lg text-text-secondary max-w-md mx-auto">
+            Generate your first UI component with AI
+          </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <Button
+            asChild
+            size="lg"
+            className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_24px_rgba(124,58,237,0.2)] hover:shadow-[0_0_32px_rgba(124,58,237,0.3)] transition-all text-base px-8 py-3"
+          >
+            <Link href="/generate">
+              <SparklesIcon className="mr-2 h-5 w-5" />
+              Start Generating
+            </Link>
+          </Button>
+          <Button
+            asChild
+            variant="outline"
+            size="lg"
+            className="border-surface-3 text-text-secondary hover:text-text-primary text-base px-8 py-3"
+          >
+            <Link href="/projects/new">
+              <PlusIcon className="mr-2 h-5 w-5" />
+              Create a Project
+            </Link>
+          </Button>
+        </div>
+
+        <div className="w-full max-w-2xl">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-text-muted text-center mb-6">
+            How it works
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="rounded-xl border border-surface-3 bg-surface-1 p-5 text-center">
+              <div className="mx-auto w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center mb-3">
+                <span className="text-sm font-bold text-violet-400">1</span>
+              </div>
+              <p className="text-sm font-medium text-text-primary">Describe</p>
+              <p className="mt-1 text-xs text-text-secondary">Tell Siza what component you need</p>
+            </div>
+            <div className="rounded-xl border border-surface-3 bg-surface-1 p-5 text-center">
+              <div className="mx-auto w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3">
+                <span className="text-sm font-bold text-emerald-400">2</span>
+              </div>
+              <p className="text-sm font-medium text-text-primary">Generate</p>
+              <p className="mt-1 text-xs text-text-secondary">AI creates production-ready code</p>
+            </div>
+            <div className="rounded-xl border border-surface-3 bg-surface-1 p-5 text-center">
+              <div className="mx-auto w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center mb-3">
+                <span className="text-sm font-bold text-amber-400">3</span>
+              </div>
+              <p className="text-sm font-medium text-text-primary">Ship</p>
+              <p className="mt-1 text-xs text-text-secondary">Copy, export, or push to your repo</p>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -377,17 +713,48 @@ export function DashboardClient() {
               </Link>
             </Button>
           )}
-          <Button
-            asChild
-            className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all"
-          >
-            <Link href="/generate">
-              <SparklesIcon className="mr-2 h-4 w-4" />
-              Generate
-            </Link>
-          </Button>
+          {activationProgress.project ? (
+            <Button
+              asChild
+              className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all"
+            >
+              <Link href={dashboardPrimaryHref}>
+                <SparklesIcon className="mr-2 h-4 w-4" />
+                {dashboardPrimaryLabel}
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              className="bg-violet-600 hover:bg-violet-500 shadow-[0_0_20px_rgba(124,58,237,0.15)] hover:shadow-[0_0_28px_rgba(124,58,237,0.25)] transition-all"
+              onClick={async () => handleCreateStarterProject('header_primary')}
+            >
+              <PlusIcon className="mr-2 h-4 w-4" />
+              {dashboardPrimaryLabel}
+            </Button>
+          )}
         </div>
       </div>
+
+      {showStarterProjectPrompt ? (
+        <GuidedStarterProjectPrompt
+          isCreatingProject={createProject.isPending}
+          onConfirm={() => handleCreateStarterProject('guided_starter_project')}
+          onNotNow={() => setIsStarterPromptDismissed(true)}
+        />
+      ) : null}
+
+      {!activationProgress.qualified ? (
+        <CoreFlowProgressChecklist
+          progress={activationProgress}
+          generationHref={generationChecklistHref}
+          onCreateProject={
+            activationProgress.project
+              ? null
+              : async () => handleCreateStarterProject('checklist_next_step')
+          }
+          isCreatingProject={createProject.isPending}
+        />
+      ) : null}
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -483,21 +850,32 @@ export function DashboardClient() {
                 Describe what you need and Siza generates production-ready code.
               </p>
               <div className="mt-4 flex items-center justify-center gap-3">
-                <Button asChild className="bg-violet-600 hover:bg-violet-500" size="sm">
-                  <Link href="/generate">
-                    <SparklesIcon className="mr-2 h-4 w-4" />
-                    Generate Component
-                  </Link>
-                </Button>
+                {activationProgress.project ? (
+                  <Button asChild className="bg-violet-600 hover:bg-violet-500" size="sm">
+                    <Link href={emptyStatePrimaryHref}>
+                      <SparklesIcon className="mr-2 h-4 w-4" />
+                      {emptyStatePrimaryLabel}
+                    </Link>
+                  </Button>
+                ) : (
+                  <Button
+                    className="bg-violet-600 hover:bg-violet-500"
+                    size="sm"
+                    onClick={async () => handleCreateStarterProject('empty_state_primary')}
+                  >
+                    <PlusIcon className="mr-2 h-4 w-4" />
+                    {emptyStatePrimaryLabel}
+                  </Button>
+                )}
                 <Button
                   asChild
                   variant="outline"
                   size="sm"
                   className="border-surface-3 text-text-secondary hover:text-text-primary"
                 >
-                  <Link href="/projects/new">
-                    <PlusIcon className="mr-2 h-4 w-4" />
-                    New Project
+                  <Link href={emptyStateSecondaryHref}>
+                    <SparklesIcon className="mr-2 h-4 w-4" />
+                    Generate Component
                   </Link>
                 </Button>
               </div>
@@ -526,7 +904,12 @@ export function DashboardClient() {
             </h2>
             <div className="space-y-2">
               <QuickAction
-                href="/generate"
+                href={quickActionGenerateHref}
+                onClick={
+                  activationProgress.project
+                    ? undefined
+                    : async () => handleCreateStarterProject('quick_action_generate')
+                }
                 icon={SparklesIcon}
                 label="Generate Component"
                 description="AI-powered code generation"

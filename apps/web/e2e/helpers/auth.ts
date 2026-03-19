@@ -1,20 +1,17 @@
 import { Page } from '@playwright/test';
-import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { createAdminClient } from './admin-client';
 
 export async function setupAuthenticatedUser(page: Page): Promise<{
   email: string;
   password: string;
   id: string;
 }> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY for authenticated E2E tests');
   }
 
-  const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
+  const adminSupabase = createAdminClient();
   const uniqueId = crypto.randomUUID();
   const testEmail = `test-${uniqueId}@example.com`;
   const testPassword = crypto.randomBytes(16).toString('hex');
@@ -29,50 +26,66 @@ export async function setupAuthenticatedUser(page: Page): Promise<{
     throw new Error(`Failed to create test user: ${createError?.message || 'unknown'}`);
   }
 
-  let profileFound = false;
-  for (let attempt = 0; attempt < 20; attempt++) {
-    const { data } = await adminSupabase
-      .from('profiles')
-      .select('id')
-      .eq('id', createdUser.user.id)
-      .single();
-    if (data) {
-      profileFound = true;
+  let signInError: string | null = null;
+  let signedIn = false;
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await page.goto('/signin');
+    await page.waitForLoadState('networkidle');
+    await page.getByLabel(/email/i).fill(testEmail);
+    await page.getByLabel(/password/i).fill(testPassword);
+
+    const navigationPromise = page.waitForURL(
+      (url) => !url.pathname.includes('/signin') && !url.pathname.includes('/auth/callback'),
+      { timeout: 20000 }
+    );
+
+    await page.getByRole('button', { name: /sign in/i }).click();
+
+    try {
+      await navigationPromise;
+      signedIn = true;
       break;
+    } catch {
+      signInError = await page
+        .locator('.text-destructive')
+        .first()
+        .textContent()
+        .catch(() => null);
+      if (!page.url().includes('/signin?')) {
+        break;
+      }
     }
-    await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
-  const setupTimestamp = new Date().toISOString();
-  const profileSetup = {
-    onboarding_completed_at: setupTimestamp,
-    tour_completed_at: setupTimestamp,
+  if (!signedIn) {
+    throw new Error(
+      `Failed to sign in disposable user: ${signInError?.trim() || 'Unknown sign-in failure'}`
+    );
+  }
+
+  const completedAt = new Date().toISOString();
+  const fullProfile = {
+    id: createdUser.user.id,
+    onboarding_completed_at: completedAt,
+    tour_completed_at: completedAt,
+  };
+  const fallbackProfile = {
+    id: createdUser.user.id,
+    onboarding_completed_at: completedAt,
   };
 
-  if (!profileFound) {
-    const { error: insertError } = await adminSupabase
-      .from('profiles')
-      .insert({ id: createdUser.user.id, ...profileSetup });
-    if (insertError) {
-      throw new Error(`Failed to initialize profile flags: ${insertError.message}`);
+  const { error: profileError } = await adminSupabase.from('profiles').upsert(fullProfile);
+  if (profileError && /tour_completed_at/i.test(profileError.message)) {
+    const { error: fallbackError } = await adminSupabase.from('profiles').upsert(fallbackProfile);
+    if (fallbackError) {
+      throw new Error(`Failed to prepare profile for test user: ${fallbackError.message}`);
     }
-  } else {
-    const { error: updateError } = await adminSupabase
-      .from('profiles')
-      .update(profileSetup)
-      .eq('id', createdUser.user.id);
-    if (updateError) {
-      throw new Error(`Failed to set onboarding/tour flags: ${updateError.message}`);
-    }
+  } else if (profileError) {
+    throw new Error(`Failed to prepare profile for test user: ${profileError.message}`);
   }
 
-  await page.goto('/signin');
-  await page.getByLabel(/email/i).fill(testEmail);
-  await page.getByLabel(/password/i).fill(testPassword);
-  await page.getByRole('button', { name: /sign in/i }).click();
-  await page.waitForURL((url) => !url.pathname.includes('/signin'), {
-    timeout: 10000,
-  });
+  await page.goto('/projects', { waitUntil: 'domcontentloaded' });
 
   return { email: testEmail, password: testPassword, id: createdUser.user.id };
 }
@@ -80,12 +93,9 @@ export async function setupAuthenticatedUser(page: Page): Promise<{
 export async function cleanupTestData(userId?: string): Promise<void> {
   if (!userId) return;
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) return;
 
-  if (!supabaseUrl || !serviceRoleKey) return;
-
-  const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
+  const adminSupabase = createAdminClient();
 
   try {
     await adminSupabase.from('components').delete().eq('user_id', userId);
@@ -98,14 +108,11 @@ export async function cleanupTestData(userId?: string): Promise<void> {
 }
 
 export async function setUserRole(userId: string, role: 'user' | 'admin'): Promise<void> {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     throw new Error('Missing SUPABASE_SERVICE_ROLE_KEY for role management');
   }
 
-  const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
+  const adminSupabase = createAdminClient();
   const { error } = await adminSupabase.from('profiles').update({ role }).eq('id', userId);
   if (error) {
     throw new Error(`Failed to set role for ${userId}: ${error.message}`);

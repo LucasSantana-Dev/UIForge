@@ -91,6 +91,7 @@ describe('GET /api/gallery', () => {
     expect(body.generations).toHaveLength(0);
     expect(body.pagination.total).toBe(0);
     expect(body.pagination.totalPages).toBe(0);
+    expect(body.message).toBe('No featured generations available yet.');
   });
 
   it('returns 500 on database error', async () => {

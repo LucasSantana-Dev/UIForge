@@ -196,8 +196,8 @@ export const useAIKeyStore = create<AIKeyStore>()(
         try {
           const stats = await aiKeyManager.getUsageStats();
           set({ usageStats: stats });
-        } catch (error) {
-          console.error('Failed to load usage stats:', error);
+        } catch {
+          // ignore failed usage stats load
         }
       },
 

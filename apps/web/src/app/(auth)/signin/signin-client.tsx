@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Image from 'next/image';
 import { OAuthButton } from '@/components/auth/oauth-button';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 import { signInWithGoogle, signInWithGitHub } from '@/lib/auth/oauth';
-import { AuthCardShell } from '@/components/migration/migration-primitives';
+import { AuthSplitShell } from '@/components/migration/migration-primitives';
 
 export function SignInClient() {
   const [email, setEmail] = useState('');
@@ -22,6 +23,12 @@ export function SignInClient() {
     setLoading(true);
     setError(null);
 
+    trackEvent({
+      action: 'signin_started',
+      category: 'Auth',
+      label: 'email',
+    });
+
     const supabase = createClient();
 
     const { error } = await supabase.auth.signInWithPassword({
@@ -30,9 +37,19 @@ export function SignInClient() {
     });
 
     if (error) {
+      trackEvent({
+        action: 'signin_error',
+        category: 'Auth',
+        label: 'email',
+      });
       setError(error.message);
       setLoading(false);
     } else {
+      trackEvent({
+        action: 'signin_success',
+        category: 'Auth',
+        label: 'email',
+      });
       router.push('/projects');
       router.refresh();
     }
@@ -42,9 +59,20 @@ export function SignInClient() {
     setOAuthLoading('google');
     setError(null);
 
+    trackEvent({
+      action: 'signin_oauth_start',
+      category: 'Auth',
+      label: 'google',
+    });
+
     const { error } = await signInWithGoogle();
 
     if (error) {
+      trackEvent({
+        action: 'signin_error',
+        category: 'Auth',
+        label: 'oauth_google',
+      });
       setError(error.message);
       setOAuthLoading(null);
     }
@@ -54,23 +82,37 @@ export function SignInClient() {
     setOAuthLoading('github');
     setError(null);
 
+    trackEvent({
+      action: 'signin_oauth_start',
+      category: 'Auth',
+      label: 'github',
+    });
+
     const { error } = await signInWithGitHub();
 
     if (error) {
+      trackEvent({
+        action: 'signin_error',
+        category: 'Auth',
+        label: 'oauth_github',
+      });
       setError(error.message);
       setOAuthLoading(null);
     }
   };
 
   return (
-    <AuthCardShell>
+    <AuthSplitShell>
       <div className="w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2">
             <Image src="/monogram.svg" alt="Siza" width={28} height={28} priority />
             <span className="text-2xl font-display font-bold">Siza</span>
           </Link>
-          <h2 className="mt-6 text-2xl font-semibold text-foreground">Sign in to Siza</h2>
+          <p className="mt-6 text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground">
+            Siza workspace access
+          </p>
+          <h1 className="mt-3 text-2xl font-semibold text-foreground">Sign in to Siza</h1>
           <p className="mt-2 text-sm text-muted-foreground">
             Welcome back to the premium AI coding platform
           </p>
@@ -162,6 +204,6 @@ export function SignInClient() {
           </p>
         </div>
       </div>
-    </AuthCardShell>
+    </AuthSplitShell>
   );
 }

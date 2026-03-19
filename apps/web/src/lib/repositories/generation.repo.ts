@@ -21,6 +21,25 @@ export interface GenerationUpdate {
   github_pr_id?: string;
 }
 
+export interface GenerationSecurityReportUpsert {
+  generation_id: string;
+  user_id: string;
+  report_version: string;
+  scanner_name: string;
+  scanner_version: string;
+  scanner_execution: 'success' | 'error';
+  scanner_error_message?: string | null;
+  summary_total_findings: number;
+  summary_by_severity: Record<string, number>;
+  summary_by_risk_level: Record<string, number>;
+  findings: Array<Record<string, unknown>>;
+  highest_risk_level?: 'high' | 'medium' | 'low' | null;
+  highest_severity?: 'critical' | 'high' | 'medium' | 'low' | 'info' | null;
+  dast_status: string;
+  dast_mode: string;
+  dast_reason: string;
+}
+
 export async function createGeneration(data: GenerationInsert): Promise<string | null> {
   const supabase = await getClient();
   const { data: gen } = await supabase
@@ -67,4 +86,13 @@ export async function getParentGenerationId(id: string): Promise<string | null> 
     .eq('id', id)
     .single();
   return data?.parent_generation_id ?? null;
+}
+
+export async function upsertGenerationSecurityReport(
+  data: GenerationSecurityReportUpsert
+): Promise<void> {
+  const supabase = await getClient();
+  await supabase
+    .from('generation_security_reports')
+    .upsert(data as any, { onConflict: 'generation_id' });
 }

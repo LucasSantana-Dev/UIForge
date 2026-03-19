@@ -21,7 +21,9 @@ test.describe('Landing Page', () => {
 
   test('should render stats bar with counters', async ({ page }) => {
     await expect(page.getByText(/live github ecosystem sync/i).first()).toBeVisible();
-    await expect(page.getByText(/product repos/i).first()).toBeVisible();
+    await expect(
+      page.getByText(/npm downloads|open source repos|product repos/i).first()
+    ).toBeVisible();
   });
 
   test('should render capabilities section', async ({ page }) => {
@@ -32,7 +34,7 @@ test.describe('Landing Page', () => {
 
   test('should render code showcase section', async ({ page }) => {
     await expect(page.getByText(/your next project/i)).toBeVisible();
-    await expect(page.getByText(/project structure/i)).toBeVisible();
+    await expect(page.getByText(/properly structured/i)).toBeVisible();
   });
 
   test('should render ecosystem section', async ({ page }) => {

@@ -4,6 +4,7 @@ import { verifySession } from '@/lib/api/auth';
 import { checkRateLimit, setRateLimitHeaders } from '@/lib/api/rate-limit';
 import { successResponse, errorResponse } from '@/lib/api/response';
 import { captureServerError } from '@/lib/sentry/server';
+import { handleGenerationRouteError } from '../error-handler';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id: generationId } = await params;
@@ -40,8 +41,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     return successResponse({ generation });
   } catch (error) {
-    captureServerError(error, { route: '/api/generations/[id]' });
-    return errorResponse('Internal server error', 500);
+    return handleGenerationRouteError(error, '/api/generations/[id]');
   }
 }
 
@@ -117,8 +117,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     return successResponse({ generation });
   } catch (error) {
-    captureServerError(error, { route: '/api/generations/[id]' });
-    return errorResponse('Internal server error', 500);
+    return handleGenerationRouteError(error, '/api/generations/[id]');
   }
 }
 
@@ -167,7 +166,6 @@ export async function DELETE(
 
     return successResponse({ message: 'Generation deleted successfully' });
   } catch (error) {
-    captureServerError(error, { route: '/api/generations/[id]' });
-    return errorResponse('Internal server error', 500);
+    return handleGenerationRouteError(error, '/api/generations/[id]');
   }
 }

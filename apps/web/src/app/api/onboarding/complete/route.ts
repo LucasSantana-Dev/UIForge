@@ -8,11 +8,15 @@ export async function POST() {
   try {
     const { user } = await verifySession();
     const supabase = await createClient();
+    const completedAt = new Date().toISOString();
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({ onboarding_completed_at: new Date().toISOString() })
-      .eq('id', user.id);
+    const { error } = await supabase.from('profiles').upsert(
+      {
+        id: user.id,
+        onboarding_completed_at: completedAt,
+      },
+      { onConflict: 'id' }
+    );
 
     if (error) {
       return errorResponse('Failed to complete onboarding', 500);

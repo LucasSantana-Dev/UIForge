@@ -3,6 +3,7 @@
 import { Sparkles, Code2, Zap } from 'lucide-react';
 import { Button } from '@siza/ui';
 import { Card, CardContent } from '@siza/ui';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 
 interface WelcomeStepProps {
   onNext: () => void;
@@ -50,11 +51,38 @@ export function WelcomeStep({ onNext, onSkip }: WelcomeStepProps) {
       </div>
 
       <div className="flex justify-center gap-3">
-        <Button variant="ghost" onClick={onSkip} className="text-white/40">
+        <Button
+          variant="ghost"
+          onClick={() => {
+            trackEvent({
+              action: 'onboarding_cta_clicked',
+              category: 'Onboarding',
+              label: 'welcome',
+              params: { step: 'welcome', cta: 'skip_tutorial' },
+            });
+            onSkip();
+          }}
+          className="text-white/40"
+        >
           Skip tutorial
         </Button>
-        <Button onClick={onNext}>Get started</Button>
+        <Button
+          onClick={() => {
+            trackEvent({
+              action: 'onboarding_cta_clicked',
+              category: 'Onboarding',
+              label: 'welcome',
+              params: { step: 'welcome', cta: 'get_started' },
+            });
+            onNext();
+          }}
+        >
+          Get started
+        </Button>
       </div>
+      <p className="text-center text-xs text-white/50">
+        You can skip now and finish the remaining qualification steps later from the dashboard.
+      </p>
     </div>
   );
 }

@@ -1,0 +1,37 @@
+{
+  "campaign_name": "siza_br_en_leadtest_v1",
+  "campaign_type": "Search",
+  "goal": "Leads",
+  "network_settings": {
+    "google_search": true,
+    "search_partners": false,
+    "display_expansion": false
+  },
+  "location_targeting": ["Brazil"],
+  "language_targeting": ["English"],
+  "budget": {
+    "amount_per_day_usd": 1.0,
+    "total_hard_stop_usd": 10.0
+  },
+  "bidding": {
+    "strategy": "Maximize Clicks",
+    "max_cpc_usd": 0.8
+  },
+  "ad_schedule": "all_day",
+  "conversion": {
+    "source": "GA4 import",
+    "event_name": "lead_signup_success",
+    "google_ads_goal_status": "Primary"
+  },
+  "final_url": "https://siza.forgespace.co/?utm_source=google&utm_medium=cpc&utm_campaign=siza_br_en_leadtest_v1",
+  "checkpoints_usd": [3, 6, 8],
+  "stop_rules": {
+    "ctr_below_percent_at_6_usd": 1.5,
+    "no_intent_signal_at_6_usd": true,
+    "high_irrelevant_query_share": true
+  },
+  "continue_rules": {
+    "paid_signup_count_gte": 1,
+    "or_ctr_gte_percent_with_relevant_terms": 3.0
+  }
+}

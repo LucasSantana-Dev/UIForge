@@ -7,6 +7,11 @@ import { useQueryClient } from '@tanstack/react-query';
 import { streamGeneration, GenerationOptions, GenerationEvent } from '@/lib/api/generation';
 import type { QualityReport } from '@/lib/quality/gates';
 import { categorizeGenerationError } from '@/lib/errors/generation-errors';
+import {
+  trackEvent,
+  trackComponentGeneration,
+  trackError,
+} from '@/components/analytics/AnalyticsProvider';
 
 export interface UseGenerationState {
   isGenerating: boolean;
@@ -78,6 +83,11 @@ export function useGeneration(projectId?: string) {
             case 'start':
               chunkCount = 0;
               code = '';
+              trackEvent({
+                action: 'generation_started',
+                category: 'Generation',
+                label: options.componentName,
+              });
               break;
 
             case 'chunk':
@@ -104,6 +114,16 @@ export function useGeneration(projectId?: string) {
 
             case 'complete':
               resultGenerationId = event.generationId ?? null;
+              trackComponentGeneration(
+                options.framework || 'react',
+                options.componentLibrary || 'none'
+              );
+              trackEvent({
+                action: 'generation_completed',
+                category: 'Generation',
+                label: options.componentName,
+                value: chunkCount,
+              });
               setState((prev) => ({
                 ...prev,
                 code,
@@ -121,6 +141,12 @@ export function useGeneration(projectId?: string) {
               break;
 
             case 'error':
+              trackError(event.message || 'unknown', 'generation');
+              trackEvent({
+                action: 'generation_failed',
+                category: 'Generation',
+                label: categorizeGenerationError(event.message || '').category,
+              });
               setState((prev) => ({
                 ...prev,
                 error:
@@ -139,6 +165,7 @@ export function useGeneration(projectId?: string) {
 
         return { code, generationId: resultGenerationId };
       } catch (error) {
+        trackError(error instanceof Error ? error.message : 'unknown', 'generation_exception');
         setState((prev) => ({
           ...prev,
           error:

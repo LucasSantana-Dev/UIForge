@@ -7,48 +7,45 @@
 - **Tagline**: "Design that thinks. Code that lasts."
 - **Positioning**: AI-powered UI development platform, MCP-native, open-source
 
-## The Architect Metaphor
-Siza is the architect in the room — designs the blueprint, not lays the bricks. Transforms how you build UI, not builds it for you. The forge/anvil metaphor governs the Forge Space ecosystem.
-
-## Logo: Anvil Evolved (Mark C)
-Three offset rectangles — base (widest), face (wide), horn (narrow, right-shifted). Tectonic asymmetry. Only `#7C3AED` or `#FAFAFA` fill. Never gradient, never rotated.
-
 ## Architecture
 **Monorepo structure**:
 - `apps/web` — Next.js 16 frontend (@siza/web)
 - `apps/api` — API utilities and shared services (@siza/api)
+- `apps/desktop` — Electron desktop app with Ollama local generation
+- `apps/docs` — Fumadocs documentation site
 - `packages/` — Shared utilities and types
-
-## Core Features
-- AI-powered component generation with streaming SSE
-- Figma export service (wireframe-to-figma)
-- BYOK model (bring your own AI keys)
-- Dark-only theme with 5-layer animated background
-- MCP server integration for AI routing
 
 ## Tech Stack
 - **Frontend**: Next.js 16, React 19, TypeScript, Tailwind CSS 3
 - **Backend**: Cloudflare Workers, Hono framework
 - **Database**: Supabase (auth + PostgreSQL + storage)
 - **AI**: Gemini 2.0 Flash (primary), BYOK for OpenAI/Anthropic
-- **Deployment**: Cloudflare Workers via OpenNext (unified web + API)
+- **Deployment**: Vercel (primary), Cloudflare Workers (legacy)
 - **UI Library**: shadcn/ui (57 components), Lucide React icons
 
-## Security
-- AES-256 encryption for user API keys
-- Environment-based key management
-- No server-side key storage (BYOK principle)
-
-## Brand Voice
-Precise, confident, technical, dry, architectural. Write for engineers. No emoji in product copy. No marketing speak.
-
-## Current State (2026-03-07)
-- **Version**: v0.39.0 (released 2026-03-07)
-- **Domain**: `siza.forgespace.co` (Cloudflare Workers)
-- **Branch**: main — 2 open PRs (#388 Skills spec, #391 Entity permissions)
-- **Tags**: v0.2.1 → ... → v0.33.0 → v0.39.0
-- **Tests**: 763+ webapp + 54 API passing, 64+ suites, 8 E2E spec files
-- **RBAC**: Team-based RBAC with entity permissions (see `rbac_entity_permissions` memory)
-- **IDP**: All 4 phases complete — Plugin System, TechDocs, Search Federation, Entity Relationships
+## Current State (2026-03-15)
+- **Version**: v0.47.1 (root + apps/web synced, PR #508)
+- **Tests**: 1659 passing, 169 suites, 15 E2E spec files
+- **Route coverage**: 100% — 68/68 API routes have unit tests
+- **Security**: 0 high CVEs, 3 moderate dev-only (electron/yauzl, intentional)
+- **RBAC**: Team-based RBAC with entity permissions
+- **IDP**: All phases complete — Plugin System, TechDocs, Search Federation
+- **Skills**: Anthropic Skills marketplace with import/export
 - **Desktop**: v0.2.0 released (Electron + Ollama local generation)
-- **Deploy**: Restored via @vercel/og stub (PR #298). Bundle 2975 KiB gzipped
+- **Funnel**: P0 (scratch mode generate) + P1 (pre-fill form, simplified dashboard) merged
+
+## Active PRs
+- #508: `chore/sync-version-and-release` — version sync + CHANGELOG + verify skill v1.2.0
+
+## Automation Tools
+- `npm run routes:check` — verify 100% route test coverage
+- `npm run routes:scaffold <path>` — scaffold test for new API route
+- CI: route coverage gate runs before unit tests (fails on untested routes)
+- Release: auto-bumps package.json on `chore: Release vX.Y.Z` commits
+
+## Key Gotchas
+- Run Jest from `apps/web/` NOT repo root
+- Always `--forceExit` for Jest (Supabase mocks leave handles)
+- `HUSKY=0` for non-code commits (docs, config)
+- `apps/docs` has pre-existing Fumadocs TS errors (use `--filter=!@siza/docs`)
+- Middleware: `runtime = 'experimental-edge'` required (OpenNext constraint)

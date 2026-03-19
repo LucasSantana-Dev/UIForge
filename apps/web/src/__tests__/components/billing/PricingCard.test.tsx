@@ -1,7 +1,8 @@
+import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PricingCard } from '@/components/billing/PricingCard';
-import type { PlanDefinition } from '@/lib/stripe/plans';
+import { PlanDefinition } from '@/lib/stripe/plans';
 
 const freePlan: PlanDefinition = {
   id: 'free',

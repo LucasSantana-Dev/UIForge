@@ -50,8 +50,8 @@ export default function SaveToProject({
 
       setSavedComponentId(result.id);
       onSave?.(result.id);
-    } catch (error) {
-      console.error('Failed to save component:', error);
+    } catch {
+      // save failed silently
     } finally {
       setIsSaving(false);
     }

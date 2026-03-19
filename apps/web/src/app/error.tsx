@@ -36,9 +36,6 @@ function AppError({ error, reset }: { error: Error & { digest?: string }; reset:
         // Sentry reporting is best-effort
       }
     }
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Error boundary caught:', error);
-    }
   }, [error]);
 
   return (

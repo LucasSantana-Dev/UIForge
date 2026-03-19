@@ -1,0 +1,21 @@
+{
+  "campaign_name": "siza_br_en_leadtest_v1",
+  "ad_group_name": "high_intent",
+  "final_url": "https://siza.forgespace.co/?utm_source=google&utm_medium=cpc&utm_campaign=siza_br_en_leadtest_v1",
+  "headlines": [
+    "Open-Source AI App Builder",
+    "Build Full-Stack Apps with AI",
+    "Privacy-First, BYOK AI Workspace",
+    "AI Coding for Developers",
+    "Generate Components Fast",
+    "No Credit Card to Start",
+    "Self-Hosted Friendly Workflow",
+    "From Prompt to Working App"
+  ],
+  "descriptions": [
+    "Create full-stack apps and components with an open-source AI workflow built for developers.",
+    "Use your own keys, keep control of privacy, and start free without a credit card.",
+    "Go from idea to generated UI/code fast, then iterate inside your workspace.",
+    "Built for practical shipping: templates, generation, and developer-focused tooling."
+  ]
+}

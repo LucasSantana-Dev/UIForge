@@ -66,7 +66,7 @@ const mockSingle = jest.fn();
 
 jest.mock('@/lib/repositories/base.repo', () => ({
   getClient: jest.fn().mockResolvedValue({
-    from: (...args) => mockFrom(...args),
+    from: (...args: unknown[]) => mockFrom(...args),
   }),
   paginationRange: jest.fn((page, limit) => ({
     from: (page - 1) * limit,

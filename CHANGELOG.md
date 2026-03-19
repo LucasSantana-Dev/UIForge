@@ -7,7 +7,112 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.49.1] — 2026-03-19
+
+### Fixed
+- **Release provenance continuity** — cut a corrective follow-up release on `main` so release lineage and tags move forward without retagging `v0.49.0`.
+
+### Changed
+- **Version alignment** — synced root and `apps/web` package versions to `0.49.1`.
+
+## [0.49.0] — 2026-03-16
+
 ### Added
+- **Landing page redesign** — animated demo, unified violet palette, social proof section, and improved hero copy (#530)
+- **Interactive CodeShowcase** — hover-to-highlight file tree nodes with live diff view (#532, #534)
+- **EcosystemSection pipeline diagram** — layered flow diagram replacing card grid with connected architecture visual (#534)
+- **Auth split-panel layout** — sign-in/up pages now show feature bullets and trust signals in a left panel (#533)
+- **Pricing annual/monthly toggle** — gradient header, annual discount display, and tier differentiation (#547)
+- **Generator empty state** — styled placeholder in code/preview panels before first generation (#546)
+- **ProjectCard open link** — replaces meaningless progress bar with direct Open project link (#545)
+- **Typography hierarchy** — normalized H2/H3 sizing across EcosystemSection and CapabilitiesSection; sidebar active indicator polish (#549)
+- **Generator component unit tests** — 74 tests across 9 suites covering GeneratorForm, ThemeGenerator, DesignContext, LivePreview, and CodeEditor
+- **Dashboard shell unit tests** — 46 tests across 7 suites covering Sidebar, TopBar, UserMenu, MobileNav, PRStatus, GitHubPanel, and ProjectSettings
+- **Billing component unit tests** — 38 tests across PricingCard (15), SubscriptionStatus (10), UpgradePrompt (4), and UsageChart (9)
+- **Roadmap and tour unit tests** — PhaseCard, PhaseNavigator, StatusFilter, TourCard, RoadmapHero (50+ tests)
+- **Catalog, onboarding, analytics unit tests** — TryItPanel, WelcomeStep, ProjectStep, GenerateStep, AnalyticsDashboard, StatsBar, ecosystem-data (90+ tests)
+- **Wireframe component unit tests** — FigmaExportDialog (8) and WireframePreview (10)
+- **ThemeSelector unit tests** — 14 tests covering selection, save, import/export, duplicate, and built-in delete guard
+- **SonarCloud CPD exclusions** — test files excluded from duplication checks (#528)
+
+### Fixed
+- **Sidebar active indicator** — exact-match on `/dashboard` prevents all child routes from appearing active; collapsed sidebar now hides left border correctly
+- **Teams E2E flakiness** — unique `runId` suffix prevents parallel test collisions; `afterEach` cleanup removes created teams
+
+### Changed
+- **Dependencies** — major bumps: openai 4→6, express 4→5, vite 6→8, @vitejs/plugin-react 4→6, @types/node 22→25, @typescript-eslint 7→8, supertest, marked 15→17, and 14-package minor/patch group (#535–#544)
+
+## [0.48.0] — 2026-03-15
+
+### Added
+- **StatsBar component** — global stats strip with real-time project, component, and user metrics (PR #521)
+
+## [0.47.1] — 2026-03-15
+
+### Added
+- **Route coverage enforcement** — `scripts/check-route-coverage.ts` + CI gate blocks merges when any `route.ts` lacks a test; `scripts/scaffold-route-test.ts` scaffolds test files from route source (detects methods, auth, rate-limit, dynamic params, redirects)
+- `npm run routes:check` and `npm run routes:scaffold <path>` convenience scripts
+
+### Fixed
+- **Security: 4 high CVEs in undici** — added `"overrides": { "undici": "^7.24.3" }` in root `package.json` to fix GHSA-f269, GHSA-2mjp, GHSA-vrm6, GHSA-v9p9, GHSA-4992, GHSA-phc3 (root cause: wrangler → miniflare → undici@7.18.2)
+- **CI security gate** — changed `npm audit --audit-level=moderate` to `--omit=dev` to exclude dev-only electron/yauzl false positives
+
+### Changed
+- **Package.json version** — synced root + `apps/web` from 0.41.0 to 0.47.1 to match git tags
+
+## [0.47.0] — 2026-03-15
+
+> Covers changes from v0.42.0 through v0.47.0 (test expansion, funnel fixes, analytics, IDP telemetry).
+
+### Added
+- **P0 funnel fix** — removed project gate on `/generate`; users can generate in scratch mode without creating a project first; `ENABLE_MCP_DIRECT_PROVIDER_FALLBACK` enabled by default
+- **P1 funnel improvements** — pre-fill generate form with last session context; simplified dashboard for zero-project users showing direct Start Generating + Create Project CTAs; Google Ads conversion tracking; signin flow GA4 events
+- **Complete API route test coverage** — 100% of 68 route handlers now have unit tests (1368 → 1663 tests, +295 across 28 new test files)
+- **Route test automation** — `scripts/check-route-coverage.ts` (CI gate) + `scripts/scaffold-route-test.ts` (test scaffold generator)
+- **`api-route-testing` skill v1.6.0** — 6 documented mock patterns including barrel-mock error classes, NextResponse.redirect spy, bearer-token auth, AbortSignal polyfill, global.fetch override
+- **Claude AI skills** — 5 new project skills: `verify`, `test-recovery`, `coverage-boost`, `api-route-testing`, `changelog`
+- **Core-flow validation telemetry** — admin validation endpoint, internal snapshot/report endpoints, scheduled workflows
+- **Lead attribution + Google Ads pilot** — first-touch attribution, GA4 funnel events, campaign assets
+- **Production audit harness** — E2E production smoke, marketplace funnel spec
+
+### Fixed
+- **Security: 4 high CVEs in undici** — npm override to `^7.24.3` (wrangler → miniflare chain)
+- **Unit test reliability** — generation.service postGenScore assertion
+- **CI security gate** — `--omit=dev` excludes dev-only electron/yauzl
+
+### Changed
+- **Test coverage** — 87.6% → 91.4% statements, 79.6% → 82.9% branches
+
+- **Production audit harness** — Added `test:e2e:prod`, `playwright.production.config.ts`,
+  `e2e/production-public-smoke.spec.ts`, and `scripts/e2e-production-audit.sh` for
+  Chromium production sweeps with artifacted reports and runtime API probe diagnostics
+- **Generation unauth contract tests** — Added route tests for unauthenticated
+  `GET /api/generations`, `GET /api/generations/history`, and `GET /api/generations/[id]`
+  to prevent 500 regressions on auth-required endpoints
+- **Lead-readiness E2E coverage** — Added `lead-readiness.spec.ts` for disposable signup-to-generation smoke and `marketplace.spec.ts` for templates/plugins/gallery marketplace funnel checks
+- **Lead prepublish automation** — Added `test:e2e:lead:preflight`, `test:e2e:lead:chromium`, and `ads:google:prepublish` scripts plus supporting shell runners
+- **Google Ads pilot assets** — Added campaign package for `siza_br_en_leadtest_v1` under `apps/web/marketing/google-ads/siza_br_en_leadtest_v1` (campaign config, keywords, negatives, RSA copy, day-1 ops)
+- **Lead attribution module** — Added first-touch attribution capture/storage and unit coverage (`lead-attribution.test.ts`)
+- **Signup lead-conversion coverage** — Expanded `SignUpPage` unit tests to assert
+  `marketing_attribution` payload propagation and GA4 lead event emission paths
+  (`lead_signup_started`, `lead_signup_success`, `lead_signup_oauth_start`, `lead_signup_error`)
+- **Core-flow validation telemetry** — Added `GET /api/admin/validation` (admin-only),
+  `POST /api/internal/validation/snapshot` (token-protected), daily snapshot storage
+  (`core_flow_gate_snapshots`), and scheduled snapshot workflow for 50-user gate tracking
+- **Core-flow activation funnel telemetry** — Added shared activation service with
+  per-user qualification progress and `windowDays=7|30|90` funnel aggregation
+  (onboarding -> first project -> first completed generation -> qualified)
+- **Core-flow validation reporting ops** — Added token-protected
+  `GET /api/internal/validation/report` and scheduled report workflow
+  (`core-flow-validation-report.yml`) that publishes Actions summary + JSON artifact
+- **Security Spoke admin telemetry** — Added `GET /api/admin/security` (admin-only,
+  `windowDays=7|30|90`) with summary metrics, top triggered rules, risk/severity
+  distributions, and recent high-risk generations
+- **Security report persistence** — Added `generation_security_reports` storage
+  (one report per generation) and MCP quality-event ingestion path to persist
+  `security_spoke` payloads with advisory fail-open behavior
+- **Live admin metrics endpoint** — Added `GET /api/admin/metrics` (admin-only)
+  with `windowDays=7|30|90` support for product telemetry
 - **Marketing SEO contract** — Added centralized route metadata map for
   `/`, `/about`, `/roadmap`, `/pricing`, `/docs`, `/gallery`,
   `/legal/privacy`, and `/legal/terms` with canonical/Open Graph/Twitter fields
@@ -33,10 +138,79 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Official skills parser sweep test** — Validates all `skills/*/SKILL.md` files parse cleanly
 - **Roadmap gate metrics contract** — `/api/metrics` now returns 50-user gate status,
   core-flow adoption metrics, revision rate, satisfaction rate, and MCP routing coverage
+- **Live analytics telemetry wiring** — Replaced mocked Analytics Dashboard data with
+  live `/api/admin/metrics` telemetry (core totals, generation success, revision rate,
+  satisfaction rate, MCP coverage) and CSV export from real values
 - **MCP fallback policy flag** — Added `ENABLE_MCP_DIRECT_PROVIDER_FALLBACK` (default: off)
   to control whether MCP failures may fallback to direct providers
+- **Core-flow activation UX** — Added onboarding nudges + deterministic onboarding telemetry
+  events and a dashboard Core Flow Progress checklist that persists until qualification
+- **Core-flow activation v2** — Added deterministic activation bottleneck telemetry
+  (`onboardedWithoutProject`, `projectWithoutCompletedGeneration`, `qualifiedUsers`)
+  plus next-action prioritization (`CREATE_PROJECT`/`COMPLETE_GENERATION`) in
+  `GET /api/admin/validation`
+- **Activation starter conversion telemetry** — Added deterministic activation lifecycle
+  events for starter-project flows: `activation_starter_project_confirmed`,
+  `activation_starter_project_created`, `activation_starter_project_fallback`,
+  and `activation_route_to_generate`
 
 ### Changed
+- **Public auth semantics and gallery guidance** — Auth routes now render a real
+  page-level `h1` inside the auth shell `main` landmark, and gallery empty states
+  now direct signed-out users to `/signup` and signed-in users to `/generate`
+- **Production audit script lint compliance** — `apps/web/scripts/e2e-production-audit.sh`
+  now follows strict Shell Lint/Sonar rules (`[[ ]]`, stderr error output, explicit
+  function returns, stable status capture, and `shfmt -i 2` formatting)
+- **Generation route error handling deduplication** — Added shared generation API
+  error mapping helper used by `/api/generations`, `/api/generations/history`,
+  and `/api/generations/[id]` catch paths to keep UnauthorizedError => `401`
+  behavior consistent without repeated handler logic
+- **Generation unauth test deduplication** — Replaced three near-identical
+  unauthenticated generation GET route tests with one parameterized auth-contract
+  suite covering list, history, and by-id endpoints
+- **Lead-readiness production smoke resilience** — `lead-readiness.spec.ts`
+  now dismisses the in-app tour overlay before code-tab interaction, preventing
+  pointer interception in production disposable-user audit runs
+- **Generation API auth contract** — `verifySession` failures now return `401`
+  (instead of `500`) for `/api/generations`, `/api/generations/history`, and
+  `/api/generations/[id]`, while preserving existing `403`/`404`/`500` semantics
+- **Roadmap mobile overflow resilience** — Updated `PhaseCard` header layout to wrap
+  safely on narrow viewports and applied page-level `overflow-x-hidden` in roadmap client
+- **Lead-readiness billing smoke policy** — Checkout-session validation now accepts
+  `403 Billing is not enabled` when billing is disabled, and requires `200` with URL when enabled
+- **Production issues map quality** — `e2e-production-audit.sh` now records findings only
+  from real failures/probe mismatches, maps roadmap overflow failures to component fix targets,
+  and resolves Vercel env pulls correctly from git worktrees
+- **Signup and analytics flow** — Wrapped app layout with `AnalyticsProvider`; signup now emits GA4 lead events and includes `marketing_attribution` metadata on auth signup
+- **Template ownership querying** — Templates UI/API now uses explicit ownership filter (`all|official|mine`) with auth-checked `mine` behavior and route tests
+- **Admin validation API** — `GET /api/admin/validation` now accepts
+  `windowDays=7|30|90` and returns additive `activationFunnel` data for conversion/drop-off analysis
+- **Activation routing nudges** — Onboarding skip/complete routing now drives users
+  to project creation or project-aware generation paths, and dashboard Core Flow
+  Progress now highlights a single primary next-action CTA
+- **Activation project-conversion CTAs** — Onboarding done-step and dashboard Core
+  Flow primary "Create project" actions now support one-click starter project
+  creation and route directly to project-aware Generate flow
+- **Dashboard conversion-first CTA routing** — Header and empty-state primary
+  actions now route no-project users to project creation first, while preserving
+  project-aware Generate routes for users with an existing project
+- **Gate activation v5 guided conversion** — Added a dashboard guided
+  starter-project prompt for onboarding-complete/no-project users with explicit
+  confirm + "Not now" actions, project-aware Generate routing on starter-project
+  success, manual project-creation fallback on failure, and project-first
+  quick-action generate routing for the same cohort
+- **P0-A in-app conversion lift** — Dashboard no-project primary CTAs now execute
+  one-click starter-project creation across header, empty-state primary,
+  quick-action generate, and checklist next-step actions, each tagged with
+  deterministic `entry=<cta>&step=project` attribution params
+- **Onboarding conversion exits** — No-project onboarding skip/done exits now route
+  through dashboard conversion intent (`/dashboard?...&intent=create_project`)
+  while preserving project-aware generation routing when project context exists
+- **Lead E2E determinism** — Playwright config now supports explicit lead smoke port/reuse controls and disables onboarding tour overlays by env for automation runs
+- **Lead/auth E2E hardening** — Auth/onboarding/stripe smoke specs now use shared
+  admin-client setup and deterministic webhook payloads to reduce flaky setup paths
+- **Catalog E2E redirect resilience** — Catalog creation specs now handle both
+  direct-detail and list-first redirect flows by resolving created entry IDs via API
 - **Project MCP defaults** — Added wrapper-first `playwright` server entry in
   `.mcp.json` and documented global-registry recovery flow + restart step for
   Codex runtime MCP reload
@@ -58,6 +232,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Marketing data model refresh** — Home (`StatsBar`, `EcosystemSection`), About, and Roadmap now consume a live ecosystem snapshot instead of stale hardcoded repo/capability claims
 - **Marketing UI polish** — Improved label/card rhythm, metadata chips, focus-visible states, and contrast consistency across ecosystem and stats surfaces
 - **Docs refresh** — Updated README ecosystem narrative to 11 product repositories and documented `FORGE_SPACE_GITHUB_TOKEN` with `GITHUB_TOKEN` fallback
+- **Ads operator docs** — Expanded README lead/ads prepublish section with explicit
+  Google Ads asset file inventory for `siza_br_en_leadtest_v1`
 - **Desktop dependency security baseline** — Upgraded `apps/desktop` build chain to
   `electron-builder@^26.8.1` and refreshed lockfile resolution so `tar` resolves to
   `7.5.11` across desktop and generator transitive paths.
@@ -85,6 +261,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   and disabled by default; failures now return explicit MCP-availability guidance
 
 ### Fixed
+- **Core-flow report workflow load failure** — Corrected report workflow schedule
+  cron expressions and cadence mapping to avoid zero-job parse failures on push
+- **Auth callback failure handling** — Sanitized callback `next` parameter and route failures to `/auth/auth-code-error` with explicit reason handling
+- **Marketplace resilience surfaces** — Improved templates/plugins/gallery handling for ownership filtering, empty-state messaging, and API failure/retry behavior used by marketplace smoke
+- **Onboarding completion idempotency** — Switched onboarding completion route to profile upsert-by-id to avoid missing-row failures
 - **Deferred dependency alerts remediation (`#448`)** — Upgraded desktop test
   toolchain to `vitest@4` (removing vulnerable `vite-node/esbuild` path) and
   upgraded web Jest/JSDOM environment to v30 (removing vulnerable

@@ -53,6 +53,10 @@ export interface EcosystemSnapshot {
     updatedLast30d: number;
     updatedLast7d: number;
   };
+  npmDownloads: {
+    total: number;
+    packages: Record<string, number>;
+  };
 }
 
 interface GitHubRepoResponse {
@@ -232,7 +236,11 @@ function countUpdatedSince(repos: EcosystemRepo[], days: number): number {
   return repos.filter((repo) => now - new Date(repo.updatedAt).getTime() <= rangeMs).length;
 }
 
-function buildSnapshot(repos: EcosystemRepo[], lastSyncedAt: string): EcosystemSnapshot {
+function buildSnapshot(
+  repos: EcosystemRepo[],
+  lastSyncedAt: string,
+  npmDownloads: { total: number; packages: Record<string, number> }
+): EcosystemSnapshot {
   return {
     repoCount: repos.length,
     releasedRepoCount: repos.filter((repo) => repo.latestReleaseTag).length,
@@ -242,6 +250,7 @@ function buildSnapshot(repos: EcosystemRepo[], lastSyncedAt: string): EcosystemS
       updatedLast30d: countUpdatedSince(repos, 30),
       updatedLast7d: countUpdatedSince(repos, 7),
     },
+    npmDownloads,
   };
 }
 
@@ -262,7 +271,10 @@ function buildFallbackRepo(name: ProductRepoName): EcosystemRepo {
 
 export function getFallbackEcosystemSnapshot(): EcosystemSnapshot {
   const repos = PRODUCT_REPO_ALLOWLIST.map((name) => buildFallbackRepo(name));
-  return buildSnapshot(repos, FALLBACK_LAST_SYNCED_AT);
+  return buildSnapshot(repos, FALLBACK_LAST_SYNCED_AT, {
+    total: 0,
+    packages: {},
+  });
 }
 
 async function fetchOrganizationRepos(): Promise<GitHubRepoResponse[]> {
@@ -305,9 +317,65 @@ async function fetchLatestRelease(name: ProductRepoName): Promise<{
   };
 }
 
+const NPM_PACKAGES = [
+  '@forgespace/core',
+  '@forgespace/siza-gen',
+  '@forgespace/ui-mcp',
+  '@forgespace/brand-guide',
+  '@forgespace/branding-mcp',
+] as const;
+
+interface NpmDownloadsResponse {
+  downloads: number;
+  start: string;
+  end: string;
+  package: string;
+}
+
+async function fetchNpmDownloads(): Promise<{
+  total: number;
+  packages: Record<string, number>;
+}> {
+  try {
+    const results = await Promise.all(
+      NPM_PACKAGES.map(async (packageName) => {
+        const response = await fetch(
+          `https://api.npmjs.org/downloads/point/last-month/${packageName}`,
+          {
+            next: { revalidate: REVALIDATE_SECONDS },
+          }
+        );
+
+        if (!response.ok) {
+          return { packageName, downloads: 0 };
+        }
+
+        const data = (await response.json()) as NpmDownloadsResponse;
+        return { packageName, downloads: data.downloads ?? 0 };
+      })
+    );
+
+    const packages: Record<string, number> = {};
+    let total = 0;
+
+    for (const { packageName, downloads } of results) {
+      packages[packageName] = downloads;
+      total += downloads;
+    }
+
+    return { total, packages };
+  } catch {
+    return { total: 0, packages: {} };
+  }
+}
+
 export async function getEcosystemSnapshot(): Promise<EcosystemSnapshot> {
   try {
-    const reposFromApi = await fetchOrganizationRepos();
+    const [reposFromApi, npmDownloads] = await Promise.all([
+      fetchOrganizationRepos(),
+      fetchNpmDownloads(),
+    ]);
+
     const repoMap = new Map<ProductRepoName, GitHubRepoResponse>();
 
     for (const repo of reposFromApi) {
@@ -354,7 +422,7 @@ export async function getEcosystemSnapshot(): Promise<EcosystemSnapshot> {
       })
     );
 
-    return buildSnapshot(repos, new Date().toISOString());
+    return buildSnapshot(repos, new Date().toISOString(), npmDownloads);
   } catch {
     return getFallbackEcosystemSnapshot();
   }

@@ -8,6 +8,7 @@ import { useCreateProject, useUpdateProject } from '@/hooks/use-projects';
 import { useProjectThumbnail } from '@/hooks/use-project-thumbnail';
 import { useState } from 'react';
 import { UploadIcon } from 'lucide-react';
+import { trackProjectCreation } from '@/components/analytics/AnalyticsProvider';
 
 const projectSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters').max(100),
@@ -57,6 +58,8 @@ export default function CreateProjectForm() {
         description: data.description || null,
         framework: data.framework,
       });
+
+      trackProjectCreation();
 
       if (thumbnailFile) {
         const thumbnailUrl = await uploadThumbnail(project.id, thumbnailFile);

@@ -20,7 +20,7 @@ const CATEGORIES = [
 export function PluginsClient() {
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
-  const { data, isLoading } = usePlugins({ search, category });
+  const { data, isLoading, isError, error, refetch } = usePlugins({ search, category });
   const installMutation = useInstallPlugin();
   const uninstallMutation = useUninstallPlugin();
 
@@ -100,6 +100,20 @@ export function PluginsClient() {
               className="h-52 animate-pulse rounded-xl border border-border/30 bg-surface"
             />
           ))}
+        </div>
+      ) : isError ? (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Puzzle className="mb-3 h-10 w-10 text-text-tertiary" />
+          <p className="mb-3 text-sm text-text-secondary">
+            {error instanceof Error ? error.message : 'Failed to load plugins.'}
+          </p>
+          <button
+            type="button"
+            onClick={() => refetch()}
+            className="rounded-md border border-border/50 px-3 py-1.5 text-xs text-text-primary hover:bg-surface-secondary"
+          >
+            Retry
+          </button>
         </div>
       ) : plugins.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">

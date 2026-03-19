@@ -1,6 +1,6 @@
 import { test as base, type Page } from '@playwright/test';
-import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { createAdminClient } from './helpers/admin-client';
 
 type TestFixtures = {
   authenticatedPage: Page;
@@ -8,7 +8,7 @@ type TestFixtures = {
 };
 
 export const test = base.extend<TestFixtures>({
-  testUser: async ({ browserName: _browserName }, applyFixture) => {
+  testUser: async ({ page: _page }, applyFixture) => {
     const uniqueId = crypto.randomUUID();
     const testPassword = crypto.randomBytes(16).toString('hex');
     const testUser = {
@@ -19,7 +19,10 @@ export const test = base.extend<TestFixtures>({
     await applyFixture(testUser);
   },
 
-  authenticatedPage: async ({ page, testUser }, applyFixture: (page: Page) => Promise<void>) => {
+  authenticatedPage: async (
+    { page, testUser },
+    applyFixture: (authedPage: Page) => Promise<void>
+  ) => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -28,7 +31,7 @@ export const test = base.extend<TestFixtures>({
       return;
     }
 
-    const adminSupabase = createClient(supabaseUrl, serviceRoleKey);
+    const adminSupabase = createAdminClient();
 
     const { data: createdUser, error: createError } = await adminSupabase.auth.admin.createUser({
       email: testUser.email,
@@ -43,67 +46,25 @@ export const test = base.extend<TestFixtures>({
 
     testUser.id = createdUser.user.id;
 
-    let profileFound = false;
-    for (let attempt = 0; attempt < 20; attempt++) {
-      const { data } = await adminSupabase
-        .from('profiles')
-        .select('id')
-        .eq('id', testUser.id)
-        .single();
-      if (data) {
-        profileFound = true;
-        break;
-      }
-      await new Promise((r) => setTimeout(r, 500));
-    }
-    const setupTimestamp = new Date().toISOString();
-    const profileSetup = {
-      onboarding_completed_at: setupTimestamp,
-      tour_completed_at: setupTimestamp,
+    const completedAt = new Date().toISOString();
+    const fullProfile = {
+      id: testUser.id,
+      onboarding_completed_at: completedAt,
+      tour_completed_at: completedAt,
     };
-    let profileSetupError: string | null = null;
+    const fallbackProfile = {
+      id: testUser.id,
+      onboarding_completed_at: completedAt,
+    };
 
-    if (!profileFound) {
-      const { error: insertErr } = await adminSupabase
-        .from('profiles')
-        .insert({ id: testUser.id, ...profileSetup });
-      if (insertErr) profileSetupError = insertErr.message;
-    } else {
-      const { error: updateErr } = await adminSupabase
-        .from('profiles')
-        .update(profileSetup)
-        .eq('id', testUser.id);
-      if (updateErr) profileSetupError = updateErr.message;
-    }
-
-    if (profileSetupError) {
-      try {
-        await adminSupabase.auth.admin.deleteUser(testUser.id);
-      } catch (cleanupError) {
-        void cleanupError;
+    const { error: profileError } = await adminSupabase.from('profiles').upsert(fullProfile);
+    if (profileError && /tour_completed_at/i.test(profileError.message)) {
+      const { error: fallbackError } = await adminSupabase.from('profiles').upsert(fallbackProfile);
+      if (fallbackError) {
+        console.warn('E2E fixture profile upsert error:', fallbackError.message);
       }
-      base.skip(true, `Failed to set onboarding/tour fixture flags: ${profileSetupError}`);
-      return;
-    }
-
-    const { data: verifyProfile, error: verifyProfileError } = await adminSupabase
-      .from('profiles')
-      .select('onboarding_completed_at, tour_completed_at')
-      .eq('id', testUser.id)
-      .single();
-    if (
-      verifyProfileError ||
-      !verifyProfile?.onboarding_completed_at ||
-      !verifyProfile?.tour_completed_at
-    ) {
-      try {
-        await adminSupabase.auth.admin.deleteUser(testUser.id);
-      } catch (cleanupError) {
-        void cleanupError;
-      }
-      const reason = verifyProfileError?.message || 'onboarding/tour flags missing after update';
-      base.skip(true, `Failed to verify onboarding/tour fixture flags: ${reason}`);
-      return;
+    } else if (profileError) {
+      console.warn('E2E fixture profile upsert error:', profileError.message);
     }
 
     await page.goto('/signin');
@@ -117,7 +78,7 @@ export const test = base.extend<TestFixtures>({
       try {
         await adminSupabase.auth.admin.deleteUser(testUser.id);
       } catch (cleanupError) {
-        void cleanupError;
+        console.warn('Failed to cleanup test user after sign-in error:', cleanupError);
       }
       base.skip(true, 'Sign-in flow did not complete - skipping authenticated test');
       return;

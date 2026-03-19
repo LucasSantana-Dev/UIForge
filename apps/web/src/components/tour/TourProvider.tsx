@@ -20,6 +20,10 @@ interface TourProviderProps {
   tourCompleted: boolean;
 }
 
+function isE2ETourDisabled(): boolean {
+  return process.env.NEXT_PUBLIC_E2E_DISABLE_TOUR === 'true';
+}
+
 export function TourProvider({ children, tourCompleted: initialCompleted }: TourProviderProps) {
   const [active, setActive] = useState(false);
   const completedRef = useRef(initialCompleted);
@@ -28,6 +32,7 @@ export function TourProvider({ children, tourCompleted: initialCompleted }: Tour
   useEffect(() => {
     if (mountedRef.current) return;
     mountedRef.current = true;
+    if (isE2ETourDisabled()) return;
 
     if (!completedRef.current) {
       const timer = setTimeout(() => {
@@ -49,7 +54,10 @@ export function TourProvider({ children, tourCompleted: initialCompleted }: Tour
     await fetch('/api/tour/complete', { method: 'POST' });
   };
 
-  const startTour = () => setActive(true);
+  const startTour = () => {
+    if (isE2ETourDisabled()) return;
+    setActive(true);
+  };
 
   return (
     <TourContext value={{ startTour }}>

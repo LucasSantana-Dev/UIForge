@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { StepIndicator } from './StepIndicator';
@@ -8,10 +8,35 @@ import { WelcomeStep } from './WelcomeStep';
 import { ProjectStep } from './ProjectStep';
 import { GenerateStep } from './GenerateStep';
 import { DoneStep } from './DoneStep';
+import { trackEvent } from '@/components/analytics/AnalyticsProvider';
 
 interface StepData {
   project: { id: string; name: string; framework: string } | null;
   generatedCode: string | null;
+}
+
+const stepKeys = ['welcome', 'project', 'generate', 'done'] as const;
+type OnboardingStepKey = (typeof stepKeys)[number];
+
+const stepNudges: Record<OnboardingStepKey, string> = {
+  welcome:
+    'To qualify for core flow, complete onboarding, create one project, and finish one generation.',
+  project: 'Creating your first project unlocks the next qualification step.',
+  generate: 'Complete one generation now to qualify faster.',
+  done: 'You can continue from the dashboard and keep your qualification progress.',
+};
+
+function trackOnboardingEvent(
+  action: string,
+  step: OnboardingStepKey,
+  params: Record<string, string | number | boolean | null> = {}
+) {
+  trackEvent({
+    action,
+    category: 'Onboarding',
+    label: step,
+    params: { step, ...params },
+  });
 }
 
 export function OnboardingWizard() {
@@ -21,22 +46,41 @@ export function OnboardingWizard() {
     project: null,
     generatedCode: null,
   });
+  const currentStepKey = stepKeys[currentStep] ?? 'welcome';
 
-  const handleNext = useCallback((updates?: Partial<StepData>) => {
-    if (updates) {
-      setStepData((prev) => ({ ...prev, ...updates }));
+  useEffect(() => {
+    trackOnboardingEvent('onboarding_step_viewed', currentStepKey, {
+      stepIndex: currentStep + 1,
+    });
+  }, [currentStep, currentStepKey]);
+
+  const handleNext = useCallback(
+    (step: OnboardingStepKey, updates?: Partial<StepData>) => {
+      if (updates) setStepData((prev) => ({ ...prev, ...updates }));
+      trackOnboardingEvent('onboarding_step_completed', step, { stepIndex: currentStep + 1 });
+      setCurrentStep((prev) => Math.min(prev + 1, 3));
+    },
+    [currentStep]
+  );
+
+  const getSkipDestination = (step: OnboardingStepKey) => {
+    if (step === 'generate' && stepData.project?.id) {
+      return `/generate?projectId=${stepData.project.id}&source=onboarding&step=${step}`;
     }
-    setCurrentStep((prev) => Math.min(prev + 1, 3));
-  }, []);
+    return `/dashboard?source=onboarding&entry=skip_${step}&intent=create_project`;
+  };
 
-  const handleSkip = useCallback(async () => {
+  const handleSkip = async (step: OnboardingStepKey) => {
+    const destination = getSkipDestination(step);
+    trackOnboardingEvent('onboarding_step_skipped', step, { stepIndex: currentStep + 1 });
+    trackOnboardingEvent('onboarding_cta_clicked', step, { cta: 'skip', destination });
     try {
       await fetch('/api/onboarding/complete', { method: 'POST' });
     } catch {
       // Non-blocking
     }
-    router.push('/projects');
-  }, [router]);
+    router.push(destination);
+  };
 
   return (
     <div className="w-full max-w-2xl space-y-10">
@@ -49,12 +93,37 @@ export function OnboardingWizard() {
 
       <StepIndicator currentStep={currentStep} />
 
-      {currentStep === 0 && <WelcomeStep onNext={() => handleNext()} onSkip={handleSkip} />}
-      {currentStep === 1 && <ProjectStep onNext={handleNext} onSkip={handleSkip} />}
-      {currentStep === 2 && (
-        <GenerateStep project={stepData.project} onNext={handleNext} onSkip={handleSkip} />
+      <p className="text-center text-sm text-violet-200/80">{stepNudges[currentStepKey]}</p>
+
+      {currentStep === 0 && (
+        <WelcomeStep
+          onNext={() => {
+            trackOnboardingEvent('onboarding_cta_clicked', 'welcome', { cta: 'get_started' });
+            handleNext('welcome');
+          }}
+          onSkip={() => handleSkip('welcome')}
+        />
       )}
-      {currentStep === 3 && <DoneStep project={stepData.project} />}
+      {currentStep === 1 && (
+        <ProjectStep
+          onNext={(updates) => handleNext('project', updates)}
+          onSkip={() => handleSkip('project')}
+        />
+      )}
+      {currentStep === 2 && (
+        <GenerateStep
+          project={stepData.project}
+          onNext={(updates) => handleNext('generate', updates)}
+          onSkip={() => handleSkip('generate')}
+        />
+      )}
+      {currentStep === 3 && (
+        <DoneStep
+          project={stepData.project}
+          onComplete={() => trackOnboardingEvent('onboarding_step_completed', 'done')}
+          onCtaClick={(cta) => trackOnboardingEvent('onboarding_cta_clicked', 'done', { cta })}
+        />
+      )}
     </div>
   );
 }

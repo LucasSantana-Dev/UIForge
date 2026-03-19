@@ -171,22 +171,46 @@ export default function ComponentGenerator({ projectId }: ComponentGeneratorProp
           </div>
 
           <div
-            className={`flex-[3] border-b border-surface-3 ${activeTab !== 'code' ? 'hidden lg:block' : ''}`}
+            className={`flex-[3] border-b border-surface-3 relative ${activeTab !== 'code' ? 'hidden lg:block' : ''}`}
           >
-            <CodeEditor
-              code={displayCode}
-              onChange={(code) => {
-                setEditedCode(code);
-                setIsEdited(true);
-              }}
-              language={project.framework === 'vue' ? 'vue' : 'typescript'}
-            />
+            {!displayCode && !generation.isGenerating ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center p-8 select-none">
+                <div className="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center">
+                  <Code2 className="h-6 w-6 text-brand/60" />
+                </div>
+                <p className="text-sm font-medium text-text-primary">No code yet</p>
+                <p className="text-xs text-text-muted-foreground max-w-[200px]">
+                  Describe a component and click Generate to see the code here
+                </p>
+              </div>
+            ) : (
+              <CodeEditor
+                code={displayCode}
+                onChange={(code) => {
+                  setEditedCode(code);
+                  setIsEdited(true);
+                }}
+                language={project.framework === 'vue' ? 'vue' : 'typescript'}
+              />
+            )}
           </div>
 
           <div
-            className={`flex-[2] border-b border-surface-3 ${activeTab !== 'preview' ? 'hidden lg:block' : ''}`}
+            className={`flex-[2] border-b border-surface-3 relative ${activeTab !== 'preview' ? 'hidden lg:block' : ''}`}
           >
-            <LivePreview code={displayCode} framework={project.framework} />
+            {!displayCode && !generation.isGenerating ? (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center p-8 select-none">
+                <div className="w-12 h-12 rounded-xl bg-brand/10 flex items-center justify-center">
+                  <Eye className="h-6 w-6 text-brand/60" />
+                </div>
+                <p className="text-sm font-medium text-text-primary">No preview yet</p>
+                <p className="text-xs text-text-muted-foreground max-w-[200px]">
+                  Your generated component will render here live
+                </p>
+              </div>
+            ) : (
+              <LivePreview code={displayCode} framework={project.framework} />
+            )}
           </div>
 
           {generation.code && (

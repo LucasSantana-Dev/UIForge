@@ -39,9 +39,6 @@ export default function GlobalError({
         // Sentry reporting is best-effort
       }
     }
-    if (process.env.NODE_ENV === 'development') {
-      console.error('Global error:', error);
-    }
   }, [error]);
 
   return (

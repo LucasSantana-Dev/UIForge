@@ -21,8 +21,8 @@ export default function ProjectActions({ projectId, projectName }: ProjectAction
       await deleteProject.mutateAsync(projectId);
       setDeleteConfirmOpen(false);
       setMenuOpen(false);
-    } catch (error) {
-      console.error('Failed to delete project:', error);
+    } catch {
+      // delete failed — mutation state handles error display
     }
   };
 
