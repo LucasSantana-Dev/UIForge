@@ -34,7 +34,7 @@ issues=()
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "${tmp_dir}"' EXIT
 issue_details_file="${tmp_dir}/issue-details.json"
-printf '%s\n' '[]' > "${issue_details_file}"
+printf '%s\n' '[]' >"${issue_details_file}"
 
 append_issue_detail() {
   local code="$1"
@@ -60,7 +60,7 @@ append_issue_detail() {
       expected: $expected,
       actual: $actual
     }]' \
-    "${issue_details_file}" > "${tmp_issue_details}"
+    "${issue_details_file}" >"${tmp_issue_details}"
   mv "${tmp_issue_details}" "${issue_details_file}"
 }
 
@@ -106,7 +106,7 @@ check_pattern_absent() {
     --glob '!**/.DS_Store' \
     --glob '!**/scripts/check-path-portability.sh' \
     --glob '!**/.github/workflows/path-portability.yml' \
-    --fixed-strings -- "${pattern}" "${repo_root}" > "${hits_file}" || rc=$?
+    --fixed-strings -- "${pattern}" "${repo_root}" >"${hits_file}" || rc=$?
 
   if [[ "${rc}" -ge 2 ]]; then
     echo "ripgrep failed while scanning pattern: ${code}" >&2
@@ -115,7 +115,7 @@ check_pattern_absent() {
 
   if [[ -s "${hits_file}" ]]; then
     expected_json="$(jq -Rn --arg value "${expected_text}" '$value')"
-    actual_json="$(jq -Rsc 'split("\n") | map(select(length > 0))' < "${hits_file}")"
+    actual_json="$(jq -Rsc 'split("\n") | map(select(length > 0))' <"${hits_file}")"
     record_issue "${code}" "${repo_root}" "high" "portability:${code}" \
       "${expected_json}" "${actual_json}"
     if [[ "${json_mode}" != "true" ]]; then

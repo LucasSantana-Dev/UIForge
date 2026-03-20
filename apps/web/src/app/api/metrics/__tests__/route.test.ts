@@ -1,15 +1,87 @@
 import { GET } from '../route';
-import { getMetricsReport, parseWindowDays } from '@/lib/services/metrics.service';
 
-jest.mock('@/lib/services/metrics.service');
+const mockFrom = jest.fn();
 
-const mockGetMetricsReport = getMetricsReport as jest.MockedFunction<typeof getMetricsReport>;
-const mockParseWindowDays = parseWindowDays as jest.MockedFunction<typeof parseWindowDays>;
+jest.mock('@supabase/supabase-js', () => ({
+  createClient: jest.fn(() => ({ from: mockFrom })),
+}));
+
+function makeThenable(result: unknown) {
+  const query = Promise.resolve(result) as Promise<unknown> & Record<string, unknown>;
+  query.gte = jest.fn(() => query);
+  query.eq = jest.fn(() => query);
+  query.not = jest.fn(() => query);
+  return query;
+}
+
+function setupMocks(counts: {
+  profiles: number;
+  profiles7d: number;
+  profiles30d: number;
+  generations: number;
+  gen24h: number;
+  gen7d: number;
+  completed: number;
+  projects: number;
+  activeRows: Array<{ user_id: string }>;
+  onboardingRows: Array<{ id: string }>;
+  projectRows: Array<{ owner_id: string }>;
+  feedbackRows: Array<{ user_feedback: string | null }>;
+  revisions: number;
+  mcpTotal: number;
+  mcp30d: number;
+}) {
+  const responses = [
+    { count: counts.profiles, error: null, data: null },
+    { count: counts.profiles7d, error: null, data: null },
+    { count: counts.profiles30d, error: null, data: null },
+    { count: counts.generations, error: null, data: null },
+    { count: counts.gen24h, error: null, data: null },
+    { count: counts.gen7d, error: null, data: null },
+    { count: counts.completed, error: null, data: null },
+    { count: counts.projects, error: null, data: null },
+    { data: counts.activeRows, error: null, count: null },
+    { data: counts.onboardingRows, error: null, count: null },
+    { data: counts.projectRows, error: null, count: null },
+    { data: counts.feedbackRows, error: null, count: null },
+    { count: counts.revisions, error: null, data: null },
+    { count: counts.mcpTotal, error: null, data: null },
+    { count: counts.mcp30d, error: null, data: null },
+  ];
+
+  let callIndex = 0;
+  mockFrom.mockImplementation(() => ({
+    select: jest.fn(() => makeThenable(responses[callIndex++])),
+  }));
+}
+
+function setupErrorMock(errorIndex: number) {
+  let callIndex = 0;
+  mockFrom.mockImplementation(() => ({
+    select: jest.fn(() => {
+      const idx = callIndex++;
+      if (idx === errorIndex) {
+        return makeThenable({
+          count: null,
+          error: { message: 'Connection refused' },
+          data: null,
+        });
+      }
+      return makeThenable({
+        count: 0,
+        error: null,
+        data: idx >= 8 && idx <= 11 ? [] : null,
+      });
+    }),
+  }));
+}
 
 const VALID_KEY = 'test-metrics-key';
 
-function makeRequest(headers: Record<string, string> = {}, search = '') {
-  return new Request(`http://localhost:3000/api/metrics${search}`, { headers });
+function makeRequest(headers: Record<string, string> = {}) {
+  return new Request('http://localhost:3000/api/metrics', {
+    headers,
+  });
 }
 
 describe('GET /api/metrics', () => {
@@ -17,12 +89,10 @@ describe('GET /api/metrics', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockParseWindowDays.mockImplementation((value) => {
-      const parsed = Number(value);
-      return parsed === 7 || parsed === 30 || parsed === 90 ? parsed : 30;
-    });
     process.env = {
       ...originalEnv,
+      NEXT_PUBLIC_SUPABASE_URL: 'https://test.supabase.co',
+      SUPABASE_SERVICE_ROLE_KEY: 'service-key',
       METRICS_API_KEY: VALID_KEY,
     };
   });
@@ -35,13 +105,15 @@ describe('GET /api/metrics', () => {
     delete process.env.METRICS_API_KEY;
     const res = await GET(makeRequest());
     expect(res.status).toBe(503);
-    expect(await res.json()).toEqual({ error: 'Metrics endpoint not configured' });
+    const body = await res.json();
+    expect(body.error).toBe('Metrics endpoint not configured');
   });
 
   it('returns 401 with no authorization header', async () => {
     const res = await GET(makeRequest());
     expect(res.status).toBe(401);
-    expect(await res.json()).toEqual({ error: 'Unauthorized' });
+    const body = await res.json();
+    expect(body.error).toBe('Unauthorized');
   });
 
   it('returns 401 with wrong API key', async () => {
@@ -54,74 +126,129 @@ describe('GET /api/metrics', () => {
     expect(res.status).toBe(401);
   });
 
-  it('returns metrics payload with quality block', async () => {
-    mockGetMetricsReport.mockResolvedValue({
-      timestamp: '2026-03-12T00:00:00.000Z',
-      users: { total: 42, last7d: 5, last30d: 15, active: 2 },
-      generations: { total: 200, last24h: 10, last7d: 50, successRate: 90 },
-      projects: { total: 30 },
-      quality: {
-        windowDays: 30,
-        totalGenerations: 120,
-        revisionRate: 35,
-        satisfactionRate: 72,
-        satisfactionVotes: 18,
-        mcpCoverage: 61,
-      },
+  it('returns metrics with correct shape on success', async () => {
+    setupMocks({
+      profiles: 42,
+      profiles7d: 5,
+      profiles30d: 15,
+      generations: 200,
+      gen24h: 10,
+      gen7d: 50,
+      completed: 180,
+      projects: 30,
+      activeRows: [
+        { user_id: 'u1' },
+        { user_id: 'u1' },
+        { user_id: 'u1' },
+        { user_id: 'u2' },
+        { user_id: 'u2' },
+        { user_id: 'u2' },
+        { user_id: 'u3' },
+      ],
+      onboardingRows: [{ id: 'u1' }, { id: 'u2' }, { id: 'u4' }, { id: 'u5' }],
+      projectRows: [{ owner_id: 'u1' }, { owner_id: 'u2' }, { owner_id: 'u3' }, { owner_id: 'u6' }],
+      feedbackRows: [
+        { user_feedback: 'thumbs_up' },
+        { user_feedback: 'thumbs_up' },
+        { user_feedback: 'thumbs_down' },
+      ],
+      revisions: 40,
+      mcpTotal: 120,
+      mcp30d: 60,
     });
 
-    const res = await GET(makeRequest({ authorization: `Bearer ${VALID_KEY}` }, '?windowDays=30'));
+    const res = await GET(makeRequest({ authorization: `Bearer ${VALID_KEY}` }));
     expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({
+
+    const body = await res.json();
+    expect(body).toMatchObject({
       users: { total: 42, last7d: 5, last30d: 15, active: 2 },
-      generations: { total: 200, last24h: 10, last7d: 50, successRate: 90 },
+      generations: {
+        total: 200,
+        last24h: 10,
+        last7d: 50,
+        successRate: 90,
+        revisions: { total: 40, rate: 20 },
+        satisfaction: { responses: 3, positive: 2, rate: 67 },
+      },
       projects: { total: 30 },
-      quality: {
-        windowDays: 30,
-        totalGenerations: 120,
-        revisionRate: 35,
-        satisfactionRate: 72,
-        satisfactionVotes: 18,
-        mcpCoverage: 61,
+      adoption: {
+        gate50: { qualifiedUsers: 2, requiredUsers: 50, validated: false },
+        onboarding: { completedUsers: 4, completionRate: 10 },
+        coreFlow: {
+          usersWithProjects: 4,
+          usersWithGenerations: 3,
+          usersWithProjectAndGeneration: 3,
+          projectAdoptionRate: 10,
+          generationAdoptionRate: 7,
+          coreFlowAdoptionRate: 7,
+        },
+      },
+      routing: {
+        mcp: { total: 120, last30d: 60, coverageRate: 60 },
       },
     });
-    expect(mockParseWindowDays).toHaveBeenCalledWith('30');
-    expect(mockGetMetricsReport).toHaveBeenCalledWith(30);
+    expect(body.timestamp).toBeDefined();
   });
 
-  it('falls back to default 30-day window when query is invalid', async () => {
-    mockGetMetricsReport.mockResolvedValue({
-      timestamp: '2026-03-12T00:00:00.000Z',
-      users: { total: 0, last7d: 0, last30d: 0, active: 0 },
-      generations: { total: 0, last24h: 0, last7d: 0, successRate: 0 },
-      projects: { total: 0 },
-      quality: {
-        windowDays: 30,
-        totalGenerations: 0,
-        revisionRate: 0,
-        satisfactionRate: null,
-        satisfactionVotes: 0,
-        mcpCoverage: 0,
-      },
+  it('returns 0 active users when nobody has 3+ gens', async () => {
+    setupMocks({
+      profiles: 5,
+      profiles7d: 1,
+      profiles30d: 3,
+      generations: 4,
+      gen24h: 1,
+      gen7d: 2,
+      completed: 4,
+      projects: 2,
+      activeRows: [{ user_id: 'u1' }, { user_id: 'u2' }, { user_id: 'u3' }, { user_id: 'u4' }],
+      onboardingRows: [],
+      projectRows: [],
+      feedbackRows: [],
+      revisions: 0,
+      mcpTotal: 0,
+      mcp30d: 0,
     });
 
-    const res = await GET(makeRequest({ authorization: `Bearer ${VALID_KEY}` }, '?windowDays=14'));
-    expect(res.status).toBe(200);
-    expect(mockParseWindowDays).toHaveBeenCalledWith('14');
-    expect(mockGetMetricsReport).toHaveBeenCalledWith(30);
+    const res = await GET(makeRequest({ authorization: `Bearer ${VALID_KEY}` }));
+    const body = await res.json();
+    expect(body.users.active).toBe(0);
   });
 
-  it('returns 500 when metrics service fails', async () => {
-    mockGetMetricsReport.mockRejectedValue(new Error('Database query failed'));
+  it('returns successRate 0 when no generations exist', async () => {
+    setupMocks({
+      profiles: 1,
+      profiles7d: 1,
+      profiles30d: 1,
+      generations: 0,
+      gen24h: 0,
+      gen7d: 0,
+      completed: 0,
+      projects: 0,
+      activeRows: [],
+      onboardingRows: [],
+      projectRows: [],
+      feedbackRows: [],
+      revisions: 0,
+      mcpTotal: 0,
+      mcp30d: 0,
+    });
+
+    const res = await GET(makeRequest({ authorization: `Bearer ${VALID_KEY}` }));
+    const body = await res.json();
+    expect(body.generations.successRate).toBe(0);
+    expect(body.generations.revisions.rate).toBe(0);
+    expect(body.generations.satisfaction.rate).toBe(0);
+    expect(body.adoption.gate50.validated).toBe(false);
+    expect(body.routing.mcp.coverageRate).toBe(0);
+  });
+
+  it('returns 500 when a database query fails', async () => {
+    setupErrorMock(0);
+
     const res = await GET(makeRequest({ authorization: `Bearer ${VALID_KEY}` }));
     expect(res.status).toBe(500);
-    expect(await res.json()).toEqual({ error: 'Database query failed' });
-  });
-
-  it('returns 503 when metrics service configuration is missing', async () => {
-    mockGetMetricsReport.mockRejectedValue(new Error('Metrics service configuration missing'));
-    const res = await GET(makeRequest({ authorization: `Bearer ${VALID_KEY}` }));
-    expect(res.status).toBe(503);
-    expect(await res.json()).toEqual({ error: 'Metrics service configuration missing' });
+    const body = await res.json();
+    expect(body.error).toBe('Database query failed');
   });
 });

@@ -4,7 +4,6 @@ import type { GenerationEvent } from './generation-types';
 import { generateWithProvider } from './generation';
 import { generateComponentStream as mcpStream } from '@/lib/mcp/client';
 import { captureServerError } from '@/lib/sentry/server';
-import { generateWithSizaLocalAgent, isSizaLocalFallbackEnabled } from './siza-local-agent';
 
 export interface RouteGenerationOptions {
   mcpEnabled: boolean;
@@ -22,7 +21,6 @@ export interface RouteGenerationOptions {
   model: string;
   correlationId?: string;
   accessToken?: string;
-  allowLocalSizaFallback?: boolean;
 }
 
 export async function* routeGeneration(
@@ -56,7 +54,6 @@ async function* routeViaSizaAI(opts: RouteGenerationOptions): AsyncGenerator<Gen
     ...opts,
     provider: routing.provider,
     model: routing.model,
-    allowLocalSizaFallback: true,
   });
 }
 
@@ -76,11 +73,18 @@ async function* streamDirectProviderFallback(
   provider: AIProvider,
   model: string
 ): AsyncGenerator<GenerationEvent> {
-  for await (const event of routeViaProvider({
-    ...opts,
+  for await (const event of generateWithProvider({
     provider,
     model,
-    allowLocalSizaFallback: true,
+    prompt: opts.prompt,
+    framework: opts.framework,
+    componentLibrary: opts.componentLibrary,
+    style: opts.style,
+    typescript: opts.typescript,
+    apiKey: opts.userApiKey,
+    contextAddition: opts.contextAddition,
+    imageBase64: opts.imageBase64,
+    imageMimeType: opts.imageMimeType,
   })) {
     if (event.type !== 'complete') {
       yield event;
@@ -181,109 +185,32 @@ function canFallbackToAnthropic(opts: RouteGenerationOptions): boolean {
   return !!opts.userApiKey;
 }
 
-type ProviderStreamOutcome = {
-  quotaError: GenerationEvent | null;
-  providerError: GenerationEvent | null;
-  hasChunk: boolean;
-};
+async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
+  let quotaError: GenerationEvent | null = null;
 
-function buildProviderRequest(
-  opts: RouteGenerationOptions,
-  provider: AIProvider,
-  model: string,
-  apiKey: string | undefined
-) {
-  return {
-    provider,
-    model,
+  for await (const event of generateWithProvider({
+    provider: opts.provider as AIProvider,
+    model: opts.model,
     prompt: opts.prompt,
     framework: opts.framework,
     componentLibrary: opts.componentLibrary,
     style: opts.style,
     typescript: opts.typescript,
-    apiKey,
+    apiKey: opts.userApiKey,
     contextAddition: opts.contextAddition,
     imageBase64: opts.imageBase64,
     imageMimeType: opts.imageMimeType,
-  };
-}
-
-async function* streamPrimaryProvider(
-  opts: RouteGenerationOptions
-): AsyncGenerator<GenerationEvent, ProviderStreamOutcome> {
-  let quotaError: GenerationEvent | null = null;
-  let providerError: GenerationEvent | null = null;
-  let hasChunk = false;
-
-  for await (const event of generateWithProvider(
-    buildProviderRequest(opts, opts.provider as AIProvider, opts.model, opts.userApiKey)
-  )) {
-    if (event.type === 'chunk' && event.content) {
-      hasChunk = true;
-    }
-
-    if (event.type === 'complete') {
+  })) {
+    if (event.type === 'complete') break;
+    if (event.type === 'error' && isQuotaError(event.message)) {
+      quotaError = event;
       break;
     }
-
-    if (event.type === 'error') {
-      if (isQuotaError(event.message)) {
-        quotaError = event;
-      } else {
-        providerError = event;
-      }
-      break;
-    }
-
     yield event;
   }
 
-  return { quotaError, providerError, hasChunk };
-}
+  if (!quotaError) return;
 
-async function* handleProviderErrorWithLocalFallback(
-  opts: RouteGenerationOptions,
-  providerError: GenerationEvent,
-  hasChunk: boolean
-): AsyncGenerator<GenerationEvent> {
-  const canUseLocalFallback =
-    opts.allowLocalSizaFallback && isSizaLocalFallbackEnabled() && !hasChunk;
-  if (!canUseLocalFallback) {
-    yield providerError;
-    return;
-  }
-
-  try {
-    const localCode = generateWithSizaLocalAgent({
-      prompt: opts.prompt,
-      framework: opts.framework,
-      componentLibrary: opts.componentLibrary,
-    });
-
-    yield {
-      type: 'fallback',
-      provider: 'siza-local',
-      message: 'Primary provider unavailable, using Siza local agent.',
-      timestamp: Date.now(),
-    };
-    yield {
-      type: 'chunk',
-      content: localCode,
-      timestamp: Date.now(),
-    };
-  } catch (fallbackError) {
-    captureServerError(fallbackError, {
-      route: '/api/generate',
-      extra: { fallback: 'siza-local' },
-    });
-    yield providerError;
-  }
-}
-
-async function* handleQuotaFallback(
-  opts: RouteGenerationOptions,
-  quotaError: GenerationEvent
-): AsyncGenerator<GenerationEvent> {
   if (!canFallbackToAnthropic(opts)) {
     yield {
       type: 'error',
@@ -293,7 +220,7 @@ async function* handleQuotaFallback(
     return;
   }
 
-  captureServerError(new Error(quotaError.message || CAPACITY_MESSAGE), {
+  captureServerError(new Error(quotaError.message), {
     route: '/api/generate',
     extra: { fallback: `${opts.provider}-to-anthropic` },
   });
@@ -308,37 +235,20 @@ async function* handleQuotaFallback(
     timestamp: Date.now(),
   };
 
-  for await (const event of generateWithProvider(
-    buildProviderRequest(opts, 'anthropic', 'claude-haiku-4-5-20251001', undefined)
-  )) {
-    if (event.type === 'complete') {
-      break;
-    }
+  for await (const event of generateWithProvider({
+    provider: 'anthropic',
+    model: 'claude-haiku-4-5-20251001',
+    prompt: opts.prompt,
+    framework: opts.framework,
+    componentLibrary: opts.componentLibrary,
+    style: opts.style,
+    typescript: opts.typescript,
+    apiKey: undefined,
+    contextAddition: opts.contextAddition,
+    imageBase64: opts.imageBase64,
+    imageMimeType: opts.imageMimeType,
+  })) {
+    if (event.type === 'complete') break;
     yield event;
   }
-}
-
-async function* routeViaProvider(opts: RouteGenerationOptions): AsyncGenerator<GenerationEvent> {
-  const providerStream = streamPrimaryProvider(opts);
-  let outcome: ProviderStreamOutcome | null = null;
-
-  while (!outcome) {
-    const next = await providerStream.next();
-    if (next.done) {
-      outcome = next.value;
-      continue;
-    }
-    yield next.value;
-  }
-
-  if (outcome.providerError) {
-    yield* handleProviderErrorWithLocalFallback(opts, outcome.providerError, outcome.hasChunk);
-    return;
-  }
-
-  if (!outcome.quotaError) {
-    return;
-  }
-
-  yield* handleQuotaFallback(opts, outcome.quotaError);
 }

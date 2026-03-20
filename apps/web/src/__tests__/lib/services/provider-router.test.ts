@@ -21,13 +21,6 @@ jest.mock('@/lib/sentry/server', () => ({
   captureServerError: jest.fn(),
 }));
 
-jest.mock('@/lib/services/siza-local-agent', () => ({
-  isSizaLocalFallbackEnabled: jest.fn(() => true),
-  generateWithSizaLocalAgent: jest.fn(
-    () => 'export default function LocalSizaAgent() { return null; }'
-  ),
-}));
-
 async function collectEvents(gen: AsyncGenerator<GenerationEvent>): Promise<GenerationEvent[]> {
   const events: GenerationEvent[] = [];
   for await (const e of gen) events.push(e);
@@ -46,7 +39,7 @@ describe('routeGeneration', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.SIZA_AGENT_LOCAL_FALLBACK = 'true';
+    delete process.env.ANTHROPIC_API_KEY;
   });
 
   describe('MCP routing', () => {
@@ -75,13 +68,15 @@ describe('routeGeneration', () => {
       expect(events.some((e) => e.type === 'chunk')).toBe(true);
     });
 
-    it('yields fallback event on MCP failure and falls back to default provider', async () => {
+    it('yields fallback event on MCP failure when direct-provider fallback is enabled', async () => {
       const { generateComponentStream: mcpStream } = require('@/lib/mcp/client');
       const { generateWithProvider } = require('@/lib/services/generation');
       const { captureServerError } = require('@/lib/sentry/server');
 
       mcpStream.mockImplementation(async function* () {
-        yield* [];
+        if (Date.now() < 0) {
+          yield { type: 'start', timestamp: 0 };
+        }
         throw new Error('Gateway down');
       });
       generateWithProvider.mockImplementation(async function* () {
@@ -104,26 +99,28 @@ describe('routeGeneration', () => {
       expect(events.some((e) => e.type === 'chunk' && e.content === 'fallback-code')).toBe(true);
     });
 
-    it('returns policy error when MCP fallback is disabled', async () => {
+    it('returns an error on MCP failure when direct-provider fallback is disabled', async () => {
       const { generateComponentStream: mcpStream } = require('@/lib/mcp/client');
+      const { generateWithProvider } = require('@/lib/services/generation');
 
       mcpStream.mockImplementation(async function* () {
-        yield* [];
+        if (Date.now() < 0) {
+          yield { type: 'start', timestamp: 0 };
+        }
         throw new Error('Gateway down');
+      });
+      generateWithProvider.mockImplementation(async function* () {
+        yield { type: 'chunk', content: 'fallback-code', timestamp: 11 };
       });
 
       const events = await collectEvents(
-        routeGeneration({
-          ...baseOpts,
-          mcpEnabled: true,
-          accessToken: 'tok-123',
-          allowDirectProviderFallback: false,
-        })
+        routeGeneration({ ...baseOpts, mcpEnabled: true, accessToken: 'tok-123' })
       );
 
-      expect(events).toHaveLength(2);
-      expect(events[1].type).toBe('error');
-      expect(events[1].message).toContain('disabled by policy');
+      expect(events.find((e) => e.type === 'fallback')).toBeUndefined();
+      expect(events.some((e) => e.type === 'chunk' && e.content === 'fallback-code')).toBe(false);
+      expect(events.some((e) => e.type === 'error')).toBe(true);
+      expect(generateWithProvider).not.toHaveBeenCalled();
     });
 
     it('does not yield fallback when MCP succeeds', async () => {
@@ -175,7 +172,34 @@ describe('routeGeneration', () => {
       );
     });
 
-    it('propagates errors without fallback', async () => {
+    it('falls back to Anthropic on quota errors when server backup is available', async () => {
+      const { generateWithProvider } = require('@/lib/services/generation');
+      process.env.ANTHROPIC_API_KEY = 'server-anthropic-key';
+
+      generateWithProvider.mockImplementation(async function* (options: any) {
+        if (options.provider === 'google') {
+          yield { type: 'error', message: 'quota exceeded 429', timestamp: 1 };
+          return;
+        }
+        yield { type: 'start', timestamp: 2 };
+        yield { type: 'chunk', content: 'fallback-code', timestamp: 3 };
+        yield { type: 'complete', timestamp: 4 };
+      });
+
+      const events = await collectEvents(routeGeneration(baseOpts));
+
+      expect(events.some((e) => e.type === 'fallback')).toBe(true);
+      expect(events.some((e) => e.type === 'chunk' && e.content === 'fallback-code')).toBe(true);
+      expect(generateWithProvider).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          provider: 'anthropic',
+          apiKey: undefined,
+        })
+      );
+    });
+
+    it('returns normalized capacity guidance when no backup provider key is configured', async () => {
       const { generateWithProvider } = require('@/lib/services/generation');
 
       generateWithProvider.mockImplementation(async function* () {
@@ -186,6 +210,60 @@ describe('routeGeneration', () => {
 
       expect(events).toHaveLength(1);
       expect(events[0].type).toBe('error');
+      expect(events[0].message).toContain('capacity reached');
+    });
+
+    it('does not fallback for non-quota provider failures', async () => {
+      const { generateWithProvider } = require('@/lib/services/generation');
+      process.env.ANTHROPIC_API_KEY = 'server-anthropic-key';
+
+      generateWithProvider.mockImplementation(async function* () {
+        yield { type: 'error', message: 'provider key invalid', timestamp: 1 };
+      });
+
+      const events = await collectEvents(routeGeneration(baseOpts));
+
+      expect(events).toHaveLength(1);
+      expect(events[0].type).toBe('error');
+      expect(events[0].message).toContain('provider key invalid');
+      expect(generateWithProvider).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls back from Anthropic BYOK to server Anthropic key on quota errors', async () => {
+      const { generateWithProvider } = require('@/lib/services/generation');
+      process.env.ANTHROPIC_API_KEY = 'server-anthropic-key';
+
+      generateWithProvider.mockImplementation(async function* (options: any) {
+        if (options.provider === 'anthropic' && options.apiKey === 'user-byok-key') {
+          yield { type: 'error', message: 'quota exceeded 429', timestamp: 1 };
+          return;
+        }
+        if (options.provider === 'anthropic' && options.apiKey === undefined) {
+          yield { type: 'chunk', content: 'server-capacity-code', timestamp: 2 };
+          yield { type: 'complete', timestamp: 3 };
+        }
+      });
+
+      const events = await collectEvents(
+        routeGeneration({
+          ...baseOpts,
+          provider: 'anthropic',
+          model: 'claude-sonnet-4-20250514',
+          userApiKey: 'user-byok-key',
+        })
+      );
+
+      expect(events.some((e) => e.type === 'fallback')).toBe(true);
+      expect(events.some((e) => e.type === 'chunk' && e.content === 'server-capacity-code')).toBe(
+        true
+      );
+      expect(generateWithProvider).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({
+          provider: 'anthropic',
+          apiKey: undefined,
+        })
+      );
     });
   });
 
@@ -217,29 +295,6 @@ describe('routeGeneration', () => {
       expect(generateWithProvider).toHaveBeenCalledWith(
         expect.objectContaining({ provider: 'google', model: 'gemini-2.5-flash' })
       );
-    });
-
-    it('falls back to local Siza agent when provider is unavailable', async () => {
-      const { generateWithProvider } = require('@/lib/services/generation');
-      const { generateWithSizaLocalAgent } = require('@/lib/services/siza-local-agent');
-
-      generateWithProvider.mockImplementation(async function* () {
-        yield { type: 'error', message: 'Google generation failed: API key invalid', timestamp: 1 };
-      });
-
-      const events = await collectEvents(routeGeneration({ ...baseOpts, provider: 'siza' }));
-
-      expect(generateWithSizaLocalAgent).toHaveBeenCalled();
-      expect(
-        events.find((e) => e.type === 'fallback' && e.provider === 'siza-local')
-      ).toBeDefined();
-      expect(
-        events.find(
-          (e) =>
-            e.type === 'chunk' &&
-            e.content === 'export default function LocalSizaAgent() { return null; }'
-        )
-      ).toBeDefined();
     });
   });
 });

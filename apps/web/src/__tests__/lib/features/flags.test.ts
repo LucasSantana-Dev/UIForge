@@ -39,8 +39,8 @@ describe('Feature Flags', () => {
       expect(DEFAULT_FEATURE_FLAGS.ENABLE_MAINTENANCE_MODE).toBe(false);
     });
 
-    it('should keep direct-provider fallback enabled by default for generation resilience', () => {
-      expect(DEFAULT_FEATURE_FLAGS.ENABLE_MCP_DIRECT_PROVIDER_FALLBACK).toBe(true);
+    it('should keep direct-provider fallback disabled by default for MCP-first routing', () => {
+      expect(DEFAULT_FEATURE_FLAGS.ENABLE_MCP_DIRECT_PROVIDER_FALLBACK).toBe(false);
     });
   });
 
@@ -100,7 +100,7 @@ describe('Feature Flags', () => {
       expect(Object.keys(flags)).toHaveLength(37);
       expect(flags.ENABLE_GOOGLE_SSO).toBe(true);
       expect(flags.ENABLE_STRIPE_BILLING).toBe(false);
-      expect(flags.ENABLE_MCP_DIRECT_PROVIDER_FALLBACK).toBe(true);
+      expect(flags.ENABLE_MCP_DIRECT_PROVIDER_FALLBACK).toBe(false);
     });
 
     it('should respect env var overrides', () => {
