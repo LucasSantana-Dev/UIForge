@@ -74,48 +74,31 @@ export async function GET(request: Request) {
   const last24h = new Date(now.getTime() - 86400000).toISOString();
   const last7d = new Date(now.getTime() - 7 * 86400000).toISOString();
   const last30d = new Date(now.getTime() - 30 * 86400000).toISOString();
+  const countRows = (table: string) =>
+    supabase.from(table).select('id', { count: 'exact', head: true });
+  const countRowsSince = (table: string, createdAt: string) =>
+    countRows(table).gte('created_at', createdAt);
+  const countRowsWhere = (table: string, column: string, value: string) =>
+    countRows(table).eq(column, value);
+  const countRowsWhereSince = (table: string, column: string, value: string, createdAt: string) =>
+    countRowsWhere(table, column, value).gte('created_at', createdAt);
 
   const results = await Promise.all([
-    supabase.from('profiles').select('id', { count: 'exact', head: true }),
-    supabase
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', last7d),
-    supabase
-      .from('profiles')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', last30d),
-    supabase.from('generations').select('id', { count: 'exact', head: true }),
-    supabase
-      .from('generations')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', last24h),
-    supabase
-      .from('generations')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', last7d),
-    supabase
-      .from('generations')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'completed'),
-    supabase.from('projects').select('id', { count: 'exact', head: true }),
+    countRows('profiles'),
+    countRowsSince('profiles', last7d),
+    countRowsSince('profiles', last30d),
+    countRows('generations'),
+    countRowsSince('generations', last24h),
+    countRowsSince('generations', last7d),
+    countRowsWhere('generations', 'status', 'completed'),
+    countRows('projects'),
     supabase.from('generations').select('user_id').eq('status', 'completed'),
     supabase.from('profiles').select('id').not('onboarding_completed_at', 'is', null),
     supabase.from('projects').select('owner_id'),
     supabase.from('generations').select('user_feedback').not('user_feedback', 'is', null),
-    supabase
-      .from('generations')
-      .select('id', { count: 'exact', head: true })
-      .not('parent_generation_id', 'is', null),
-    supabase
-      .from('generations')
-      .select('id', { count: 'exact', head: true })
-      .eq('ai_provider', 'mcp-gateway'),
-    supabase
-      .from('generations')
-      .select('id', { count: 'exact', head: true })
-      .eq('ai_provider', 'mcp-gateway')
-      .gte('created_at', last30d),
+    countRows('generations').not('parent_generation_id', 'is', null),
+    countRowsWhere('generations', 'ai_provider', 'mcp-gateway'),
+    countRowsWhereSince('generations', 'ai_provider', 'mcp-gateway', last30d),
   ]);
 
   const errors = results.filter((result) => result.error);

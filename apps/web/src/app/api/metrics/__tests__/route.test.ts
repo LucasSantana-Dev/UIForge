@@ -7,17 +7,11 @@ jest.mock('@supabase/supabase-js', () => ({
 }));
 
 function makeThenable(result: unknown) {
-  const obj: Record<string, unknown> = {
-    ...Object(result),
-    then: (resolve: (v: unknown) => void) => {
-      resolve(result);
-      return Promise.resolve(result);
-    },
-    gte: jest.fn(() => obj),
-    eq: jest.fn(() => obj),
-    not: jest.fn(() => obj),
-  };
-  return obj;
+  const query = Promise.resolve(result) as Promise<unknown> & Record<string, unknown>;
+  query.gte = jest.fn(() => query);
+  query.eq = jest.fn(() => query);
+  query.not = jest.fn(() => query);
+  return query;
 }
 
 function setupMocks(counts: {

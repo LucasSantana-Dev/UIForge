@@ -103,8 +103,10 @@ describe('routeGeneration', () => {
       const { generateComponentStream: mcpStream } = require('@/lib/mcp/client');
       const { generateWithProvider } = require('@/lib/services/generation');
 
-      // eslint-disable-next-line require-yield
       mcpStream.mockImplementation(async function* () {
+        if (Date.now() < 0) {
+          yield { type: 'start', timestamp: 0 };
+        }
         throw new Error('Gateway down');
       });
       generateWithProvider.mockImplementation(async function* () {
