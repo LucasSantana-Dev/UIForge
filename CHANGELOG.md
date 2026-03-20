@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Removed stale duplicate metrics API unit test (`apps/web/src/__tests__/lib/api/metrics-route.test.ts`) that targeted the old service-based route contract and conflicted with the current Supabase-backed metrics route tests.
+
 ## [0.49.1] — 2026-03-19
 
 ### Fixed
